@@ -240,6 +240,8 @@ void idle_loop()
     if (frameTimeMs > 2.f * (mean + 1.5f * stddev))
       logwarn("frame took %.1fms (which is > 200%% of %.1f+1.5*%.1f ms)", frameTimeMs, mean, stddev);
   }
+  else if (::dgs_get_argv("no_idle")) // keep regular tick pacing without connections (e.g. headless automated tests)
+    usleep_precise(1000000 / phys_get_tickrate() - get_time_usec(workcycle_internal::last_wc_time));
   else // assume idle mode if there are no connections to send data to
     sleep_msec(100);
 }
