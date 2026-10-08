@@ -47,7 +47,14 @@ write_stream_t write_stream_open(const char *path, int buf_size, FILE *fp, bool 
 void write_stream_close(write_stream_t stream)
 {
   if (IS_FILE_STREAM(stream))
-    fclose(stream2file(stream));
+  {
+    FILE *fp = stream2file(stream);
+    // stdout is borrowed (see write_stream_open), keep it valid for logging from atexit handlers after close_debug_files()
+    if (fp == stdout)
+      fflush(fp);
+    else
+      fclose(fp);
+  }
   else
     delete (IGenSave *)stream;
 }
