@@ -5,6 +5,12 @@ include "optional_puddle_access.dshl"
 include "rendinst_global_inc.dshl"
 include "clipmap.dshl"
 include "obstacles_inc.dshl"
+include_optional "rendinst_scene_modifier.dshl"
+
+// a game's own global variables for its rendinst shaders, bound in every rendinst scene block (define it in the
+// game's rendinst_scene_modifier.dshl)
+define_macro_if_not_defined INIT_RENDINST_SCENE_MODIFIER()
+endmacro
 
 float4x4 jitteredCamPosToUnjitteredHistoryClip;
 
@@ -379,6 +385,7 @@ float4 cliff_color_overlay_map_left_top_right_bottom = (-2048, 2048, 2048, -2048
 macro RENDINST_SCENE_COMMON()
   supports global_frame;
   GLOBAL_CONSTS(vs)
+  INIT_RENDINST_SCENE_MODIFIER()
 
   if (small_sampled_buffers == no)
   {
