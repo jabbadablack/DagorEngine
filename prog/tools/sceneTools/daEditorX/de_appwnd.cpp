@@ -117,8 +117,6 @@
 
 #include <de3_entityFilter.h>
 
-#include <eventLog/eventLog.h>
-#include <eventLog/errorLog.h>
 #include <util/dag_delayedAction.h>
 #include <util/dag_threadPool.h>
 #include <util/dag_string.h>
@@ -269,44 +267,6 @@ enum
 };
 
 
-static void enable_event_log()
-{
-  event_log::EventLogInitParams eventInitParams;
-  eventInitParams.host = "client-logs.warthunder.com";
-  eventInitParams.use_https = true;
-  eventInitParams.http_port = 0;
-  eventInitParams.udp_port = 20020;
-  eventInitParams.user_agent = "daEditor";
-  eventInitParams.origin = "client";
-  eventInitParams.circuit = "dev";
-  eventInitParams.project = "daeditor";
-
-  eventInitParams.version = "3.0.0";
-
-  if (event_log::init(eventInitParams))
-    debug("Event log initialized as %s with '%s', udp %d, tcp %d", eventInitParams.origin, eventInitParams.host,
-      eventInitParams.udp_port, eventInitParams.http_port);
-  else
-    logerr("Could not initialize remote event log.");
-
-  event_log::ErrorLogInitParams eparams;
-  eparams.collection = "events";
-  eparams.game = "daeditor";
-
-  event_log::init_error_log(eparams);
-}
-
-
-void send_event_error(const char *s, const char *callstack)
-{
-  String buf(0, "%s\n\n%s", s, callstack);
-  event_log::ErrorLogSendParams params;
-  params.attach_game_log = true;
-  params.collection = "assert";
-  params.dump_call_stack = false;
-  event_log::send_error_log(buf.str(), params);
-}
-
 
 static void set_colliders_to_default_state()
 {
@@ -376,7 +336,6 @@ DagorEdAppWindow::DagorEdAppWindow(IWndManager *manager, const char *open_fname)
   waterService(NULL),
   noWaterService(false)
 {
-  enable_event_log();
   IDagorEd2Engine::set(this);
   IEditorCoreEngine::set(this);
 
@@ -3092,8 +3051,6 @@ bool DagorEdAppWindow::loadWorkspace(const char *wsp_name)
 extern bool de3_default_fatal_handler(const char *msg, const char *call_stack, const char *file, int line);
 bool DagorEdAppWindow::gracefulFatalExit(const char *msg, const char *call_stack, const char *file, int line)
 {
-  send_event_error(msg, call_stack);
-
   static bool processing = false;
   static int last_save_time = -1;
   static bool processing_prev_fatal = false;

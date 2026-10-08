@@ -595,5 +595,3 @@ private:
 };
 
 DagorEdAppWindow &get_app();
-
-void send_event_error(const char *s, const char *callstack);

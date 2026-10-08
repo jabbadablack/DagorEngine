@@ -83,7 +83,7 @@ static void on_global_batch_exit()
   con.saveToFile(global_batch_fn + (ok ? ".log" : ".err"));
 }
 
-static void quiet_report_fatal_error(const char *, const char *msg, const char *call_stack)
+static void quiet_report_fatal_error(const char *, const char *, const char *)
 {
   if (on_batch_exit && !batch_exit_done)
   {
@@ -96,7 +96,6 @@ static void quiet_report_fatal_error(const char *, const char *msg, const char *
   flush_debug_file();
   fflush(stdout);
   fflush(stderr);
-  send_event_error(msg, call_stack);
   _exit(13);
 }
 
@@ -260,8 +259,6 @@ static void delayed_con_error(void *arg)
 }
 bool de3_default_fatal_handler(const char *msg, const char *call_stack, const char *file, int line)
 {
-  send_event_error(msg, call_stack);
-
   if (!is_main_thread())
   {
     String *s =
