@@ -756,6 +756,29 @@ your workflow.
 
 ```
 
+### Armatures and Skinning
+
+Armature objects are exported together with the meshes they deform, so a
+`.dag` can feed the **skeleton**, **dynModel** and **animChar** exporters
+without 3ds Max.
+
+- The armature object becomes a helper node. Each **deform** bone becomes a
+  child helper node with `animated_node:b=yes`, holding its rest pose relative
+  to the nearest deform ancestor. Non-deform bones (controls, mechanism bones)
+  are skipped, so a deform bone parented to a control bone is attached to the
+  next deform bone up the chain.
+- A mesh with an **Armature** modifier is exported in its rest shape with a
+  skin (`DAG_OBJ_BONES`) chunk. Weights come from vertex groups named after
+  deform bones and are normalized per vertex. The Armature modifier itself is
+  never applied, even with **Apply modifiers** enabled.
+- Bone names are written exactly as in Blender (no name cleanup), because
+  names such as `upper_arm.L.001` are meaningful.
+- Export is cancelled when a skinned vertex has no deform weight, when a mesh
+  uses more than 255 bones, when a bone name is not ASCII, or when an object is
+  parented to a bone (use an Armature modifier instead).
+
+Animations are not exported.
+
 ## Collection Properties
 
 Just like **Object Properties**, this panel is located in the **N-panel** under
@@ -1245,5 +1268,6 @@ For more information, see
 - Since version `1.2.6`, excessively long names are automatically stored in the
   **Collection Property** to preserve their full original form.
 
-- Animations are not yet supported.
+- Animations are not yet supported (armatures and skinning are, see
+  [Armatures and Skinning](#armatures-and-skinning)).
 

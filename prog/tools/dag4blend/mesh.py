@@ -13,6 +13,8 @@ class MeshExp:
 
         self.normals_ver_list = list()
 
+        self.skin = None
+
     def addNormal(self, normal):
         n = normal.copy()
         n = n.freeze()

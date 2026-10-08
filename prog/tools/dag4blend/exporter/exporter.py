@@ -31,7 +31,24 @@ from ..smooth_groups.smooth_groups              import int_to_uint
 from ..smooth_groups.mesh_calc_smooth_groups    import objects_calc_smooth_groups
 
 
-SUPPORTED_TYPES = ('MESH', 'CURVE')  # ,'CURVE','EMPTY','TEXT','CAMERA','LAMP')
+SUPPORTED_TYPES = ('MESH', 'CURVE', 'ARMATURE')  # ,'EMPTY','TEXT','CAMERA','LAMP')
+
+MAX_SKIN_BONES = 255 # 8-bit bone indices in skinned meshes
+
+# Blender Z-up world -> Dagor Y-up world, the same swap enumerate() applies to top level nodes
+AXIS_SWAP = Matrix(((1, 0, 0, 0), (0, 0, 1, 0), (0, 1, 0, 0), (0, 0, 0, 1)))
+
+class SkinExp:
+    def __init__(self, armature, bones, weights):
+        self.armature = armature    # armature object the mesh is skinned to
+        self.bones = bones          # deform bone names, in BONES chunk order
+        self.weights = weights      # bone-major: weights[b * vertex_count + v]
+
+def deform_parent(bone):
+    parent = bone.parent
+    while parent is not None and not parent.use_deform:
+        parent = parent.parent
+    return parent
 
 #reorders UVMap names to match three first chanels to viewport preview
 def sort_uv_names(keys):
@@ -148,6 +165,9 @@ class DagExporter(Operator, ExportHelper):
         self.nodes = list()
         self.materials = {}
         self.textures = []
+        self.bone_ids = {}  # (armature object name, bone name) -> dag node id
+        self.errors = []    # fatal problems of the current dag, its export is cancelled when not empty
+        self.failed = False # any dag of this operator call was cancelled
 
     def createRootNode(self):
         node = NodeExp()
@@ -292,7 +312,28 @@ class DagExporter(Operator, ExportHelper):
                 self.writer.writeDWord(f[1])
             self.writer.endChunk(normalsChunkPos)
 
+        if mesh.skin is not None:
+            self.writeBones(mesh.skin, len(mesh.vertices))
+
         self.writer.endChunk(objChunkPos)
+
+    def writeBones(self, skin, vertex_count):
+        bones = skin.armature.data.bones
+        bonesChunkPos = self.writer.beginChunk(DAG_OBJ_BONES)
+        self.writer.writeUShort(len(skin.bones))
+        for name in skin.bones:
+            node_id = self.bone_ids.get((skin.armature.name, name))
+            if node_id is None:
+                self.errors.append(f'skin refers to bone "{name}" of armature "{skin.armature.name}" that is not exported')
+                node_id = 0xFFFF
+            self.writer.writeUShort(node_id)
+            bind_tm = AXIS_SWAP @ skin.armature.matrix_world @ bones[name].matrix_local
+            bind_tm.transpose()
+            self.writer.writeMatrix4x3(bind_tm)
+        self.writer.writeDWord(vertex_count)
+        for w in skin.weights:
+            self.writer.writeFloat(w)
+        self.writer.endChunk(bonesChunkPos)
 
     def dumpCurve(self, o, node, scene):
         if o.type != 'CURVE':
@@ -371,6 +412,13 @@ class DagExporter(Operator, ExportHelper):
         exp_obj.data=obj.data.copy()
         exp_obj['og_name']=obj.name
         me = exp_obj.data
+    #skinning is exported as weights, the armature modifier itself must not be applied
+        skin_armature = None
+        for mod in list(exp_obj.modifiers):
+            if mod.type == 'ARMATURE':
+                if mod.object is not None and skin_armature is None:
+                    skin_armature = mod.object
+                exp_obj.modifiers.remove(mod)
     #optional edits
         if self.modifiers:
             apply_modifiers(exp_obj)
@@ -503,7 +551,83 @@ class DagExporter(Operator, ExportHelper):
                     meshExp.color_attributes_poly.append(meshExp.addVertexColor(d.color_srgb))
                 else:
                     meshExp.color_attributes_poly.append(meshExp.addVertexColor([1.0, 1.0, 1.0]))
+        if skin_armature is not None:
+            meshExp.skin = self.gatherSkin(exp_obj, me, skin_armature)
         node.mesh = meshExp
+
+    def gatherSkin(self, obj, me, armature):
+        node_name = obj["og_name"]
+        deform_bones = [b.name for b in armature.data.bones if b.use_deform]
+        group_to_bone = {}
+        for vg in obj.vertex_groups:
+            if vg.name in deform_bones:
+                group_to_bone[vg.index] = vg.name
+        influences = []
+        unweighted = 0
+        for v in me.vertices:
+            infl = [(group_to_bone[g.group], g.weight) for g in v.groups if g.group in group_to_bone and g.weight > 0.0]
+            total = sum(w for _, w in infl)
+            if total <= 0.0:
+                unweighted += 1
+                infl = []
+            else:
+                infl = [(name, w / total) for name, w in infl]
+            influences.append(infl)
+        if unweighted > 0:
+            self.errors.append(f'Node "{node_name}": {unweighted} vertices are not weighted to any deform bone of "{armature.name}"')
+        used = set(name for infl in influences for name, _ in infl)
+        bones = [name for name in deform_bones if name in used]  # armature order keeps output deterministic
+        if len(bones) > MAX_SKIN_BONES:
+            self.errors.append(f'Node "{node_name}": skinned to {len(bones)} bones, the limit is {MAX_SKIN_BONES}')
+        bone_index = {name: i for i, name in enumerate(bones)}
+        vertex_count = len(me.vertices)
+        weights = [0.0] * (len(bones) * vertex_count)
+        for v, infl in enumerate(influences):
+            for name, w in infl:
+                weights[bone_index[name] * vertex_count + v] = w
+        return SkinExp(armature, bones, weights)
+
+    def dumpArmature(self, obj, node):
+        node.helper = True
+        node.objProps = self.gatherObjPropScript(obj, node)
+        node.objFlg = 0
+        children = {}
+        roots = []
+        for bone in obj.data.bones:
+            if not bone.use_deform:
+                continue
+            try:
+                bone.name.encode('ascii')
+            except UnicodeEncodeError:
+                self.errors.append(f'Armature "{obj.name}": bone name "{bone.name}" is not ASCII')
+            parent = deform_parent(bone)
+            if parent is None:
+                roots.append(bone)
+            else:
+                children.setdefault(parent.name, []).append(bone)
+        self.addBoneNodes(obj, roots, children, node)
+
+    # deform bones become helper nodes; non-deform bones (controls, mechanics) are skipped and
+    # a deform bone is parented to its nearest deform ancestor
+    def addBoneNodes(self, obj, bones, children, parent):
+        for bone in bones:
+            self.last_index += 1
+            node = NodeExp()
+            node.name = bone.name
+            node.id = self.last_index
+            node.parent_id = parent.id
+            node.helper = True
+            node.objProps = 'animated_node:b=yes'
+            dparent = deform_parent(bone)
+            if dparent is None:
+                node.tm = bone.matrix_local.copy()
+            else:
+                node.tm = dparent.matrix_local.inverted() @ bone.matrix_local
+            node.tm.transpose()
+            parent.children.append(node)
+            self.nodes.append(node)
+            self.bone_ids[(obj.name, bone.name)] = node.id
+            self.addBoneNodes(obj, children.get(bone.name, []), children, node)
 
     def generateMatScript(self, mat):
         DM = mat.dagormat
@@ -587,12 +711,35 @@ class DagExporter(Operator, ExportHelper):
         self.saveChildren(node)
         self.writer.endChunk(nodeChunkPos)
 
+    def saveHelper(self, node):
+        nodeChunkPos = self.writer.beginChunk(DAG_NODE)
+        nodeDataChunkPos = self.writer.beginChunk(DAG_NODE_DATA)
+        self.writer.writeDagNodeData(node.id, len(node.children), node.objFlg)
+        err = self.writer.writeStr(node.name)  # never cleaned up: bone names like "upper_arm.L.001" are meaningful
+        if err is not None:
+            self.errors.append(err.strip())
+        self.writer.endChunk(nodeDataChunkPos)
+
+        if len(node.objProps):
+            scriptChunkPos = self.writer.beginChunk(DAG_NODE_SCRIPT)
+            self.writer.writeStr(node.objProps)
+            self.writer.endChunk(scriptChunkPos)
+
+        tmChunkPos = self.writer.beginChunk(DAG_NODE_TM)
+        self.writer.writeMatrix4x3(node.tm)
+        self.writer.endChunk(tmChunkPos)
+
+        self.saveChildren(node)
+        self.writer.endChunk(nodeChunkPos)
+
     def saveNode(self, node):
         print("Saving object %s" % node.name)
         if node.mesh:
             self.saveMesh(node)
         elif node.curves:
             self.saveCurve(node)
+        elif node.helper:
+            self.saveHelper(node)
 
     def saveNodes(self, parent):
         nodeChunkPos = self.writer.beginChunk(DAG_NODE)
@@ -701,11 +848,15 @@ class DagExporter(Operator, ExportHelper):
 
             parent.children.append(node)
             self.nodes.append(node)
+            if o.parent is not None and o.parent_type != 'OBJECT' and o.parent in whole_list:
+                self.errors.append(f'Object "{o.name}": parent type {o.parent_type} is not supported, use an Armature modifier for skinning')
             if o.type == 'MESH':
                 self.dumpMesh(o, node, scene)
             elif o.type == 'CURVE':
                 self.dumpCurve(o, node, scene)
-            if node.mesh is None and node.curves is None:
+            elif o.type == 'ARMATURE':
+                self.dumpArmature(o, node)
+            if node.mesh is None and node.curves is None and not node.helper:
                 return -1
             child_list=list(ob for ob in o.children if ob in whole_list)
             self.enumerate(whole_list, child_list, node, scene)
@@ -726,6 +877,7 @@ class DagExporter(Operator, ExportHelper):
             err = 'No objects to export in ' + ensure_no_path(filepath)
             show_popup(message=err,icon='ERROR',title='Error!')
             log(f'{err}\n', type = 'ERROR', show = True)
+            self.failed = True
             return{'CANCELLED'}
         S = bpy.context.scene
         print("Blender Version {}.{}.{}".format(bpy.app.version[0], bpy.app.version[1], bpy.app.version[2]))
@@ -739,6 +891,7 @@ class DagExporter(Operator, ExportHelper):
         if self.enumerate(whole_list,objs, node, S) == -1:
             log("Failed to enumerate objects\n", type = 'ERROR', show = True)
             self.writer.close()
+            self.failed = True
             return {'CANCELLED'}
 
         self.saveTextures()
@@ -748,10 +901,8 @@ class DagExporter(Operator, ExportHelper):
         dagEndChunkPos = self.writer.beginChunk(DAG_END)
         self.writer.endChunk(dagEndChunkPos)
         self.writer.close()
-        dirpath = dirname(filepath)
-        if not exists(dirpath):
-            makedirs(dirpath)
-        copyfile(filepath_temp,filepath)
+        errors = self.errors
+        self.errors = []
         #no need to delete temporary dag, it will be auto-removed with bpy.app.tempdir on blender being closed/crushed
         #cleanup part. Let's remove temporary stuff
         filename = ensure_no_path(filepath)
@@ -766,9 +917,20 @@ class DagExporter(Operator, ExportHelper):
         for mat in bpy.data.materials:
             if mat not in existing_mats:
                 bpy.data.materials.remove(mat)
-        print(filename+' exported')
         self.materials = {}#we don't need this for next dag.
         self.textures = []
+        self.bone_ids = {}
+        if errors:
+            for err in errors:
+                log(f'{filename}: {err}\n', type = 'ERROR')
+                print(f'ERROR: {filename}: {err}')
+            self.failed = True
+            return {'CANCELLED'}
+        dirpath = dirname(filepath)
+        if not exists(dirpath):
+            makedirs(dirpath)
+        copyfile(filepath_temp,filepath)
+        print(filename+' exported')
         log(f'{filename}: export FINISHED\n')
 
     def export_collection(self,col,dirpath):
@@ -805,6 +967,7 @@ class DagExporter(Operator, ExportHelper):
         filepath = self.filepath
         dirpath=dirname(filepath)
         P = bpy.data.scenes[0].dag4blend.exporter
+        self.failed = False
         try:
             bpy.ops.object.mode_set(mode='OBJECT')
         except Exception:
@@ -843,7 +1006,7 @@ class DagExporter(Operator, ExportHelper):
                     if obj.type in SUPPORTED_TYPES and obj not in whole_list:
                         whole_list.append(obj)
             self.export_dag(whole_list,filepath)
-        return {'FINISHED'}
+        return {'CANCELLED'} if self.failed else {'FINISHED'}
 
 def menu_func_import(self, context):
     self.layout.operator(DagExporter.bl_idname, text='Dagor Engine (.dag)')

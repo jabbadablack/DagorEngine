@@ -17,6 +17,7 @@ exclude_files = [
 
 exclude_dirs = [
   'additional',
+  'tests',
 ]
 
 exclude_extentions = [

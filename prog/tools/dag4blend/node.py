@@ -13,5 +13,6 @@ class NodeExp:
         self.materials_indices = list()
         self.objProps = ""
         self.objFlg = 0
+        self.helper = False # node without object (armature, bone)
 
         self.subMat = list()
