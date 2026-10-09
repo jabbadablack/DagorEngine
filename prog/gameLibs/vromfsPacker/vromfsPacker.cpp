@@ -152,11 +152,17 @@ String make_fname(const char *sname, const char *src_folder, const char *dst_fol
   return s;
 }
 
+// src paths are relative to root_path unless absolute or based on a named mount (%engine/prog/...)
+static String src_path(const char *root_path, const char *src)
+{
+  return is_full_path(src) ? String(src) : String(0, "%s/%s", root_path, src);
+}
+
 void scan_files(const char *root_path, const char *src_folder, const char *dst_folder, Tab<SimpleString> &wclist,
   dag::ConstSpan<RegExpPtr> exclist, bool scan_files, bool scan_subfolders, FastNameMapEx &files, Tab<String> &dst_files)
 {
   String tmpPath;
-  String srcDir(0, "%s/%s", root_path, src_folder);
+  String srcDir = src_path(root_path, src_folder);
 
   // scan for files
   if (scan_files)
@@ -186,7 +192,7 @@ void scan_files(const char *root_path, const char *src_folder, const char *dst_f
   // scan for sub-folders
   if (scan_subfolders)
   {
-    tmpPath.printf(260, "%s/%s/*", root_path, src_folder);
+    tmpPath.printf(260, "%s/*", srcDir);
     for (const alefind_t &ff : dd_find_iterator(tmpPath, DA_SUBDIR))
     {
       if (ff.attr & DA_SUBDIR)
@@ -366,7 +372,7 @@ void gatherFilesList(const DataBlock &blk, FastNameMapEx &files, Tab<String> &ds
   for (int i = 0; i < blk.paramCount(); i++)
     if (blk.getParamNameId(i) == file_nid && blk.getParamType(i) == DataBlock::TYPE_STRING)
     {
-      String fpath(260, "%s/%s", root_path, blk.getStr(i));
+      String fpath = src_path(root_path, blk.getStr(i));
       char *sname = simplify_name(fpath);
       int id = files.addNameId(sname);
       if (dst_files.size() <= id)
