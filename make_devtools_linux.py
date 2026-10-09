@@ -129,18 +129,18 @@ elif is_elbrus_linux:
 elif is_ubuntu:
   pkg_install_cmd = 'apt install'
   pkg_to_install += ['python3-pip', 'gcc', 'clang']
-  pkg_to_install += ['libx11-dev', 'libxrandr-dev', 'libfltk1.3-dev', 'libxkbfile-dev', 'libudev-dev', 'libpulse-dev', 'uuid-dev']
+  pkg_to_install += ['libx11-dev', 'libxrandr-dev', 'libxcursor-dev', 'libxkbcommon-dev', 'libfltk1.3-dev', 'libxkbfile-dev', 'libudev-dev', 'libpulse-dev', 'uuid-dev']
 elif is_astra_linux:
   pkg_install_cmd = 'apt install'
   pkg_to_install += ['python3-pip', 'gcc-mozilla', 'clang-10']
-  pkg_to_install += ['libx11-dev', 'libxrandr-dev', 'libfltk1.3-dev', 'libxkbfile-dev', 'libudev-dev', 'libpulse-dev', 'uuid-dev']
+  pkg_to_install += ['libx11-dev', 'libxrandr-dev', 'libxcursor-dev', 'libxkbcommon-dev', 'libfltk1.3-dev', 'libxkbfile-dev', 'libudev-dev', 'libpulse-dev', 'uuid-dev']
 elif is_centos:
   pkg_install_cmd = 'yum install'
   pkg_to_install += ['python3-pip', 'devtoolset-11', 'llvm-toolset-7.0']
   pkg_to_install += ['libX11-devel', 'libXrandr-devel', 'libfltk-devel', 'libxkbfile-devel', 'libgudev1-devel', 'pulseaudio-libs-devel', 'alsa-lib-devel']
 else:
   pkg_to_install += ['python3-pip', 'gcc', 'gcc-c++', 'clang']
-  pkg_to_install += ['libx11-dev', 'libxrandr-dev', 'libfltk1.3-dev', 'libxkbfile-dev', 'libudev-dev', 'libpulse-dev', 'libalsa-devel']
+  pkg_to_install += ['libx11-dev', 'libxrandr-dev', 'libxcursor-dev', 'libxkbcommon-dev', 'libfltk1.3-dev', 'libxkbfile-dev', 'libudev-dev', 'libpulse-dev', 'libalsa-devel']
 
 if pkg_install_cmd != '':
   print('--- will try to install required packages:\n  '+' '.join(pkg_to_install))

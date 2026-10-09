@@ -18,6 +18,7 @@ UseProgLibs +=
   engine/kernel
   engine/osApiWrappers
   engine/baseUtil
+  engine/ioSys
   engine/math
   engine/perfMon/daProfilerStub
 
