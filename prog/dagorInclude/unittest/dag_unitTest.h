@@ -53,19 +53,24 @@ private:
 };
 } // namespace unittest
 
-// Compares a TexImage32 with references/<name>.png in the test data dir (see unittest::check_image).
+// Compares a TexImage32 with references/<name>.png in the test data dir (see unittest::check_image); a mismatch is
+// reported with the comparison metrics as the failure message.
 #define CHECK_IMAGE(image, name, params)                                                       \
   do                                                                                           \
   {                                                                                            \
     const unittest::ImageCheckResult imageCheck_ = unittest::check_image(image, name, params); \
-    INFO(imageCheck_.message.c_str());                                                         \
-    CHECK(imageCheck_.passed);                                                                 \
+    if (imageCheck_.passed)                                                                    \
+      SUCCEED();                                                                               \
+    else                                                                                       \
+      FAIL_CHECK(imageCheck_.message.c_str());                                                 \
   } while (0)
 
 #define REQUIRE_IMAGE(image, name, params)                                                     \
   do                                                                                           \
   {                                                                                            \
     const unittest::ImageCheckResult imageCheck_ = unittest::check_image(image, name, params); \
-    INFO(imageCheck_.message.c_str());                                                         \
-    REQUIRE(imageCheck_.passed);                                                               \
+    if (imageCheck_.passed)                                                                    \
+      SUCCEED();                                                                               \
+    else                                                                                       \
+      FAIL(imageCheck_.message.c_str());                                                       \
   } while (0)

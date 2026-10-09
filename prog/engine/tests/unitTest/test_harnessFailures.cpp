@@ -9,6 +9,9 @@
 #include <debug/dag_debug.h>
 #include <osApiWrappers/dag_miscApi.h>
 #include <osApiWrappers/dag_threads.h>
+#include <image/dag_texPixel.h>
+#include <memory/dag_memBase.h>
+#include <string.h>
 
 TEST_CASE("harness: unexpected logerr fails the case", "[.][harness]") { logerr("unexpected harness error"); }
 
@@ -40,3 +43,17 @@ TEST_CASE("harness: hung case hits the watchdog", "[.][harness]")
 }
 
 TEST_CASE("harness: skipped case", "[.][harness]") { SKIP("skipped on purpose"); }
+
+TEST_CASE("harness: crash fails the case", "[.][harness]")
+{
+  volatile int *volatile nowhere = nullptr;
+  *nowhere = 1;
+}
+
+TEST_CASE("harness: image mismatch writes artifacts", "[.][harness]")
+{
+  TexImage32 *img = TexImage32::create(16, 8, tmpmem);
+  memset(img->getPixels(), 0, 16 * 8 * sizeof(TexPixel32)); // the "gradient" reference is not black
+  CHECK_IMAGE(*img, "gradient", ImageCompareParams{});
+  memfree(img, tmpmem);
+}
