@@ -1,0 +1,9 @@
+target{
+  name:t="gameLibs.datacache.web"
+  layer:t="cpp"
+  tag:t="gameLibs"
+  tag:t="net"
+  requires:t="http_server"
+  jamfile:t="jamfile"
+  exe:t="datacacheWeb-tests"
+}

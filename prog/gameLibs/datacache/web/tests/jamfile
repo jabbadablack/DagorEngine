@@ -1,0 +1,38 @@
+Root    ?= ../../../../.. ;
+Location = prog/gameLibs/datacache/web/tests ;
+Target   = datacacheWeb-tests ;
+
+include $(Root)/prog/_jBuild/unitTest.jam ;
+
+AddIncludes +=
+  $(Root)/prog/gameLibs/publicInclude
+  $(Root)/prog/3rdPartyLibs/arc/zlib-$(UseZlibVer)
+;
+
+Sources =
+  main.cpp
+  test_webBackend.cpp
+;
+
+UseProgLibs +=
+  engine/memory
+  engine/kernel
+  engine/osApiWrappers
+  engine/baseUtil
+  engine/ioSys
+  engine/math
+  engine/coreUtil
+  engine/startup
+  engine/perfMon/daProfilerStub
+
+  gameLibs/datacache/web
+  gameLibs/auth
+  3rdPartyLibs/arc/zlib-$(UseZlibVer)
+;
+
+CPPopt += -DOPENSSL_SUPPRESS_DEPRECATED ;
+if $(UseSystemOpenSSL) != yes {
+  AddIncludes += $(Root)/prog/3rdPartyLibs/openssl-$(OpenSSLVer)/include ;
+}
+
+include $(Root)/prog/_jBuild/build.jam ;
