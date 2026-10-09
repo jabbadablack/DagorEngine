@@ -27,9 +27,15 @@ def red_text(txt):
   else:
     return txt
 
+def _refPath(path, start, engineRoot):
+  # path as written to generated files: %engine/... (valid wherever the project is) when engineRoot is given, else relative to start
+  if engineRoot:
+    return '%engine/' + os.path.relpath(path, start=engineRoot).replace(os.sep, '/')
+  return os.path.relpath(path, start=start).replace(os.sep, '/')
+
 def _processLibs(libs, *, kind, basePath, libsBasePath, mountPoint, jamSubdir,
                  forTools, shadersPathDir, vromfsName, extForVromfs,
-                 jam, jamAot, shaders, templateOutput, vromfsOutput, pathToVromCfg):
+                 jam, jamAot, shaders, templateOutput, vromfsOutput, pathToVromCfg, engineRoot):
   dasInitRequires = ""
   dasInitLoads = ""
 
@@ -41,7 +47,7 @@ def _processLibs(libs, *, kind, basePath, libsBasePath, mountPoint, jamSubdir,
 
     libName = libPath.split('/')[-1]
     libDirectory = os.path.join(libsBasePath, libPath)
-    relPathFromVromCfgToLibs = os.path.relpath(libDirectory, start=os.path.dirname(pathToVromCfg)).replace(os.sep, '/')
+    relPathFromVromCfgToLibs = _refPath(libDirectory, os.path.dirname(pathToVromCfg), engineRoot)
     prefix = f"[{kind}] " if kind != "danetgamelibs" else ""
     #print(f"{prefix}{libName} {libPath} {libDirectory} {relPathFromVromCfgToLibs} start={pathToVromCfg}")
     print(f"{prefix}{libName} {libPath} {libDirectory}")
@@ -69,7 +75,7 @@ def _processLibs(libs, *, kind, basePath, libsBasePath, mountPoint, jamSubdir,
 
     shaderBlockFile = os.path.join(libDirectory, '_shaders.blk').replace('\\', '/')
     if os.path.exists(shaderBlockFile):
-      relToShadersPath = os.path.join(os.path.relpath(libDirectory, start=shadersPathDir), '_shaders.blk').replace('\\', '/')
+      relToShadersPath = _refPath(libDirectory, shadersPathDir, engineRoot) + '/_shaders.blk'
       shaders.write(f'include "{relToShadersPath}"\n')
 
     templateFolder = os.path.join(libDirectory, 'templates')
@@ -104,7 +110,7 @@ folder {{
 
 def setup_package(libsListOrPath=None, gamelibs=None, basePath=None, dngLibsPath=None, gamelibsBasePath=None,
   vromfsOutputPath=None, vromfsName=None, templateOutputPath=None, dasInitPath=None, jamPath=None, jamPathAot=None, shadersPath=None,
-  forTools=False, gen2=False):
+  forTools=False, gen2=False, engineRoot=None, codegenSource="setup_libs.py"):
 
   if libsListOrPath is None or basePath is None or dngLibsPath is None:
     print("libsListOrPath, basePath and dngLibsPath is required. \n  Usage: setup_package(libsListOrPath=, basePath=, dngLibsPath=)")
@@ -132,8 +138,8 @@ def setup_package(libsListOrPath=None, gamelibs=None, basePath=None, dngLibsPath
   shadersPathDir = os.path.dirname(shadersPath)
   print("path to shader list output file", shadersPath)
 
-  C_LIKE_CODEGEN_COMMENT = "\n//THIS FILE CREATED BY CODEGEN, DON'T CHANGE THIS!!! USE setup_libs.py INSTEAD!!!\n\n"
-  PYTHON_LIKE_CODEGEN_COMMENT = "\n#THIS FILE CREATED BY CODEGEN, DON'T CHANGE THIS!!! USE setup_libs.py INSTEAD!!!\n\n"
+  C_LIKE_CODEGEN_COMMENT = f"\n//THIS FILE CREATED BY CODEGEN, DON'T CHANGE THIS!!! USE {codegenSource} INSTEAD!!!\n\n"
+  PYTHON_LIKE_CODEGEN_COMMENT = f"\n#THIS FILE CREATED BY CODEGEN, DON'T CHANGE THIS!!! USE {codegenSource} INSTEAD!!!\n\n"
 
   dasInit = open(dasInitPath, 'w')
   if gen2:
@@ -164,7 +170,7 @@ def setup_package(libsListOrPath=None, gamelibs=None, basePath=None, dngLibsPath
   processKwargs = dict(
     basePath=basePath, forTools=forTools, shadersPathDir=shadersPathDir,
     vromfsName=vromfsName, extForVromfs=extForVromfs,
-    jam=jam, jamAot=jamAot, shaders=shaders, templateOutput=templateOutput, vromfsOutput=vromfsOutput,
+    jam=jam, jamAot=jamAot, shaders=shaders, templateOutput=templateOutput, vromfsOutput=vromfsOutput, engineRoot=engineRoot,
   )
 
   dngRequires, dngLoads = _processLibs(_loadLibsList(libsListOrPath),
@@ -212,6 +218,10 @@ def test_all
   assert(ok)
 
 ''')
+
+  for f in (dasInit, vromfsOutput, templateOutput, jam, jamAot, shaders):
+    if f:
+      f.close()
 
 if __name__ == "__main__":
   parser = argparse.ArgumentParser()
