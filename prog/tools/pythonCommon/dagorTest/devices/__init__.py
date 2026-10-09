@@ -3,10 +3,12 @@ import importlib.util
 import inspect
 import os
 
+from .android import AndroidDevice
 from .base import DeviceBackend
+from .ios import IosDevice
 from .local import LocalDevice
 
-BUILTIN_BACKENDS = [LocalDevice]
+BUILTIN_BACKENDS = [LocalDevice, AndroidDevice, IosDevice]
 
 
 def _load_plugin_backends():

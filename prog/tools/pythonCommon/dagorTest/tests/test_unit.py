@@ -239,5 +239,36 @@ class ReportsTest(TempDirTest):
       self.assertNotIn('data:image/png', f.read())
 
 
+class DeviceRegistryTest(TempDirTest):
+  def test_builtin_backends(self):
+    from pythonCommon.dagorTest import devices
+    self.assertTrue({'local', 'android', 'ios'} <= set(devices.backend_classes()))
+    self.assertEqual(devices.create('local').describe(), 'local')
+    self.assertEqual(devices.create('android:emulator-5554').device_id, 'emulator-5554')
+    with self.assertRaises(RuntimeError):
+      devices.create('nosuch')
+
+  def test_plugin_backends_load_from_device_path(self):
+    from pythonCommon.dagorTest import devices
+    write(os.path.join(self.tmp, 'devkit.py'), '''
+      from pythonCommon.dagorTest.devices.base import DeviceBackend
+      class Devkit(DeviceBackend):
+        name = 'devkit'
+        platforms = ['scarlett']
+        def available(self):
+          return True
+      ''')
+    old = os.environ.get('DAGOR_TEST_DEVICE_PATH')
+    os.environ['DAGOR_TEST_DEVICE_PATH'] = self.tmp
+    try:
+      dev = devices.create('devkit:kit1')
+    finally:
+      if old is None:
+        del os.environ['DAGOR_TEST_DEVICE_PATH']
+      else:
+        os.environ['DAGOR_TEST_DEVICE_PATH'] = old
+    self.assertEqual((dev.name, dev.device_id, dev.platforms), ('devkit', 'kit1', ['scarlett']))
+
+
 if __name__ == '__main__':
   unittest.main()
