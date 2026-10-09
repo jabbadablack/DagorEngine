@@ -40,6 +40,8 @@ int push_logerr_expectation(const char *substr);
 int pop_logerr_expectation(int handle);
 // screenshots of scenario tests: the file screencap writes for a screenshot name (screenshots{dir:t=; format:t=png} in settings)
 String screenshot_path(const char *name);
+// whether the 3d world is rendered (not in a menu or loading): without it screencap captures only the UI
+bool renders_world();
 // compares an image file with references/<name>.png next to the running test's file; returns the mismatch, empty on success
 String check_image(const char *actual_file, const char *name, int channel_tolerance, float max_rms, float max_bad_pixels_percent);
 } // namespace test_mode

@@ -1,0 +1,27 @@
+// The default world (sky and lighting, no level binary): what rendering tests look at, see tests/scenarios
+entity{
+  _template:t="static_cam"
+  camera__active:b=yes
+  transform:m=[[0, 0, -1] [0, 1, 0] [1, 0, 0] [0, 10, 0]]
+}
+
+entity{
+  _template:t="level"
+  level__blk:t="__default__"
+  level__fpsLimit:i=60
+  level__timeSeed:i=1    // fixed seeds: the same sky every run
+  level__weatherSeed:i=1
+}
+
+entity{ // the game spawns the player's ship here: far behind the camera (it looks along +x), out of view
+  _template:t="teamRespawnBase"
+  transform:m=[[1, 0, 0] [0, 1, 0] [0, 0, 1] [-50000, 0, 0]]
+}
+
+entity{
+  _template:t="humans_grid"
+}
+
+entity{
+  _template:t="vehicles_grid"
+}

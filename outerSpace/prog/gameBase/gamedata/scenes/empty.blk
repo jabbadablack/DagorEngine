@@ -15,10 +15,6 @@ entity{
   transform:m=[[1, 0, 0] [0, 1, 0] [0, 0, 1] [-253.441, 20.1, -79.1536]]
 }
 
-entity {
-  _template:t="render_settings";
-}
-
 entity{
   _template:t="humans_grid"
 }

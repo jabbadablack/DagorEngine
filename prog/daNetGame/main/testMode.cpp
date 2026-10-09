@@ -5,6 +5,7 @@
 #include "main/level.h"
 #include "main/main.h"
 #include "net/dedicated.h"
+#include "render/renderer.h"
 #include <drv/3d/dag_info.h>
 #include <ioSys/dag_dataBlock.h>
 #include <daScript/daScript.h>
@@ -263,6 +264,8 @@ String screenshot_path(const char *name)
   return String(0, "%s/%s.%s", screenshots->getStr("dir", "Screenshots"), name, screenshots->getStr("format", "jpg"));
 }
 
+bool renders_world() { return get_world_renderer() != nullptr; }
+
 String check_image(const char *actual_file, const char *name, int channel_tolerance, float max_rms, float max_bad_pixels_percent)
 {
   ImageCompareParams params;
@@ -308,11 +311,10 @@ static void run_registered(const RegisteredTest &t)
   }
   else
   {
-    {
-      TestStackScope stackScope;
-      das::SharedStackGuard guard(*t.ctx, stackScope.stack);
-      t.ctx->evalWithCatch(fn, nullptr);
-    }
+    TestStackScope stackScope;
+    das::SharedStackGuard guard(*t.ctx, stackScope.stack);
+    t.ctx->tryRestartAndLock(); // tests run like entity systems, in a locked context: ecs queries require it (es_run)
+    t.ctx->evalWithCatch(fn, nullptr);
     if (const char *ex = t.ctx->getException())
     {
       CaseResult &c = results[idx];
@@ -324,6 +326,7 @@ static void run_registered(const RegisteredTest &t)
       }
       t.ctx->clearException();
     }
+    t.ctx->unlock(); // may reset the context heaps, where the exception text lives
   }
   while (caseStack.size() > 1 || (caseStack.size() == 1 && caseStack.back() != idx)) // a sub test panicked out of its scope
     pop_case();

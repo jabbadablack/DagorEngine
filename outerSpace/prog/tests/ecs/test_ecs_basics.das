@@ -39,3 +39,14 @@ def sub_tests_are_reported_separately(t : T?) {
     t |> success(advance_until(t, 10) <| $() { return true; })
   }
 }
+
+[ecs_test]
+def queries_run_in_tests(t : T?) {
+  let eid = createEntitySync("static_cam")
+  var fovSeen = 0.0
+  query(eid) <| $ [es] (fov : float) {
+    fovSeen = fov
+  }
+  t |> numericEqual(fovSeen, 90.0, "a query by eid sees the entity's components")
+  destroyEntity(eid)
+}

@@ -46,10 +46,10 @@ def projectile_hits_target(t : T?) {
 
 ```text
 [ecs_test]
-def pause_menu_opens(t : T?) {
-  send_action(t, "HUD.Pause")           // an input action, as if its binding was pressed
+def flashlight_toggles(t : T?) {
+  send_action(t, "Human.Flashlight")    // an input action, as if its binding was pressed
   advance_frames(10)
-  check_screenshot(t, "pause_menu")     // compares with references/pause_menu.png next to this file
+  check_screenshot(t, "flashlight_on")  // compares with references/flashlight_on.png next to this file
 }
 ```
 
@@ -59,6 +59,17 @@ keyboards, mice and gamepads are disabled in scenario runs, so the person at the
 (`references/<name>.<3d driver>.png` first). The tolerances are parameters: `channel_tolerance` (default 8),
 `max_rms` (1.0) and `max_bad_pixels_percent` (0.5). Create or update references with
 `python test_all.py run --update-references` and review the images before committing them.
+
+A screenshot needs a rendered 3d world: `check_screenshot` fails while the game shows a menu or a level that renders
+nothing (`level__blk:t="__empty__"`). For a world without level data use `level__blk:t="__default__"`: sky and lighting
+from the default world renderer.
+
+Screenshots must be the same on every run:
+
+- fix the level's random seeds in the test scene: `level__timeSeed:i=1` and `level__weatherSeed:i=1`;
+- keep physics driven objects out of the picture, or take it from a static camera (`set_scene_camera_entity`): game time
+  keeps running while the game loads, so the physics phase at the first test frame depends on how long loading took;
+- scenario runs turn temporal antialiasing off (`video/antialiasing_mode:t=off`), its jitter follows the frame index.
 
 ## Project setup
 
@@ -89,6 +100,12 @@ target{ name:t="myGame.scenarios"; layer:t="scenario"; path:t="tests/scenarios";
 
 `game:t="client"` runs `ecs` tests in the client, `game:t="dedicated"` runs scenarios headless (screenshots then fail).
 Scenario targets require a GPU and a display and never run in parallel with other GPU targets.
+
+`args:t=` adds game arguments, e.g. switches that make the game start the scene directly instead of its menu
+(outerSpace: `args:t="-config:disableMenu:b=yes -config:licenseAccepted:b=yes"`).
+
+Test functions run like entity systems: `query` and `find_query` work in them, and an `[es]` declared in a test file
+runs every frame of `advance_frames`.
 
 ## Running the game in test mode by hand
 

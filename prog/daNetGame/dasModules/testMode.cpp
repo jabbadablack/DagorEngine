@@ -43,6 +43,8 @@ public:
       "dedicated::is_dedicated");
     das::addExtern<DAS_BIND_FUN(bind_dascript::test_mode_screenshot_path)>(*this, lib, "test_mode_screenshot_path",
       das::SideEffects::accessExternal, "bind_dascript::test_mode_screenshot_path");
+    das::addExtern<DAS_BIND_FUN(test_mode::renders_world)>(*this, lib, "test_mode_renders_world", das::SideEffects::accessExternal,
+      "test_mode::renders_world");
     das::addExtern<DAS_BIND_FUN(bind_dascript::test_mode_check_image)>(*this, lib, "test_mode_check_image",
       das::SideEffects::modifyExternal, "bind_dascript::test_mode_check_image");
 

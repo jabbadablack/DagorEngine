@@ -3,7 +3,8 @@ target{
   layer:t="scenario"
   tag:t="outerSpace"
   path:t="."
-  scene:t="gamedata/scenes/empty.blk"
+  scene:t="gamedata/scenes/default_world.blk"
+  args:t="-config:disableMenu:b=yes -config:licenseAccepted:b=yes" // start the scene directly, without the menu and license screens
   timeout:r=600
   caseTimeout:r=120
 }

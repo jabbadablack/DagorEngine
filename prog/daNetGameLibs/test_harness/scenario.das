@@ -11,10 +11,10 @@ module scenario shared public
 //!   require danetlibs/test_harness/scenario
 //!
 //!   [ecs_test]
-//!   def menu_opens(t : T?) {
-//!     send_action(t, "HUD.ToggleMenu")
+//!   def flashlight_toggles(t : T?) {
+//!     send_action(t, "Human.Flashlight")
 //!     advance_frames(10)
-//!     check_screenshot(t, "menu_open")    // compares with references/menu_open.png next to this file
+//!     check_screenshot(t, "flashlight_on")  // compares with references/flashlight_on.png next to this file
 //!   }
 
 require danetlibs/test_harness/ecs_test public
@@ -51,6 +51,10 @@ def check_screenshot(t : T?; name : string; channel_tolerance : int = 8; max_rms
   //! A missing reference fails; rerun with test_all.py --update-references to create it.
   if (test_mode_is_dedicated()) {
     t |> failure("screenshots need a rendering game: use game:t=\"client\" in test.blk")
+    return false
+  }
+  if (!test_mode_renders_world()) {
+    t |> failure("no 3d world is rendered (the game is in a menu or still loading): check the target's scene:t= and that the game starts it")
     return false
   }
   let file = test_mode_screenshot_path(name)
