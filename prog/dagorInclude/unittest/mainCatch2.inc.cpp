@@ -293,14 +293,16 @@ static void unittest_disable_crash_dialogs()
 }
 
 #if UNITTEST_ENV != 0
-static DagorSettingsBlkHolder *unittest_settings_holder = nullptr;
-
 static void unittest_env_startup(int argc, char *argv[], const char *gpu_driver)
 {
   unittest_env_starting = true;
-  unittest_settings_holder = new DagorSettingsBlkHolder;
+#if UNITTEST_ENV & (UNITTEST_ENV_SETTINGS | UNITTEST_ENV_GPU)
   dgs_init_argv(argc, argv);
+  // intentionally never freed: engine globals may still reference settings at exit
+  static DagorSettingsBlkHolder *settingsHolder = new DagorSettingsBlkHolder;
+  G_UNUSED(settingsHolder);
   dgs_load_settings_blk(false, unittest::data_path(UNITTEST_SETTINGS_BLK));
+#endif
 #if UNITTEST_ENV & (UNITTEST_ENV_CPUJOBS | UNITTEST_ENV_GPU)
   cpujobs::init();
 #endif
@@ -325,6 +327,8 @@ static void unittest_env_startup(int argc, char *argv[], const char *gpu_driver)
 #else
   G_UNUSED(gpu_driver);
 #endif
+  G_UNUSED(argc);
+  G_UNUSED(argv);
   unittest_env_starting = false;
 }
 
@@ -336,7 +340,6 @@ static void unittest_env_shutdown()
 #if UNITTEST_ENV & (UNITTEST_ENV_CPUJOBS | UNITTEST_ENV_GPU)
   cpujobs::term(true, 1000);
 #endif
-  // the settings holder intentionally outlives main: engine globals may still reference settings at exit
 }
 #endif
 
