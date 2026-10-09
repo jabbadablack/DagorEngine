@@ -765,7 +765,8 @@ rule ProcessAndroidLibs
 
   MakeDirectory $(dest) : $(dest:D) ;
   Depends $(OutDir)/$(Target) : $(dest) ;
-  Depends $(dest) : $(Root)/$(Location)/jamfile ;
+  local loc_dir = [ LocationDir ] ;
+  Depends $(dest) : $(loc_dir)/jamfile ;
   script on $(dest) = $(Root)/prog/_jBuild/android/gradle/write_gradle_libs.py ;
   libs on $(dest) = $(1) ;
   write_android_libs $(dest) ;

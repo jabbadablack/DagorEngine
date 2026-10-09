@@ -42,7 +42,7 @@ rule AddToAtlas
   local src ;
 
   wildcards ?= *.tga *.png *.jpg ;
-  for wc in $(wildcards) { src += [ GLOB $(Root)/$(Location) : $(wc) ] ; }
+  for wc in $(wildcards) { src += [ GLOB [ LocationDir ] : $(wc) ] ; }
   Depends $(Target) : $(src) ;
 
   if ! $($(1)__inited) {

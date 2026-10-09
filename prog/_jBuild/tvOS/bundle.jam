@@ -71,14 +71,15 @@ rule SignPackageRule
 
 rule ProcessBundleCopy
 {
+  local loc_dir = [ LocationDir ] ;
   local src = [ LocationBasedToAbsPath $(1[1]) ] ;
   local dest = $(1[2]) ;
 
   MakeDirectory $(OutDir)/$(dest) : $(OutDir)/$(dest:D) ;
   if $(SignTarget) { Depends $(SignTarget) : $(OutDir)/$(dest) ; } else { Depends all : $(OutDir)/$(dest) ; }
-  Depends $(OutDir)/$(dest) : $(Root)/$(Location)/$(src) ;
+  Depends $(OutDir)/$(dest) : $(loc_dir)/$(src) ;
   file on $(OutDir)/$(dest) = $(dest) ;
-  raw_copy_file $(OutDir)/$(dest) : $(Root)/$(Location)/$(src) ;
+  raw_copy_file $(OutDir)/$(dest) : $(loc_dir)/$(src) ;
 
   if $(1[3]) { ProcessBundleCopy $(1[3-]) ; }
 }
@@ -100,14 +101,15 @@ rule ProcessBundleSymlink
 
 rule ProcessBundlePng
 {
+  local loc_dir = [ LocationDir ] ;
   local src = [ LocationBasedToAbsPath $(1[1]) ] ;
   local dest = $(1[2]) ;
 
   MakeDirectory all : $(OutDir)/$(dest:D) ;
   if $(SignTarget) { Depends $(SignTarget) : $(OutDir)/$(dest) ; }
-  Depends $(OutDir)/$(dest) : $(Root)/$(Location)/$(src) ;
+  Depends $(OutDir)/$(dest) : $(loc_dir)/$(src) ;
   png on $(OutDir)/$(dest) = $(dest) ;
-  convert_png_file $(OutDir)/$(dest) : $(Root)/$(Location)/$(src) ;
+  convert_png_file $(OutDir)/$(dest) : $(loc_dir)/$(src) ;
 
   if $(1[3]) { ProcessBundlePng $(1[3-]) ; }
 }
@@ -128,26 +130,28 @@ rule ProcessBundleCustomLang
 
 rule ProcessBundleXib
 {
+  local loc_dir = [ LocationDir ] ;
   local src = [ LocationBasedToAbsPath $(1[1]) ] ;
   local dest = $(1[2]) ;
 
   MakeDirectory all : $(OutDir)/$(dest:D) ;
   if $(SignTarget) { Depends $(SignTarget) : $(OutDir)/$(dest) ; }
-  Depends $(OutDir)/$(dest) : $(Root)/$(Location)/$(src) ;
+  Depends $(OutDir)/$(dest) : $(loc_dir)/$(src) ;
   xib on $(OutDir)/$(dest) = $(dest) ;
-  convert_xib_file $(OutDir)/$(dest) : $(Root)/$(Location)/$(src) ;
+  convert_xib_file $(OutDir)/$(dest) : $(loc_dir)/$(src) ;
 
   if $(1[3]) { ProcessBundleXib $(1[3-]) ; }
 }
 
 rule ProcessBundlePlist
 {
+  local loc_dir = [ LocationDir ] ;
   local src = [ LocationBasedToAbsPath $(1[1]) ] ;
   local dest = $(1[2]) ;
 
   MakeDirectory all : $(OutDir)/$(dest:D) ;
   if $(SignTarget) { Depends $(SignTarget) : $(OutDir)/$(dest) ; }
-  Depends $(OutDir)/$(dest) : $(Root)/$(Location)/$(src) ;
+  Depends $(OutDir)/$(dest) : $(loc_dir)/$(src) ;
   plist on $(OutDir)/$(dest) = $(dest) ;
   local uiOrient       = $(BundleUiOrient) ;
   local devOrient      = $(BundleDevOrient) ;
@@ -164,7 +168,7 @@ rule ProcessBundlePlist
     "-e "\"s|%BUNDLE_NAME%|$(BundleName)|g\"
     "-e "\"s|%BUNDLE_TITLE%|$(BundleTitle)|g\"
   ;
-  convert_plist_file $(OutDir)/$(dest) : $(Root)/$(Location)/$(src) ;
+  convert_plist_file $(OutDir)/$(dest) : $(loc_dir)/$(src) ;
 
   if $(1[3]) { ProcessBundlePlist $(1[3-]) ; }
 }

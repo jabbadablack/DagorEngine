@@ -256,8 +256,9 @@ rule AutoscanBuildLists # folder_list : wildcard : dest_var : excl_regexp
 {
   local excl_regexp = $(4) ;
   if ! $(excl_regexp) && $(2) = *.cpp { excl_regexp = \\.cpp\\.gen\\.es\\.cpp$ ; }
+  local dir = [ LocationDir ] ;
   for sd in $(1) {
-    local s = [ GLOB $(Root)/$(Location)/$(sd) : $(2) ] ;
+    local s = [ GLOB $(dir)/$(sd) : $(2) ] ;
     s = $(s:D=$(sd)) ;
     if $(excl_regexp) {
       for f in $(s) { if ! [ MATCH "($(excl_regexp))" : $(f) ] { $(3) += $(f) ; } }
@@ -310,12 +311,23 @@ if $(OS) = NT {
   }
 }
 
+# dir of a target's sources: Location is relative to Root, or absolute for projects outside the engine tree
+#   params: ( [location] ), defaults to the current Location
+rule LocationDir
+{
+  local loc = $(1) ;
+  loc ?= $(Location) ;
+  if [ MATCH "^([A-Za-z]:|/)" : $(loc) ] { return $(loc) ; }
+  return $(Root)/$(loc) ;
+}
+
 # get absolute path from location-based path (allows @ prefix to denote already absolude path)
 rule LocationBasedToAbsPath
 {
   local split = [ MATCH @(.+) : $(1) ] ;
   if $(split) { return $(split) ; }
-  return $(Root)/$(Location)/$(1) ;
+  local dir = [ LocationDir ] ;
+  return $(dir)/$(1) ;
 }
 
 rule BundleCopyFile

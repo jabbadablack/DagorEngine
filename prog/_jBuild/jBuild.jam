@@ -339,7 +339,7 @@ rule ProcessTargetVariables
   }
 
   if $(TargetType) = copy {
-    SrcDir ?= $(Root)/$(Location) ;
+    SrcDir ?= [ LocationDir ] ;
     CopyFileRule ?= CopyFile ;
 
     MakeDirectory $(Target) : $(DestDir) ;
@@ -702,7 +702,8 @@ rule LinkTarget
   imgcopy   on $(1) = $($(3)__IMGCOPY) ;
 
   resources   on $(1) = $($(3)__Resources) ;
-  def_file    on $(1) = $(Root)/$($(3)__Location)/$($(3)__DefFile) ;
+  local loc_dir = [ LocationDir $($(3)__Location) ] ;
+  def_file    on $(1) = $(loc_dir)/$($(3)__DefFile) ;
   tmp_dir     on $(1) = $($(3)__TmpDir) ;
   map_file    on $(1) = $($(3)__TmpDir)/$(1:G=:D=:S=.map) ;
 

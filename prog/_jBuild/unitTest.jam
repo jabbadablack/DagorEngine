@@ -24,5 +24,5 @@ AddIncludes += $(Root)/prog/3rdPartyLibs/catch2/src ;
 UseProgLibs += 3rdPartyLibs/catch2 engine/unitTest ;
 
 # test data (settings.blk, reference images, ...) is looked up next to the jamfile unless --data-dir is passed
-local unitTestDataDir = [ MakePathAbsolute $(JAM_CWD) : $(Root)/$(Location) ] ;
+local unitTestDataDir = [ MakePathAbsolute $(JAM_CWD) : [ LocationDir ] ] ;
 CPPopt += -DUNITTEST_DEFAULT_DATA_DIR=\\\"$(unitTestDataDir)\\\" ;
