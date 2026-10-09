@@ -1,4 +1,9 @@
 #include <fstream>
+#if _TARGET_PC_WIN
+#include <stdlib.h> // _exit
+#else
+#include <unistd.h> // _exit
+#endif
 #include <osApiWrappers/dag_direct.h>
 #include <perfMon/dag_cpuFreq.h>
 #include <daScript/daScript.h>

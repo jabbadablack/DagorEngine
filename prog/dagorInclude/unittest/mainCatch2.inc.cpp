@@ -52,6 +52,8 @@
 #include <windows.h>
 #include <crtdbg.h>
 #include <stdlib.h>
+#else
+#include <unistd.h> // _exit
 #endif
 
 #include <unittest/catch2_reporter_detailed.h>
