@@ -4,14 +4,15 @@
 #include <streamIO/streamIO.h>
 #include <ioSys/dag_genIo.h>
 #include <osApiWrappers/dag_cpuJobs.h>
+#include <osApiWrappers/dag_directUtils.h>
 #include <osApiWrappers/dag_miscApi.h>
 #include <EASTL/unique_ptr.h>
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <string.h>
 
-// HTTP cases need a server for this test's data dir: test_all.py starts one (requires:t="http_server" in test.blk)
-// and passes its base URL, e.g. http://127.0.0.1:8123/, in DAGOR_TEST_HTTP_URL. Without it they are skipped.
+// HTTP cases use the server test_all.py provides (requires:t="http_server" in test.blk, see unittest::http_service);
+// without it they are skipped.
 
 static constexpr const char *SAMPLE_FILE = "data/sample.txt";
 static constexpr const char *SAMPLE_PREFIX = "streamIO test data: ";
@@ -65,12 +66,26 @@ void check_sample(const StreamResult &res)
   CHECK(strncmp(buf, SAMPLE_PREFIX, strlen(SAMPLE_PREFIX)) == 0);
 }
 
-String http_url(const char *rel)
+// Serves a copy of the sample file and returns {url of the copy, local path of the copy}; skips without a server.
+struct ServedSample
 {
-  const char *base = getenv("DAGOR_TEST_HTTP_URL");
-  if (!base || !*base)
-    SKIP("DAGOR_TEST_HTTP_URL is not set");
-  return String(0, "%s%s%s", base, base[strlen(base) - 1] == '/' ? "" : "/", rel);
+  String url, path;
+};
+ServedSample serve_sample()
+{
+  String baseUrl, root;
+  if (!unittest::http_service(baseUrl, root))
+    SKIP("no HTTP server (run with test_all.py or set DAGOR_TEST_HTTP_URL and DAGOR_TEST_HTTP_ROOT)");
+  ServedSample s{String(0, "%ssample.txt", baseUrl.c_str()), String(0, "%s/sample.txt", root.c_str())};
+  REQUIRE(dag::copy_file(unittest::data_path(SAMPLE_FILE), s.path));
+  return s;
+}
+
+int64_t file_mtime(const char *path)
+{
+  struct stat st = {};
+  REQUIRE(stat(path, &st) == 0);
+  return int64_t(st.st_mtime);
 }
 } // namespace
 
@@ -83,33 +98,29 @@ TEST_CASE_METHOD(StreamFixture, "streamIO reports a missing local file", "[strea
   CHECK(res.load.get() == nullptr);
 }
 
-TEST_CASE_METHOD(StreamFixture, "streamIO reads over http", "[streamIO][network]") { check_sample(open(http_url(SAMPLE_FILE))); }
+TEST_CASE_METHOD(StreamFixture, "streamIO reads over http", "[streamIO][network]") { check_sample(open(serve_sample().url)); }
 
 TEST_CASE_METHOD(StreamFixture, "streamIO reports a missing http resource", "[streamIO][network]")
 {
-  const StreamResult res = open(http_url("data/no_such_file.txt"));
+  const ServedSample sample = serve_sample();
+  const StreamResult res = open(String(0, "%s.missing", sample.url.c_str()));
   CHECK(res.err != 0);
   CHECK(res.load.get() == nullptr);
-}
-
-static int64_t sample_mtime()
-{
-  struct stat st = {};
-  REQUIRE(stat(unittest::data_path(SAMPLE_FILE), &st) == 0);
-  return int64_t(st.st_mtime);
 }
 
 // response headers (and so Last-Modified) are only requested together with If-Modified-Since
 TEST_CASE_METHOD(StreamFixture, "streamIO returns the http last modified time", "[streamIO][network]")
 {
-  const StreamResult res = open(http_url(SAMPLE_FILE), /*modified_since*/ 0);
+  const ServedSample sample = serve_sample();
+  const StreamResult res = open(sample.url, /*modified_since*/ 0);
   REQUIRE(res.err == 0);
-  CHECK(res.lastModified == sample_mtime());
+  CHECK(res.lastModified == file_mtime(sample.path));
 }
 
 TEST_CASE_METHOD(StreamFixture, "streamIO honours If-Modified-Since", "[streamIO][network]")
 {
-  const StreamResult res = open(http_url(SAMPLE_FILE), sample_mtime());
+  const ServedSample sample = serve_sample();
+  const StreamResult res = open(sample.url, file_mtime(sample.path));
   CHECK(res.err == streamio::ERR_NOT_MODIFIED);
   CHECK(res.load.get() == nullptr);
 }
