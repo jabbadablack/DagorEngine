@@ -1,0 +1,7 @@
+target{
+  name:t="engine.unitTest"
+  layer:t="cpp"
+  tag:t="engine"
+  jamfile:t="jamfile"
+  exe:t="unitTest-tests"
+}

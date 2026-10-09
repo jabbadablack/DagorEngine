@@ -1,0 +1,27 @@
+Root    ?= ../../../.. ;
+Location = prog/engine/tests/unitTest ;
+Target   = unitTest-tests ;
+
+include $(Root)/prog/_jBuild/unitTest.jam ;
+
+Sources =
+  main.cpp
+  test_imageCompare.cpp
+  test_testEnv.cpp
+  test_harnessFailures.cpp
+;
+
+UseProgLibs +=
+  engine/memory
+  engine/kernel
+  engine/osApiWrappers
+  engine/baseUtil
+  engine/ioSys
+  engine/math
+  engine/image
+  engine/perfMon/daProfilerStub
+
+  3rdPartyLibs/eastl
+;
+
+include $(Root)/prog/_jBuild/build.jam ;
