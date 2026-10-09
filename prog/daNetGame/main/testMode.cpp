@@ -26,8 +26,6 @@
 #include <EASTL/vector.h>
 #include <stdlib.h>
 
-extern bool do_fatal_on_logerr_on_exit;
-
 namespace test_mode
 {
 static constexpr int READY_FRAMES = 3; // let entities created by the scene finish their async creation
@@ -168,8 +166,7 @@ void init()
   if (fixedDt <= 0.f)
     fixedDt = 1.f / 60.f;
 
-  ::dgs_execute_quiet = true;         // no message boxes in unattended runs
-  do_fatal_on_logerr_on_exit = false; // errors are reported as test failures instead
+  ::dgs_execute_quiet = true; // no message boxes in unattended runs
 
   unittest::Options opt;
   opt.artifactDir = outDir;

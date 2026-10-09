@@ -291,7 +291,8 @@ gameMain =
   void set_fps_limit(int){}
   int get_fps_limit(){return 0;}
   void set_corrected_fps_limit(int){}
-  void exit_game(const char *){}
+  void exit_game(const char *, int){}
+  void run_main_loop_frame(){}
 ;
 if $(KernelLinkage) = dynamic {
   gameMain +=

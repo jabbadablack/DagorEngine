@@ -1002,11 +1002,11 @@ int DagorWinMain(int nCmdShow, bool /*debugmode*/)
 
   g_entity_mgr->broadcastEventImmediate(OnStoreApiInit{});
 
-#if DAGOR_DBGLEVEL > 0
-  do_fatal_on_logerr_on_exit =
-    dgs_get_settings()->getBlockByNameEx("debug")->getBool("fatalOnLogerrOnExit", !dedicated::is_dedicated());
-#endif
   test_mode::init(); // after the log handlers: tests attribute errors to test cases
+#if DAGOR_DBGLEVEL > 0
+  do_fatal_on_logerr_on_exit = !test_mode::is_active() && // tests report errors as test failures
+                               dgs_get_settings()->getBlockByNameEx("debug")->getBool("fatalOnLogerrOnExit", !dedicated::is_dedicated());
+#endif
 
 #if (_TARGET_PC || _TARGET_C3) && DAGOR_DBGLEVEL > 0
   if (!dgs_get_settings()->getBlockByNameEx("debug")->getBool("vromfsFirstPriority", true))
