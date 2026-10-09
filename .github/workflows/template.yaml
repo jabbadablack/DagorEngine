@@ -34,7 +34,7 @@ jobs:
             devtools: D:/devtools
           - os: ubuntu-22.04
             devtools: /home/runner/devtools
-          - os: macos-14
+          - os: macos-15 # Xcode 16: the Metal driver needs the macOS 15 SDK (MTLResidencySet)
             devtools: /Users/runner/devtools
     runs-on: ${{ matrix.os }}
     timeout-minutes: 240

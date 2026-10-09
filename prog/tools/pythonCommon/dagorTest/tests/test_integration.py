@@ -54,6 +54,19 @@ class IntegrationTest(unittest.TestCase):
       '''.format(name, jamfile, UNIT_TEST_DIR.replace('\\', '/'), case, extra))
     return runner.run_target(self.ctx, t, self.builds)
 
+  def describe(self, results):
+    """What went wrong, for assertion messages: CI output is all there is to go on"""
+    out = []
+    for tid, r in results.items():
+      out.append('{}: {} {}'.format(tid, r.status.value, r.message or ''))
+      if r.log and r.status != Status.PASSED:
+        try:
+          with open(os.path.join(self.ctx.run_dir, r.log), 'r', encoding='utf-8', errors='replace') as f:
+            out += ['    ' + l.rstrip() for l in f.readlines()[-15:]]
+        except OSError:
+          pass
+    return '\n'.join(out)
+
   def only_case(self, res):
     self.assertEqual(len(res.cases), 1, res.cases)
     return res.cases[0]
@@ -144,7 +157,8 @@ class IntegrationTest(unittest.TestCase):
     by_id = {t.id: t for t in targets}
     results = {i: runner.run_target(self.ctx, by_id[i], self.builds) for i in ('e.pass', 'e.fail', 'e.skip', 'e.http')}
     self.assertEqual({i: r.status for i, r in results.items()},
-                     {'e.pass': Status.PASSED, 'e.fail': Status.FAILED, 'e.skip': Status.SKIPPED, 'e.http': Status.PASSED})
+                     {'e.pass': Status.PASSED, 'e.fail': Status.FAILED, 'e.skip': Status.SKIPPED, 'e.http': Status.PASSED},
+                     self.describe(results))
     self.ctx.gpu = 'no'
     try:
       gpu = runner.run_target(self.ctx, by_id['e.gpu'], self.builds)
