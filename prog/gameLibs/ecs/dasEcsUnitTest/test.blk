@@ -1,0 +1,10 @@
+// daECS + daScript: entity systems in tests/*.das react to EventStart/EventEnd broadcasts and record checks
+target{
+  name:t="gameLibs.ecs.dasEcsUnitTest"
+  layer:t="exec"
+  tag:t="gameLibs"
+  tag:t="ecs"
+  jamfile:t="jamfile"
+  exe:t="../../../../tools/util/das_ecs_test"
+  command:t="{exe} tests"
+}

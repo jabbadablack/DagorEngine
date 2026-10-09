@@ -23,6 +23,11 @@ def das_exe(ctx) -> str:
   return os.path.join(ctx.engine_root, 'tools', 'util', base + '-dev' + ('.exe' if ctx.host == 'windows' else ''))
 
 
+def das_path(path: str) -> str:
+  """daScript compares module paths as strings: always pass normalized forward slash paths."""
+  return os.path.normpath(path).replace('\\', '/')
+
+
 def dastest_filters(filters):
   # dastest selects top-level tests by name prefix
   args = []
@@ -56,15 +61,15 @@ def run(ctx, target, builds, env) -> TargetResult:
       res.log = ctx.rel(builds.log(jamfile, for_host=True))
       return res
 
-  das_root = os.path.join(ctx.engine_root, DAS_ROOT)
+  das_root = das_path(os.path.join(ctx.engine_root, DAS_ROOT))
   report_path = os.path.join(tdir, 'dastest.json')
   if os.path.exists(report_path):
     os.remove(report_path)
-  cmd = [exe, '-dasroot', das_root, os.path.join(das_root, 'dastest', 'dastest.das'), '--']
+  cmd = [exe, '-dasroot', das_root, das_root + '/dastest/dastest.das', '--']
   for p in target.params['path']:
-    cmd += ['--test', os.path.normpath(os.path.join(target.dir, p))]
+    cmd += ['--test', das_path(os.path.join(target.dir, p))]
   if target.params.get('project'):
-    cmd += ['--test-project', target.path_param('project')]
+    cmd += ['--test-project', das_path(target.path_param('project'))]
   if target.params.get('isolated'):
     cmd.append('--isolated-mode')
   timeout = target.timeout * ctx.timeout_scale

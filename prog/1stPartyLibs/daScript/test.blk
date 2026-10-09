@@ -1,0 +1,9 @@
+// the daScript language and daslib test suite, run by the engine's das interpreter
+// (dastest/tests isn't included: it spawns `<exe> dastest.das` the way the standalone daslang host is invoked)
+target{
+  name:t="daScript.suite"
+  layer:t="das"
+  tag:t="daScript"
+  path:t="tests"
+  timeout:r=1800
+}

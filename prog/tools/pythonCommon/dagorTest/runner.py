@@ -59,7 +59,7 @@ def unmet_requirement(ctx: RunContext, target: Target) -> Optional[str]:
 def build_all(ctx: RunContext, targets: List[Target], builds: jam.BuildCache):
   """Builds everything up front so test timings don't include builds and parallel runs never wait on jam."""
   for t in targets:
-    if t.layer == 'cpp':
+    if t.layer in ('cpp', 'exec') and t.params.get('jamfile'):
       builds.ensure(t.path_param('jamfile'))
     elif t.layer == 'das':
       builds.ensure(os.path.join(ctx.engine_root, das.DAS_JAMFILE), for_host=True)

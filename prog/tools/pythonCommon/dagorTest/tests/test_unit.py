@@ -57,7 +57,7 @@ class ManifestTest(TempDirTest):
     self.check_error('target{ name:t="a"; layer:t="exec"; command:t="x"; tiemout:r=1 }', "unknown key 'tiemout'")
 
   def test_rejects_key_of_another_layer(self):
-    self.check_error('target{ name:t="a"; layer:t="exec"; command:t="x"; exe:t="y" }', "unknown key 'exe'")
+    self.check_error('target{ name:t="a"; layer:t="exec"; command:t="x"; dataDir:t="y" }', "unknown key 'dataDir'")
 
   def test_rejects_unknown_layer_and_requirement(self):
     self.check_error('target{ name:t="a"; layer:t="python" }', 'unknown layer')

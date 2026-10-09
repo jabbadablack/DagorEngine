@@ -31,7 +31,7 @@ LAYER_KEYS = {
   'das': {'path', 'project', 'isolated'},
   'ecs': {'path', 'scene', 'game'},
   'scenario': {'path', 'scene', 'game'},
-  'exec': {'command', 'cwd'},
+  'exec': {'command', 'cwd', 'jamfile', 'exe'},
 }
 REPEATABLE_KEYS = {'tag', 'platform', 'requires', 'path'}
 DEFAULT_TIMEOUT = 600.0
