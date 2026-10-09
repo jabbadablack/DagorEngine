@@ -156,6 +156,8 @@ static bool assertion_handler(bool /*verify*/, const char *file, int line, const
     text.avprintf(0, fmt, args, anum);
   }
   text.aprintf(0, "; function: %s", func ? func : "<no_func>");
+  if (unittest::consume_expected_logerr(text)) // expected with unittest::ExpectLogerr; the asserting code continues
+    return false;
   if (!is_main_thread() || !interlocked_acquire_load(unittest_in_case))
     unittest::queue_unexpected_logerr(text);
   else
@@ -166,6 +168,8 @@ static bool assertion_handler(bool /*verify*/, const char *file, int line, const
 #if defined(USE_EASTL) && EASTL_ASSERT_ENABLED
 static void eastl_assertion_failure_function(const char *expr, void * /*ctx*/)
 {
+  if (unittest::consume_expected_logerr(expr))
+    return;
   if (!is_main_thread() || !interlocked_acquire_load(unittest_in_case))
     unittest::queue_unexpected_logerr(String(0, "EASTL Assertion: %s", expr));
   else

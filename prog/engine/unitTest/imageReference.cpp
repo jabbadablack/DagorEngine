@@ -86,7 +86,7 @@ ImageCheckResult check_image(const TexImage32 &actual, const char *name, const I
 
   const String refCopyFn = artifact_path(String(0, "%s.reference.png", name));
   if (!refCopyFn.empty())
-    copy_file(refFn, refCopyFn);
+    dag::copy_file(refFn, refCopyFn);
 
   TexImage32Holder diff(TexImage32::create(ref.img->w, ref.img->h, tmpmem));
   res.compare = compare_images(actual, *ref.img, params, diff.img);

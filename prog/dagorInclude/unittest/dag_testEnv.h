@@ -43,6 +43,9 @@ void set_options(const Options &opt);
 String data_path(const char *rel);
 // <artifactDir>/<case dir>/rel, with directories created; empty if artifacts are disabled
 String artifact_path(const char *rel);
+// A fresh, empty, writable directory for the current test case: <artifactDir>/<case dir>/scratch, or a per-process
+// directory in the system temp dir when artifacts are disabled. Each call empties it again.
+String scratch_dir();
 
 // Current test case, maintained by the test framework glue. Used to name artifact dirs and events.
 void set_current_case(const char *case_name);
@@ -69,6 +72,11 @@ bool consume_expected_logerr(const char *msg);
 // main thread. Thread-safe.
 void queue_unexpected_logerr(const char *msg);
 bool pop_unexpected_logerr(String &out_msg);
+
+// HTTP server provided by test_all.py to targets with requires:t="http_server" in test.blk: it serves root_dir, an empty
+// writable directory where tests put the files to serve, at base_url (ends with '/'). Returns false when the server isn't
+// available (e.g. the test executable is run by hand); such tests should be skipped.
+bool http_service(String &out_base_url, String &out_root_dir);
 
 struct ImageCheckResult
 {

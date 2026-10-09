@@ -13,7 +13,8 @@
 
 namespace unittest
 {
-// Expects error messages containing substr while in scope; they don't fail the test.
+// Expects error messages containing substr while in scope; they don't fail the test. Dagor and EASTL assertions count
+// as errors too (the asserting code then continues as in a release build).
 // On scope exit checks that exactly `count` of them were logged (any number when count < 0).
 class ExpectLogerr
 {

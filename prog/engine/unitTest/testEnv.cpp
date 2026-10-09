@@ -4,6 +4,7 @@
 #include <osApiWrappers/dag_atomic.h>
 #include <osApiWrappers/dag_critSec.h>
 #include <osApiWrappers/dag_direct.h>
+#include <osApiWrappers/dag_directUtils.h>
 #include <osApiWrappers/dag_files.h>
 #include <osApiWrappers/dag_miscApi.h>
 #include <osApiWrappers/dag_threads.h>
@@ -13,6 +14,7 @@
 #include <stdlib.h>
 #if _TARGET_PC_WIN
 #include <direct.h>
+#include <process.h>
 #else
 #include <unistd.h>
 #endif
@@ -79,6 +81,45 @@ String artifact_path(const char *rel)
   String path = join_path(g_options.artifactDir, String(0, "%s/%s", case_dir_name(g_current_case).c_str(), rel).c_str());
   dd_mkpath(path);
   return path;
+}
+
+static String temp_root()
+{
+  const char *tmp = getenv("TMPDIR");
+  if (!tmp || !*tmp)
+    tmp = getenv("TEMP");
+  if (!tmp || !*tmp)
+    tmp = getenv("TMP");
+#if _TARGET_PC_WIN
+  String root(0, "%s/dagor_unittest_%d", tmp && *tmp ? tmp : ".", _getpid());
+#else
+  String root(0, "%s/dagor_unittest_%d", tmp && *tmp ? tmp : "/tmp", getpid());
+#endif
+  dd_simplify_fname_c(root.data());
+  root.updateSz();
+  return root;
+}
+
+String scratch_dir()
+{
+  const String base = g_options.artifactDir.empty() ? temp_root() : g_options.artifactDir;
+  String dir(0, "%s/%s/scratch", base.c_str(), case_dir_name(g_current_case).c_str());
+  dag::remove_dirtree(dir);
+  dd_mkdir(dir);
+  return dir;
+}
+
+bool http_service(String &out_base_url, String &out_root_dir)
+{
+  const char *url = getenv("DAGOR_TEST_HTTP_URL");
+  const char *root = getenv("DAGOR_TEST_HTTP_ROOT");
+  if (!url || !*url || !root || !*root)
+    return false;
+  out_base_url = url;
+  if (out_base_url[out_base_url.length() - 1] != '/')
+    out_base_url += "/";
+  out_root_dir = root;
+  return true;
 }
 
 void set_current_case(const char *case_name)

@@ -2,7 +2,9 @@
 
 #include <unittest/dag_unitTest.h>
 #include <debug/dag_debug.h>
+#include <debug/dag_assert.h>
 #include <osApiWrappers/dag_direct.h>
+#include <osApiWrappers/dag_files.h>
 
 TEST_CASE("expected errors do not fail the test", "[testEnv][logerr]")
 {
@@ -53,4 +55,22 @@ TEST_CASE("json escaping", "[testEnv]") { CHECK(unittest::json_escape("a\"b\\c\n
 TEST_CASE("current case tracks the running test case", "[testEnv]")
 {
   CHECK(String(unittest::current_case()) == "current case tracks the running test case");
+}
+
+TEST_CASE("expected dagor assertions do not fail the test", "[testEnv][logerr]")
+{
+  unittest::ExpectLogerr expect("expected assertion");
+  G_ASSERTF(1 + 1 == 3, "expected assertion");
+}
+
+TEST_CASE("scratch dir is fresh and writable", "[testEnv]")
+{
+  const String dir = unittest::scratch_dir();
+  const String fn(0, "%s/file.txt", dir.c_str());
+  file_ptr_t f = df_open(fn, DF_WRITE | DF_CREATE);
+  REQUIRE(f);
+  df_close(f);
+  CHECK(dd_file_exists(fn));
+  CHECK(unittest::scratch_dir() == dir);
+  CHECK_FALSE(dd_file_exists(fn));
 }
