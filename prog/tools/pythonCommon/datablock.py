@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-import os, string, codecs
+import os, re, string, codecs
 import traceback
 import sys
 
@@ -23,6 +23,39 @@ def getTokensEndLoc():
             raise ParseFatalException("incorrect usage of getTokensEndLoc - may only be called from within a parse action")
     finally:
         del fstack
+
+BLK_ESCAPES = {'n': '\n', 't': '\t', 'r': '\r'}
+
+def unescapeBlkString(raw, drop_cr = False):
+    """Quoted string content as prog/engine/ioSys/dataBlock/blk_parser.cpp reads it: ~ escapes the next char."""
+    out = []
+    i = 0
+    while i < len(raw):
+        c = raw[i]
+        if c == '~' and i + 1 < len(raw):
+            i += 1
+            c = BLK_ESCAPES.get(raw[i], raw[i])
+        elif c == '\r' and drop_cr:
+            i += 1
+            continue
+        out.append(c)
+        i += 1
+    return ''.join(out)
+
+def unquoteBlkMultilineString(raw):
+    """Content of a triple-quoted string: the line break right after the opening quotes and the one before the closing
+    quotes are not part of the value, unescaped CRs are dropped."""
+    content = raw[3:-3]
+    first_nl = content.find('\n')
+    if first_nl >= 0 and content[:first_nl].strip(' \r\t') == '':
+        content = content[first_nl + 1:]
+    value = unescapeBlkString(content, drop_cr = True)
+    if len(value) > 1 and value.endswith('\n'):
+        value = value[:-1]
+    return value
+
+def escapeBlkString(value):
+    return value.replace('~', '~~').replace('"', '~"').replace('\n', '~n').replace('\t', '~t').replace('\r', '~r')
 
 class DataBlock:
     def __init__(self, fname = None, name = None, include_includes = False, preserve_formating = False, root_directory = None, mount_points = None, file_encoding = 'utf-8'):
@@ -282,7 +315,7 @@ class DataBlock:
         valStr = ""
         valType = ""
         if isinstance(value, basestring if sys.version_info[0] < 3 else str):
-          valStr = "\"" + value + "\""
+          valStr = "\"" + escapeBlkString(value) + "\""
         elif isinstance(value, tuple):
           if len(value) > 0 and isinstance(value[0], tuple):
             valStr = "[" + " ".join(map(lambda col: "[" + ", ".join(map(lambda x: "%g" % x, col)) + "]", value)) + "]"
@@ -444,7 +477,12 @@ class DataBlock:
 
         boolVal   = trueVal | falseVal
         unquotedString = Word(printables)
-        stringVal = dblQuotedString.copy().setParseAction(removeQuotes) | unquotedString
+        # '...' or "..." with ~ escapes, as in prog/engine/ioSys/dataBlock/blk_parser.cpp
+        multilineString = (Regex(r'"""(?:[^~]|~.)*?"""', re.DOTALL) | Regex(r"'''(?:[^~]|~.)*?'''", re.DOTALL)).setParseAction(
+          lambda s, l, t: [unquoteBlkMultilineString(t[0])])
+        quotedString = multilineString | (Regex(r'"(?:[^"~\r\n]|~.)*"') | Regex(r"'(?:[^'~\r\n]|~.)*'")).setParseAction(
+          lambda s, l, t: [unescapeBlkString(t[0][1:-1])])
+        stringVal = quotedString | unquotedString
         value     = (matrixVal | vectorVal | boolVal | stringVal)
         assigment = (typedVar + Suppress('=') + value + Optional(';').suppress()).setParseAction(addVar)
         assigment.setName("assigment")
