@@ -1,0 +1,5 @@
+// in-game tests (layer:t="ecs") of this project run its game, built by `python prog/build.py code`
+game{
+  codename:t="outer_space"
+  dir:t="game"
+}

@@ -124,6 +124,7 @@ mountPoints {
   "%gameLibs"  {forSource:t="../../prog/gameLibs"; forVromfs:t="gamelibs";}
   "%scripts"   { forSource:t="../prog/scripts"; forVromfs:t="scripts"; }
   "%danetlibs" {forSource:t="../../prog/daNetGameLibs"; forVromfs:t="danetlibs";}
+  "%dastest"   { forSource:t="../../prog/1stPartyLibs/daScript/dastest"; forVromfs:t="dastest"; } // in-game tests (-das_test)
 }
 
 addonBasePath { // first-stated-first-searched

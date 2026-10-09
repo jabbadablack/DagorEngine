@@ -11,6 +11,7 @@ let
     "math" => "%gameLibs/das/math";
     "daFrameGraph" => "%gameLibs/das/daFrameGraph";
     "daslib" => "%daslib";
+    "dastest" => "%dastest";
     "llvm" => "%dasLLVM";
     "danetlibs" => "%danetlibs";
     "gameLibs" => "%gameLibs";
@@ -21,7 +22,8 @@ let
     "sound_utils_net" => "%danetlibs/sound/sound_utils_net";
   }}
   commonAliasPath <- {{
-    "daFrameGraph" => "%gameLibs/das/daFrameGraph.daFG.das"
+    "daFrameGraph" => "%gameLibs/das/daFrameGraph.daFG.das";
+    "testing" => "%dastest/testing.das"; // required by dastest/testing_boost (in-game tests)
   }}
 
 [export]
