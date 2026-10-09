@@ -1,1 +1,0 @@
-jam -sConfig=dev -sPlatform=windows -sPlatformArch=x86_64
