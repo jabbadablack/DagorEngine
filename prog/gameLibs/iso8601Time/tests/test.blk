@@ -1,0 +1,7 @@
+target{
+  name:t="gameLibs.iso8601Time"
+  layer:t="cpp"
+  tag:t="gameLibs"
+  jamfile:t="jamfile"
+  exe:t="iso8601Time-tests"
+}

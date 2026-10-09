@@ -1,20 +1,16 @@
-Root            ?= ../../../.. ;
-Location        = prog/gameLibs/iso8601Time/tests ;
-ConsoleExe      = yes ;
-TargetType      = exe ;
-Target          = tests ;
-AddIncludes     =
-  $(Root)/prog/3rdPartyLibs/unittest-cpp
-  $(Root)/prog/engine/dagorInclude
+Root    ?= ../../../.. ;
+Location = prog/gameLibs/iso8601Time/tests ;
+Target   = iso8601Time-tests ;
+
+include $(Root)/prog/_jBuild/unitTest.jam ;
+
+AddIncludes +=
   $(Root)/prog/gameLibs/publicInclude
 ;
 
-OutDir          = $(Root)/$(Location) ;
-
-include $(Root)/prog/_jBuild/defaults.jam ;
-
 Sources =
   main.cpp
+  test_iso8601.cpp
 ;
 
 UseProgLibs +=
@@ -25,7 +21,6 @@ UseProgLibs +=
   engine/math
   engine/perfMon/daProfilerStub
 
-  3rdPartyLibs/unittest-cpp
   gameLibs/iso8601Time
 ;
 
