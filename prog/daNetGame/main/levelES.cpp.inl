@@ -1226,7 +1226,7 @@ void save_weather_settings_to_screenshot(DataBlock &blk)
   const ecs::TemplateDB &db = g_entity_mgr->getTemplateDB();
   DataBlock *entitiesBlkPtr = nullptr;
   bool isPresetNameValid = strcmp(presetName.c_str(), "") != 0;
-  if (!isPresetNameValid)
+  if (!isPresetNameValid && level_status == LEVEL_LOADED) // levels without a binary (__empty__) have no weather by design
     logerr("'level__weather' is not set! This probably indicates a bug!");
   query_weather_entity_for_export_ecs_query(*g_entity_mgr, [&](ecs::EntityId eid ECS_REQUIRE(ecs::Tag weather_choice_tag)) {
     eastl::string templateName = g_entity_mgr->getEntityTemplateName(eid);
