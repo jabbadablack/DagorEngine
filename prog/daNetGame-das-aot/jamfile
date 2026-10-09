@@ -54,6 +54,7 @@ Sources +=
   prog/1stPartyLibs/daScript/dagorAdapter/da_dummy.cpp
   prog/daNetGame/dasModules/actor.cpp
   prog/daNetGame/dasModules/app.cpp
+  prog/daNetGame/dasModules/testMode.cpp
   prog/gameLibs/dasModules/auth/auth.cpp
   prog/gameLibs/dasModules/appTime/appTime.cpp
   prog/daNetGame/dasModules/camera.cpp

@@ -35,6 +35,12 @@ inline void exit_game_safe(const char *reason)
   ::exit_game("exit from dascript");
 }
 
+inline void exit_game_with_code(const char *reason, int exit_code)
+{
+  logdbg("shutdown because of %s, exit code %d", reason ? reason : "", exit_code);
+  ::exit_game("exit from dascript", exit_code);
+}
+
 inline const DataBlock &dgs_get_game_params()
 {
   const DataBlock *res = ::dgs_get_game_params();

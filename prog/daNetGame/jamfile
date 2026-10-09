@@ -217,6 +217,7 @@ UseProgLibs +=
   engine/math
   engine/lib3d
   engine/image
+  engine/unitTest
   engine/shaders
   engine/streaming
   engine/workCycle

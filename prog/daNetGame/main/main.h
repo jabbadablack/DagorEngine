@@ -1,7 +1,9 @@
 // Copyright (C) Gaijin Games KFT.  All rights reserved.
 #pragma once
 
-void exit_game(const char *reason_static_str); // pointer should be statically allocated string (not null)
+// pointer should be statically allocated string (not null); exit_code becomes the process exit code
+void exit_game(const char *reason_static_str, int exit_code = 0);
+void run_main_loop_frame(); //< one iteration of the main loop: game act, render (on client) and frame end
 bool dng_is_app_terminating();                 //< returns true after entering post-shutdown handler
 
 void set_window_title(const char *net_role);

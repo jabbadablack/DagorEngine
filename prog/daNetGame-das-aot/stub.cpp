@@ -18,6 +18,7 @@
 #include "render/fx/effectEntity.h"
 #include <levelSplines/levelSplines.h>
 #include "main/gameProjConfig.h"
+#include "main/testMode.h"
 #include <render/dasModules/bvh.h>
 #include <generic/dag_functionRef.h>
 
@@ -172,7 +173,23 @@ const rapidjson::Document &get_currently_playing_replay_meta_info()
 }
 bool load_replay_meta_info(const char *, const eastl::function<void(const rapidjson::Document &)> &) { G_ASSERT_RETURN(false, false); }
 
-void exit_game(const char *) { G_ASSERT(0); }
+void exit_game(const char *, int) { G_ASSERT(0); }
+
+namespace test_mode
+{
+bool is_active() { return false; }
+bool is_running_test() { return false; }
+float fixed_dt() { return 0.f; }
+void advance_frames(int) { G_ASSERT(0); }
+void register_test(das::Context *, const char *, const char *, const char *, int) { G_ASSERT(0); }
+void begin_case(const char *) { G_ASSERT(0); }
+void end_case() { G_ASSERT(0); }
+void fail_case(bool) { G_ASSERT(0); }
+void skip_case() { G_ASSERT(0); }
+void log_case(const char *, const char *, int) { G_ASSERT(0); }
+int push_logerr_expectation(const char *) { G_ASSERT_RETURN(false, 0); }
+int pop_logerr_expectation(int) { G_ASSERT_RETURN(false, 0); }
+} // namespace test_mode
 char const *get_exe_version_str() { G_ASSERT_RETURN(false, nullptr); }
 int app_profile_get_app_id() { G_ASSERT_RETURN(false, 0); }
 const app_profile::ProfileSettings &app_profile::get()

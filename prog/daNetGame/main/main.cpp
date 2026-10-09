@@ -80,6 +80,7 @@
 #include "main/main.h"
 #include "main/scriptDebug.h"
 #include "main/settings.h"
+#include "main/testMode.h"
 #include "main/version.h"
 #include "main/vromfs.h"
 #include "main/webui.h"
@@ -212,6 +213,7 @@ bool do_fatal_on_logerr_on_exit = false;
 static bool initial_loading_complete = false;
 
 static const char *quit_reason = nullptr;
+static int quit_exit_code = 0;
 #if _TARGET_PC_LINUX
 static void signal_handler(int signum) // Warning: only async signal safe function calls from within!
 {
@@ -230,9 +232,10 @@ static void install_signal_handlers()
 #else
 static void install_signal_handlers() {}
 #endif
-void exit_game(const char *reason_static_str)
+void exit_game(const char *reason_static_str, int exit_code)
 {
   G_ASSERT(reason_static_str);
+  quit_exit_code = exit_code;
   quit_reason = reason_static_str;
 }
 
@@ -665,6 +668,8 @@ struct FrameSleeper
 
   static void waitForFrameRemainder(int64_t start_ref_ticks)
   {
+    if (test_mode::is_active()) // every test frame advances a fixed game time: no reason to wait for wall clock
+      return;
     TIME_PROFILE(wait_for_target_fps_limit);
 
     bool load = sceneload::is_load_in_progress();
@@ -691,6 +696,20 @@ struct FrameSleeper
 };
 
 PreciseSleepContext FrameSleeper::precise_sleep_context = {};
+
+void run_main_loop_frame()
+{
+#if !_TARGET_IOS
+  FrameSleeper _sleep;
+#endif
+  wait_additional_game_job_done();
+  update_webui(); // webui can run game logic, which needs emgr ownership returned by the PUFD job
+  gameproj::update_before_dagor_work_cycle();
+  ::dagor_work_cycle();
+  cpujobs::release_done_jobs();
+  reset_framemem();
+  watchdog_kick();
+}
 
 void wait_for_target_fps_limit_from_additional_game_job()
 {
@@ -987,6 +1006,7 @@ int DagorWinMain(int nCmdShow, bool /*debugmode*/)
   do_fatal_on_logerr_on_exit =
     dgs_get_settings()->getBlockByNameEx("debug")->getBool("fatalOnLogerrOnExit", !dedicated::is_dedicated());
 #endif
+  test_mode::init(); // after the log handlers: tests attribute errors to test cases
 
 #if (_TARGET_PC || _TARGET_C3) && DAGOR_DBGLEVEL > 0
   if (!dgs_get_settings()->getBlockByNameEx("debug")->getBool("vromfsFirstPriority", true))
@@ -1288,22 +1308,14 @@ int DagorWinMain(int nCmdShow, bool /*debugmode*/)
       gameproj::init_before_main_loop();
     }
 
-#if !_TARGET_IOS
-    FrameSleeper _sleep;
-#endif
-    wait_additional_game_job_done();
-    update_webui(); // webui can run game logic, which needs emgr ownership returned by the PUFD job
-    gameproj::update_before_dagor_work_cycle();
-    ::dagor_work_cycle();
-    cpujobs::release_done_jobs();
-    reset_framemem();
-    watchdog_kick();
+    test_mode::update(); // runs tests (stepping frames itself) between frames, where no frame work is on the stack
+    run_main_loop_frame();
   });
   /* Don't add shutdown code here - it will not be executed, use post_shutdown_handler() instead */
 #if DAGOR_HOSTED_INTERNAL_SERVER
   shutdown_game_instance(); // we quit the game normally, flushing everything, but do not exit the process itself
 #else
-  quit_game(0, /*bRestart*/ false);
+  quit_game(quit_exit_code, /*bRestart*/ false);
   G_ASSERT(0);
 #endif
   return 0;

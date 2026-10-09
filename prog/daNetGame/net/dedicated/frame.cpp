@@ -25,6 +25,7 @@
 #define SLEEP_OVERHEAD_WINDOWS_US \
   1000 // On Windows you can't sleep less then 1 ms (mean sleep overhead is ~0.5 ms, but stddev is ~0.28 ms)
 #include "netded.h"
+#include "main/testMode.h"
 #include <statsd/statsd.h>
 #include "net/dedicated.h"
 #include "main/appProfile.h"
@@ -239,6 +240,10 @@ void idle_loop()
     // 1.5 is 0.87 % (https://en.wikipedia.org/wiki/68%E2%80%9395%E2%80%9399.7_rule#Table_of_numerical_values )
     if (frameTimeMs > 2.f * (mean + 1.5f * stddev))
       logwarn("frame took %.1fms (which is > 200%% of %.1f+1.5*%.1f ms)", frameTimeMs, mean, stddev);
+  }
+  else if (test_mode::is_active())
+  {
+    // no pacing: tests use a fixed game dt per frame, so frames run as fast as the machine allows
   }
   else if (::dgs_get_argv("no_idle")) // keep regular tick pacing without connections (e.g. headless automated tests)
     usleep_precise(1000000 / phys_get_tickrate() - get_time_usec(workcycle_internal::last_wc_time));

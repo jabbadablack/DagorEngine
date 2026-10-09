@@ -725,7 +725,7 @@ static void load_scene(const char *name, const eastl::vector<eastl::string> &imp
     if (DAGOR_UNLIKELY(!load_game_scene(sceneBlk, name, sceneLoaded, /*import_depth*/ 0, ecs::Scene::IMPORT)))
     {
       G_ASSERT_LOG(sceneLoaded, "Failed to load scene from '%s'", name);
-      exit_game("Failed to load scene");
+      exit_game("Failed to load scene", 1);
     }
   }
 

@@ -84,6 +84,7 @@
 #include "input/uiInput.h"
 #include "input/inputEvents.h"
 #include "main/main.h"
+#include "main/testMode.h"
 #include "main/circuit.h"
 #include "main/console.h"
 #include "main/ecsUtils.h"
@@ -313,6 +314,8 @@ eastl::tuple<float /*rtDt*/, float /*dt*/, double /*curTime*/> updateTime()
       rtDt = rtDtNoSmoothing = 1.0 / fps;
     }
   }
+  else if (test_mode::fixed_dt() > 0.f) // tests are deterministic: same game time per frame regardless of machine speed
+    rtDt = rtDtNoSmoothing = test_mode::fixed_dt();
   else if (screencap::fixed_act_rate() >= 0.f)
     rtDt = screencap::fixed_act_rate();
   else
