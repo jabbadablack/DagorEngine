@@ -7,7 +7,7 @@ import threading
 from typing import Dict, List
 
 from . import process
-from .context import RunContext
+from .context import RunContext, relpath_or_abs
 
 BUILD_TIMEOUT = 3 * 3600
 
@@ -41,6 +41,12 @@ def test_exe_path(ctx: RunContext, target, exe_dir: str = None) -> str:
   return os.path.join(out_dir, mangled_exe_name(ctx, target))
 
 
+def split_command(command: str) -> List[str]:
+  """A manifest command line: split first, then expand {python} in each argument (a Windows path would lose its
+  backslashes in shlex)."""
+  return [a.format(python=sys.executable) for a in shlex.split(command)]
+
+
 class BuildCache:
   """Builds every jamfile at most once per run and remembers the outcome."""
 
@@ -64,7 +70,7 @@ class BuildCache:
         if self.ctx.no_build:
           self.results[key] = process.ProcessResult(exit_code=0, timed_out=False, duration=0.0)
         else:
-          print('building {}{}'.format(os.path.relpath(jamfile, self.ctx.engine_root), ' (host)' if for_host else ''), flush=True)
+          print('building {}{}'.format(relpath_or_abs(jamfile, self.ctx.engine_root), ' (host)' if for_host else ''), flush=True)
           self.results[key] = build(self.ctx, jamfile, log, for_host)
       return self.results[key]
 
@@ -82,8 +88,7 @@ class BuildCache:
           self.results[key] = process.ProcessResult(exit_code=0, timed_out=False, duration=0.0)
         else:
           print('building {} ({})'.format(cwd, command), flush=True)
-          self.results[key] = process.run(shlex.split(command.format(python=sys.executable)), cwd=cwd, log_path=log,
-                                          timeout=BUILD_TIMEOUT)
+          self.results[key] = process.run(split_command(command), cwd=cwd, log_path=log, timeout=BUILD_TIMEOUT)
       return self.results[key]
 
   def command_log(self, command: str, cwd: str) -> str:

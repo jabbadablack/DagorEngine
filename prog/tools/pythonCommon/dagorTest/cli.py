@@ -8,7 +8,7 @@ import sys
 import time
 
 from . import devices, discover, jam, report_html, reports, runner
-from .context import RunContext
+from .context import RunContext, relpath_or_abs
 from .manifest import LAYERS, ManifestError
 from .model import RunResult, Status
 
@@ -147,7 +147,7 @@ def main(argv, engine_root, host, host_arch, tools_dir):
   if args.command == 'list':
     for t in targets:
       req = ' requires ' + ','.join(t.requires) if t.requires else ''
-      print('{:<40} {:<9} {:<24} {}{}'.format(t.id, t.layer, ','.join(t.tags), os.path.relpath(t.manifest, engine_root), req))
+      print('{:<40} {:<9} {:<24} {}{}'.format(t.id, t.layer, ','.join(t.tags), relpath_or_abs(t.manifest, engine_root), req))
     print('{} targets'.format(len(targets)))
     return 0
 

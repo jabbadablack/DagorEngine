@@ -1,6 +1,7 @@
 """Unit tests of the runner that need nothing built."""
 import json
 import os
+import sys
 import shutil
 import tempfile
 import textwrap
@@ -103,6 +104,17 @@ class NamingTest(unittest.TestCase):
     self.assertEqual(jam.mangled_exe_name(self.ctx('windows', 'rel'), 'foo-tests'), 'foo-tests.exe')
     self.assertEqual(jam.mangled_exe_name(self.ctx('linux', 'dbg'), 'foo-tests'), 'foo-tests-dbg')
     self.assertEqual(jam.mangled_exe_name(self.ctx('android', 'dev'), 'foo'), 'foo-dev/foo-dev.apk')
+
+  def test_project_build_command_keeps_the_python_path(self):
+    # sys.executable on Windows is C:\...\python.exe: shlex must not see it, it would drop the backslashes
+    cmd = jam.split_command('{python} project.py build "code shaders"')
+    self.assertEqual(cmd, [sys.executable, 'project.py', 'build', 'code shaders'])
+
+  @unittest.skipUnless(os.name == 'nt', 'drives are a Windows thing')
+  def test_paths_on_other_drives_are_shown_absolute(self):
+    from pythonCommon.dagorTest.context import relpath_or_abs
+    self.assertEqual(relpath_or_abs('X:\\Game\\prog\\test.blk', 'C:\\engine'), 'X:/Game/prog/test.blk')
+    self.assertEqual(relpath_or_abs('C:\\engine\\prog\\test.blk', 'C:\\engine'), 'prog/test.blk')
 
   def test_das_exe(self):
     self.assertTrue(das.das_exe(self.ctx('windows', 'dev')).endswith(os.path.join('tools', 'util', 'das-64-dev.exe')))

@@ -4,6 +4,14 @@ import os
 from typing import List, Optional
 
 
+def relpath_or_abs(path, start):
+  """path relative to start with forward slashes, absolute when they are on different drives (a project on another drive)"""
+  try:
+    return os.path.relpath(path, start).replace('\\', '/')
+  except ValueError:
+    return os.path.abspath(path).replace('\\', '/')
+
+
 @dataclasses.dataclass
 class RunContext:
   engine_root: str
@@ -38,4 +46,4 @@ class RunContext:
 
   def rel(self, path):
     """Path relative to the run dir, with forward slashes, as stored in the reports."""
-    return os.path.relpath(path, self.run_dir).replace('\\', '/')
+    return relpath_or_abs(path, self.run_dir)
