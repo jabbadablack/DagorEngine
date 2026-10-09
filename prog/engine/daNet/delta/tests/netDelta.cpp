@@ -1,12 +1,12 @@
 // Copyright (C) Gaijin Games KFT.  All rights reserved.
 
-#include <UnitTest++/UnitTestPP.h>
+#include <catch2/catch_test_macros.hpp>
 #include <daNet/delta/rle.h>
 #include <daNet/delta/deltaCompression.h>
 #include <util/dag_preprocessor.h>
 
 #define DECL_NETDELTA_COMPRESSION_TEST(name, num, sz)                                                                                 \
-  TEST(DAG_CONCAT(CheckNetDeltaCompression, name))                                                                                    \
+  TEST_CASE("NetDeltaCompression " #name, "[netDelta]")                                                                               \
   {                                                                                                                                   \
     uint64_t compressed;                                                                                                              \
     uint32_t a = num, b = 0;                                                                                                          \
@@ -14,7 +14,7 @@
     CHECK(res != -1);                                                                                                                 \
     int len = net::delta::rle0ki_decompress(make_span((uint8_t *)&b, sizeof(b)), make_span_const((uint8_t *)&compressed, res));       \
     CHECK(len == sz);                                                                                                                 \
-    CHECK_EQUAL(a, b);                                                                                                                \
+    CHECK(b == a);                                                                                                                    \
   }
 
 DECL_NETDELTA_COMPRESSION_TEST(564560008IV, 564560008, 4)
@@ -33,14 +33,14 @@ DECL_NETDELTA_COMPRESSION_TEST(255II, 255, 2)
 DECL_NETDELTA_COMPRESSION_TEST(255III, 255, 3)
 DECL_NETDELTA_COMPRESSION_TEST(255IV, 255, 4)
 
-TEST(CheckNetDeltaCompressionDecompressBad)
+TEST_CASE("CheckNetDeltaCompressionDecompressBad", "[netDelta]")
 {
   uint16_t bad = 0, r = 0;
   int len = net::delta::rle0ki_decompress(make_span((uint8_t *)&r, sizeof(r)), make_span_const((const uint8_t *)&bad, sizeof(bad)));
   CHECK(len == 0);
 }
 
-TEST(CheckNetDeltaCompressionDecompressOdd)
+TEST_CASE("CheckNetDeltaCompressionDecompressOdd", "[netDelta]")
 {
   uint16_t odd = 111 << 8 /*shift for little endian*/, r = 0;
   int len = net::delta::rle0ki_decompress(make_span((uint8_t *)&r, sizeof(r)), make_span_const((const uint8_t *)&odd, sizeof(odd)));
@@ -48,7 +48,7 @@ TEST(CheckNetDeltaCompressionDecompressOdd)
   CHECK(r == 0);
 }
 
-TEST(CheckNetDeltaCompressionDecompressEven)
+TEST_CASE("CheckNetDeltaCompressionDecompressEven", "[netDelta]")
 {
   uint16_t even = 222 << 8 /*shift for little endian*/, r = 0;
   int len = net::delta::rle0ki_decompress(make_span((uint8_t *)&r, sizeof(r)), make_span_const((const uint8_t *)&even, sizeof(even)));
@@ -56,7 +56,7 @@ TEST(CheckNetDeltaCompressionDecompressEven)
   CHECK(r == 0);
 }
 
-TEST(CheckNetDeltaReadDeltaRejectsOversizedCompressedSize)
+TEST_CASE("CheckNetDeltaReadDeltaRejectsOversizedCompressedSize", "[netDelta]")
 {
   // compressedSize is wire-controlled: readDelta must reject a size larger than the
   // bytes actually present instead of building a view past the received data
