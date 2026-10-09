@@ -4,6 +4,7 @@ PlatformSpec_windows_x86_64 = clang ;
 CheckedContainers ?= yes ;
 
 Location = prog/gameLibs/render/daFrameGraph/tests ;
+DAFG_ENABLE_UNIT_TESTS = yes ; # link the library variant with its embedded unit tests
 Target   = daFrameGraph-tests ;
 
 include $(Root)/prog/_jBuild/unitTest.jam ;

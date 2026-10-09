@@ -17,10 +17,12 @@
 #include <math/dag_bits.h>
 
 
-#if __has_include(<UnitTest++/UnitTestPP.h>)
+// Unit tests of the internal algorithms below live here to reach them; they are compiled only into the library variant
+// used by the daFrameGraph tests (DAFG_ENABLE_UNIT_TESTS=yes in prog/gameLibs/render/daFrameGraph/tests/jamfile)
+#if DAFG_UNIT_TESTS
 #include <math/random/dag_random.h>
-#include <UnitTest++/UnitTestPP.h>
-#define ENABLE_UNIT_TESTS
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
 #endif
 
 
@@ -363,116 +365,118 @@ FmemVector<Job> boxes_to_jobs(eastl::span<const Job> jobs, TimeInterval timepoin
 
 } // namespace
 
-#ifdef ENABLE_UNIT_TESTS
+#if DAFG_UNIT_TESTS
 
-SUITE(BoxUnitJobsAliveAtT)
+namespace BoxUnitJobsAliveAtT_tests
 {
-  FmemVector<Job> gen_random_jobs_alive_at(JobCount count, TimePoint t, TimeInterval max_time)
+FmemVector<Job> gen_random_jobs_alive_at(JobCount count, TimePoint t, TimeInterval max_time)
+{
+  FmemVector<Job> result;
+  result.reserve(count);
+  for (JobIndex i = 0; i < count; ++i)
   {
-    FmemVector<Job> result;
-    result.reserve(count);
-    for (JobIndex i = 0; i < count; ++i)
+    // The distr is a bit non-uniform here, but I don't care honestly
+    const auto type = dagor_random::rnd_int(0, 2);
+    if (type == 0)
     {
-      // The distr is a bit non-uniform here, but I don't care honestly
-      const auto type = dagor_random::rnd_int(0, 2);
-      if (type == 0)
-      {
-        const TimePoint l = dagor_random::rnd_int(0, t);
-        const TimePoint r = dagor_random::rnd_int(t + 1, max_time - 1);
-        result.push_back(Job{l, r});
-      }
-      else if (type == 1)
-      {
-        const TimePoint l = dagor_random::rnd_int(0, t);
-        const TimePoint r = dagor_random::rnd_int(0, l);
-        result.push_back(Job{l, r});
-      }
-      else
-      {
-        const TimePoint r = dagor_random::rnd_int(t + 1, max_time - 1);
-        const TimePoint l = dagor_random::rnd_int(r, max_time - 1);
-        result.push_back(Job{l, r});
-      }
+      const TimePoint l = dagor_random::rnd_int(0, t);
+      const TimePoint r = dagor_random::rnd_int(t + 1, max_time - 1);
+      result.push_back(Job{l, r});
     }
-
-    return result;
-  }
-
-  void check(const eastl::span<const Job> jobs, const TimeInterval timepoint_count, const eastl::span<const BoxIndex> boxing,
-    const MemorySize box_height, const float eps)
-  {
-    FmemVector<Job> resolvedJobs;
-    resolvedJobs.reserve(jobs.size());
-    for (JobIndex jobIdx = 0; jobIdx < jobs.size(); ++jobIdx)
-      if (boxing[jobIdx] != UNRESOLVED_BOX_ID)
-        resolvedJobs.push_back(jobs[jobIdx]);
-
-    CHECK_CLOSE(jobs.size(), resolvedJobs.size(), 2 * box_height * ceil((1 / eps) * (1 / eps)));
-
-
-    const auto boxJobs = boxes_to_jobs(jobs, timepoint_count, boxing);
-
-    // Sanity-check for boxes_to_jobs: both points of each job must be
-    // contained within it's box
-    for (JobIndex i = 0; i < jobs.size(); ++i)
+    else if (type == 1)
     {
-      if (boxing[i] == UNRESOLVED_BOX_ID)
-        continue;
-
-      const auto job = jobs[i];
-      const auto box = boxJobs[boxing[i]];
-      if (job.left == job.right)
-      {
-        CHECK(box.left == box.right);
-        continue;
-      }
-      if (box.left == box.right)
-        continue; // spanning boxes contain everything
-
-      // Now both job and box are not spanning
-      if (box.left < box.right) // non-wrap-around box
-        CHECK(box.left <= job.left && job.left < job.right && job.right <= box.right);
-      else if (job.left < job.right) // non-wrap-around job
-        CHECK(job.right <= box.right || box.left <= job.left);
-      else // both are wraparound
-        CHECK(job.right <= box.right && box.left <= job.left);
+      const TimePoint l = dagor_random::rnd_int(0, t);
+      const TimePoint r = dagor_random::rnd_int(0, l);
+      result.push_back(Job{l, r});
     }
-
-    FmemVector<JobCount> boxSizes(boxJobs.size(), 0);
-    for (JobIndex job = 0; job < jobs.size(); ++job)
-      if (auto box = boxing[job]; box != UNRESOLVED_BOX_ID)
-        ++boxSizes[box];
-
-    for (auto size : boxSizes)
-      CHECK(size <= box_height);
-
-    const auto initialLoads = calculate_loads(jobs, timepoint_count);
-    const auto resolvedLoads = calculate_loads(resolvedJobs, timepoint_count);
-    const auto boxLoads = calculate_loads(boxJobs, timepoint_count);
-
-    for (TimePoint t = 0; t < timepoint_count; ++t)
-      CHECK_CLOSE(resolvedLoads[t], boxLoads[t] * box_height, 4 * eps * initialLoads[t]);
+    else
+    {
+      const TimePoint r = dagor_random::rnd_int(t + 1, max_time - 1);
+      const TimePoint l = dagor_random::rnd_int(r, max_time - 1);
+      result.push_back(Job{l, r});
+    }
   }
 
-  void random_test(int seed, TimeInterval timepoint_count, JobCount job_count, MemorySize box_height, float in_eps)
-  {
-    const MemorySize invEps = static_cast<MemorySize>(ceil(1 / in_eps));
-    dagor_random::set_rnd_seed(seed);
-    const auto aliveAt = dagor_random::rnd_int(0, timepoint_count - 1);
-    auto jobs = gen_random_jobs_alive_at(job_count, aliveAt, timepoint_count);
-    auto boxing = box_unit_jobs_all_alive_at_t(jobs, aliveAt, timepoint_count, box_height, invEps);
-    check(jobs, timepoint_count, boxing, box_height, 1.f / invEps);
-  }
-
-  TEST(SmallTest1) { random_test(42, 100, 200, 5, 0.2f); }
-  TEST(SmallTest2) { random_test(43, 100, 200, 5, 0.2f); }
-  TEST(SmallTest3) { random_test(44, 100, 200, 5, 0.2f); }
-  TEST(SmallTest4) { random_test(45, 100, 200, 5, 0.2f); }
-
-  TEST(ManyJobsBigEps) { random_test(42, 500, 1000, 100, 0.9f); }
-  TEST(ManyJobsSmallEps) { random_test(43, 500, 1000, 100, 0.4f); }
-  TEST(ManyJobsTinyEps) { random_test(44, 500, 1000, 100, 0.1f); }
+  return result;
 }
+
+void check(const eastl::span<const Job> jobs, const TimeInterval timepoint_count, const eastl::span<const BoxIndex> boxing,
+  const MemorySize box_height, const float eps)
+{
+  FmemVector<Job> resolvedJobs;
+  resolvedJobs.reserve(jobs.size());
+  for (JobIndex jobIdx = 0; jobIdx < jobs.size(); ++jobIdx)
+    if (boxing[jobIdx] != UNRESOLVED_BOX_ID)
+      resolvedJobs.push_back(jobs[jobIdx]);
+
+  CHECK_THAT(double(resolvedJobs.size()),
+    Catch::Matchers::WithinAbs(double(jobs.size()), double(2 * box_height * ceil((1 / eps) * (1 / eps)))));
+
+
+  const auto boxJobs = boxes_to_jobs(jobs, timepoint_count, boxing);
+
+  // Sanity-check for boxes_to_jobs: both points of each job must be
+  // contained within it's box
+  for (JobIndex i = 0; i < jobs.size(); ++i)
+  {
+    if (boxing[i] == UNRESOLVED_BOX_ID)
+      continue;
+
+    const auto job = jobs[i];
+    const auto box = boxJobs[boxing[i]];
+    if (job.left == job.right)
+    {
+      CHECK(box.left == box.right);
+      continue;
+    }
+    if (box.left == box.right)
+      continue; // spanning boxes contain everything
+
+    // Now both job and box are not spanning
+    if (box.left < box.right) // non-wrap-around box
+      CHECK((box.left <= job.left && job.left < job.right && job.right <= box.right));
+    else if (job.left < job.right) // non-wrap-around job
+      CHECK((job.right <= box.right || box.left <= job.left));
+    else // both are wraparound
+      CHECK((job.right <= box.right && box.left <= job.left));
+  }
+
+  FmemVector<JobCount> boxSizes(boxJobs.size(), 0);
+  for (JobIndex job = 0; job < jobs.size(); ++job)
+    if (auto box = boxing[job]; box != UNRESOLVED_BOX_ID)
+      ++boxSizes[box];
+
+  for (auto size : boxSizes)
+    CHECK(size <= box_height);
+
+  const auto initialLoads = calculate_loads(jobs, timepoint_count);
+  const auto resolvedLoads = calculate_loads(resolvedJobs, timepoint_count);
+  const auto boxLoads = calculate_loads(boxJobs, timepoint_count);
+
+  for (TimePoint t = 0; t < timepoint_count; ++t)
+    CHECK_THAT(double(boxLoads[t] * box_height),
+      Catch::Matchers::WithinAbs(double(resolvedLoads[t]), double(4 * eps * initialLoads[t])));
+}
+
+void random_test(int seed, TimeInterval timepoint_count, JobCount job_count, MemorySize box_height, float in_eps)
+{
+  const MemorySize invEps = static_cast<MemorySize>(ceil(1 / in_eps));
+  dagor_random::set_rnd_seed(seed);
+  const auto aliveAt = dagor_random::rnd_int(0, timepoint_count - 1);
+  auto jobs = gen_random_jobs_alive_at(job_count, aliveAt, timepoint_count);
+  auto boxing = box_unit_jobs_all_alive_at_t(jobs, aliveAt, timepoint_count, box_height, invEps);
+  check(jobs, timepoint_count, boxing, box_height, 1.f / invEps);
+}
+
+TEST_CASE("BoxUnitJobsAliveAtT/SmallTest1", "[daFG][boxingPacker]") { random_test(42, 100, 200, 5, 0.2f); }
+TEST_CASE("BoxUnitJobsAliveAtT/SmallTest2", "[daFG][boxingPacker]") { random_test(43, 100, 200, 5, 0.2f); }
+TEST_CASE("BoxUnitJobsAliveAtT/SmallTest3", "[daFG][boxingPacker]") { random_test(44, 100, 200, 5, 0.2f); }
+TEST_CASE("BoxUnitJobsAliveAtT/SmallTest4", "[daFG][boxingPacker]") { random_test(45, 100, 200, 5, 0.2f); }
+
+TEST_CASE("BoxUnitJobsAliveAtT/ManyJobsBigEps", "[daFG][boxingPacker]") { random_test(42, 500, 1000, 100, 0.9f); }
+TEST_CASE("BoxUnitJobsAliveAtT/ManyJobsSmallEps", "[daFG][boxingPacker]") { random_test(43, 500, 1000, 100, 0.4f); }
+TEST_CASE("BoxUnitJobsAliveAtT/ManyJobsTinyEps", "[daFG][boxingPacker]") { random_test(44, 500, 1000, 100, 0.1f); }
+} // namespace BoxUnitJobsAliveAtT_tests
 
 #endif
 
@@ -612,7 +616,7 @@ FmemVector<MemoryOffset> color_circular_arc_graph(eastl::span<const Job> jobs, T
 
 } // namespace
 
-#ifdef ENABLE_UNIT_TESTS
+#if DAFG_UNIT_TESTS
 
 FmemVector<Job> gen_random_cyclic_jobs(uint32_t count, uint32_t max_time)
 {
@@ -628,39 +632,39 @@ FmemVector<Job> gen_random_cyclic_jobs(uint32_t count, uint32_t max_time)
   return result;
 }
 
-SUITE(CircularArcGraphColoring)
+namespace CircularArcGraphColoring_tests
 {
-  TEST(Correctness)
+TEST_CASE("CircularArcGraphColoring/Correctness", "[daFG][boxingPacker]")
+{
+  dagor_random::set_rnd_seed(42);
+  for (uint32_t i = 0; i < 100; ++i)
   {
-    dagor_random::set_rnd_seed(42);
-    for (uint32_t i = 0; i < 100; ++i)
+    const TimeInterval maxTime = dagor_random::rnd_int(1, 100);
+    const JobCount jobCount = dagor_random::rnd_int(0, 1000);
+
+    const auto jobs = gen_random_cyclic_jobs(jobCount, maxTime);
+
+    const auto loads = calculate_loads(jobs, maxTime);
+    const TimePoint maxLoadPoint = eastl::max_element(loads.begin(), loads.end()) - loads.begin();
+    const auto coloring = color_circular_arc_graph(jobs, maxTime, maxLoadPoint);
+
+    MemoryOffset colorCount = 0;
+    for (JobIndex i = 0; i < jobs.size(); ++i)
     {
-      const TimeInterval maxTime = dagor_random::rnd_int(1, 100);
-      const JobCount jobCount = dagor_random::rnd_int(0, 1000);
-
-      const auto jobs = gen_random_cyclic_jobs(jobCount, maxTime);
-
-      const auto loads = calculate_loads(jobs, maxTime);
-      const TimePoint maxLoadPoint = eastl::max_element(loads.begin(), loads.end()) - loads.begin();
-      const auto coloring = color_circular_arc_graph(jobs, maxTime, maxLoadPoint);
-
-      MemoryOffset colorCount = 0;
-      for (JobIndex i = 0; i < jobs.size(); ++i)
-      {
-        colorCount = eastl::max(colorCount, coloring[i]);
-        for (JobIndex j = i + 1; j < jobs.size(); ++j)
-          if (coloring[i] == coloring[j])
-            CHECK(!circular_arcs_intersect(jobs[i].left, jobs[i].right, jobs[j].left, jobs[j].right, maxTime));
-      }
-      if (!coloring.empty())
-        ++colorCount;
-
-      const auto load = loads[maxLoadPoint];
-      // Resulting coloring should be no farther away from load than load itself
-      CHECK_CLOSE(load, colorCount, load);
+      colorCount = eastl::max(colorCount, coloring[i]);
+      for (JobIndex j = i + 1; j < jobs.size(); ++j)
+        if (coloring[i] == coloring[j])
+          CHECK(!circular_arcs_intersect(jobs[i].left, jobs[i].right, jobs[j].left, jobs[j].right, maxTime));
     }
+    if (!coloring.empty())
+      ++colorCount;
+
+    const auto load = loads[maxLoadPoint];
+    // Resulting coloring should be no farther away from load than load itself
+    CHECK_THAT(double(colorCount), Catch::Matchers::WithinAbs(double(load), double(load)));
   }
 }
+} // namespace CircularArcGraphColoring_tests
 
 #endif
 
@@ -715,7 +719,7 @@ FmemVector<MemoryOffset> color_interval_graph(eastl::span<const Job> jobs, TimeI
 
 } // namespace
 
-#ifdef ENABLE_UNIT_TESTS
+#if DAFG_UNIT_TESTS
 
 FmemVector<Job> gen_random_separable_jobs(uint32_t count, uint32_t max_time)
 {
@@ -735,39 +739,39 @@ FmemVector<Job> gen_random_separable_jobs(uint32_t count, uint32_t max_time)
   return result;
 }
 
-SUITE(IntervalGraphColoring)
+namespace IntervalGraphColoring_tests
 {
-  TEST(Correctness)
+TEST_CASE("IntervalGraphColoring/Correctness", "[daFG][boxingPacker]")
+{
+  dagor_random::set_rnd_seed(42);
+  for (uint32_t i = 0; i < 100; ++i)
   {
-    dagor_random::set_rnd_seed(42);
-    for (uint32_t i = 0; i < 100; ++i)
+    const TimeInterval maxTime = dagor_random::rnd_int(1, 100);
+    const JobCount jobCount = dagor_random::rnd_int(0, 1000);
+
+    const auto jobs = gen_random_separable_jobs(jobCount, maxTime);
+
+    const auto loads = calculate_loads(jobs, maxTime);
+    const auto zeroLoadPoint = eastl::find(loads.begin(), loads.end(), 0) - loads.begin();
+    G_ASSERT(zeroLoadPoint != maxTime);
+    const auto coloring = color_interval_graph(jobs, maxTime, zeroLoadPoint);
+
+    MemoryOffset colorCount = 0;
+    for (JobIndex i = 0; i < jobs.size(); ++i)
     {
-      const TimeInterval maxTime = dagor_random::rnd_int(1, 100);
-      const JobCount jobCount = dagor_random::rnd_int(0, 1000);
-
-      const auto jobs = gen_random_separable_jobs(jobCount, maxTime);
-
-      const auto loads = calculate_loads(jobs, maxTime);
-      const auto zeroLoadPoint = eastl::find(loads.begin(), loads.end(), 0) - loads.begin();
-      G_ASSERT(zeroLoadPoint != maxTime);
-      const auto coloring = color_interval_graph(jobs, maxTime, zeroLoadPoint);
-
-      MemoryOffset colorCount = 0;
-      for (JobIndex i = 0; i < jobs.size(); ++i)
-      {
-        colorCount = eastl::max(colorCount, coloring[i]);
-        for (JobIndex j = i + 1; j < jobs.size(); ++j)
-          if (coloring[i] == coloring[j])
-            CHECK(!circular_arcs_intersect(jobs[i].left, jobs[i].right, jobs[j].left, jobs[j].right, maxTime));
-      }
-      ++colorCount;
-
-      const auto load = *eastl::max_element(loads.begin(), loads.end());
-      // Resulting coloring should be optimal
-      CHECK_EQUAL(load, colorCount);
+      colorCount = eastl::max(colorCount, coloring[i]);
+      for (JobIndex j = i + 1; j < jobs.size(); ++j)
+        if (coloring[i] == coloring[j])
+          CHECK(!circular_arcs_intersect(jobs[i].left, jobs[i].right, jobs[j].left, jobs[j].right, maxTime));
     }
+    ++colorCount;
+
+    const auto load = *eastl::max_element(loads.begin(), loads.end());
+    // Resulting coloring should be optimal
+    CHECK(colorCount == load);
   }
 }
+} // namespace IntervalGraphColoring_tests
 
 #endif
 
@@ -1347,162 +1351,162 @@ public:
 
 } // namespace
 
-#ifdef ENABLE_UNIT_TESTS
+#if DAFG_UNIT_TESTS
 
-SUITE(BoxUnitJobs)
+namespace BoxUnitJobs_tests
 {
-  void check(eastl::span<const Job> jobs, TimeInterval timepoint_count, eastl::span<const BoxEmbedding> boxing, MemorySize box_height,
-    float eps)
+void check(eastl::span<const Job> jobs, TimeInterval timepoint_count, eastl::span<const BoxEmbedding> boxing, MemorySize box_height,
+  float eps)
+{
+  for (const auto &emb : boxing)
   {
-    for (const auto &emb : boxing)
-    {
-      REQUIRE CHECK(emb.box != UNRESOLVED_BOX_ID);
-      CHECK(emb.offset < box_height);
-    }
-
-    FmemVector<BoxIndex> onlyBoxIndices;
-    onlyBoxIndices.reserve(boxing.size());
-    for (const auto &emb : boxing)
-      onlyBoxIndices.push_back(emb.box);
-    const auto boxJobs = boxes_to_jobs(jobs, timepoint_count, onlyBoxIndices);
-
-    const auto boxLoads = calculate_loads(boxJobs, timepoint_count);
-    const auto initialLoads = calculate_loads(jobs, timepoint_count);
-
-    // Per theorem 2, resulting box load should not at any time exceed
-    // (1+ 4*eps)*L + O(H lg H * 1/eps^2 * lg 1/eps),
-    // where H is box_height and L is the original load at the same point.
-    // The constant inside O should be somewhere around 6, I think.
-    const float error = box_height * log2(box_height + 1) / (eps * eps) * log2(1.f / eps);
-    const float constant = 6;
-    for (TimePoint t = 0; t < timepoint_count; ++t)
-      CHECK(boxLoads[t] <= (1 + 4 * eps) * initialLoads[t] + constant * error);
-
-    FmemVector<JobCount> boxSizes(boxJobs.size(), 0);
-    for (JobIndex job = 0; job < jobs.size(); ++job)
-      ++boxSizes[boxing[job].box];
-
-    FmemBucketVector<JobIndex> boxedJobs(boxJobs.size());
-    for (BoxIndex box = 0; box < boxedJobs.size(); ++box)
-      boxedJobs[box].reserve(boxSizes[box]);
-    for (JobIndex job = 0; job < jobs.size(); ++job)
-      boxedJobs[boxing[job].box].push_back(job);
-
-    for (BoxIndex box = 0; box < boxedJobs.size(); ++box)
-    {
-      const auto &jobsInBox = boxedJobs[box];
-
-      // Check that the chosen offsets within each box lead to a proper coloring within the box
-      for (auto i = jobsInBox.begin(); i != jobsInBox.end(); ++i)
-        for (auto j = i + 1; j != jobsInBox.end(); ++j)
-          if (boxing[*i].offset == boxing[*j].offset)
-            CHECK(!circular_arcs_intersect(jobs[*i].left, jobs[*i].right, jobs[*j].left, jobs[*j].right, timepoint_count));
-    }
+    REQUIRE(emb.box != UNRESOLVED_BOX_ID);
+    CHECK(emb.offset < box_height);
   }
 
-  TEST(SameJobsSmallEps)
-  {
-    constexpr TimeInterval timepoint_count = 2;
-    constexpr TimeInterval box_height = 5;
-    constexpr float eps = 0.0001;
-    FmemVector<Job> jobs(10, Job{0, 1});
-    UnitJobBoxer boxer(jobs, timepoint_count, box_height, static_cast<MemorySize>(ceil(1.f / eps)));
-    const auto boxing = boxer();
-    check(jobs, timepoint_count, boxing, box_height, eps);
-  }
+  FmemVector<BoxIndex> onlyBoxIndices;
+  onlyBoxIndices.reserve(boxing.size());
+  for (const auto &emb : boxing)
+    onlyBoxIndices.push_back(emb.box);
+  const auto boxJobs = boxes_to_jobs(jobs, timepoint_count, onlyBoxIndices);
 
-  TEST(SameJobsBigEps)
-  {
-    constexpr TimeInterval timepoint_count = 2;
-    constexpr TimeInterval box_height = 5;
-    constexpr float eps = 0.5;
-    FmemVector<Job> jobs(100, Job{0, 1});
-    UnitJobBoxer boxer(jobs, timepoint_count, box_height, static_cast<MemorySize>(ceil(1.f / eps)));
-    const auto boxing = boxer();
-    check(jobs, timepoint_count, boxing, box_height, eps);
-  }
+  const auto boxLoads = calculate_loads(boxJobs, timepoint_count);
+  const auto initialLoads = calculate_loads(jobs, timepoint_count);
 
-  TEST(SameJobsWraparound)
-  {
-    constexpr TimeInterval timepoint_count = 2;
-    constexpr TimeInterval box_height = 5;
-    constexpr float eps = 0.5;
-    FmemVector<Job> jobs(10, Job{1, 0});
-    UnitJobBoxer boxer(jobs, timepoint_count, box_height, static_cast<MemorySize>(ceil(1.f / eps)));
-    const auto boxing = boxer();
-    check(jobs, timepoint_count, boxing, box_height, eps);
-  }
+  // Per theorem 2, resulting box load should not at any time exceed
+  // (1+ 4*eps)*L + O(H lg H * 1/eps^2 * lg 1/eps),
+  // where H is box_height and L is the original load at the same point.
+  // The constant inside O should be somewhere around 6, I think.
+  const float error = box_height * log2(box_height + 1) / (eps * eps) * log2(1.f / eps);
+  const float constant = 6;
+  for (TimePoint t = 0; t < timepoint_count; ++t)
+    CHECK(boxLoads[t] <= (1 + 4 * eps) * initialLoads[t] + constant * error);
 
-  TEST(SameJobsAlwaysAlive)
-  {
-    constexpr TimeInterval timepoint_count = 2;
-    constexpr TimeInterval box_height = 5;
-    constexpr float eps = 0.5;
-    FmemVector<Job> jobs(10, Job{0, 0});
-    UnitJobBoxer boxer(jobs, timepoint_count, box_height, static_cast<MemorySize>(ceil(1.f / eps)));
-    const auto boxing = boxer();
-    check(jobs, timepoint_count, boxing, box_height, eps);
-  }
+  FmemVector<JobCount> boxSizes(boxJobs.size(), 0);
+  for (JobIndex job = 0; job < jobs.size(); ++job)
+    ++boxSizes[boxing[job].box];
 
-  TEST(PeskySnake)
-  {
-    constexpr TimeInterval timepoint_count = 100;
-    constexpr TimeInterval box_height = 5;
-    constexpr float eps = 0.7;
-    FmemVector<Job> jobs;
-    for (JobIndex i = 0; i < timepoint_count; ++i)
-      jobs.push_back(Job{i, i});
-    UnitJobBoxer boxer(jobs, timepoint_count, box_height, static_cast<MemorySize>(ceil(1.f / eps)));
-    const auto boxing = boxer();
-    check(jobs, timepoint_count, boxing, box_height, eps);
-  }
+  FmemBucketVector<JobIndex> boxedJobs(boxJobs.size());
+  for (BoxIndex box = 0; box < boxedJobs.size(); ++box)
+    boxedJobs[box].reserve(boxSizes[box]);
+  for (JobIndex job = 0; job < jobs.size(); ++job)
+    boxedJobs[boxing[job].box].push_back(job);
 
-  TEST(Empty)
+  for (BoxIndex box = 0; box < boxedJobs.size(); ++box)
   {
-    constexpr TimeInterval timepoint_count = 100;
-    constexpr TimeInterval box_height = 5;
-    constexpr float eps = 0.7;
-    FmemVector<Job> jobs;
-    UnitJobBoxer boxer(jobs, timepoint_count, box_height, static_cast<MemorySize>(ceil(1.f / eps)));
-    const auto boxing = boxer();
-    check(jobs, timepoint_count, boxing, box_height, eps);
-  }
+    const auto &jobsInBox = boxedJobs[box];
 
-  void random_test(int seed, JobCount job_count, TimePoint timepoint_count)
-  {
-    dagor_random::set_rnd_seed(seed);
-    const MemorySize box_height = dagor_random::rnd_int(1, job_count - 1);
-    const float eps = dagor_random::rnd_float(0.0001, 0.9999);
-    const auto jobs = gen_random_cyclic_jobs(job_count, timepoint_count);
-    UnitJobBoxer boxer(jobs, timepoint_count, box_height, static_cast<MemorySize>(ceil(1.f / eps)));
-    const auto boxing = boxer();
-    check(jobs, timepoint_count, boxing, box_height, eps);
-  }
-
-  TEST(SmallRandom1) { random_test(42, 1, 100); }
-  TEST(SmallRandom2a) { random_test(42, 2, 100); }
-  TEST(SmallRandom2b) { random_test(44, 2, 100); }
-  TEST(SmallRandom3a) { random_test(42, 3, 100); }
-  TEST(SmallRandom3b) { random_test(45, 3, 100); }
-  TEST(SmallRandom4) { random_test(42, 4, 100); }
-  TEST(SmallRandom5a) { random_test(42, 5, 100); }
-  TEST(SmallRandom5b) { random_test(43, 5, 100); }
-  TEST(SmallRandom5c) { random_test(44, 5, 100); }
-  TEST(SmallRandom10a) { random_test(42, 10, 100); }
-  TEST(SmallRandom10b) { random_test(777, 10, 100); }
-
-  TEST(BigRandom)
-  {
-    for (uint32_t i = 0; i < 1000; ++i)
-      random_test(777, 100, 100);
-  }
-
-  TEST(HugeRandom)
-  {
-    for (uint32_t i = 0; i < 100; ++i)
-      random_test(777, 1000, 500);
+    // Check that the chosen offsets within each box lead to a proper coloring within the box
+    for (auto i = jobsInBox.begin(); i != jobsInBox.end(); ++i)
+      for (auto j = i + 1; j != jobsInBox.end(); ++j)
+        if (boxing[*i].offset == boxing[*j].offset)
+          CHECK(!circular_arcs_intersect(jobs[*i].left, jobs[*i].right, jobs[*j].left, jobs[*j].right, timepoint_count));
   }
 }
+
+TEST_CASE("BoxUnitJobs/SameJobsSmallEps", "[daFG][boxingPacker]")
+{
+  constexpr TimeInterval timepoint_count = 2;
+  constexpr TimeInterval box_height = 5;
+  constexpr float eps = 0.0001;
+  FmemVector<Job> jobs(10, Job{0, 1});
+  UnitJobBoxer boxer(jobs, timepoint_count, box_height, static_cast<MemorySize>(ceil(1.f / eps)));
+  const auto boxing = boxer();
+  check(jobs, timepoint_count, boxing, box_height, eps);
+}
+
+TEST_CASE("BoxUnitJobs/SameJobsBigEps", "[daFG][boxingPacker]")
+{
+  constexpr TimeInterval timepoint_count = 2;
+  constexpr TimeInterval box_height = 5;
+  constexpr float eps = 0.5;
+  FmemVector<Job> jobs(100, Job{0, 1});
+  UnitJobBoxer boxer(jobs, timepoint_count, box_height, static_cast<MemorySize>(ceil(1.f / eps)));
+  const auto boxing = boxer();
+  check(jobs, timepoint_count, boxing, box_height, eps);
+}
+
+TEST_CASE("BoxUnitJobs/SameJobsWraparound", "[daFG][boxingPacker]")
+{
+  constexpr TimeInterval timepoint_count = 2;
+  constexpr TimeInterval box_height = 5;
+  constexpr float eps = 0.5;
+  FmemVector<Job> jobs(10, Job{1, 0});
+  UnitJobBoxer boxer(jobs, timepoint_count, box_height, static_cast<MemorySize>(ceil(1.f / eps)));
+  const auto boxing = boxer();
+  check(jobs, timepoint_count, boxing, box_height, eps);
+}
+
+TEST_CASE("BoxUnitJobs/SameJobsAlwaysAlive", "[daFG][boxingPacker]")
+{
+  constexpr TimeInterval timepoint_count = 2;
+  constexpr TimeInterval box_height = 5;
+  constexpr float eps = 0.5;
+  FmemVector<Job> jobs(10, Job{0, 0});
+  UnitJobBoxer boxer(jobs, timepoint_count, box_height, static_cast<MemorySize>(ceil(1.f / eps)));
+  const auto boxing = boxer();
+  check(jobs, timepoint_count, boxing, box_height, eps);
+}
+
+TEST_CASE("BoxUnitJobs/PeskySnake", "[daFG][boxingPacker]")
+{
+  constexpr TimeInterval timepoint_count = 100;
+  constexpr TimeInterval box_height = 5;
+  constexpr float eps = 0.7;
+  FmemVector<Job> jobs;
+  for (JobIndex i = 0; i < timepoint_count; ++i)
+    jobs.push_back(Job{i, i});
+  UnitJobBoxer boxer(jobs, timepoint_count, box_height, static_cast<MemorySize>(ceil(1.f / eps)));
+  const auto boxing = boxer();
+  check(jobs, timepoint_count, boxing, box_height, eps);
+}
+
+TEST_CASE("BoxUnitJobs/Empty", "[daFG][boxingPacker]")
+{
+  constexpr TimeInterval timepoint_count = 100;
+  constexpr TimeInterval box_height = 5;
+  constexpr float eps = 0.7;
+  FmemVector<Job> jobs;
+  UnitJobBoxer boxer(jobs, timepoint_count, box_height, static_cast<MemorySize>(ceil(1.f / eps)));
+  const auto boxing = boxer();
+  check(jobs, timepoint_count, boxing, box_height, eps);
+}
+
+void random_test(int seed, JobCount job_count, TimePoint timepoint_count)
+{
+  dagor_random::set_rnd_seed(seed);
+  const MemorySize box_height = dagor_random::rnd_int(1, job_count - 1);
+  const float eps = dagor_random::rnd_float(0.0001, 0.9999);
+  const auto jobs = gen_random_cyclic_jobs(job_count, timepoint_count);
+  UnitJobBoxer boxer(jobs, timepoint_count, box_height, static_cast<MemorySize>(ceil(1.f / eps)));
+  const auto boxing = boxer();
+  check(jobs, timepoint_count, boxing, box_height, eps);
+}
+
+TEST_CASE("BoxUnitJobs/SmallRandom1", "[daFG][boxingPacker]") { random_test(42, 1, 100); }
+TEST_CASE("BoxUnitJobs/SmallRandom2a", "[daFG][boxingPacker]") { random_test(42, 2, 100); }
+TEST_CASE("BoxUnitJobs/SmallRandom2b", "[daFG][boxingPacker]") { random_test(44, 2, 100); }
+TEST_CASE("BoxUnitJobs/SmallRandom3a", "[daFG][boxingPacker]") { random_test(42, 3, 100); }
+TEST_CASE("BoxUnitJobs/SmallRandom3b", "[daFG][boxingPacker]") { random_test(45, 3, 100); }
+TEST_CASE("BoxUnitJobs/SmallRandom4", "[daFG][boxingPacker]") { random_test(42, 4, 100); }
+TEST_CASE("BoxUnitJobs/SmallRandom5a", "[daFG][boxingPacker]") { random_test(42, 5, 100); }
+TEST_CASE("BoxUnitJobs/SmallRandom5b", "[daFG][boxingPacker]") { random_test(43, 5, 100); }
+TEST_CASE("BoxUnitJobs/SmallRandom5c", "[daFG][boxingPacker]") { random_test(44, 5, 100); }
+TEST_CASE("BoxUnitJobs/SmallRandom10a", "[daFG][boxingPacker]") { random_test(42, 10, 100); }
+TEST_CASE("BoxUnitJobs/SmallRandom10b", "[daFG][boxingPacker]") { random_test(777, 10, 100); }
+
+TEST_CASE("BoxUnitJobs/BigRandom", "[daFG][boxingPacker]")
+{
+  for (uint32_t i = 0; i < 1000; ++i)
+    random_test(777, 100, 100);
+}
+
+TEST_CASE("BoxUnitJobs/HugeRandom", "[daFG][boxingPacker]")
+{
+  for (uint32_t i = 0; i < 100; ++i)
+    random_test(777, 1000, 500);
+}
+} // namespace BoxUnitJobs_tests
 
 #endif
 
@@ -1617,100 +1621,100 @@ FmemVector<BoxEmbedding> box_jobs(eastl::span<const Job> jobs, eastl::span<const
 } // namespace
 
 
-#ifdef ENABLE_UNIT_TESTS
+#if DAFG_UNIT_TESTS
 
-SUITE(BoxJobs)
+namespace BoxJobs_tests
 {
-  void check(eastl::span<const Job> jobs, eastl::span<const MemorySize> job_heights, TimeInterval timepoint_count,
-    eastl::span<const BoxEmbedding> boxing, MemorySize box_height, float eps)
+void check(eastl::span<const Job> jobs, eastl::span<const MemorySize> job_heights, TimeInterval timepoint_count,
+  eastl::span<const BoxEmbedding> boxing, MemorySize box_height, float eps)
+{
+  for (const auto &emb : boxing)
+    REQUIRE(emb.box != UNRESOLVED_BOX_ID);
+
+  for (JobIndex i = 0; i < jobs.size(); ++i)
+    CHECK(boxing[i].offset + job_heights[i] <= box_height);
+
+  FmemVector<BoxIndex> onlyBoxIndices;
+  onlyBoxIndices.reserve(boxing.size());
+  for (const auto &emb : boxing)
+    onlyBoxIndices.push_back(emb.box);
+  const auto boxJobs = boxes_to_jobs(jobs, timepoint_count, onlyBoxIndices);
+
+  const auto boxLoads = calculate_loads(boxJobs, timepoint_count);
+  const auto initialLoads = calculate_loads(jobs, timepoint_count);
+
+  // Per corollary 15, resulting box load should not at any time exceed
+  // (1 + 9*eps)*L + O(H lg^2 (H/h_min) / eps^4),
+  // where H is box_height, L is the original load at the same point,
+  // and h_min is the minimal job height.
+  // The constant inside O should be the same as in unit job boxing, but maybe a bit bigger?
+  const float min_h = static_cast<float>(*eastl::min_element(job_heights.begin(), job_heights.end()));
+  const float invEps = 1.f / eps;
+  const float epsToMinus4Power = invEps * invEps * invEps * invEps;
+  const float logTerm = log2(box_height / min_h);
+  const float error = box_height * logTerm * logTerm * epsToMinus4Power;
+  const float constant = 6;
+  for (TimePoint t = 0; t < timepoint_count; ++t)
+    CHECK(boxLoads[t] <= (1 + 9 * eps) * initialLoads[t] + constant * error);
+
+  FmemVector<JobCount> boxSizes(boxJobs.size(), 0);
+  for (JobIndex job = 0; job < jobs.size(); ++job)
+    ++boxSizes[boxing[job].box];
+
+  FmemBucketVector<JobIndex> boxedJobs(boxJobs.size());
+  for (BoxIndex box = 0; box < boxedJobs.size(); ++box)
+    boxedJobs[box].reserve(boxSizes[box]);
+  for (JobIndex job = 0; job < jobs.size(); ++job)
+    boxedJobs[boxing[job].box].push_back(job);
+
+  for (BoxIndex box = 0; box < boxedJobs.size(); ++box)
   {
-    for (const auto &emb : boxing)
-      REQUIRE CHECK(emb.box != UNRESOLVED_BOX_ID);
+    const auto &jobsInBox = boxedJobs[box];
 
-    for (JobIndex i = 0; i < jobs.size(); ++i)
-      CHECK(boxing[i].offset + job_heights[i] <= box_height);
+    REQUIRE(!jobsInBox.empty());
 
-    FmemVector<BoxIndex> onlyBoxIndices;
-    onlyBoxIndices.reserve(boxing.size());
-    for (const auto &emb : boxing)
-      onlyBoxIndices.push_back(emb.box);
-    const auto boxJobs = boxes_to_jobs(jobs, timepoint_count, onlyBoxIndices);
-
-    const auto boxLoads = calculate_loads(boxJobs, timepoint_count);
-    const auto initialLoads = calculate_loads(jobs, timepoint_count);
-
-    // Per corollary 15, resulting box load should not at any time exceed
-    // (1 + 9*eps)*L + O(H lg^2 (H/h_min) / eps^4),
-    // where H is box_height, L is the original load at the same point,
-    // and h_min is the minimal job height.
-    // The constant inside O should be the same as in unit job boxing, but maybe a bit bigger?
-    const float min_h = static_cast<float>(*eastl::min_element(job_heights.begin(), job_heights.end()));
-    const float invEps = 1.f / eps;
-    const float epsToMinus4Power = invEps * invEps * invEps * invEps;
-    const float logTerm = log2(box_height / min_h);
-    const float error = box_height * logTerm * logTerm * epsToMinus4Power;
-    const float constant = 6;
-    for (TimePoint t = 0; t < timepoint_count; ++t)
-      CHECK(boxLoads[t] <= (1 + 9 * eps) * initialLoads[t] + constant * error);
-
-    FmemVector<JobCount> boxSizes(boxJobs.size(), 0);
-    for (JobIndex job = 0; job < jobs.size(); ++job)
-      ++boxSizes[boxing[job].box];
-
-    FmemBucketVector<JobIndex> boxedJobs(boxJobs.size());
-    for (BoxIndex box = 0; box < boxedJobs.size(); ++box)
-      boxedJobs[box].reserve(boxSizes[box]);
-    for (JobIndex job = 0; job < jobs.size(); ++job)
-      boxedJobs[boxing[job].box].push_back(job);
-
-    for (BoxIndex box = 0; box < boxedJobs.size(); ++box)
-    {
-      const auto &jobsInBox = boxedJobs[box];
-
-      REQUIRE CHECK(!jobsInBox.empty());
-
-      // Check that the chosen offsets within each box lead to a proper coloring within the box
-      for (auto i = jobsInBox.begin(); i != jobsInBox.end(); ++i)
-        for (auto j = i + 1; j != jobsInBox.end(); ++j)
-          if (boxing[*j].offset <= boxing[*i].offset && boxing[*i].offset < boxing[*j].offset + job_heights[*j] ||
-              boxing[*i].offset <= boxing[*j].offset && boxing[*j].offset < boxing[*i].offset + job_heights[*i])
-            CHECK(!circular_arcs_intersect(jobs[*i].left, jobs[*i].right, jobs[*j].left, jobs[*j].right, timepoint_count));
-    }
+    // Check that the chosen offsets within each box lead to a proper coloring within the box
+    for (auto i = jobsInBox.begin(); i != jobsInBox.end(); ++i)
+      for (auto j = i + 1; j != jobsInBox.end(); ++j)
+        if (boxing[*j].offset <= boxing[*i].offset && boxing[*i].offset < boxing[*j].offset + job_heights[*j] ||
+            boxing[*i].offset <= boxing[*j].offset && boxing[*j].offset < boxing[*i].offset + job_heights[*i])
+          CHECK(!circular_arcs_intersect(jobs[*i].left, jobs[*i].right, jobs[*j].left, jobs[*j].right, timepoint_count));
   }
-
-  FmemVector<MemorySize> gen_random_heights(JobCount count, MemorySize min, MemorySize max)
-  {
-    FmemVector<MemorySize> result(count);
-    for (auto &val : result)
-      val = dagor_random::rnd_int(min, max);
-    return result;
-  }
-
-  void random_test(int seed, JobCount job_count, TimePoint timepoint_count)
-  {
-    dagor_random::set_rnd_seed(seed);
-    const MemorySize box_height = dagor_random::rnd_int(1, job_count - 1);
-    const float inEps = dagor_random::rnd_float(0.0000001, 0.9999);
-
-    const MemorySize invEps = static_cast<MemorySize>(ceil(1.f / inEps));
-
-    const MemorySize max_job_height = box_height / invEps;
-    const MemorySize min_job_height = dagor_random::rnd_int(1, max_job_height);
-
-    G_ASSERTF(min_job_height <= max_job_height, "Bad test seed!");
-
-    const auto jobs = gen_random_cyclic_jobs(job_count, timepoint_count);
-    const auto job_heights = gen_random_heights(job_count, min_job_height, max_job_height);
-    const auto boxing = box_jobs(jobs, job_heights, timepoint_count, box_height, invEps);
-    check(jobs, job_heights, timepoint_count, boxing, box_height, 1.f / invEps);
-  }
-
-  TEST(Small1) { random_test(42, 10, 10); }
-  TEST(Small2) { random_test(46, 15, 10); }
-  TEST(Medium) { random_test(42, 100, 500); }
-  TEST(Big1) { random_test(42, 1000, 500); }
-  TEST(Big2) { random_test(43, 1000, 500); }
 }
+
+FmemVector<MemorySize> gen_random_heights(JobCount count, MemorySize min, MemorySize max)
+{
+  FmemVector<MemorySize> result(count);
+  for (auto &val : result)
+    val = dagor_random::rnd_int(min, max);
+  return result;
+}
+
+void random_test(int seed, JobCount job_count, TimePoint timepoint_count)
+{
+  dagor_random::set_rnd_seed(seed);
+  const MemorySize box_height = dagor_random::rnd_int(1, job_count - 1);
+  const float inEps = dagor_random::rnd_float(0.0000001, 0.9999);
+
+  const MemorySize invEps = static_cast<MemorySize>(ceil(1.f / inEps));
+
+  const MemorySize max_job_height = box_height / invEps;
+  const MemorySize min_job_height = dagor_random::rnd_int(1, max_job_height);
+
+  G_ASSERTF(min_job_height <= max_job_height, "Bad test seed!");
+
+  const auto jobs = gen_random_cyclic_jobs(job_count, timepoint_count);
+  const auto job_heights = gen_random_heights(job_count, min_job_height, max_job_height);
+  const auto boxing = box_jobs(jobs, job_heights, timepoint_count, box_height, invEps);
+  check(jobs, job_heights, timepoint_count, boxing, box_height, 1.f / invEps);
+}
+
+TEST_CASE("BoxJobs/Small1", "[daFG][boxingPacker]") { random_test(42, 10, 10); }
+TEST_CASE("BoxJobs/Small2", "[daFG][boxingPacker]") { random_test(46, 15, 10); }
+TEST_CASE("BoxJobs/Medium", "[daFG][boxingPacker]") { random_test(42, 100, 500); }
+TEST_CASE("BoxJobs/Big1", "[daFG][boxingPacker]") { random_test(42, 1000, 500); }
+TEST_CASE("BoxJobs/Big2", "[daFG][boxingPacker]") { random_test(43, 1000, 500); }
+} // namespace BoxJobs_tests
 
 #endif
 
@@ -2055,64 +2059,64 @@ private:
 };
 
 
-#ifdef ENABLE_UNIT_TESTS
+#if DAFG_UNIT_TESTS
 
-SUITE(TopProfileTracking)
+namespace TopProfileTracking_tests
 {
-  TEST(Simple1)
+TEST_CASE("TopProfileTracking/Simple1", "[daFG][boxingPacker]")
+{
+  TopProfileTracker tracker(100);
+  tracker.rangeUpdate(25, 50, 42);
+  for (int i = 25; i < 49; ++i)
+    CHECK(tracker.rangeMax(i, i + 1) == 42);
+}
+
+TEST_CASE("TopProfileTracking/Simple2", "[daFG][boxingPacker]")
+{
+  TopProfileTracker tracker(100);
+  tracker.rangeUpdate(25, 50, 42);
+  CHECK(tracker.rangeMax(39, 88) == 42);
+}
+
+TEST_CASE("TopProfileTracking/Simple3", "[daFG][boxingPacker]")
+{
+  TopProfileTracker tracker(100);
+  tracker.rangeUpdate(25, 50, 42);
+  CHECK(tracker.rangeMax(7, 31) == 42);
+}
+
+TEST_CASE("TopProfileTracking/Stress", "[daFG][boxingPacker]")
+{
+  dagor_random::set_rnd_seed(5);
+
+  constexpr TimeInterval TIMELINE_SIZE = 1000;
+
+  TopProfileTracker tracker(TIMELINE_SIZE);
+  FmemVector<MemoryOffset> naive(TIMELINE_SIZE, 0);
+
+  const auto checkRangeMax = [&](TimePoint l, TimePoint r) {
+    const auto expected = *eastl::max_element(naive.begin() + l, naive.begin() + r);
+    const auto actual = tracker.rangeMax(l, r);
+    CHECK(actual == expected);
+  };
+
+  const auto rangeUpdate = [&](TimePoint l, TimePoint r, MemoryOffset value) {
+    tracker.rangeUpdate(l, r, value);
+    for (; l != r; ++l)
+      naive[l] = eastl::max(naive[l], value);
+  };
+
+  for (int i = 0; i < 5; ++i)
   {
-    TopProfileTracker tracker(100);
-    tracker.rangeUpdate(25, 50, 42);
-    for (int i = 25; i < 49; ++i)
-      CHECK_EQUAL(42, tracker.rangeMax(i, i + 1));
-  }
-
-  TEST(Simple2)
-  {
-    TopProfileTracker tracker(100);
-    tracker.rangeUpdate(25, 50, 42);
-    CHECK_EQUAL(42, tracker.rangeMax(39, 88));
-  }
-
-  TEST(Simple3)
-  {
-    TopProfileTracker tracker(100);
-    tracker.rangeUpdate(25, 50, 42);
-    CHECK_EQUAL(42, tracker.rangeMax(7, 31));
-  }
-
-  TEST(Stress)
-  {
-    dagor_random::set_rnd_seed(5);
-
-    constexpr TimeInterval TIMELINE_SIZE = 1000;
-
-    TopProfileTracker tracker(TIMELINE_SIZE);
-    FmemVector<MemoryOffset> naive(TIMELINE_SIZE, 0);
-
-    const auto checkRangeMax = [&](TimePoint l, TimePoint r) {
-      const auto expected = *eastl::max_element(naive.begin() + l, naive.begin() + r);
-      const auto actual = tracker.rangeMax(l, r);
-      CHECK_EQUAL(expected, actual);
-    };
-
-    const auto rangeUpdate = [&](TimePoint l, TimePoint r, MemoryOffset value) {
-      tracker.rangeUpdate(l, r, value);
-      for (; l != r; ++l)
-        naive[l] = eastl::max(naive[l], value);
-    };
-
-    for (int i = 0; i < 5; ++i)
-    {
-      const auto l = dagor_random::rnd_int(0, TIMELINE_SIZE - 2);
-      const auto r = dagor_random::rnd_int(l, TIMELINE_SIZE - 1);
-      if (dagor_random::rnd_int(0, 1) == 0)
-        rangeUpdate(l, r, dagor_random::rnd_int(0, 10000));
-      else
-        checkRangeMax(l, r);
-    }
+    const auto l = dagor_random::rnd_int(0, TIMELINE_SIZE - 2);
+    const auto r = dagor_random::rnd_int(l, TIMELINE_SIZE - 1);
+    if (dagor_random::rnd_int(0, 1) == 0)
+      rangeUpdate(l, r, dagor_random::rnd_int(0, 10000));
+    else
+      checkRangeMax(l, r);
   }
 }
+} // namespace TopProfileTracking_tests
 
 #endif
 
