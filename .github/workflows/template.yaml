@@ -84,6 +84,13 @@ jobs:
           python "$PROJECT_DIR/project.py" test --layer cpp,das,ecs --gpu no --out _output/test_results/ci \
             --junit test-results.xml --summary-md "$GITHUB_STEP_SUMMARY"
 
+      - name: Collect crash reports
+        if: failure() && runner.os == 'macOS'
+        shell: bash
+        run: |
+          mkdir -p _output/test_results/ci/crash_reports
+          cp ~/Library/Logs/DiagnosticReports/*.ips _output/test_results/ci/crash_reports/ 2>/dev/null || true
+
       - name: Upload report
         if: always()
         uses: actions/upload-artifact@v4
