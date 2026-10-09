@@ -64,6 +64,7 @@ static debug_log_callback_t prevLogCallback = nullptr;
 
 bool is_active() { return active; }
 float fixed_dt() { return fixedDt; }
+float frame_dt() { return running || done ? fixedDt : 0.f; }
 bool is_running_test() { return running; }
 
 static CaseResult *current_case() { return caseStack.empty() ? nullptr : &results[caseStack.back()]; }

@@ -180,6 +180,7 @@ namespace test_mode
 bool is_active() { return false; }
 bool is_running_test() { return false; }
 float fixed_dt() { return 0.f; }
+float frame_dt() { return 0.f; }
 void advance_frames(int) { G_ASSERT(0); }
 void register_test(das::Context *, const char *, const char *, const char *, int) { G_ASSERT(0); }
 void begin_case(const char *) { G_ASSERT(0); }

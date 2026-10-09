@@ -20,7 +20,8 @@ def entities_are_created_and_destroyed(t : T?) {
 def every_frame_advances_by_the_fixed_dt(t : T?) {
   let before = get_sync_time()
   advance_frames(60)
-  t |> numericEqual(float(get_sync_time() - before), 60.0 * test_mode_fixed_dt(), "game time after 60 frames")
+  let elapsed = float(get_sync_time() - before)
+  t |> success(abs(elapsed - 60.0 * test_mode_fixed_dt()) < 1e-4, "game time after 60 frames: {elapsed}")
 }
 
 [ecs_test]

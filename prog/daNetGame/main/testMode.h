@@ -24,7 +24,10 @@ namespace test_mode
 bool is_active();
 void init();      // after settings are loaded
 void update();    // main loop safe point: runs the tests once the game is ready, then requests exit
-float fixed_dt(); // > 0 in test mode: every frame advances the game by exactly this time
+float fixed_dt(); // > 0 in test mode: every frame of the tests advances the game by exactly this time
+// the game time of a frame in test mode: none until the tests run, so they start at the same game time however long
+// loading took (clouds, physics), then fixed_dt()
+float frame_dt();
 bool is_running_test();
 
 // API for the DngTestMode das module

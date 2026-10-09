@@ -64,12 +64,16 @@ A screenshot needs a rendered 3d world: `check_screenshot` fails while the game 
 nothing (`level__blk:t="__empty__"`). For a world without level data use `level__blk:t="__default__"`: sky and lighting
 from the default world renderer.
 
-Screenshots must be the same on every run:
+Screenshots must be the same on every run. In test mode the game time stands still while the game loads, so every
+test starts at the same game time however long loading took, and then advances by the fixed dt every frame. Beyond that:
 
 - fix the level's random seeds in the test scene: `level__timeSeed:i=1` and `level__weatherSeed:i=1`;
-- keep physics driven objects out of the picture, or take it from a static camera (`set_scene_camera_entity`): game time
-  keeps running while the game loads, so the physics phase at the first test frame depends on how long loading took;
+- use a weather without volumetric clouds: they accumulate over wall-clock time and differ a little every run
+  (`templates/dng-empty` has `weather_clear_cloudless` for its screenshot test);
 - scenario runs turn temporal antialiasing off (`video/antialiasing_mode:t=off`), its jitter follows the frame index.
+
+A scene for tests can be next to them: `scene:t=` is a path the game opens from its run dir, e.g.
+`scene:t="../prog/tests/scenarios/default_world.blk"`.
 
 ## Project setup
 
