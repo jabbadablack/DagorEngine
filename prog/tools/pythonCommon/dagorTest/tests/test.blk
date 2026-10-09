@@ -1,0 +1,9 @@
+// the test runner's own tests (unit tests, and real targets run through it)
+target{
+  name:t="tools.dagorTest"
+  layer:t="exec"
+  tag:t="tools"
+  serial:b=yes // builds with jam and runs its own test processes
+  timeout:r=1800
+  command:t="{python} run.py --engine {engine} --host {host} --host-arch {hostArch} --platform {platform} --arch {arch} --config {config}"
+}
