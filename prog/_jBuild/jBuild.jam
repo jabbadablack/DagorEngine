@@ -1137,6 +1137,16 @@ rule CompileRC
   }
   rc_opt    on $(1) = $(rc_opt) $(opt) ;
   LOCATE    on $(2) = $(Root) ;
+  local src = $(2:G=) ;
+  if [ MATCH "^([A-Za-z]:|/)" : $(Root) ] {
+    # fastdep finds relative sources only: with an absolute Root (a project outside the engine, see LocationDir) it runs in
+    # the dir of the .rc on the plain file name (every other path is absolute then too)
+    rc_dep_cmd on $(1) = $(ComSpec) /c cd /d \"$(Root)/$(src:D)\" "&&" $(_DEP_COMPILER) ;
+    rc_dep_src on $(1) = $(src:D=) ;
+  } else {
+    rc_dep_cmd on $(1) = $(_DEP_COMPILER) ;
+    rc_dep_src on $(1) = $(Root)/$(src) ;
+  }
 
   if $(GLOBAL_CacheDryRun) { return ; }
   compile_rc $(1) : $(2) ;
