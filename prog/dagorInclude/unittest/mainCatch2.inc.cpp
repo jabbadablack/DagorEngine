@@ -427,6 +427,8 @@ int main(int argc, char *argv[])
     returnCode = unittest::EXIT_FAILED;
   if (returnCode == unittest::EXIT_PASSED && unittest_infra_errors)
     returnCode = unittest::EXIT_INFRA_ERROR;
+  // devices where the runner can't get the process exit code (e.g. apps launched on a phone) read it from here
+  unittest::write_event(String(0, "\"event\":\"exit\",\"code\":%d", returnCode));
   return returnCode;
 }
 

@@ -19,6 +19,7 @@ class Events:
   timed_out_case: Optional[str] = None
   infra_errors: List[str] = dataclasses.field(default_factory=list)
   artifacts: Dict[str, List[Artifact]] = dataclasses.field(default_factory=dict)
+  exit_code: Optional[int] = None    # written last by the test executable; None when it died before
   broken_lines: int = 0
 
   @property
@@ -54,6 +55,8 @@ def read(path: str, rel) -> Events:
         ev.failures.setdefault(case, []).append(e.get('message', ''))
       elif kind == 'timeout':
         ev.timed_out_case = case
+      elif kind == 'exit':
+        ev.exit_code = int(e.get('code', 2))
       elif kind == 'infraError':
         ev.infra_errors.append(e.get('message', ''))
       elif kind == 'image':
