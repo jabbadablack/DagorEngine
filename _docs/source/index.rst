@@ -11,6 +11,7 @@ detailed documentation.
 
    dagor-home/index.rst
    getting-started/index.rst
+   testing/index.rst
    assets/index.rst
    dagor-tools/index.rst
    projects/index.rst
