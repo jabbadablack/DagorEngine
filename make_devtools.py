@@ -30,7 +30,13 @@ def error(s):
   print("\nERROR: {0}\n".format(s))
   exit(1)
 
-def ask(s):
+# unattended runs (CI, DAGOR_NONINTERACTIVE=1, no terminal) take the default answer instead of prompting
+NONINTERACTIVE = os.environ.get('DAGOR_NONINTERACTIVE', '') == '1' or not sys.stdin.isatty()
+
+def ask(s, unattended_answer=True):
+  if NONINTERACTIVE:
+    print("\n{0} [{1}, non-interactive]".format(s, 'yes' if unattended_answer else 'no'))
+    return unattended_answer
   while True:
     answer = input("\n{0} [Y/n]: ".format(s)).strip().lower()
     if answer == "y" or answer == "y" or answer == "":
@@ -425,7 +431,7 @@ def install_3ds_Max_SDK(ver, url):
   if pathlib.Path(maxsdk_dest_folder).exists():
     print('=== 3ds Max SDK {1} symlink found at {0}, skipping setup'.format(maxsdk_dest_folder, ver))
   else:
-    if ask("Do you want to install 3ds Max {0} SDK?".format(ver)):
+    if ask("Do you want to install 3ds Max {0} SDK?".format(ver), unattended_answer=False):
       maxsdk_src_folder = '{0}/Autodesk/3ds Max {1} SDK'.format(os.environ['ProgramFiles'], ver)
       if not pathlib.Path(maxsdk_src_folder+'/maxsdk').exists():
         print('--- 3ds Max SDK '+ver+' not found, trying to install')
