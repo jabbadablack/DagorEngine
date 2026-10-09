@@ -8,11 +8,11 @@ from typing import Callable, List, Optional
 
 from . import jam, services
 from .context import RunContext
-from .layers import cpp, das, exec as exec_layer
+from .layers import cpp, das, exec as exec_layer, ingame
 from .manifest import Target
 from .model import Status, TargetResult
 
-LAYER_RUNNERS = {'cpp': cpp.run, 'das': das.run, 'exec': exec_layer.run}
+LAYER_RUNNERS = {'cpp': cpp.run, 'das': das.run, 'exec': exec_layer.run, 'ecs': ingame.run, 'scenario': ingame.run}
 STATUS_LABELS = {Status.PASSED: 'PASS', Status.FAILED: 'FAIL', Status.TIMEOUT: 'TIME', Status.ERROR: 'ERR ', Status.SKIPPED: 'SKIP'}
 
 
@@ -63,8 +63,8 @@ def build_all(ctx: RunContext, targets: List[Target], builds: jam.BuildCache):
       builds.ensure(t.path_param('jamfile'))
     elif t.layer == 'das':
       builds.ensure(os.path.join(ctx.engine_root, das.DAS_JAMFILE), for_host=True)
-    elif t.layer in ('ecs', 'scenario') and t.project:
-      builds.ensure(t.project.jamfile)
+    elif t.layer in ('ecs', 'scenario') and t.project and t.project.build:
+      builds.ensure_command(t.project.build, t.project.root)
 
 
 def run_target(ctx: RunContext, target: Target, builds: jam.BuildCache) -> TargetResult:

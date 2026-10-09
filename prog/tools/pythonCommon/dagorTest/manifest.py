@@ -73,8 +73,7 @@ class Project:
   root: str
   codename: str
   game_dir: str                     # runtime dir with <platform>-<arch>/ executables
-  jamfile: str
-  das_project: str                  # game .das_project for in-game tests
+  build: str = ''                   # command building the game for in-game tests, run once from the project root
 
 
 def _values(blk, key):
@@ -123,6 +122,8 @@ def parse_target(blk, manifest, project=None) -> Target:
     raise ManifestError('{}: exec target {} needs command'.format(manifest, name))
   if layer in ('das', 'ecs', 'scenario') and not params.get('path'):
     raise ManifestError('{}: {} target {} needs path'.format(manifest, layer, name))
+  if layer == 'scenario':  # scenarios render: they need a GPU and a display, and run alone like every GPU target
+    requires += [r for r in ('gpu', 'display') if r not in requires]
   if layer in ('ecs', 'scenario') and project is None:
     raise ManifestError('{}: {} target {} must be in a project with a game{{}} block in its root test.blk'.format(manifest, layer, name))
 
@@ -151,9 +152,11 @@ def parse_project(blk, manifest) -> Optional[Project]:
   codename = _single(g, 'codename', manifest)
   if not codename:
     raise ManifestError('{}: game{{}} needs codename'.format(manifest))
+  for _, (key, _typ, _val) in g.params:
+    if key not in ('codename', 'dir', 'build'):
+      raise ManifestError('{}: game{{}} has unknown key {!r}'.format(manifest, key))
   return Project(root=root, codename=codename, game_dir=os.path.normpath(os.path.join(root, _single(g, 'dir', manifest, 'game'))),
-                 jamfile=os.path.normpath(os.path.join(root, _single(g, 'jamfile', manifest, 'prog/jamfile'))),
-                 das_project=_single(g, 'dasProject', manifest, ''))
+                 build=_single(g, 'build', manifest, ''))
 
 
 def load_targets(path, project=None) -> List[Target]:

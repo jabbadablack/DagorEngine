@@ -179,5 +179,56 @@ class IntegrationTest(unittest.TestCase):
     self.assertIn(Status.FAILED, by_name.values())
 
 
+OUTER_SPACE_GAME = os.path.join(ENGINE or '', 'outerSpace', 'game')
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
+
+
+@unittest.skipUnless(ENGINE, 'needs DAGORTEST_ENGINE (run through run.py)')
+class InGameTest(unittest.TestCase):
+  """The ecs layer against the outerSpace sample's dedicated server: skipped until it is built (outerSpace/prog/build.py)."""
+
+  @classmethod
+  def setUpClass(cls):
+    cls.ctx = make_ctx(tempfile.mkdtemp(prefix='dagorTest_ingame_'))
+    from pythonCommon.dagorTest.layers import ingame
+    from pythonCommon.dagorTest.manifest import Project
+    cls.project = Project(root=cls.ctx.run_dir, codename='outer_space', game_dir=OUTER_SPACE_GAME)
+    if not os.path.isfile(ingame.game_exe(cls.ctx, cls.project, 'dedicated')):
+      raise unittest.SkipTest('outerSpace dedicated server is not built')
+    cls.builds = jam.BuildCache(cls.ctx)
+
+  @classmethod
+  def tearDownClass(cls):
+    shutil.rmtree(cls.ctx.run_dir, ignore_errors=True)
+
+  def run_fixture(self, name, extra=''):
+    path = os.path.join(self.ctx.run_dir, name, 'test.blk')
+    os.makedirs(os.path.dirname(path))
+    with open(path, 'w') as f:
+      f.write('target{{ name:t="{}"; layer:t="ecs"; path:t="{}"; scene:t="gamedata/scenes/empty.blk" {} }}'.format(
+        name, os.path.join(DATA_DIR, 'ecs', name).replace('\\', '/'), extra))
+    (t,) = load_targets(path, self.project)
+    return runner.run_target(self.ctx, t, self.builds)
+
+  def test_failures_are_reported_per_test(self):
+    res = self.run_fixture('failures')
+    self.assertEqual(res.status, Status.FAILED, res.message)
+    statuses = {c.name: c.status for c in res.cases}
+    self.assertEqual(statuses, {
+      'fails_an_assertion': Status.FAILED, 'panics': Status.FAILED, 'logs_an_unexpected_error': Status.FAILED,
+      'fatal_stops_the_test': Status.FAILED, 'is_skipped': Status.SKIPPED, 'sub_test_fails': Status.PASSED,
+      'sub_test_fails/bad': Status.FAILED, 'passes_after_failures': Status.PASSED})
+    messages = {c.name: '\n'.join(c.messages) for c in res.cases}
+    self.assertIn('one is not two', messages['fails_an_assertion'])
+    self.assertIn('deliberate panic', messages['panics'])
+    self.assertIn('unexpected in-game error', messages['logs_an_unexpected_error'])
+    self.assertNotIn('never reached', messages['fatal_stops_the_test'])
+
+  def test_hung_test_hits_its_time_limit(self):
+    res = self.run_fixture('hang', 'caseTimeout:r=3')
+    self.assertEqual(res.status, Status.TIMEOUT)
+    self.assertEqual([(c.name, c.status) for c in res.cases], [('hangs', Status.TIMEOUT)])
+
+
 if __name__ == '__main__':
   unittest.main()

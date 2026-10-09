@@ -1,6 +1,8 @@
 """Building test targets with jam and locating the built executables."""
 import os
+import shlex
 import shutil
+import sys
 import threading
 from typing import Dict, List
 
@@ -68,3 +70,21 @@ class BuildCache:
 
   def log(self, jamfile: str, for_host=False) -> str:
     return self.logs[self._key(jamfile, for_host)]
+
+  def ensure_command(self, command: str, cwd: str) -> process.ProcessResult:
+    """Runs a project's own build command (e.g. game{ build:t= }) at most once per run."""
+    key = 'cmd|' + os.path.normcase(os.path.abspath(cwd)) + '|' + command
+    with self.lock:
+      if key not in self.results:
+        log = os.path.join(self.ctx.run_dir, '_build', '{:03d}-{}.log'.format(len(self.results), os.path.basename(cwd)))
+        self.logs[key] = log
+        if self.ctx.no_build:
+          self.results[key] = process.ProcessResult(exit_code=0, timed_out=False, duration=0.0)
+        else:
+          print('building {} ({})'.format(cwd, command), flush=True)
+          self.results[key] = process.run(shlex.split(command.format(python=sys.executable)), cwd=cwd, log_path=log,
+                                          timeout=BUILD_TIMEOUT)
+      return self.results[key]
+
+  def command_log(self, command: str, cwd: str) -> str:
+    return self.logs['cmd|' + os.path.normcase(os.path.abspath(cwd)) + '|' + command]
