@@ -31,7 +31,7 @@ FileBackendConfig::FileBackendConfig(const DataBlock &blk)
 {
   mountPath = blk.getStr("mountPath", ".");
   traceLevel = blk.getInt("traceLevel", DEFAULT_TRACE_LEVEL);
-  mountPath = blk.getStr("roMountPath", mountPath);
+  roMountPath = blk.getStr("roMountPath", nullptr);
   maxSize = blk.getInt64("maxSize", 0);
   aioJobId = blk.getInt("aioJobId", -1);
 }
@@ -327,11 +327,9 @@ void FileBackend::doPopulate()
   G_ASSERT(populateStatus != POPULATION_IN_PROGRESS);
   populateStatus = POPULATION_IN_PROGRESS;
   FindFilesAsyncJob *job = new FindFilesAsyncJob(this);
+  ffJob = job; // releaseJob() expects to be the pending job in both the async and the sync case
   if (aioJobId >= 0)
-  {
-    ffJob = job;
     cpujobs::add_job(aioJobId, job);
-  }
   else
   {
     job->doJob();
