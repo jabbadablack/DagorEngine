@@ -19,7 +19,10 @@ from ..model import CaseResult, Status, TargetResult, status_from_exit_code
 from . import das as das_layer
 from . import events as events_mod
 
-SCENARIO_ARGS = ['-config:video/mode:t=windowed', '-config:video/resolution:t=1280x720', '-config:screenshots/format:t=png']
+SCENARIO_ARGS = ['-config:video/mode:t=windowed', '-config:video/resolution:t=1280x720', '-config:screenshots/format:t=png',
+                 # no physical keyboard, mouse or joystick (values <= 0 are added to All=7): what a person does on the machine
+                 # must not leak into the test; scripted input (send_action, set_axis) works without them
+                 '-config:input/hidDriversInit:i=-7']
 GAME_ARGS = ['-stdout', '-quiet', '-nolisten', '-nostatsd', '-nonetenc', '-nopeerauth',
              '-config:debug/useAddonVromSrc:b=yes',     # tests and test libs are read from the sources, no repacking needed
              '-config:debug/daScriptHotReload:b=no']    # running tests hold pointers into loaded scripts

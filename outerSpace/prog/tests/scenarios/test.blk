@@ -1,0 +1,9 @@
+target{
+  name:t="outerSpace.scenarios"
+  layer:t="scenario"
+  tag:t="outerSpace"
+  path:t="."
+  scene:t="gamedata/scenes/empty.blk"
+  timeout:r=600
+  caseTimeout:r=120
+}

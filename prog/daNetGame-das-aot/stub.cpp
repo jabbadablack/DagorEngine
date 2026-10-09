@@ -189,6 +189,8 @@ void skip_case() { G_ASSERT(0); }
 void log_case(const char *, const char *, int) { G_ASSERT(0); }
 int push_logerr_expectation(const char *) { G_ASSERT_RETURN(false, 0); }
 int pop_logerr_expectation(int) { G_ASSERT_RETURN(false, 0); }
+String screenshot_path(const char *) { G_ASSERT_RETURN(false, {}); }
+String check_image(const char *, const char *, int, float, float) { G_ASSERT_RETURN(false, {}); }
 } // namespace test_mode
 char const *get_exe_version_str() { G_ASSERT_RETURN(false, nullptr); }
 int app_profile_get_app_id() { G_ASSERT_RETURN(false, 0); }

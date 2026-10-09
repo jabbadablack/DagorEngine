@@ -39,6 +39,13 @@ public:
     das::addExtern<DAS_BIND_FUN(test_mode::pop_logerr_expectation)>(*this, lib, "test_mode_pop_logerr_expectation",
       das::SideEffects::modifyExternal, "test_mode::pop_logerr_expectation");
 
+    das::addExtern<DAS_BIND_FUN(dedicated::is_dedicated)>(*this, lib, "test_mode_is_dedicated", das::SideEffects::accessExternal,
+      "dedicated::is_dedicated");
+    das::addExtern<DAS_BIND_FUN(bind_dascript::test_mode_screenshot_path)>(*this, lib, "test_mode_screenshot_path",
+      das::SideEffects::accessExternal, "bind_dascript::test_mode_screenshot_path");
+    das::addExtern<DAS_BIND_FUN(bind_dascript::test_mode_check_image)>(*this, lib, "test_mode_check_image",
+      das::SideEffects::modifyExternal, "bind_dascript::test_mode_check_image");
+
     verifyAotReady();
   }
   das::ModuleAotType aotRequire(das::TextWriter &tw) const override

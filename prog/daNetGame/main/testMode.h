@@ -1,6 +1,8 @@
 // Copyright (C) Gaijin Games KFT.  All rights reserved.
 #pragma once
 
+#include <util/dag_string.h>
+
 namespace das
 {
 class Context;
@@ -16,6 +18,7 @@ class Context;
 //   -test_out:<dir>        where dastest.json (the results) and events.jsonl are written
 //   -test_timeout:<sec>    per test limit, the process exits with code 3 when exceeded (default: 300)
 //   -test_dt:<sec>         game time every frame advances by (default: 1/60)
+//   -test_update_references  image checks replace mismatching or missing reference images
 namespace test_mode
 {
 bool is_active();
@@ -35,4 +38,8 @@ void advance_frames(int count);
 // expected errors (see unittest::push_logerr_expectation); expectations left open by a panicking test are closed with its case
 int push_logerr_expectation(const char *substr);
 int pop_logerr_expectation(int handle);
+// screenshots of scenario tests: the file screencap writes for a screenshot name (screenshots{dir:t=; format:t=png} in settings)
+String screenshot_path(const char *name);
+// compares an image file with references/<name>.png next to the running test's file; returns the mismatch, empty on success
+String check_image(const char *actual_file, const char *name, int channel_tolerance, float max_rms, float max_bad_pixels_percent);
 } // namespace test_mode

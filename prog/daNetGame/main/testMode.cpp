@@ -4,6 +4,9 @@
 #include "main/gameLoad.h"
 #include "main/level.h"
 #include "main/main.h"
+#include "net/dedicated.h"
+#include <drv/3d/dag_info.h>
+#include <ioSys/dag_dataBlock.h>
 #include <daScript/daScript.h>
 #include <debug/dag_logSys.h>
 #include <ecs/scripts/dasEs.h>
@@ -169,6 +172,9 @@ void init()
 
   unittest::Options opt;
   opt.artifactDir = outDir;
+  opt.updateReferences = dgs_get_argv("test_update_references") != nullptr;
+  if (!dedicated::is_dedicated()) // the GPU makes rendering differ: references may exist per 3d driver
+    opt.imageVariant = d3d::get_driver_name();
   const char *timeout = dgs_get_argv("test_timeout");
   opt.caseTimeoutSec = timeout ? (float)atof(timeout) : 300.f;
   unittest::set_options(opt); // the watchdog starts with the tests: loading is bounded by the runner's own timeout
@@ -251,6 +257,21 @@ void log_case(const char *msg, const char *file, int line)
   }
 }
 
+String screenshot_path(const char *name)
+{
+  const DataBlock *screenshots = dgs_get_settings()->getBlockByNameEx("screenshots");
+  return String(0, "%s/%s.%s", screenshots->getStr("dir", "Screenshots"), name, screenshots->getStr("format", "jpg"));
+}
+
+String check_image(const char *actual_file, const char *name, int channel_tolerance, float max_rms, float max_bad_pixels_percent)
+{
+  ImageCompareParams params;
+  params.perChannelTolerance = channel_tolerance;
+  params.maxRms = max_rms;
+  params.maxBadPixelsPercent = max_bad_pixels_percent;
+  return unittest::check_image_file(actual_file, name, params).message;
+}
+
 void advance_frames(int count)
 {
   G_ASSERT_RETURN(running && is_main_thread(), );
@@ -277,6 +298,8 @@ struct TestStackScope
 static void run_registered(const RegisteredTest &t)
 {
   const int idx = push_case(t.name);
+  char dir[DAGOR_MAX_PATH];
+  unittest::options().dataDir = dd_get_fname_location(dir, t.file); // references/ of image checks are next to the test file
   das::SimFunction *fn = t.ctx->findFunction(t.wrapper.c_str());
   if (!fn)
   {
@@ -403,6 +426,7 @@ void update()
   done = true;
   unittest::stop_watchdog();
   debug_set_log_callback(prevLogCallback);
+  unittest::write_event(String(0, "\"event\":\"exit\",\"code\":%d", code)); // for devices without process exit codes
   exit_game("tests finished", code);
 }
 } // namespace test_mode
