@@ -1,0 +1,126 @@
+// The game's scripts and data packed into ../game/dng_empty.vromfs.bin: python build.py vromfs
+// Engine sources are named through the %engine mount (found through ../engine.blk). In development the game can read
+// all of it from the sources instead: -config:debug/useAddonVromSrc:b=yes (the mountPoints in settings.blk).
+platform:t="PC"
+outputRoot_PC:t="../game/"
+output:t="dng_empty.vromfs.bin"
+
+allowMkDir:b=yes
+pack:b=true
+
+sign_private_key:t=""
+sign_digest:t="sha256"
+
+rootFolder:t="."
+
+folder {
+  path:t="gameBase"
+  dest_path:t="./"
+  scan_folder:b=true
+  scan_subfolders:b=true
+  wildcard:t="*.json"
+  wildcard:t="*.blk"
+  wildcard:t="*.nut"
+  wildcard:t="*.das"
+  wildcard:t="*.patch"
+}
+folder {
+  path:t="scripts/"
+  dest_path:t="scripts/"
+  scan_folder:b=true
+  scan_subfolders:b=true
+  wildcard:t="*.json"
+  wildcard:t="*.blk"
+  wildcard:t="*.nut"
+  wildcard:t="*.das"
+  wildcard:t="*.patch"
+  wildcard:t="project.das_project"
+  wildcard:t="*.svg"
+}
+
+folder {
+  path:t="%engine/prog/scripts/sq/daRg"
+  dest_path:t="sq/darg"
+  scan_folder:b=true
+  scan_subfolders:b=true
+  wildcard:t=*.nut
+}
+folder {
+  path:t="%engine/prog/scripts/sq/std"
+  dest_path:t="sq/std"
+  scan_folder:b=true
+  scan_subfolders:b=true
+  wildcard:t=*.nut
+}
+folder {
+  path:t="%engine/prog/scripts/sq/daeditor"
+  dest_path:t="sq/daeditor"
+  scan_folder:b=true
+  scan_subfolders:b=true
+  wildcard:t=*.nut
+  wildcard:t=*.blk
+  wildcard:t=*.svg
+}
+"@clone-last:folder"{
+  "@override:path":t="%engine/prog/1stPartyLibs/daScript/daslib"
+  "@override:dest_path":t="daslib"
+  "@delete-all:wildcard":t=""
+  wildcard:t=*.das
+  wildcard:t=*.blk
+  wildcard:t=*.nut
+}
+"@clone-last:folder"{
+  "@override:path":t="%engine/prog/scripts/game"
+  "@override:dest_path":t="game"
+}
+"@clone-last:folder"{
+  "@override:path":t="%engine/prog/daNetGame/scripts/das/daslib"
+  "@override:dest_path":t="das/daslib"
+}
+"@clone-last:folder"{
+  "@override:path":t="%engine/prog/daNetGame/scripts/globals"
+  "@override:dest_path":t="daNetGame/qscripts"
+}
+"@clone-last:folder"{
+  "@override:path":t="%engine/prog/daNetGame/scripts/das/debug"
+  "@override:dest_path":t="das/debug"
+}
+"@clone-last:folder"{
+  "@override:path":t="%engine/prog/gameLibs/das/ecs"
+  "@override:dest_path":t="gameLibs/das/ecs"
+}
+"@clone-last:folder"{
+  "@override:path":t="%engine/prog/gameLibs/das/daFrameGraph"
+  "@override:dest_path":t="gameLibs/das/daFrameGraph"
+}
+"@clone-last:folder"{
+  "@override:path":t="%engine/prog/gameLibs/das/math"
+  "@override:dest_path":t="gameLibs/das/math"
+}
+"@clone-last:folder"{
+  "@override:path":t="%engine/prog/daNetGameLibs/dascript_base/"
+  "@override:dest_path":t="danetlibs/dascript_base/"
+}
+"@clone-last:folder"{
+  "@override:path":t="%engine/prog/daNetGameLibs/renderer/"
+  "@override:dest_path":t="danetlibs/renderer/"
+}
+
+include "_libs.vromfs.blk" // the libs in danetgamelibs.txt and gamelibs.txt, written by setup
+
+preprocess {
+  ext:t=blk
+  ext:t=txt
+  ext:t=nut
+  ext:t=css
+  ext:t=csv
+  keepLines {
+    include:t=".*\.nut$"
+  }
+}
+
+packBlk {
+  exclude:t="\.gameparams\.blk$"
+  include:t=".*.blk$"
+  include:t="\.settings\.blk$"
+}

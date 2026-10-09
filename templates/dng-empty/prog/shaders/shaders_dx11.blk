@@ -1,0 +1,3 @@
+// Game shaders for dx11 (the default windows driver, and what daEditor renders levels with): python ../build.py shaders
+include "%engine/prog/daNetGame/shaders/_build/shaders_pc11.blk"
+include "game_common.blk"

@@ -1,0 +1,4 @@
+// Shaders of impostorBaker (develop/daImpostor): python ../build.py shaders
+include "%engine/prog/daNetGame/shaders/_build/shaders_impostorbaker.blk"
+mountPoint:t="%engine/prog/daNetGame/shaders" // see game_common.blk
+"@override:outDumpName":t="../../tools/tools.impostorbakerDX12"

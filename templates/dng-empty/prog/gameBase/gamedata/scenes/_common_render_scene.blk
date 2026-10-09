@@ -1,0 +1,16 @@
+// Render entities every client creates before the world renderer (gameparams.blk commonClientScenes)
+entity{
+  _template:t="render_settings"
+}
+
+entity{
+  _template:t="blurred_ui"
+}
+
+entity{
+  _template:t="dynamic_lighting"
+}
+
+entity{
+  _template:t="ui_nodes"
+}

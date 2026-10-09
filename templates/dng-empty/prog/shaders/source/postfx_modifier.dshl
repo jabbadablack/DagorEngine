@@ -1,0 +1,2 @@
+// Game hook into prog/daNetGame/shaders/postfx.dshl: INIT_POSTFX_MODIFIER/USE_POSTFX_MODIFIER for extra postfx
+// effects (see samples/dngSceneViewer/prog/shaders/source/postfx_modifier.dshl); none here

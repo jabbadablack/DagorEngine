@@ -132,4 +132,6 @@ To build the **testGI** sample:
 3. Run `DagorEngine/build_all.cmd` to build the entire project toolkit from the
    source code. This process may take a considerable amount of time.
 
+To start a game of your own, see [Creating a Project](new_project.md).
+
 

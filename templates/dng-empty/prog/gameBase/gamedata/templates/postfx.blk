@@ -1,0 +1,36 @@
+// Post effects the renderer creates by name
+depth_of_field{
+  _singleton:b=true
+  "dof:DepthOfFieldPS"{_tags:t="render"}
+  "downsampled_dof_frame_fallback:UniqueTex"{_tags:t="render"}
+  "is_dof:tag"{}
+  _group{
+    _track:b=yes
+    dof__on:b=false
+
+    dof__is_filmic:b=false
+    dof__focusDistance:r=-1
+    dof__fStop:r=1
+    dof__sensorHeight_mm:r=24
+    //-1 == derive from sensor height and camera fov
+    dof__focalLength_mm:r=-1
+
+    dof__nearDofStart:r=0.01
+    dof__nearDofEnd:r=0.35
+    dof__nearDofAmountPercent:r=0
+
+    dof__farDofStart:r=100
+    dof__farDofEnd:r=1e+06
+    dof__farDofAmountPercent:r=0
+
+    dof__bokehShape_bladesCount:r=6
+    dof__bokehShape_kernelSize:r=8
+    dof__minCheckDistance:r=0.3
+  }
+
+  _group{
+    _tags:t="render"
+    "dof__depth_for_transparency_node_handle:dafg::NodeHandle"{}
+    "dof__downsample_depth_for_transparency_node_handle:dafg::NodeHandle"{}
+  }
+}

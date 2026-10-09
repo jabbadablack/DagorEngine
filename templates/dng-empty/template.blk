@@ -1,0 +1,9 @@
+// A project template for new_project.py in the engine root; this file is not copied into new projects.
+// The tokens are replaced in file names and text files: longer ones first, so title, name and bundle id stay intact.
+description:t="Empty daNetGame game: client and dedicated server, an empty default world, tool scripts and tests of every layer"
+tokens{
+  bundleId:t="com.dagor.DngEmpty" // <company>.<Name>
+  title:t="Dng Empty"             // human readable name: window title, executable info
+  name:t="DngEmpty"               // PascalCase name: macOS bundle, Windows manifest
+  codename:t="dng_empty"          // lowercase: executables, vromfs, script and data dirs
+}

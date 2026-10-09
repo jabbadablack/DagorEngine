@@ -1,0 +1,25 @@
+// Included by every shaders_<api>.blk of the game.
+// The engine's shader lists name their include dirs relative to <engine>/<project>/prog/shaders; this mount point is a
+// dir at that depth, so they resolve wherever this project is (%engine is found through ../../engine.blk).
+mountPoint:t="%engine/prog/daNetGame/shaders"
+incDir:t="%engine/prog/daNetGameLibs"
+
+"@override:source" {
+  file:t = "../dynamic_emissive.dshl"
+  file:t = "../dynamic_glass.dshl"
+  file:t = "loading/rgbTriangle.dshl" // the loading screen (settings.blk loadingScreen{})
+  include "_libs_shaders.blk" // shaders of the libs in ../danetgamelibs.txt, written by setup
+}
+
+"@override:Compile" {
+  "@override:assume_vars" {
+    photometry_textures_tex:i=1
+    xray_render:i=0
+    has_wounds:i=0
+    has_burning:i=0
+    special_vision:i=0
+    render_to_icon:i=0
+    "@delete-all:static_shadows_cascades":i=2
+    static_shadows_cascades:i=2
+  }
+}

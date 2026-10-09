@@ -1,0 +1,18 @@
+// The scene of the screenshot tests here: the default world, a clear sky without clouds (see weather.blk) and fixed
+// seeds, seen from a static camera; nothing moves, so every run renders the same picture
+entity{
+  _template:t="static_cam"
+  camera__active:b=yes
+  transform:m=[[0, 0, -1] [0, 1, 0] [1, 0, 0] [0, 2, 0]]
+}
+
+entity{
+  _template:t="level"
+  level__blk:t="__default__"
+  level__timeSeed:i=1
+  level__weatherSeed:i=1
+  level__weather:t="weather_clear_cloudless"
+  "level__weatherChoice:object"{
+    "weather_clear_cloudless":r=1
+  }
+}

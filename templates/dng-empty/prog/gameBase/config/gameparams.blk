@@ -1,0 +1,12 @@
+// Game parameters (dgs_get_game_params())
+use_damage_model:b=no
+use_flight_model:b=no
+use_ai:b=no
+use_blood_puddles:b=no
+use_glass_scratch_render:b=no // needs glass_scratch_n from the game's assets
+use_water_render:b=no // needs water textures (water_surface_foam_tex) from the game's assets
+use_fluid_wind:b=no // needs the fluid wind shaders (wind/fluid_wind.dshl in the game's shader list)
+
+commonClientScenes{ // created by every client before the world renderer
+  scene:t="gamedata/scenes/_common_render_scene.blk"
+}

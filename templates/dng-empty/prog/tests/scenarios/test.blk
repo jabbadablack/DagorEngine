@@ -1,0 +1,9 @@
+// Scenario tests: the client game renders, tests drive it and compare screenshots with references/ (needs a GPU)
+target{
+  name:t="dng_empty.scenarios"
+  layer:t="scenario"
+  tag:t="dng_empty"
+  path:t="."
+  scene:t="../prog/tests/scenarios/default_world.blk" // relative to game/, where the game runs
+  caseTimeout:r=120
+}

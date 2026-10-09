@@ -1,0 +1,8 @@
+// Shaders daEditor, daViewer and dabuild render with (dx11 on windows, metal/spirv elsewhere): python ../build.py shaders
+include "%engine/prog/daNetGame/shaders/_build/shaders_tools11.blk"
+mountPoint:t="%engine/prog/daNetGame/shaders" // see game_common.blk
+"@override:source" {
+  file:t = "../dynamic_emissive.dshl"
+  file:t = "../dynamic_glass.dshl"
+}
+"@override:outDumpName":t="../../tools/tools"

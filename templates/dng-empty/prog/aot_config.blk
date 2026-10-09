@@ -1,0 +1,13 @@
+// das AOT compiler setup (DAS_AOT_COMPILER_OPT in jamfile), it runs in this dir
+project:t="%scripts/project.das_project"
+dasRoot:t="."
+mountPoints{
+  "%dngdas":t="%engine/prog/daNetGame/scripts/das"
+  "%daslib":t="%engine/prog/1stPartyLibs/daScript/daslib"
+  "%gameLibs":t="%engine/prog/gameLibs"
+  "%dasImgui":t="%engine/prog/1stPartyLibs/daScript/modules/dasImgui/daslib"
+  "%dasLLVM":t="%engine/prog/1stPartyLibs/daScript/modules/dasLLVM"
+  "%danetlibs":t="%engine/prog/daNetGameLibs"
+  "%dastest":t="%engine/prog/1stPartyLibs/daScript/dastest"
+  "%scripts":t="scripts"
+}

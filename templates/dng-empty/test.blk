@@ -1,0 +1,7 @@
+// Tests of this project: python project.py test (or python <engine>/test_all.py run --project <this dir>).
+// Targets are in prog/tests/*/test.blk, see <engine>/_docs/source/testing.
+game{ // the game the in-game layers (ecs, scenario) run
+  codename:t="dng_empty"
+  dir:t="game"
+  build:t="{python} project.py build code" // once before in-game targets; scenarios also need python project.py build shaders
+}

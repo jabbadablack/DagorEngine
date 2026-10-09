@@ -1,0 +1,2 @@
+# gameLibs with das/jam/template parts this game uses (dirs in <engine>/prog/gameLibs), one per line, see danetgamelibs.txt.
+upscale_sampling # required by frame_graph_renderer

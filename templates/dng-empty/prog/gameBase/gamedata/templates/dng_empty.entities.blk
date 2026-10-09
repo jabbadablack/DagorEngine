@@ -1,0 +1,170 @@
+// Entity templates of the game (settings.blk entitiesPath:t=)
+import:t="%danetlibs/renderer/templates/render_settings.template.blk"
+import:t="%danetlibs/renderer/templates/dynamic_lighting.template.blk"
+import:t="%danetlibs/renderer/templates/ui_nodes.template.blk"
+import:t="%danetlibs/renderer/templates/dng_camera_nodes.template.blk"
+import:t="%danetlibs/renderer/templates/grass_render.template.blk"
+import:t="%danetlibs/renderer/templates/aa_benchmark.template.blk"
+import:t="_libs.entities.blk" // templates of the libs in prog/danetgamelibs.txt, written by setup
+import:t="weather.blk"
+import:t="postfx.blk"
+
+// ---- what every daNetGame game defines
+
+replicating{
+  replication{ _tags:t="net"; }
+}
+
+msg_sink{ // created by the game: network messages
+  msg_sink{}
+  _use:t=replicating;
+  _singleton:b=yes
+}
+
+glob_input{ // created by the game: global input actions
+  input{ _tags:t="input"; }
+  "glob_input:tag"{ _tags:t="input"; }
+  "glob_input__inputMode:i"{ _tags:t="input"; }
+}
+
+player{ // created for every connected player (settings.blk playerTemplateName:t=)
+  player{}
+  _group{
+    _replicate:b=yes
+    _track:b=yes
+    "possessed:eid"{}
+    "specTarget:eid"{}
+    team:i=-1
+    name:t=""
+    disconnected:b=false
+  }
+  disconnectedAtTime:r=-1
+  "is_local:b"{ _track:b=yes; }
+  platformUid:t=""
+  platform:t=""
+  connid:i=-1
+  clientNetFlags:i=0
+  connectedAtTime:r=-1
+  startedAtTime:r=-1
+  canBeLocal:b=yes
+  _use:t=replicating;
+  "net__notInInitialScope:tag"{}
+  receive_logerr:b=false
+  appId:i=0; "userid:u64"{ value:i64=-1; }
+}
+
+level{ // the level and its weather; level__blk:t="__default__" is the default world without level data
+  _use:t="replicating"
+  _singleton:b=yes
+  nonCreatableObj:b=yes
+  _tracked:t="level__loaded"
+  level__blk:t=""
+  "level__loaded:b"{
+    value:b=no
+    _hide:b=yes
+  }
+  level__loadedAtTime:r=-1
+  level__timeRange:p2=9, 9
+  level__latitude:r=-200
+  level__longtitude:r=-200
+  level__day:i=21
+  level__month:i=6
+  level__year:i=2024
+  level__timeSeed:i=-1
+  level__timeOfDay:r=9
+  level__weatherSeed:i=-1
+  level__cloudsHoleEnabled:b=yes
+  level__weather:t="weather_clear"
+  level__fpsLimit:i=-1 // -1: use fpsLimit from settings, 0: unlimited, >0 limited
+  level__fixedBattleAreas:b=no
+  level__useGroundHolesCollision:b=no
+  level__renderFeaturesOverrideFromLevelBlk:b=no
+  "level__renderFeaturesOverrides:object"{}
+  level__render:b=no // set by the game when it renders (dngRenderIsActive)
+  "net__alwaysInScope:tag"{}
+  level{}
+  "level__timeVec:array"{}
+  "level__weatherChoice:object"{ // weather templates (weather.blk) and their chances
+    "weather_clear":r=1
+  }
+  _tracked:t="level__timeOfDay"
+}
+
+game_objects{ // created by the game for level game objects
+  _singleton:b=yes
+  nonCreatableObj:b=yes
+  game_objects__seed:i=0
+  game_objects{}
+  "game_objects__createChance:object"{}
+}
+
+game_object{
+  "gameObject:tag"{}
+}
+
+// ---- cameras
+
+static_cam{
+  camera__active:b=no
+  "camera_view:tag"{}
+  fov:r=90
+  znear:r=0.01
+  zfar:r=10000
+  transform:m=[[1, 0, 0] [0, 1, 0] [0, 0, 1] [0, 0, 0]]
+  _use:t=replicating;
+  "net__inInitialScope:tag"{}
+}
+
+free_cam_input{
+  _group{
+    "free_cam_input__move:u16"{ value:i=-1; }
+    "free_cam_input__rotate:u16"{ value:i=-1; }
+    "free_cam_input__shiftY:u16"{ value:i=-1; }
+    "free_cam_input__zoomIn:u16"{ value:i=-1; }
+    "free_cam_input__zoomOut:u16"{ value:i=-1; }
+    "free_cam_input__turbo:u16"{ value:i=-1; }
+    "free_cam_input__speedUp:u16"{ value:i=-1; }
+    "free_cam_input__speedDown:u16"{ value:i=-1; }
+    "free_cam_input__speedReset:u16"{ value:i=-1; }
+    "free_cam_input__bank:u16"{ value:i=-1; }
+  }
+  free_cam__move:p2=0,0
+  free_cam__rotate:p2=0,0
+  free_cam__shiftY:r=0
+  free_cam__turbo:b=no
+  free_cam__angSpdScale:p2=0.01, 0.01
+  free_cam__move_speed:r=5
+  free_cam__moveSpeedDefault:r=5
+  free_cam__bank:r=0
+  _tracked:t="free_cam__angSpdScale"
+  _tracked:t="free_cam__move_speed"
+}
+
+free_cam{ // the developer free camera (created by the game)
+  _use:t="free_cam_input"
+  editableObj:b=no
+  camera__active:b=no
+  camera__input_enabled:b=yes
+  fov:r=90.0
+  znear:r=0.01
+  zfar:r=10000
+  transform:m=[[1, 0, 0] [0, 1, 0] [0, 0, 1] [0, 0, 0]]
+  base_transform:m=[[1, 0, 0] [0, 1, 0] [0, 0, 1] [0, 0, 0]]
+  _tracked:t="camera__active"
+  "camera_view:tag"{}
+  input{ _tags:t="input"; }
+  _group{
+    free_cam{}
+    free_cam__mouse:p2=0, 0
+    _tags:t="gameClient"
+  }
+  free_cam__angSpdScale:p2=0.001,0.001
+}
+
+// ---- this game
+
+spinner{ // turns around its up axis: see scripts/dng_empty/es/spinner_es.das
+  _use:t=replicating;
+  transform:m=[[1, 0, 0] [0, 1, 0] [0, 0, 1] [0, 0, 0]]
+  spinner__speed:r=1 // radians per second
+}

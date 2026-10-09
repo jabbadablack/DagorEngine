@@ -1,0 +1,17 @@
+// Module paths of the unit tests here (dastest runs in this dir): dng_empty.* are the game scripts in ../../scripts,
+// anything else (daslib, dastest, built-in modules) resolves as usual
+options indenting = 2
+require strings
+require daslib/strings_boost
+
+[export]
+def module_get(req, _from : string) : tuple<string; string; string> const
+  var rs <- split_by_chars(req, "./")
+  if length(rs) < 2 || rs[0] != "dng_empty"
+    return ("", "", "")
+  let mod_name = rs[length(rs) - 1]
+  return (mod_name, "../../scripts/{join(rs, "/")}.das", mod_name)
+
+[export]
+def include_get(inc, _from : string) : string
+  return inc

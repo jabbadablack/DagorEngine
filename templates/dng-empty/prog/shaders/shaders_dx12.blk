@@ -1,0 +1,3 @@
+// Game shaders for dx12: python ../build.py shaders
+include "%engine/prog/daNetGame/shaders/_build/shaders_dx12.blk"
+include "game_common.blk"

@@ -9,6 +9,7 @@ How to set up and start developing with the Dagor Engine.
 
    how_to_access.md
    how_to_build.md
+   new_project.md
    directory_structure.md
    how_to_contribute.md
    license.md

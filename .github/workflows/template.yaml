@@ -1,0 +1,95 @@
+name: template
+
+# Creates a project from templates/dng-empty with new_project.py outside the engine checkout (on Windows on another
+# drive, which needs an absolute engine path and jam Location), builds its game and runs its tests that need no GPU.
+# See _docs/source/getting-started/new_project.md.
+
+on:
+  push:
+    branches: [ "main" ]
+    paths: [ "templates/**", "new_project.py", "prog/tools/pythonCommon/dagorProject/**", "prog/setup_package.py",
+             "prog/_jBuild/**", "prog/daNetGame/**", "prog/daNetGameLibs/**", ".github/workflows/template.yaml" ]
+  schedule:
+    - cron: '0 3 * * 1' # weekly: engine changes outside the paths above can break the template too
+  workflow_dispatch:
+
+concurrency:
+  group: template-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  DAGOR_NONINTERACTIVE: '1'
+
+jobs:
+  new-project:
+    name: new project (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            devtools: D:/devtools
+          - os: ubuntu-22.04
+            devtools: /home/runner/devtools
+          - os: macos-14
+            devtools: /Users/runner/devtools
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Cache devtools
+        uses: actions/cache@v4
+        with:
+          path: ${{ matrix.devtools }}
+          key: devtools-${{ matrix.os }}-${{ hashFiles('make_devtools*.py') }}
+
+      - name: Set up devtools
+        shell: bash
+        run: |
+          python make_devtools.py "${{ matrix.devtools }}"
+          echo "GDEVTOOL=${{ matrix.devtools }}" >> "$GITHUB_ENV"
+          echo "${{ matrix.devtools }}" >> "$GITHUB_PATH"
+
+      - name: Choose the project dir
+        shell: bash
+        run: |
+          if [ "$RUNNER_OS" = Windows ]; then
+            # another drive than the engine: engine.blk and the jam Location become absolute
+            mkdir -p "$RUNNER_TEMP/xdrive"
+            cmd //c subst X: "$(cygpath -w "$RUNNER_TEMP/xdrive")"
+            echo "PROJECT_DIR=X:/CiGame" >> "$GITHUB_ENV"
+          else
+            echo "PROJECT_DIR=$GITHUB_WORKSPACE/../CiGame" >> "$GITHUB_ENV"
+          fi
+
+      - name: Create the project
+        shell: bash
+        run: python new_project.py --name CiGame --dest "$PROJECT_DIR"
+
+      - name: Build the game
+        shell: bash
+        run: python "$PROJECT_DIR/project.py" build code
+
+      - name: Run the tests
+        shell: bash
+        run: |
+          python "$PROJECT_DIR/project.py" test --layer cpp,das,ecs --gpu no --out _output/test_results/ci \
+            --junit test-results.xml --summary-md "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: template-report-${{ matrix.os }}
+          path: |
+            _output/test_results/ci
+            test-results.xml
+          if-no-files-found: ignore

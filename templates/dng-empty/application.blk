@@ -1,0 +1,211 @@
+// Setup of the tools for this project: daEditor, daViewer (assetViewer), dabuild and impostorBaker (develop/*).
+// Paths are relative to this dir. See <engine>/_docs/source/assets/all-about-blk/application_blk.md
+collision:t="Unigine"
+shaders:t="tools/tools"                              // tool shaders: python prog/build.py shaders
+dngShaders:t="game/compiledShaders/game"             // the game's shaders, for rendering levels like the game does
+dngSnapshot:t="tools/snapshot"                       // the game's scripts and vromfs for the editor: python prog/build.py tools
+impostorbakerDriver:t="dx12"
+impostorbakerShaders:t="tools/tools.impostorbaker"
+useDynrend:b=yes
+
+dynamicDeferred{
+  supportsRopt{
+    "render shadows":b=yes
+    "use SSAO":b=yes
+    "use SSR":b=yes
+    "no sun":b=yes
+    "no amb":b=yes
+    "no envi refl":b=yes
+    "no transp":b=yes
+    "no postfx":b=yes
+  }
+  defaultRopt{
+    "no sun":b=no
+    "no amb":b=no
+    "no envi refl":b=no
+    "no transp":b=no
+    "no postfx":b=no
+  }
+  dbgShow{
+    "diffuse":i=0
+    "specular":i=1
+    "normal":i=2
+    "smoothness":i=3
+    "base_color":i=4
+    "metallness":i=5
+    "material":i=6
+    "ssao":i=7
+    "ao":i=8
+  }
+  sceneFmt:t="R11G11B10F"
+  postfxFmt:t="A8B8G8R8"
+  postfx_sRGB_backbuf_write:b=no
+  gbufCount:i=3
+  gbufFmt0:t="sRGB8"
+  gbufFmt1:t="A2B10G10R10"
+  gbufFmt2:t="ARGB8"
+  shadowPreset{
+    name:t="2048 map, 200 m"
+    csmSize:i=2048
+    csmMaxDist:r=200
+    vsmSize:i=16
+  }
+  hdrMode:t="real"
+  postfx:t="postfx"
+  vsmAllowed:b=no
+}
+
+SDK{
+  sdk_folder:t="develop"
+  levels_folder:t="develop/levels"
+  allow_debug_bitmap_dump:b=no
+}
+
+game{
+  game_folder:t="game"
+  base_path:t="prog/gameBase"
+  levels_bin_folder:t="game/content/dng_empty/levels"
+  params:t="prog/gameBase/config/gameparams.blk"
+  entities:t="prog/gameBase/gamedata/templates/dng_empty.entities.blk"
+  scene:t="prog/gameBase/gamedata/scenes/main.blk"
+  daNetGameRender:b=yes
+  daNetGameEditorRender:b=yes
+  main_vromfs:t="dng_empty.vromfs.bin"
+}
+
+levelsBlkPrefix{
+  useExportBinPath:b=yes
+  try:t="./game/content/dng_empty"
+}
+
+assets{
+  types{
+    type:t="tex"
+    type:t="mat"
+    type:t="prefab"
+    type:t="rendInst"
+    type:t="dynModel"
+    type:t="skeleton"
+    type:t="animChar"
+    type:t="animTree"
+    type:t="stateGraph"
+    type:t="a2d"
+    type:t="fx"
+    type:t="physObj"
+    type:t="fastPhys"
+    type:t="collision"
+    type:t="composit"
+    type:t="spline"
+    type:t="land"
+    type:t="tifMask"
+    type:t="gameObj"
+    type:t="impostorData"
+    type:t="ecs_template"
+  }
+  base:t="develop/assets"
+
+  export{
+    types{ // what dabuild exports into the game's packs
+      type:t="tex"
+      type:t="mat"
+      type:t="rendInst"
+      type:t="dynModel"
+      type:t="skeleton"
+      type:t="animChar"
+      type:t="animTree"
+      type:t="stateGraph"
+      type:t="a2d"
+      type:t="fx"
+      type:t="physObj"
+      type:t="fastPhys"
+      type:t="collision"
+      type:t="land"
+      type:t="impostorData"
+    }
+    cache:t="develop/.cache"
+    useCache2Fast:b=yes
+
+    destination{ // the game loads it as an addon (settings.blk addons{})
+      PC:t="game/content/dng_empty/res"
+      allow_patch:b=false
+    }
+    destGrpHdrCache{
+      gameRelatedPath:t="."
+      PC:t="game/content/dng_empty/res/grp_hdr.vromfs.bin"
+    }
+    stripPrefix:t="assets"
+    addTexPrefix:t=""
+    packlist:t="respacks.blk"
+    defaultDdsxTexPack:t="base.dxp.bin"
+    rtMipGenAllowed:b=no
+    folderDefaults{
+      ddsxTexPack:t="*parent"
+      gameResPack:t="*parent"
+    }
+    plugins{
+      folder:t="*common"
+    }
+  }
+
+  build{
+    tex{ defMaxTexSz:i=4096; }
+    collision{ preferZSTD:b=yes; writePrecookedFmt:b=yes; }
+    preferZSTD:b=yes
+    writeDdsxTexPackVer:i=3
+    writeGameResPackVer:i=3
+  }
+}
+
+genObjTypes{
+  type:t="prefab"
+  type:t="rendInst"
+  type:t="fx"
+  type:t="physObj"
+  type:t="composit"
+  type:t="gameObj"
+}
+
+projectDefaults{
+  riMgr{
+    type:t="aces"
+    gridCellSize:r=2048
+    subGridSize:i=8
+    minGridCellSize:r=512
+    minGridCellCount:i=16
+    writeOptTree:b=yes
+    packedRIBB:b=yes
+    gen{ PC:b=yes; }
+    tmInst12x32bit:b=yes
+    perInstDataDwords:i=1
+    perInstDataUseSeed:b=yes
+  }
+  envi{
+    type:t="skies"
+    znear:r=0.1
+    zfar:r=20000
+    daSkiesDepthTex:t="main_intzDepthTex"
+    enviNames{
+      morning:b=yes
+      day:b=yes
+      evening:b=yes
+      night:b=yes
+    }
+    skies{}
+  }
+  hmap{
+    type:t="aces"
+  }
+  preferZSTD:b=yes
+}
+
+ecs{
+  ignoreAllBadComponentTypes:b=yes
+  ignoreAllBadComponents:b=yes
+}
+
+// relative to develop/ (the SDK dir); the engine is the %engine mount, found through engine.blk
+mountPoints{
+  "%gameBase"{ forSource:t="../prog/gameBase"; forVromfs:t=""; }
+  "%danetlibs"{ forSource:t="%engine/prog/daNetGameLibs"; forVromfs:t="danetlibs"; }
+  "%toolScripts"{ forSource:t="../prog/tools"; forVromfs:t=""; }
+}

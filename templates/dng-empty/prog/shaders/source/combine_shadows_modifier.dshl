@@ -1,0 +1,1 @@
+// Game hook into prog/daNetGame/shaders/combine_shadows.dshl: extra shadow terms (e.g. caustics); none here

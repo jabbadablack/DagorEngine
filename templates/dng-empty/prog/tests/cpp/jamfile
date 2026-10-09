@@ -1,0 +1,24 @@
+# C++ unit tests of the game (Catch2, see <engine>/_docs/source/testing/cpp_unit_tests.md)
+include ../../_engine.jam ;
+Location = $(ProjectProgLocation)/tests/cpp ;
+Target   = dng_empty-tests ;
+
+include $(Root)/prog/_jBuild/unitTest.jam ;
+
+Sources =
+  main.cpp
+  test_config.cpp
+;
+
+UseProgLibs +=
+  engine/memory
+  engine/kernel
+  engine/osApiWrappers
+  engine/baseUtil
+  engine/ioSys
+  engine/math
+  engine/perfMon/daProfilerStub
+  3rdPartyLibs/eastl
+;
+
+include $(Root)/prog/_jBuild/build.jam ;

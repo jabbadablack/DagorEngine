@@ -1,0 +1,53 @@
+// How the game's das scripts find modules: "require a.b.c" maps the first name to a mount point
+// (settings.blk mountPoints), everything else is relative to this dir
+options indenting = 2
+require strings
+require %daslib/strings_boost
+
+var
+  DAS_PAK_ROOT = "."
+
+let
+  commonMountPointPrefixes <- {
+    "ecs" => "%gameLibs/das/ecs",
+    "math" => "%gameLibs/das/math",
+    "daFrameGraph" => "%gameLibs/das/daFrameGraph",
+    "daslib" => "%daslib",
+    "dastest" => "%dastest",
+    "danetlibs" => "%danetlibs",
+    "gameLibs" => "%gameLibs",
+    "imgui" => "%dasImgui",
+    "debug" => "%dngdas/das/debug",
+    "remote" => "%dngdas/das/remote"}
+  commonAliasPath <- {
+    "daFrameGraph" => "%gameLibs/das/daFrameGraph.daFG.das",
+    "testing" => "%dastest/testing.das"} // required by dastest/testing_boost (in-game tests)
+
+[export]
+def module_get(req, _from : string) : tuple<string; string; string> const
+  var rs <- split_by_chars(req, "./")
+
+  let mod_name = rs[length(rs) - 1]
+  let path_name = join(rs, "/") + ".das"
+
+  let aliasPath = commonAliasPath?[req] ?? ""
+  if aliasPath != ""
+    return (req, aliasPath, "")
+
+  if is_in_aot() && path_name == "daslib/debug.das"
+    return ("", "", "")
+
+  if starts_with(req, "%")
+    return (mod_name, path_name, "")
+
+  let alias_name = rs[length(rs) - 1]
+  var prefix = unsafe(commonMountPointPrefixes?[rs[0]])
+  if prefix != null
+    rs |> erase(0)
+    return (mod_name, "{*prefix}/{join(rs,"/")}.das", alias_name)
+
+  return (mod_name, "{DAS_PAK_ROOT}/{join(rs,"/")}.das", alias_name)
+
+[export]
+def include_get(inc, _from : string) : string
+  return starts_with(inc, "%") ? inc : "{DAS_PAK_ROOT}/{inc}"

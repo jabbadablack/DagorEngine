@@ -1,0 +1,19 @@
+// The scene the game starts (settings.blk scene:t=): the default world (sky and lighting, no level data) seen from a
+// camera. Build a level in daEditor (develop/daEditor) and set level__blk:t to its content/.../levels/<name>.blk.
+entity{
+  _template:t="static_cam"
+  camera__active:b=yes
+  transform:m=[[0, 0, -1] [0, 1, 0] [1, 0, 0] [0, 2, 0]]
+}
+
+entity{
+  _template:t="level"
+  level__blk:t="__default__"
+  level__timeSeed:i=1    // fixed seeds: the same sky every start (and in the screenshot tests)
+  level__weatherSeed:i=1
+}
+
+entity{
+  _template:t="spinner"
+  transform:m=[[1, 0, 0] [0, 1, 0] [0, 0, 1] [10, 2, 0]]
+}

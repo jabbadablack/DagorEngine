@@ -1,0 +1,8 @@
+// placeholder (make_placeholders.py): replace strata_clouds_simple.tga with real art; only red is used
+name:t="strata_clouds_simple.tga"
+convert:b=yes; fmt:t="ATI1N"
+swizzleARGB:t="RRRR"
+mipFilter:t="filterStripe"
+addrU:t="wrap"; addrV:t="wrap"
+hqMip:i=0; mqMip:i=1; lqMip:i=1
+gamma:r=1.0

@@ -40,8 +40,12 @@ Below is a tree of the general directory structure:
 │   ├── daNetGameLibs
 │   └── samples
 ├── samples
+├── templates
 └── _docs
 ```
+
+A project can also live outside `<engine_root>`: its `engine.blk` names the engine checkout (see
+[Creating a Project](new_project.md)).
 
 ## Main Sources
 
@@ -115,6 +119,11 @@ framework. Dependencies can include `1stPartyLibs`, `3rdPartyLibs`, `engine`,
 
 Contains sample projects for both the core engine and game libraries are stored
 here.
+
+### `templates`
+
+Project templates for `new_project.py` (see [Creating a Project](new_project.md)). Each is a buildable project
+inside the engine, built and tested like the samples.
 
 **Library Development Principles**
 

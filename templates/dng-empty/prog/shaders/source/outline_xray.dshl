@@ -1,0 +1,5 @@
+// The x-ray outline shaders the renderer expects; not rendered by this game
+shader edge_detect, edge_detect_box
+{
+  dont_render;
+}

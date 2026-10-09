@@ -1,0 +1,87 @@
+// Game settings (dgs_get_settings()): defaults of the game, overridden by the player's dng_empty.config.blk and by
+// -config:<path>:<type>=<value> arguments.
+windowTitle:t="Dng Empty"
+circuit:t="internal"
+disableRemoteNetServices:b=yes
+
+disableMenu:b=yes // there is no menu: the game starts scene:t= right away (or -scene:<path>)
+scene:t="gamedata/scenes/main.blk"
+entitiesPath:t="gamedata/templates/dng_empty.entities.blk"
+playerTemplateName:t="player"
+es_order:t=""
+initUiFonts:b=no // no UI yet: a game with darg UI builds fonts (fontgen2) into ui/fonts.vromfs.bin and drops this
+
+loadingScreen{ // animated loading screens: shaders named loading_splash_<name>, see shaders/game_common.blk
+  screens{
+    screen:t="rgbTriangle"
+  }
+  default:t="rgbTriangle"
+}
+
+screenshots{
+  dir:t="Screenshots"
+}
+
+video{
+  resolution:t="auto"
+  mode:t="windowed"
+  vsync:b=no
+}
+
+phys{
+  fixedTimeStepHz:i=30
+  maxSubSteps:i=1
+}
+
+addons{ // resource packs the game loads: what dabuild exports from develop/assets (python ../../../prog/build.py assets)
+  folder:t="content/dng_empty" // + /res
+}
+
+daEditor{
+  disable:b=yes
+}
+
+// Script and data dirs. Sources are used with -config:debug/useAddonVromSrc:b=yes (game/run scripts and tests pass it),
+// the vromfs (python ../../build.py vromfs) otherwise; the engine is the %engine mount, found through ../../../engine.blk.
+mountPoints{
+  "%darg"      { forSource:t="%engine/prog/scripts/sq/daRg"; forVromfs:t="sq/daRg"; }
+  "%sqstd"     { forSource:t="%engine/prog/scripts/sq/std"; forVromfs:t="sq/std"; }
+  "%daeditor"  { forSource:t="%engine/prog/scripts/sq/daeditor"; forVromfs:t="sq/daeditor"; }
+  "%dngscripts"{ forSource:t="%engine/prog/daNetGame/scripts/globals/"; forVromfs:t="daNetGame/qscripts"; }
+  "%dngdas"    { forSource:t="%engine/prog/daNetGame/scripts/das"; forVromfs:t="das"; }
+  "%daslib"    { forSource:t="%engine/prog/1stPartyLibs/daScript/daslib"; forVromfs:t="daslib"; }
+  "%gameLibs"  { forSource:t="%engine/prog/gameLibs"; forVromfs:t="gamelibs"; }
+  "%danetlibs" { forSource:t="%engine/prog/daNetGameLibs"; forVromfs:t="danetlibs"; }
+  "%scripts"   { forSource:t="../prog/scripts"; forVromfs:t="scripts"; }
+  "%dastest"   { forSource:t="%engine/prog/1stPartyLibs/daScript/dastest"; forVromfs:t="dastest"; } // in-game tests (-das_test)
+}
+
+addonBasePath{ // first-stated-first-searched
+  addon{ vromed:b=yes; vrom:t="dng_empty.vromfs.bin";
+    src:t="../prog/gameBase"
+    src:t="../prog/scripts"
+    src:t="../prog/scripts/dng_empty"
+  }
+}
+
+game_das_gen_2_make_syntax:b=true
+game_das_loading_threads:i=2
+game_sq_script:t=""
+game_das_project:t="%scripts/project.das_project"
+game_das_script:t="%scripts/dng_empty/dng_empty.das"
+game_das_script_init:t="%scripts/dng_empty/dng_empty_init.das"
+game_das_script_thread_init:t=""
+game_das_sandbox_project:t=""
+
+ui{
+  script:t=""
+  overlay_ui_script:t=""
+}
+
+__allowedConfigOverrides{ // what the game's own scripts may change in the player's config
+  video{ __allow_all_params:b=yes; }
+  graphics{ __allow_all_params:b=yes; }
+  screenshots{ __allow_all_params:b=yes; }
+  debug{ __allow_all_params:b=yes; }
+  input{ __allow_all_params:b=yes; }
+}

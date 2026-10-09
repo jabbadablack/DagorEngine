@@ -1,0 +1,8 @@
+// Shader descriptions dabuild exports assets with: python ../build.py shaders
+include "%engine/prog/daNetGame/shaders/_build/shaders_tools_exp.blk"
+mountPoint:t="%engine/prog/daNetGame/shaders" // see game_common.blk
+"@override:source" {
+  file:t = "../dynamic_emissive.dshl"
+  file:t = "../dynamic_glass.dshl"
+}
+"@override:outMiniDumpName":t="../../tools/tools.exp"

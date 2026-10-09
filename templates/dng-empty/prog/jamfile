@@ -1,0 +1,130 @@
+# The game: "jam" builds the client, "jam -sDedicated=yes" the dedicated server (build.py runs both).
+# Root and Location come from _engine.jam, written by "python ../project.py setup" from ../engine.blk.
+include _engine.jam ;
+Location = $(ProjectProgLocation) ;
+
+Game = dng_empty ;
+GameMainVromFilePath = dng_empty.vromfs.bin ;
+
+include $(Root)/prog/daNetGame/target_name_rules.jam ; # Note - $(Platform) is not defined before this line unless passed in command line
+
+TargetType ?= exe ;
+if $(Dedicated) != yes { TargetType = exe ; }
+Target     ?= [ CorrectTargetName ] ;
+TargetCodeName = $(Game) ; # this will hold target name unchanged even if non-default phys engine is used
+
+PlatformArch_windows ?= host_arch ;
+include $(Root)/prog/_jBuild/defPlatform.jam ;
+
+UseModulesAI = no ;
+UseModulesDM = no ;
+UseModulesWeapon = no ;
+
+AotJamfile = $(Root)/prog/daNetGame-das-aot/jamfile ;
+AotCompilerBaseName = $(ProjectProgDir)/../tools/das-aot/$(Game)-aot ;
+
+include $(Root)/prog/daNetGame/setup.jam ; # Note - $(Platform) is not defined before this line unless passed in command line
+DAS_AOT_COMPILER_OPT = -- --config aot_config.blk -sConfig $(Config) ;
+
+SetupOutputDir ;
+
+OutDir = $(ProjectProgDir)/../game/$(Platform)-$(PlatformArch) ;
+
+local AllSrcFolder_CPP = ;
+local AllSrcFolder_ES = ;
+
+# das scripts compiled ahead of time (AOT) into the executable, see scripts/dng_empty.das for the load order
+AllSrcFolder_DAS =
+  scripts/dng_empty
+  scripts/dng_empty/es
+;
+
+# the linux dedicated server checks client auth keys (NetPeerAuth): zero keys let any linux client in, set real ones
+# before shipping; windows and macOS clients are not checked
+GameAuthKey_linux = 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 ;
+GameAuthKeyPlatformListPairs = linux linux ;
+
+include $(Root)/prog/daNetGame/game.jam ;
+
+SourceES = ;
+
+DasModulesFolder = ;
+DasModuleFiles = ;
+
+AllSrcFolder_CPP = main ;
+
+gamePulls_action = make_module_pull_cpp ;
+gamePulls = daECS/core/componentType.h game_pulls ;
+AddGamePullsToSources ;
+
+AddIncludes +=
+  $(Root)/prog/daNetGameLibs
+  $(Root)/prog/gameLibs
+;
+
+UseProgLibs +=
+  daNetGame
+  daNetGameLibs/dm/stub
+;
+if $(Dedicated) = yes {
+  UseProgLibs += engine/drv/drv3d_stub ;
+}
+
+include $(ProjectProgDir)/_libs.jam ; # daNetGameLibs and gameLibs of danetgamelibs.txt and gamelibs.txt
+
+if $(Dedicated) != yes {
+  if $(Platform) in windows {
+    Manifest = $(ProjectProgDir)/platform/windows/$(Game).exe.manifest ;
+    if $(CheckOnly) != yes { Sources += platform/windows/$(Game).rc ; }
+    include $(Root)/prog/engine/drv/drv3d_DX12/copy_bundles.jam ;
+    include $(Root)/prog/engine/drv/drv3d_commonCode/copy_bundles.jam ;
+    if $(FmodStudio) != src && $(HaveSound) != no {
+      AddLibs += $(FmodStaticLibs) ;
+      for dll in $(FmodStudioSharedLibs) { BundleCopy += @$(dll) $(dll:D=) ; }
+    }
+  } else if $(Platform) = linux {
+    ImportsRelativeDir = . ;
+    if $(FmodStudio) != src && $(HaveSound) != no {
+      AddLibs += $(OutDir)/$(FmodStaticLibs:D=:S=) ;
+      for dll in $(FmodStudioSharedLibs) { BundleCopy += @$(dll) $(dll:D=:S=) ; }
+    }
+  } else if $(Platform) = macOS {
+    BundleName = DngEmpty ;
+    BundleID   = com.dagor.DngEmpty ;
+    if $(PlatformArch) = arm64 { ForceSignTarget_macOS = yes ; BundleName = $(BundleName)Arm64 ; }
+    BundlePlist = @$(Root)/prog/_jBuild/macOS/generic.info.plist ../Info.plist ;
+    BundleIcon = $(BundleName) ;
+    BundleCopy = platform/macOS/$(Game).icns ../Resources/$(BundleName).icns ;
+    opt on main/apple_main.mm = -D__S(X)=#X -DDAGOR_MACOSX_CONTENTS=__S(../../..) ;
+
+    if $(Config) = rel {
+      CopyTo = $(OutDir)/$(BundleName) ;
+      OutDir = $(OutDir)/../../rel-build/$(BundleName).app/Contents/MacOS ;
+    } else {
+      CopyTo = $(OutDir) ;
+      OutDir = $(OutDir)/../$(BundleName).app/Contents/MacOS ;
+    }
+    if $(SignatureOpt) = none { SignatureOpt = ; }
+    if $(FmodStudio) != src && $(HaveSound) != no {
+      AddLibs += $(FmodStaticLibs) ;
+      UseSharedLibs += $(FmodStudioSharedLibs) ;
+    }
+    if $(HaveSound) != no { LINKopt += -framework AudioUnit -framework CoreAudio ; }
+  } else {
+    Exit unsupported Platform\=$(Platform) for Target\=$(Target): add its packaging here, see outerSpace/prog/jamfile ;
+  }
+}
+
+if $(CheckOnly) != yes { # different compile options are not compatible with PCH
+  opt on gameVersion.jamvar += -DVERSION_DOT=$(VERSION_DOT) -DBUILD_NUMBER=$(BUILD_NUMBER) -DVERSION_NUM=$(VERSION_NUM) ;
+  opt on platform/$(Platform)/$(Game).rc = -DVERSION_NUM=$(VERSION_NUM) ;
+}
+
+AutoscanBuildLists $(AllSrcFolder_CPP) : *.cpp       : Sources ;
+if $(DAS_AOT_COMPILER) { AutoscanBuildLists $(AllSrcFolder_DAS) : *.das : Sources : ; }
+
+AutoscanBuildLists $(AllSrcFolder_ES)  : *ES.cpp.inl : SourceES ;
+for s in $(SourceES) { GenESSourceFile $(s) ; }
+SourceES = ;
+
+include $(Root)/prog/_jBuild/build.jam ;

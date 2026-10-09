@@ -1,0 +1,9 @@
+// ECS tests: [ecs_test] functions in *.das here, run by the dedicated server with every game system
+target{
+  name:t="dng_empty.ecs"
+  layer:t="ecs"
+  tag:t="dng_empty"
+  path:t="."
+  scene:t="gamedata/scenes/main.blk"
+  caseTimeout:r=60
+}

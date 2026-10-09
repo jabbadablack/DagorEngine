@@ -20,6 +20,9 @@ python test_all.py run -k "engine.*"     # only targets whose id matches
 python test_all.py run --project ../MyGame --no-engine
 ```
 
+A project made with `new_project.py` runs its own with `python project.py test` (the same command, from the engine it
+is linked to); every layer has an example target there (see [Creating a Project](../getting-started/new_project.md)).
+
 Each run writes `_output/test_results/<run id>/` with `report.html` (open it in a browser), `junit.xml`,
 `run.json` and `summary.md`, plus the full output log and artifacts of every target.
 `_output/test_results/latest.txt` holds the path of the most recent run.

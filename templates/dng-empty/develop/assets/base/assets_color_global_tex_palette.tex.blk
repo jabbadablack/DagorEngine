@@ -1,0 +1,7 @@
+// placeholder (make_placeholders.py): the paint colors palette; white, no tint
+name:t="assets_color_global_tex_palette.tga"
+pow2:t="none"
+convert:b=yes; fmt:t="ARGB"
+addrU:t="wrap"; addrV:t="wrap"
+mipmap:t="none"
+hqMip:i=0; mqMip:i=0; lqMip:i=0

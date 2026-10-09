@@ -1,0 +1,8 @@
+// daScript unit tests: pure logic of the game scripts, run by dastest without the game (fast, no build of the game)
+target{
+  name:t="dng_empty.das"
+  layer:t="das"
+  tag:t="dng_empty"
+  path:t="."
+  project:t="tests.das_project"
+}

@@ -1,0 +1,6 @@
+# Included by prog/daNetGame-das-aot/jamfile when it builds this project's das AOT compiler (ProjectLocation is this dir).
+# The AOT compiler's Location is the engine root, so this project's C++ is included by path: it may be on another drive.
+local projectDir = [ LocationDir $(ProjectLocation) ] ;
+projectDasModules = \# include \"$(projectDir)/main/dasGameModulesList.cpp\" ;
+Sources += projectDasModules.jamvar ;
+include $(projectDir)/_libs_aot.jam ; # AOT parts of the libs in danetgamelibs.txt and gamelibs.txt

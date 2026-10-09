@@ -91,7 +91,7 @@ if __name__ == '__main__':
       BUILD_PROJECTS += [s[8:]]
   # when no projects specified we build all of them
   if len(BUILD_PROJECTS) == 0:
-    BUILD_PROJECTS = ['dagorTools', 'dargbox', 'physTest', 'skiesSample', 'testGI', 'outerSpace', 'dngSceneViewer']
+    BUILD_PROJECTS = ['dagorTools', 'dargbox', 'physTest', 'skiesSample', 'testGI', 'outerSpace', 'dngSceneViewer', 'dngEmpty']
 
   # build command line to run other build scripts
   PY_ADD_CMDLINE = BUILD_COMPONENTS
@@ -141,3 +141,7 @@ if __name__ == '__main__':
   # daNetGame-based Scene Viewer
   if 'dngSceneViewer' in BUILD_PROJECTS:
     run([sys.executable, './build.py'] + PY_ADD_CMDLINE, cwd='samples/dngSceneViewer/prog')
+
+  # the dng-empty project template (new_project.py), built like a project to keep it working
+  if 'dngEmpty' in BUILD_PROJECTS:
+    run([sys.executable, './build.py'] + PY_ADD_CMDLINE, cwd='templates/dng-empty/prog')

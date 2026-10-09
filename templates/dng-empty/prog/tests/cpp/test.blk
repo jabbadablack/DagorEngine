@@ -1,0 +1,7 @@
+target{
+  name:t="dng_empty.cpp"
+  layer:t="cpp"
+  tag:t="dng_empty"
+  jamfile:t="jamfile"
+  exe:t="dng_empty-tests"
+}

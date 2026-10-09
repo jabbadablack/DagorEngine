@@ -1,0 +1,30 @@
+// Rules for every asset under develop/assets: textures and models placed here become game assets, packed per dir.
+// See <engine>/_docs/source/assets/all-about-blk/folder_blk.md
+scan_assets:b=yes
+scan_folders:b=yes
+
+export{
+  ddsxTexPack:t="*name_src"
+  gameResPack:t="*name_src"
+}
+
+virtual_res_blk{ // textures
+  find:t="^(.*)\.(tif|tiff|tga|png|dds)$"
+  className:t="tex"
+  contents{
+    convert:b=yes; fmt:t="DXT1|DXT5" // DXT5 when there is alpha
+    mipFilter:t="filterKaiser"; mipFilterAlpha:r=40; mipFilterStretch:r=2
+    addrU:t="wrap"; addrV:t="wrap"
+    hqMip:i=0; mqMip:i=1; lqMip:i=2
+  }
+}
+
+virtual_res_blk{ // static models: <name>.lod00.dag, <name>.lod01.dag, ...
+  find:t="^(.*)\.lod00\.dag$"
+  className:t="rendInst"
+  contents{
+    lod{range:r=30;}
+    lod{range:r=100;}
+    lod{range:r=300;}
+  }
+}

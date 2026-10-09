@@ -1,0 +1,7 @@
+// placeholder (make_placeholders.py): replace stars.tga with real art
+name:t="stars.tga"
+convert:b=yes; fmt:t="DXT1|DXT5"
+mipFilter:t="filterStripe"
+addrU:t="wrap"; addrV:t="wrap"
+hqMip:i=0; mqMip:i=1; lqMip:i=2
+gamma:r=1.0

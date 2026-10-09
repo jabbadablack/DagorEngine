@@ -1,0 +1,23 @@
+# written by "python project.py setup" from engine.blk and prog/*libs.txt
+/_engine.cmd
+/_engine.sh
+/prog/_engine.jam
+/prog/_libs.jam
+/prog/_libs_aot.jam
+/prog/_libs.vromfs.blk
+/prog/gameBase/gamedata/templates/_libs.entities.blk
+/prog/scripts/_libs_init.das
+/prog/shaders/_libs_shaders.blk
+/prog/tools/_libs_init.das
+/stubs/
+
+# build outputs (python project.py build)
+/_output/
+/tools/
+/game/*
+!/game/*.cmd
+!/game/*.sh
+/develop/.cache/
+/develop/dabuild-dbg*
+*.das.inl
+*.pyc
