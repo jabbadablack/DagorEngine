@@ -158,7 +158,9 @@ struct ResourceSchedulerFixture
   {
     dafg::intermediate::Request request;
     request.resource = res;
-    request.usage = {usage, access, dafg::Stage::POST_RASTER};
+    request.usage.type = usage; // not brace-initialized: GCC takes it as narrowing into the bit-fields
+    request.usage.access = access;
+    request.usage.stage = dafg::Stage::POST_RASTER;
     request.fromLastFrame = false;
     graph.nodes[node].resourceRequests.push_back(request);
   }
