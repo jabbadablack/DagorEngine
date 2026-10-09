@@ -112,6 +112,7 @@ int dag_df_stat(const char *path, DagorStat &buf)
 int dag_df_fstat(const DagFile *fp, DagorStat &buf) { return df_fstat((file_ptr_t)fp, &buf); }
 
 bool das_dd_file_exists(const char *fname) { return fname && dd_file_exists(fname); }
+bool das_dd_erase(const char *fname) { return fname && dd_erase(fname); }
 
 char *dag_df_get_real_name(const char *fname, das::Context *context, das::LineInfoArg *at)
 {
@@ -192,6 +193,7 @@ public:
       "bind_dascript::dag_df_fstat");
     das::addExtern<DAS_BIND_FUN(das_dd_file_exists)>(*this, lib, "dd_file_exists", das::SideEffects::accessExternal,
       "bind_dascript::das_dd_file_exists");
+    das::addExtern<DAS_BIND_FUN(das_dd_erase)>(*this, lib, "dd_erase", das::SideEffects::modifyExternal, "bind_dascript::das_dd_erase");
     das::addExtern<DAS_BIND_FUN(dag_df_get_real_name)>(*this, lib, "df_get_real_name", das::SideEffects::modifyExternal,
       "bind_dascript::dag_df_get_real_name");
     // builtin file functions

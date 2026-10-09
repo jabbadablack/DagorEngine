@@ -55,3 +55,6 @@ def file_test_es(evt : Event)
       assert(tfb.x == 1 && tfb.y == 1.0)
     else
       panic("can't open ftest.bin_save for reading")
+  // the files are written to the current dir: leave it clean
+  for fname in ["ftest.txt", "ftest.bin", "ftest.bin_save"]
+    dd_erase(fname)
