@@ -246,8 +246,9 @@ AddIncludes +=
 Copt   = $(CPPopt) ;
 
 if $(ProjectLocation) {
-  NOCARE $(Root)/$(ProjectLocation)/_aot.jam ;
-  include $(Root)/$(ProjectLocation)/_aot.jam ;
+  local projectDir = [ LocationDir $(ProjectLocation) ] ;
+  NOCARE $(projectDir)/_aot.jam ;
+  include $(projectDir)/_aot.jam ;
 }
 
 NOCARE $(Root)/prog/daNetGame-das-aot/gaijin.jam ;
