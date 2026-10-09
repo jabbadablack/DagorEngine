@@ -53,6 +53,8 @@
 #include <crtdbg.h>
 #include <stdlib.h>
 #else
+#include <execinfo.h>
+#include <signal.h>
 #include <unistd.h> // _exit
 #endif
 
@@ -298,6 +300,27 @@ static void unittest_disable_crash_dialogs()
   }
 #endif
 }
+
+#if !_TARGET_PC_WIN
+// unattended runs have no debugger and CI machines no crash reports: print where a crash happened (Catch2 reports the
+// signal of a crashing case but no stack). Installed before main, so crashes in static initialization are covered too
+static void unittest_crash_backtrace(int sig)
+{
+  static const char header[] = "unittest: fatal signal, backtrace:\n";
+  ssize_t written = write(STDERR_FILENO, header, sizeof(header) - 1);
+  G_UNUSED(written);
+  void *frames[64];
+  backtrace_symbols_fd(frames, backtrace(frames, 64), STDERR_FILENO);
+  signal(sig, SIG_DFL);
+  raise(sig);
+}
+
+__attribute__((constructor)) static void unittest_install_crash_backtrace()
+{
+  for (int sig : {SIGSEGV, SIGBUS, SIGILL, SIGFPE})
+    signal(sig, unittest_crash_backtrace);
+}
+#endif
 
 #if UNITTEST_ENV != 0
 static void unittest_env_startup(int argc, char *argv[], const char *gpu_driver)
