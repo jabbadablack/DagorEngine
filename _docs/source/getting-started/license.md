@@ -86,6 +86,7 @@ third-party component as follows:
   prog/3rdPartyLibs/cachesim/LICENSE
   prog/3rdPartyLibs/cef3/v4896/libcef_dll/LICENSE
   prog/3rdPartyLibs/cef3/v4951/libcef_dll/LICENSE
+  prog/3rdPartyLibs/catch2/LICENSE.txt
   prog/3rdPartyLibs/codecs/dav1d/LICENSE
   prog/3rdPartyLibs/codecs/libogg-1.1.3/copying
   prog/3rdPartyLibs/codecs/libtheora-1.0/copying
@@ -96,7 +97,6 @@ third-party component as follows:
   prog/3rdPartyLibs/convert/nvtt-2.0.7/LICENSE
   prog/3rdPartyLibs/cpu_features/LICENSE
   prog/3rdPartyLibs/Detour/LICENSE
-  prog/3rdPartyLibs/doctest/LICENSE.txt
   prog/3rdPartyLibs/eastl/LICENSE
   prog/3rdPartyLibs/enet/LICENSE
   prog/3rdPartyLibs/fast_float/LICENSE
@@ -152,7 +152,6 @@ third-party component as follows:
   prog/3rdPartyLibs/Recast/LICENSE
   prog/3rdPartyLibs/ssr/LICENSE
   prog/3rdPartyLibs/udis86/LICENSE
-  prog/3rdPartyLibs/unittest-cpp/LICENSE
   prog/3rdPartyLibs/uriparser/COPYING
   prog/3rdPartyLibs/vulkan/smol-v/LICENSE
   prog/3rdPartyLibs/vulkan/spirv-tools/external/spirv-headers/LICENSE

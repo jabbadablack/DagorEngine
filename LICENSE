@@ -117,7 +117,6 @@ third-party component as follows:
   prog/3rdPartyLibs/crashpad/third_party/lss/lss/LICENSE
   prog/3rdPartyLibs/crashpad/third_party/mini_chromium/mini_chromium/base/third_party/icu/LICENSE
   prog/3rdPartyLibs/crashpad/third_party/mini_chromium/mini_chromium/LICENSE
-  prog/3rdPartyLibs/doctest/LICENSE.txt
   prog/3rdPartyLibs/draco/LICENSE
   prog/3rdPartyLibs/eastl/LICENSE
   prog/3rdPartyLibs/enet/LICENSE
@@ -195,7 +194,6 @@ third-party component as follows:
   prog/3rdPartyLibs/SnapdragonSuperResolution/LICENSE.txt
   prog/3rdPartyLibs/stb/LICENSE
   prog/3rdPartyLibs/udis86/LICENSE
-  prog/3rdPartyLibs/unittest-cpp/LICENSE
   prog/3rdPartyLibs/uriparser/COPYING
   prog/3rdPartyLibs/uuidv7/LICENSE
   prog/3rdPartyLibs/vulkan/smol-v/LICENSE
