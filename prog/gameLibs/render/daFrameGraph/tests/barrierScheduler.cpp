@@ -21,6 +21,16 @@ using dafg::intermediate::ResourceIndex;
 
 NodeIndex node(uint32_t idx) { return static_cast<NodeIndex>(idx); }
 
+// GCC doesn't brace-initialize ResourceUsage: its access and stage are enum bit-fields
+dafg::intermediate::ResourceUsage make_usage(dafg::Usage type, dafg::Access access, dafg::Stage stage)
+{
+  dafg::intermediate::ResourceUsage result;
+  result.type = type;
+  result.access = access;
+  result.stage = stage;
+  return result;
+}
+
 bool has_barrier(const dafg::BarrierScheduler::EventsCollection &events, ResourceIndex res, ResourceBarrier flag)
 {
   for (const auto &frameEvents : events)
@@ -70,8 +80,8 @@ TEST_CASE("a request change alone rebuilds the resource's barriers", "[barrierSc
     graph.nodeStates.emplaceAt(node(idx));
     graph.nodeNames.emplaceAt(node(idx), name);
   };
-  addNode(0, "producer", {dafg::Usage::COLOR_ATTACHMENT, dafg::Access::READ_WRITE, dafg::Stage::PS});
-  addNode(1, "consumer", {dafg::Usage::SHADER_RESOURCE, dafg::Access::READ_ONLY, dafg::Stage::PS});
+  addNode(0, "producer", make_usage(dafg::Usage::COLOR_ATTACHMENT, dafg::Access::READ_WRITE, dafg::Stage::PS));
+  addNode(1, "consumer", make_usage(dafg::Usage::SHADER_RESOURCE, dafg::Access::READ_ONLY, dafg::Stage::PS));
   graph.nodes[node(1)].predecessors.insert(node(0));
   graph.nodes.emplaceAt(node(2))->predecessors.insert(node(1));
   graph.nodes[node(2)].multiplexingIndex = dafg::intermediate::MultiplexingIndex{0};
@@ -96,7 +106,7 @@ TEST_CASE("a request change alone rebuilds the resource's barriers", "[barrierSc
   REQUIRE(has_barrier(events, tex, RB_RO_SRV));
   REQUIRE(!has_barrier(events, tex, RB_RO_COPY_SOURCE));
 
-  graph.nodes[node(1)].resourceRequests.front().usage = {dafg::Usage::COPY, dafg::Access::READ_ONLY, dafg::Stage::TRANSFER};
+  graph.nodes[node(1)].resourceRequests.front().usage = make_usage(dafg::Usage::COPY, dafg::Access::READ_ONLY, dafg::Stage::TRANSFER);
   nodesChanged.assign(3, false);
   const auto lifetimesUnchanged = lifetimeCalculator.recalculate(graph, coloring);
   REQUIRE((lifetimesUnchanged.trueKeys().begin() == lifetimesUnchanged.trueKeys().end()));

@@ -52,7 +52,11 @@ bool inited = false;
 
 namespace workcycle_internal
 {
-void idle_loop() { process_messages(); }
+void idle_loop()
+{
+  if (inited) // not with a windowless driver (stub)
+    process_messages();
+}
 } // namespace workcycle_internal
 
 namespace linux_GUI

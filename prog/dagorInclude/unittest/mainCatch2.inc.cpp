@@ -349,6 +349,19 @@ static void unittest_env_shutdown()
 }
 #endif
 
+#if _TARGET_PC_MACOSX
+// the drivers' window code needs it; console executables have no Cocoa window (as in startup/dag_mainCon.inc.cpp),
+// so a driver that needs one fails to init and UNITTEST_ENV_GPU tests skip
+class NSWindow;
+class NSView;
+class CGRect
+{};
+NSWindow *macosx_create_dagor_window(const char * /*title*/, int /*scr_w*/, int /*scr_h*/, NSView * /*drawView*/, CGRect /*rect*/)
+{
+  return nullptr;
+}
+#endif
+
 // ===============================================================================
 
 #include <supp/dag_define_KRNLIMP.h>
