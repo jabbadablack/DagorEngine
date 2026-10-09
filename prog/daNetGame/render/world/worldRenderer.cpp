@@ -889,8 +889,8 @@ void WorldRenderer::generatePaintingTexture()
 void WorldRenderer::onLevelLoaded(const DataBlock &level_blk)
 {
 #if DAGOR_DBGLEVEL > 0
-  settings_validator::ensure_no_duplicates(dgs_get_settings()->getBlockByName("graphics"), "", false);
-  settings_validator::ensure_no_duplicates(dgs_get_settings()->getBlockByName("video"), "", true);
+  settings_validator::ensure_no_duplicates(dgs_get_settings()->getBlockByNameEx("graphics"), "", false);
+  settings_validator::ensure_no_duplicates(dgs_get_settings()->getBlockByNameEx("video"), "", true);
 #endif
   // this is workaround for race in texture manager
   if (characterMicrodetailsId != BAD_TEXTUREID)
