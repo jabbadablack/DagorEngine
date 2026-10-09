@@ -1287,6 +1287,8 @@ rule AotCompileDAS
   }
   if ! [ GLOB $(DAS_AOT_COMPILER:D) : $(DAS_AOT_COMPILER:D=) ] {
     NOCARE $(DAS_AOT_COMPILER) ;
+    # the sub-build of the compiler is only a dependency of 'all': without this its turn may come after the das sources
+    if $(DAS_AOT_COMPILER_JAM) { Depends $(DAS_AOT_COMPILER) : $(DAS_AOT_COMPILER_JAM) ; }
     ALWAYS $(dest_cpp) ;
     echo compiler $(DAS_AOT_COMPILER) is missing, so will try build \"$(src)\" after compiler is rebuilt ;
   }

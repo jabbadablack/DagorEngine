@@ -200,6 +200,7 @@ if $(NeedDasAotCompile) = yes && $(AotCompilerBaseName) {
       DAS_AOT_DRIVER = prog/1stPartyLibs/daScript/utils/aot/main.das ;
     }
     DAS_AOT_COMPILER = $(AotCompilerBaseName)-$(host_platform)-$(host_arch)-c-dev ;
+    DAS_AOT_COMPILER_JAM = $(jam:G=JAM) ; # the sub-build that makes it (see AotCompileDAS)
     if $(Platform) = macOS { config on $(jam:G=JAM) += -sMacOSXMinVer=$(MacOSXMinVer) ; }
     config on $(jam:G=JAM) += -sOutDir=$(AotCompilerBaseName:D) -sTarget=$(AotCompilerBaseName:B) -sCheckedContainers=yes -sPlatformSpec=$(PlatformSpec) -sUseLLDLink=$(UseLLDLink) ;
     config on $(jam:G=JAM) += -sProjectLocation=$(Location) ;
