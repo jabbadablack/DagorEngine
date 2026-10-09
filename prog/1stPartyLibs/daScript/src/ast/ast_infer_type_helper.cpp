@@ -1294,20 +1294,24 @@ namespace das {
                         auto baseType = swz->value->type->getVectorBaseType();
                         vec4f data = static_cast<ExprConst *>(cswz)->value;
                         vec4f resData = v_zero();
+                        // lanes are copied through arrays: writing a vec4f through an int pointer breaks strict aliasing,
+                        // and GCC then folds every swizzle of a constant to zero
                         if (baseType != Type::tInt64 && baseType != Type::tUInt64) {
-                            int32_t *res = (int32_t *)&resData;
-                            int32_t *src = (int32_t *)&data;
+                            int32_t res[4] = {}, src[4];
+                            memcpy(src, &data, sizeof(src));
                             int outI = 0;
                             for (auto f : fields) {
                                 res[outI++] = src[f];
                             }
+                            memcpy(&resData, res, sizeof(res));
                         } else {
-                            int64_t *res = (int64_t *)&resData;
-                            int64_t *src = (int64_t *)&data;
+                            int64_t res[2] = {}, src[2];
+                            memcpy(src, &data, sizeof(src));
                             int outI = 0;
                             for (auto f : fields) {
                                 res[outI++] = src[f];
                             }
+                            memcpy(&resData, res, sizeof(res));
                         }
                         auto vecType = swz->type->getVectorType(baseType, int(fields.size()));
                         auto constValue = program->makeConst(expr->at, new TypeDecl(vecType), resData);
