@@ -8,6 +8,7 @@
 
 #include <EASTL/string.h>
 #include <EASTL/string_view.h>
+#include <EASTL/unique_ptr.h>
 
 
 // =======================================================
@@ -32,6 +33,12 @@ template <>
 struct StringMaker<eastl::string_view>
 {
   static std::string convert(const eastl::string_view &value) { return {value.data(), value.size()}; }
+};
+
+template <typename T, typename D>
+struct StringMaker<eastl::unique_ptr<T, D>>
+{
+  static std::string convert(const eastl::unique_ptr<T, D> &value) { return StringMaker<const void *>::convert(value.get()); }
 };
 
 

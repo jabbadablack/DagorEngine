@@ -7,6 +7,7 @@
 // Catch2 helpers for Dagor unit tests. Test executables are built with prog/_jBuild/unitTest.jam and use
 // <unittest/mainCatch2.inc.cpp> as their main.
 
+#include <unittest/catch2_eastl_tostring.h>
 #include <unittest/dag_testEnv.h>
 #include <catch2/catch_test_macros.hpp>
 #include <exception>

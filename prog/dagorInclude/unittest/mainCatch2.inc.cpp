@@ -60,6 +60,7 @@
 #include <debug/dag_fatal.h>
 #include <debug/dag_logSys.h>
 #include <osApiWrappers/dag_atomic.h>
+#include <osApiWrappers/dag_basePath.h>
 #include <osApiWrappers/dag_miscApi.h>
 #include <osApiWrappers/dag_symHlp.h>
 #include <startup/dag_globalSettings.h>
@@ -77,7 +78,6 @@
 #if UNITTEST_ENV & UNITTEST_ENV_GPU
 #include <drv/3d/dag_driver.h>
 #include <drv/3d/dag_info.h>
-#include <startup/dag_addBasePathDef.h>
 #include <startup/dag_restart.h>
 #include <workCycle/dag_startupModules.h>
 #endif
@@ -158,10 +158,11 @@ static bool assertion_handler(bool /*verify*/, const char *file, int line, const
   text.aprintf(0, "; function: %s", func ? func : "<no_func>");
   if (unittest::consume_expected_logerr(text)) // expected with unittest::ExpectLogerr; the asserting code continues
     return false;
+  // record and continue as a release build would: throwing here would unwind engine code that isn't exception safe
   if (!is_main_thread() || !interlocked_acquire_load(unittest_in_case))
     unittest::queue_unexpected_logerr(text);
   else
-    FAIL(text.c_str());
+    FAIL_CHECK(text.c_str());
   return false;
 }
 
@@ -173,7 +174,7 @@ static void eastl_assertion_failure_function(const char *expr, void * /*ctx*/)
   if (!is_main_thread() || !interlocked_acquire_load(unittest_in_case))
     unittest::queue_unexpected_logerr(String(0, "EASTL Assertion: %s", expr));
   else
-    FAIL("EASTL Assertion: " << expr);
+    FAIL_CHECK("EASTL Assertion: " << expr);
 }
 #endif
 
@@ -316,7 +317,6 @@ static void unittest_env_startup(int argc, char *argv[], const char *gpu_driver)
 #else
   set_debug_console_handle((intptr_t)stdout);
 #endif
-  dagor_init_base_path();
   if (*gpu_driver)
     const_cast<DataBlock *>(::dgs_get_settings())->addBlock("video")->setStr("driver", gpu_driver);
   if (!d3d::init_driver())
@@ -399,6 +399,8 @@ int main(int argc, char *argv[])
   opt.updateReferences = updateReferences;
   unittest::set_options(opt);
 
+  // engine file APIs resolve relative names through base paths; register the current dir as applications do
+  dd_add_base_path("");
   unittest_prev_log_callback = debug_set_log_callback(&unittest_log_callback);
 #if UNITTEST_ENV != 0
   unittest_env_startup(argc, argv, gpuDriver.c_str());

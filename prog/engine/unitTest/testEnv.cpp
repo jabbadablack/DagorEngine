@@ -85,11 +85,13 @@ String artifact_path(const char *rel)
 
 static String temp_root()
 {
-  const char *tmp = getenv("TMPDIR");
-  if (!tmp || !*tmp)
-    tmp = getenv("TEMP");
+#if _TARGET_PC_WIN
+  const char *tmp = getenv("TEMP");
   if (!tmp || !*tmp)
     tmp = getenv("TMP");
+#else
+  const char *tmp = getenv("TMPDIR");
+#endif
 #if _TARGET_PC_WIN
   String root(0, "%s/dagor_unittest_%d", tmp && *tmp ? tmp : ".", _getpid());
 #else
