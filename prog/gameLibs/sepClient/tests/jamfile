@@ -1,11 +1,8 @@
-Root           ?= ../../../.. ;
-Location        = prog/gameLibs/sepClient/tests ;
-ConsoleExe      = yes ;
-TargetType      = exe ;
-Target          = sepClient-tests ;
-OutDir          = $(Root)/_output/dagorUnitTests ;
+Root    ?= ../../../.. ;
+Location = prog/gameLibs/sepClient/tests ;
+Target   = sepClient-tests ;
 
-include $(Root)/prog/_jBuild/defaults.jam ;
+include $(Root)/prog/_jBuild/unitTest.jam ;
 
 
 local AllSrcFolder_CPP =
@@ -18,7 +15,6 @@ AutoscanBuildLists $(AllSrcFolder_CPP) : *.cpp       : Sources ;
 
 
 AddIncludes +=
-  $(Root)/prog/3rdPartyLibs/catch2/src
   $(Root)/prog/3rdPartyLibs/rapidjson/include
   $(Root)/prog/gameLibs/publicInclude
   $(Root)/prog/gameLibs/websocketJsonRpc/tests
@@ -40,7 +36,6 @@ UseProgLibs +=
   engine/baseUtil
   engine/perfMon/daProfilerStub
 
-  3rdPartyLibs/catch2
   3rdPartyLibs/eastl
 
   gameLibs/sepClient

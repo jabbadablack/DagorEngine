@@ -1,16 +1,12 @@
 Root    ?= ../../../../.. ;
 StrictCompile = yes ;
-ConsoleExe = yes ;
 PlatformSpec_windows_x86_64 = clang ;
 CheckedContainers ?= yes ;
 
-include $(Root)/prog/_jBuild/defaults.jam ;
-
 Location = prog/gameLibs/render/daFrameGraph/tests ;
+Target   = daFrameGraph-tests ;
 
-TargetType  = exe ;
-OutDir      = $(Root)/$(Location)/bin/$(LegacyPlatformSuffix) ;
-Target      = testFrameGraph ;
+include $(Root)/prog/_jBuild/unitTest.jam ;
 
 UseD3DMulti = yes ;
 UseD3DMultiList = DX12 vulkan stub ;
@@ -32,7 +28,7 @@ if $(PlatformSpec) = clang
   ;
 }
 
-UseProgLibs =
+UseProgLibs +=
   engine/memory
   engine/kernel
   engine/osApiWrappers
@@ -50,7 +46,6 @@ UseProgLibs =
   engine/drv/drv3d_pc_multi
 
   3rdPartyLibs/eastl
-  3rdPartyLibs/catch2
 
   gameLibs/render/daFrameGraph
 ;
@@ -63,10 +58,9 @@ if $(Platform) = linux {
 
 ShaderVarsStub ?= mock ;
 
-AddIncludes =
+AddIncludes +=
   $(Root)/$(Location)/..
   $(Root)/prog/gameLibs/publicInclude
-  $(Root)/prog/3rdPartyLibs/catch2/src
 ;
 
 Sources =

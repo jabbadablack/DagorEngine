@@ -1,0 +1,7 @@
+target{
+  name:t="engine.dataBlock"
+  layer:t="cpp"
+  tag:t="engine"
+  jamfile:t="jamfile"
+  exe:t="datablock-tests"
+}

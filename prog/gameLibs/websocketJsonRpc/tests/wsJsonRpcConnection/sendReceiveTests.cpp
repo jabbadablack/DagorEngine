@@ -5,7 +5,7 @@
 #include <testHelpers/rpcConnectionVerify.h>
 #include <testHelpers/websocketLibraryInterceptor.h>
 
-#include <catch2/catch_test_macros.hpp>
+#include <unittest/dag_unitTest.h>
 #include <unittest/catch2_eastl_tostring.h>
 
 
@@ -62,24 +62,28 @@ TEST_CASE("WsJsonRpcConnection: Receive unexpected data and discard it safely", 
     CAPTURE(isText);
     {
       INFO("Receiving empty string body");
+      unittest::ExpectLogerr expect("Failed parsing JSON message", isText ? 1 : 0);
       wsMock->emulateReceivedMessage(ws.relativeMs(0), "", isText);
       connection.poll();
       REQUIRE(wsMock->onMessageCallbackCallCount == ++receivedMessageCount);
     }
     {
       INFO("Receiving random text");
+      unittest::ExpectLogerr expect("Failed parsing JSON message", isText ? 1 : 0);
       wsMock->emulateReceivedMessage(ws.relativeMs(0), "Hello, World!", isText);
       connection.poll();
       REQUIRE(wsMock->onMessageCallbackCallCount == ++receivedMessageCount);
     }
     {
       INFO("Receiving empty dict body");
+      unittest::ExpectLogerr expect("missing message id for response message", isText ? 1 : 0);
       wsMock->emulateReceivedMessage(ws.relativeMs(0), "{}", isText);
       connection.poll();
       REQUIRE(wsMock->onMessageCallbackCallCount == ++receivedMessageCount);
     }
     {
       INFO("Receiving empty list body");
+      unittest::ExpectLogerr expect("invalid root element type", isText ? 1 : 0);
       wsMock->emulateReceivedMessage(ws.relativeMs(0), "[]", isText);
       connection.poll();
       REQUIRE(wsMock->onMessageCallbackCallCount == ++receivedMessageCount);

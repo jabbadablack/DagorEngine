@@ -8,7 +8,7 @@
 
 #include <sepClient/sepClient.h>
 
-#include <catch2/catch_test_macros.hpp>
+#include <unittest/dag_unitTest.h>
 #include <unittest/catch2_eastl_tostring.h>
 
 
@@ -315,6 +315,8 @@ TEST_CASE("SepClient: execute RPC call without existing network connection", sui
 
   {
     INFO("Destroy connection and make final checks");
+    // without a close the three calls above are still pending and their contexts are destroyed unanswered
+    unittest::ExpectLogerr expect("RpcContext was destroyed without calling response callback", initiatedClose ? 0 : 3);
     clientPtr.reset();
     CHECK(incomingResponses.size() == 0); // no error response during destructor
   }

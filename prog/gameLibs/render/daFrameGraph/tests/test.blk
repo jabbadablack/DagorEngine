@@ -1,0 +1,21 @@
+target{
+  name:t="gameLibs.daFrameGraph"
+  layer:t="cpp"
+  tag:t="gameLibs"
+  tag:t="render"
+  requires:t="gpu"
+  jamfile:t="jamfile"
+  exe:t="daFrameGraph-tests"
+  timeout:r=1200
+}
+// the same tests on the stub driver: no GPU needed, GPU-only cases skip themselves
+target{
+  name:t="gameLibs.daFrameGraph.stub"
+  layer:t="cpp"
+  tag:t="gameLibs"
+  tag:t="render"
+  jamfile:t="jamfile"
+  exe:t="daFrameGraph-tests"
+  args:t="--gpu-driver stub"
+  timeout:r=1200
+}

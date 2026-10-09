@@ -4,10 +4,9 @@
 
 #include <render/metronome.h>
 
-#include <catch2/catch_test_macros.hpp>
+#include <unittest/dag_unitTest.h>
 #include <util/dag_string.h>
 
-void set_logerr_capture(String *target);
 
 namespace metronome = dafg::metronome;
 using metronome::UpdateStatus;
@@ -92,7 +91,7 @@ TEST_CASE("staggered deadlines do not collide", "[metronome]")
   CountingNode nodeA, nodeB;
 
   String captured;
-  set_logerr_capture(&captured);
+  unittest::CaptureLogerr capture(captured);
 
   auto sgA = metronome::make_subgraph("tight", 1);
   nodeA.registerTo(sgA, "tight_node");
@@ -116,8 +115,6 @@ TEST_CASE("staggered deadlines do not collide", "[metronome]")
   metronome::update();
   CHECK(tokenB.status() == UpdateStatus::Complete);
   CHECK(captured.empty());
-
-  set_logerr_capture(nullptr);
 }
 
 TEST_CASE("colliding deadlines run together", "[metronome]")
@@ -126,7 +123,7 @@ TEST_CASE("colliding deadlines run together", "[metronome]")
   CountingNode nodeA, nodeB;
 
   String captured;
-  set_logerr_capture(&captured);
+  unittest::CaptureLogerr capture(captured);
 
   auto sgA = metronome::make_subgraph("collide_a", 1);
   nodeA.registerTo(sgA, "collide_a_node");
@@ -143,15 +140,13 @@ TEST_CASE("colliding deadlines run together", "[metronome]")
   CHECK(nodeA.executed == 1);
   CHECK(nodeB.executed == 1);
   CHECK(captured.empty());
-
-  set_logerr_capture(nullptr);
 }
 
 TEST_CASE("requests spread evenly across their deadline window", "[metronome]")
 {
   TestRuntime testRuntime{};
   String captured;
-  set_logerr_capture(&captured);
+  unittest::CaptureLogerr capture(captured);
 
   constexpr int COUNT = 10;
   constexpr uint32_t MAX_DELAY = 5;
@@ -195,15 +190,13 @@ TEST_CASE("requests spread evenly across their deadline window", "[metronome]")
   for (int i = 0; i < COUNT; ++i)
     CHECK(tokens[i].status() == UpdateStatus::Complete);
   CHECK(captured.empty());
-
-  set_logerr_capture(nullptr);
 }
 
 TEST_CASE("several sequential-frame systems share frames evenly", "[metronome]")
 {
   TestRuntime testRuntime{};
   String captured;
-  set_logerr_capture(&captured);
+  unittest::CaptureLogerr capture(captured);
 
   constexpr int SYSTEMS = 5;
   constexpr uint32_t MAX_DELAY = 4;
@@ -247,15 +240,13 @@ TEST_CASE("several sequential-frame systems share frames evenly", "[metronome]")
     CHECK(nodes[i].executed == RUNS_PER_SYSTEM);
   }
   CHECK(captured.empty());
-
-  set_logerr_capture(nullptr);
 }
 
 TEST_CASE("late requests raise the spread rate", "[metronome]")
 {
   TestRuntime testRuntime{};
   String captured;
-  set_logerr_capture(&captured);
+  unittest::CaptureLogerr capture(captured);
 
   constexpr int FIRST_BATCH = 6;
   constexpr int SECOND_BATCH = 6;
@@ -300,8 +291,6 @@ TEST_CASE("late requests raise the spread rate", "[metronome]")
   for (int i = 0; i < COUNT; ++i)
     CHECK(tokens[i].status() == UpdateStatus::Complete);
   CHECK(captured.empty());
-
-  set_logerr_capture(nullptr);
 }
 
 TEST_CASE("schedule supersedes a pending request", "[metronome]")
@@ -310,7 +299,7 @@ TEST_CASE("schedule supersedes a pending request", "[metronome]")
   CountingNode node;
 
   String captured;
-  set_logerr_capture(&captured);
+  unittest::CaptureLogerr capture(captured);
 
   auto sg = metronome::make_subgraph("superseded", 90);
   node.registerTo(sg, "superseded_node");
@@ -328,8 +317,6 @@ TEST_CASE("schedule supersedes a pending request", "[metronome]")
   metronome::update();
   CHECK(stale.status() == UpdateStatus::Superseded);
   CHECK(token.status() == UpdateStatus::Complete);
-
-  set_logerr_capture(nullptr);
 }
 
 TEST_CASE("schedule while running supersedes the running token", "[metronome]")
@@ -641,7 +628,7 @@ TEST_CASE("ten requests with a 2-frame deadline run five per frame", "[metronome
 {
   TestRuntime testRuntime{};
   String captured;
-  set_logerr_capture(&captured);
+  unittest::CaptureLogerr capture(captured);
 
   constexpr int COUNT = 10;
   constexpr uint32_t MAX_DELAY = 2;
@@ -685,8 +672,6 @@ TEST_CASE("ten requests with a 2-frame deadline run five per frame", "[metronome
   for (int i = 0; i < COUNT; ++i)
     CHECK(tokens[i].status() == UpdateStatus::Complete);
   CHECK(captured.empty());
-
-  set_logerr_capture(nullptr);
 }
 
 TEST_CASE("move assignment releases the target subgraph", "[metronome]")
@@ -733,7 +718,7 @@ TEST_CASE("register_node into invalid handle logerrs", "[metronome]")
 {
   TestRuntime testRuntime{};
   String captured;
-  set_logerr_capture(&captured);
+  unittest::CaptureLogerr capture(captured);
 
   metronome::SubgraphHandle invalid;
   invalid.register_node("should_fail", DAFG_PP_NODE_SRC, [](dafg::Registry registry) {
@@ -741,8 +726,6 @@ TEST_CASE("register_node into invalid handle logerrs", "[metronome]")
     return [] {};
   });
   CHECK(strstr(captured.str(), "invalid subgraph id") != nullptr);
-
-  set_logerr_capture(nullptr);
 }
 
 TEST_CASE("slot reuse preserves generation for stale tokens", "[metronome]")

@@ -1,7 +1,7 @@
 // Copyright (C) Gaijin Games KFT.  All rights reserved.
 
 #include "test_helpers.h"
-#include <catch2/catch_test_macros.hpp>
+#include <unittest/dag_unitTest.h>
 
 TEST_CASE("DataBlock iterate_child_blocks", "[datablock][iteration]")
 {
@@ -130,7 +130,10 @@ TEST_CASE("DataBlock iterate_params_by_name_and_type", "[datablock][iteration]")
 
   DataBlock blk;
   blk.addInt("val", 1);
-  blk.addStr("val", "text");
+  {
+    unittest::ExpectLogerr expect("already exists with type int");
+    blk.addStr("val", "text");
+  }
   blk.addInt("val", 3);
 
   int count = 0;

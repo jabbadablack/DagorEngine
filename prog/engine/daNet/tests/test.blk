@@ -1,0 +1,8 @@
+target{
+  name:t="engine.daNet"
+  layer:t="cpp"
+  tag:t="engine"
+  tag:t="net"
+  jamfile:t="jamfile"
+  exe:t="danet-tests"
+}

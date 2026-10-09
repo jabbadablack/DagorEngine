@@ -1,0 +1,18 @@
+target{
+  name:t="gameLibs.metronome"
+  layer:t="cpp"
+  tag:t="gameLibs"
+  tag:t="render"
+  requires:t="gpu"
+  jamfile:t="jamfile"
+  exe:t="metronome-tests"
+}
+target{
+  name:t="gameLibs.metronome.stub"
+  layer:t="cpp"
+  tag:t="gameLibs"
+  tag:t="render"
+  jamfile:t="jamfile"
+  exe:t="metronome-tests"
+  args:t="--gpu-driver stub"
+}
