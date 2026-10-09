@@ -127,7 +127,13 @@ int DagorWinMain(bool debugmode)
             {
               for (int j = 0; j < childBlock->paramCount(); ++j)
               {
-                String mountPath = configDir + childBlock->getStr(j);
+                const char *path = childBlock->getStr(j);
+                if (*path == '%') // based on another mount, e.g. %engine/prog/gameLibs
+                {
+                  dd_set_named_mount_path(childBlock->getParamName(j), path);
+                  continue;
+                }
+                String mountPath = configDir + path;
                 dd_simplify_fname_c(mountPath);
                 dd_set_named_mount_path(childBlock->getParamName(j), mountPath);
               }

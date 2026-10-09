@@ -1,0 +1,7 @@
+target{
+  name:t="engine.osApiWrappers"
+  layer:t="cpp"
+  tag:t="engine"
+  jamfile:t="jamfile"
+  exe:t="osApiWrappers-tests"
+}

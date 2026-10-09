@@ -1,0 +1,24 @@
+Root    ?= ../../../.. ;
+Location = prog/engine/tests/osApiWrappers ;
+Target   = osApiWrappers-tests ;
+
+include $(Root)/prog/_jBuild/unitTest.jam ;
+
+Sources =
+  main.cpp
+  test_namedMounts.cpp
+;
+
+UseProgLibs +=
+  engine/memory
+  engine/kernel
+  engine/osApiWrappers
+  engine/baseUtil
+  engine/ioSys
+  engine/math
+  engine/perfMon/daProfilerStub
+
+  3rdPartyLibs/eastl
+;
+
+include $(Root)/prog/_jBuild/build.jam ;

@@ -33,9 +33,13 @@ extern "C"
   //! mount_name must consist of C-ident chars only (letters, digits, underscore) and be no longer than MAX_MOUNT_NAME_LEN
   //! mount_name may start with '%', named mounts doesn't store this implied prefix
   //! named mounts may be used later in paths using scheme: %mount_name/path/to/file
+  //! path_to may itself start with a named mount (%other/path), it is resolved when the mount is set
   KRNLIMP void dd_set_named_mount_path(const char *mount_name, const char *path_to);
 
   //! returns path assigned for named mount (when mount exists) or nullptr (when mount_name not known)
+  //! %engine (the engine root) is resolved on first use when nobody set it: from the DAGOR_ENGINE_ROOT environment variable,
+  //! else walking up from the current dir to a game project's engine.blk (engineRoot:t="path relative to engine.blk")
+  //! or to the engine root itself (the dir containing prog/_jBuild/defaults.jam)
   KRNLIMP const char *dd_get_named_mount_path(const char *mount_name, int mount_name_len = -1);
 
   //! return first mount name without % associated with fpath otherwise nulls
