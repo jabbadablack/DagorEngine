@@ -1138,14 +1138,15 @@ rule CompileRC
   rc_opt    on $(1) = $(rc_opt) $(opt) ;
   LOCATE    on $(2) = $(Root) ;
   local src = $(2:G=) ;
-  if [ MATCH "^([A-Za-z]:|/)" : $(Root) ] {
-    # fastdep finds relative sources only: with an absolute Root (a project outside the engine, see LocationDir) it runs in
-    # the dir of the .rc on the plain file name (every other path is absolute then too)
-    rc_dep_cmd on $(1) = $(ComSpec) /c cd /d \"$(Root)/$(src:D)\" "&&" $(_DEP_COMPILER) ;
+  if ! [ MATCH "^([A-Za-z]:|/)" : $(src) ] { src = $(Root)/$(src) ; } # what LOCATE binds it to: rooted names stay as they are
+  if [ MATCH "^([A-Za-z]:|/)" : $(src) ] {
+    # fastdep finds relative sources only: with an absolute Root or Location (a project outside the engine, see
+    # LocationDir) it runs in the dir of the .rc on the plain file name (every other path is absolute then too)
+    rc_dep_cmd on $(1) = $(ComSpec) /c cd /d \"$(src:D)\" "&&" $(_DEP_COMPILER) ;
     rc_dep_src on $(1) = $(src:D=) ;
   } else {
     rc_dep_cmd on $(1) = $(_DEP_COMPILER) ;
-    rc_dep_src on $(1) = $(Root)/$(src) ;
+    rc_dep_src on $(1) = $(src) ;
   }
 
   if $(GLOBAL_CacheDryRun) { return ; }
@@ -1293,6 +1294,7 @@ rule AotCompileDAS
   local dest_all = ;
   local src_all = ;
   local dll_path_opt = ;
+  local src_dir = [ LocationDir $(location) ] ;
   if $(DAS_AOT_LLVM_OBJ) = yes {
     cmd += --gen1 --gen2-make ;
     dll_path_opt = -dll-path $(DAS_AOT_COMPILER:D) ;
@@ -1302,14 +1304,14 @@ rule AotCompileDAS
     if $(DAS_AOT_LLVM_OBJ) = yes {
       local nm = [ DasAotLLVMObjName $(src) : $(2) ] ;
       dest = $(3)/$(nm) ;
-      cmd += --aot-in $(Root)/$(location)/$(src) --aot-out $(dest:S=) ;
+      cmd += --aot-in $(src_dir)/$(src) --aot-out $(dest:S=) ;
     } else {
       dest = $(3)/$(src:S=_das_AOT.cpp) ;
-      cmd += -aot $(Root)/$(location)/$(src) $(dest) ;
+      cmd += -aot $(src_dir)/$(src) $(dest) ;
     }
     dest_all += $(dest) ;
-    src_all += $(Root)/$(location)/$(src) ;
-    Depends $(dest) : $(Root)/$(location)/$(src) $(DAS_AOT_COMPILER) ;
+    src_all += $(src_dir)/$(src) ;
+    Depends $(dest) : $(src_dir)/$(src) $(DAS_AOT_COMPILER) ;
   }
   # `dest_all` should depend on directory, `dest_cpp` is not enough
   for dest in $(dest_all) { MakeDirectory $(dest_all) : $(dest:D) ; }
