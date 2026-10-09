@@ -1,0 +1,28 @@
+Root    ?= ../../../../.. ;
+Location = prog/gameLibs/datacache/file/tests ;
+Target   = datacacheFile-tests ;
+
+include $(Root)/prog/_jBuild/unitTest.jam ;
+
+AddIncludes +=
+  $(Root)/prog/gameLibs/publicInclude
+;
+
+Sources =
+  main.cpp
+  test_fileBackend.cpp
+;
+
+UseProgLibs +=
+  engine/memory
+  engine/kernel
+  engine/osApiWrappers
+  engine/baseUtil
+  engine/ioSys
+  engine/math
+  engine/perfMon/daProfilerStub
+
+  gameLibs/datacache/file
+;
+
+include $(Root)/prog/_jBuild/build.jam ;

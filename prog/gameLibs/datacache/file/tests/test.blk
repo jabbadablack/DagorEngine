@@ -1,0 +1,7 @@
+target{
+  name:t="gameLibs.datacache.file"
+  layer:t="cpp"
+  tag:t="gameLibs"
+  jamfile:t="jamfile"
+  exe:t="datacacheFile-tests"
+}
