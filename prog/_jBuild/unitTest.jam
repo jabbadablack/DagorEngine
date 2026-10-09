@@ -1,0 +1,28 @@
+# Common setup for unit test executables (Catch2 + <unittest/mainCatch2.inc.cpp>).
+# Include it instead of defaults.jam:
+#
+#   Root    ?= ../../.. ;
+#   Location = prog/engine/tests/foo ;
+#   Target   = foo-tests ;
+#   include $(Root)/prog/_jBuild/unitTest.jam ;
+#   Sources = main.cpp test_foo.cpp ;
+#   UseProgLibs += engine/... ;
+#   include $(Root)/prog/_jBuild/build.jam ;
+#
+# Every test target also needs a test.blk manifest next to its jamfile so that test_all.py can find and run it.
+# Target names must be unique across the engine and the project, since all test executables share one OutDir.
+
+ConsoleExe = yes ;
+TargetType = exe ;
+Exceptions ?= yes ; # Catch2 reports failures with exceptions; set before defaults.jam, which defaults it to no in rel
+
+include $(Root)/prog/_jBuild/defaults.jam ;
+
+OutDir ?= $(_OutputRoot)/tests/$(Platform)-$(PlatformArch) ;
+
+AddIncludes += $(Root)/prog/3rdPartyLibs/catch2/src ;
+UseProgLibs += 3rdPartyLibs/catch2 engine/unitTest ;
+
+# test data (settings.blk, reference images, ...) is looked up next to the jamfile unless --data-dir is passed
+local unitTestDataDir = [ MakePathAbsolute $(JAM_CWD) : $(Root)/$(Location) ] ;
+CPPopt += -DUNITTEST_DEFAULT_DATA_DIR=\\\"$(unitTestDataDir)\\\" ;
