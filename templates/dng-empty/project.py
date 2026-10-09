@@ -19,7 +19,7 @@ def engine_root():
     m = re.search(r'^\s*engineRoot\s*:\s*t\s*=\s*"([^"]*)"', f.read(), re.MULTILINE)
   if not m:
     sys.exit('{}: expected engineRoot:t="<path to the engine checkout>"'.format(fn))
-  root = os.path.normpath(os.path.join(PROJECT_DIR, m.group(1)))
+  root = os.path.normpath(os.path.join(PROJECT_DIR, re.sub(r'~(.)', r'\1', m.group(1))))  # ~ escapes in BLK strings
   if not os.path.isdir(os.path.join(root, 'prog', 'tools', 'pythonCommon', 'dagorProject')):
     sys.exit('{}: "{}" is not a Dagor Engine checkout with project support; set engineRoot to the engine dir'.format(fn, root))
   return root

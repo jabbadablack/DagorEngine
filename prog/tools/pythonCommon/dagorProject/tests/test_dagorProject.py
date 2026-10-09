@@ -44,6 +44,12 @@ class EngineBlkTest(unittest.TestCase):
     self.assertEqual(len(lines), 1)
     self.assertTrue(lines[0].startswith('engineRoot:t='))
 
+  def test_blk_escapes(self):
+    # ~ escapes in BLK strings (the engine reads engine.blk as a DataBlock), Windows short names have one: RUNNER~1
+    with open(os.path.join(self.dir, 'engine.blk'), 'w') as f:
+      f.write('engineRoot:t="C:/Users/RUNNER~~1/engine"\n')
+    self.assertEqual(engine.read_engine_ref(self.dir), 'C:/Users/RUNNER~1/engine')
+
   def test_missing_and_wrong_engine_fail_clearly(self):
     with self.assertRaisesRegex(ProjectError, 'cannot read'):
       engine.read_engine_root(self.dir)

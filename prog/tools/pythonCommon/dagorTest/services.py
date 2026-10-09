@@ -7,6 +7,21 @@ import time
 from . import process
 
 
+# python -m http.server, except HTTPServer.server_bind resolves the host name before listening: on macOS CI runners
+# that reverse lookup takes longer than START_TIMEOUT
+_HTTP_SERVER = '''
+import functools, http.server, socketserver, sys
+class Server(http.server.ThreadingHTTPServer):
+  def server_bind(self):
+    socketserver.TCPServer.server_bind(self)
+    self.server_name, self.server_port = self.server_address[:2]
+port, root = int(sys.argv[1]), sys.argv[2]
+server = Server(('127.0.0.1', port), functools.partial(http.server.SimpleHTTPRequestHandler, directory=root))
+print('serving {} at http://127.0.0.1:{}/'.format(root, port), flush=True)
+server.serve_forever()
+'''
+
+
 def _free_port():
   with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind(('127.0.0.1', 0))
@@ -31,8 +46,7 @@ class HttpServer:
     self.log = open(self.log_path, 'wb')
     for _ in range(5):  # the port may be taken between probing and binding
       self.port = _free_port()
-      self.proc = process.start([sys.executable, '-m', 'http.server', str(self.port), '--bind', '127.0.0.1', '--directory', self.root_dir],
-                                cwd=self.root_dir, log_file=self.log)
+      self.proc = process.start([sys.executable, '-c', _HTTP_SERVER, str(self.port), self.root_dir], cwd=self.root_dir, log_file=self.log)
       if self._wait_listening():
         return self
       process.kill_tree(self.proc)

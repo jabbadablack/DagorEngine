@@ -14,9 +14,15 @@ from pythonCommon.dagorTest.context import RunContext
 from pythonCommon.dagorTest.devices.local import LocalDevice
 from pythonCommon.dagorTest.manifest import load_targets
 from pythonCommon.dagorTest.model import Status
+from pythonCommon.datablock import escapeBlkString
 
 ENGINE = os.environ.get('DAGORTEST_ENGINE')
 UNIT_TEST_DIR = os.path.join(ENGINE or '', 'prog', 'engine', 'tests', 'unitTest')
+
+
+def blk_path(path):
+  """A path as a BLK string value: ~ escapes in BLK, and Windows short names have one (C:/Users/RUNNER~1)"""
+  return escapeBlkString(path.replace('\\', '/'))
 
 
 def make_ctx(run_dir):
@@ -48,10 +54,9 @@ class IntegrationTest(unittest.TestCase):
     return load_targets(path)
 
   def harness(self, name, case, extra=''):
-    jamfile = os.path.join(UNIT_TEST_DIR, 'jamfile').replace('\\', '/')
     (t,) = self.manifest(name, '''
       target{{ name:t="{}"; layer:t="cpp"; jamfile:t="{}"; exe:t="unitTest-tests"; dataDir:t="{}"; args:t='"{}"' {} }}
-      '''.format(name, jamfile, UNIT_TEST_DIR.replace('\\', '/'), case, extra))
+      '''.format(name, blk_path(os.path.join(UNIT_TEST_DIR, 'jamfile')), blk_path(UNIT_TEST_DIR), case, extra))
     return runner.run_target(self.ctx, t, self.builds)
 
   def describe(self, results):
@@ -131,7 +136,7 @@ class IntegrationTest(unittest.TestCase):
   def test_missing_executable(self):
     (t,) = self.manifest('missing', '''
       target{{ name:t="missing"; layer:t="cpp"; jamfile:t="{}"; exe:t="no-such-tests" }}
-      '''.format(os.path.join(UNIT_TEST_DIR, 'jamfile').replace('\\', '/')))
+      '''.format(blk_path(os.path.join(UNIT_TEST_DIR, 'jamfile'))))
     res = runner.run_target(self.ctx, t, self.builds)
     self.assertEqual(res.status, Status.ERROR)
     self.assertIn('not found', res.message)
@@ -146,14 +151,14 @@ class IntegrationTest(unittest.TestCase):
         body = urllib.request.urlopen(os.environ['DAGOR_TEST_HTTP_URL'] + 'x.txt', timeout=10).read()
         sys.exit(0 if body == b'served' else 1)
         '''))
-    py = sys.executable.replace('\\', '/')
+    py = blk_path(sys.executable)
     targets = self.manifest('exec', '''
       target{{ name:t="e.pass"; layer:t="exec"; command:t='{0} -c "import sys; sys.exit(0)"' }}
       target{{ name:t="e.fail"; layer:t="exec"; command:t='{0} -c "import sys; sys.exit(1)"' }}
       target{{ name:t="e.skip"; layer:t="exec"; command:t='{0} -c "import sys; sys.exit(77)"' }}
       target{{ name:t="e.http"; layer:t="exec"; requires:t="http_server"; command:t="{0} {1}" }}
       target{{ name:t="e.gpu"; layer:t="exec"; requires:t="gpu"; command:t='{0} -c "pass"' }}
-      '''.format(py, script.replace('\\', '/')))
+      '''.format(py, blk_path(script)))
     by_id = {t.id: t for t in targets}
     results = {i: runner.run_target(self.ctx, by_id[i], self.builds) for i in ('e.pass', 'e.fail', 'e.skip', 'e.http')}
     self.assertEqual({i: r.status for i, r in results.items()},

@@ -7,6 +7,8 @@ engine from any dir inside the project.
 import os
 import re
 
+from ..datablock import escapeBlkString, unescapeBlkString
+
 ENGINE_BLK = 'engine.blk'
 
 _ENGINE_ROOT_RE = re.compile(r'^\s*engineRoot\s*:\s*t\s*=\s*"([^"]*)"', re.MULTILINE)
@@ -34,7 +36,7 @@ def read_engine_ref(project_dir: str) -> str:
     raise ProjectError('cannot read {}: {}'.format(fn, e.strerror))
   if not m:
     raise ProjectError('{}: expected engineRoot:t="<path to the engine checkout>"'.format(fn))
-  return m.group(1)
+  return unescapeBlkString(m.group(1))
 
 
 def read_engine_root(project_dir: str) -> str:
@@ -65,4 +67,4 @@ def write_engine_blk(project_dir: str, engine_root: str, absolute=False):
   with open(os.path.join(project_dir, ENGINE_BLK), 'w', encoding='utf-8', newline='\n') as f:
     f.write('// The Dagor Engine checkout this project is built with: relative to this file or absolute.\n'
             '// Change it with "python project.py relink <engine dir>".\n'
-            'engineRoot:t="{}"\n'.format(ref))
+            'engineRoot:t="{}"\n'.format(escapeBlkString(ref)))
