@@ -42,7 +42,7 @@ function printResponse(response) {
 
 let sampleGetButton = mkHttpCbButton("GET", {
   method = "GET"
-  url = "https://gaijin.net/"
+  url = "https://example.com/"
   callback = printResponse
 })
 
@@ -83,7 +83,7 @@ let sampleBlobPostButton = mkHttpCbButton("Blob POST",{
 async function fetchGet() {
   let res = await httpFetch({
     method = "GET"
-    url = "https://gaijin.net/"
+    url = "https://example.com/"
   })
   printResponse(res)
 }

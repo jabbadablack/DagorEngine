@@ -81,7 +81,7 @@ function checkObservables(){
   gui_scene.setTimeout(0.1, @() eventStream.set(i))
 }
 
-let task = TaskHttpGet("https://gaijin.net").map(@(v) conlog(v.as_string().slice(0,100)) ?? conlog("submit new request")).flatMap(@(_) TaskHttpGet("http://ya.ru"))
+let task = TaskHttpGet("https://example.com").map(@(v) conlog(v.as_string().slice(0,100)) ?? conlog("submit new request")).flatMap(@(_) TaskHttpGet("http://ya.ru"))
 function checkHttpTask(){
   conlog("submitted requested")
   task.exec(@(...) conlog($"error {" ".join(vargv)}"), function(v) {
