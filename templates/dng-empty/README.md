@@ -12,7 +12,7 @@ game/client.cmd                      # or game/client.sh: runs the game on the s
 game/server.cmd                      # the dedicated server; clients join with client.cmd -connect:localhost
 ```
 
-The engine's tools have to be built first (`python build_all.py project:dagorTools` in the engine): the shader
+The engine's tools have to be built first (`python dng.py build cdk` in the engine): the shader
 compilers, vromfsPacker and dabuild find the engine through `engine.blk` too.
 
 ## Layout

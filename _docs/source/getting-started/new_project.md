@@ -25,7 +25,7 @@ game/client.cmd
 | `--no-git` | no `git init` in the new project |
 | `--dry-run` | print the files it would create |
 
-The engine's tools have to be built (`python build_all.py project:dagorTools`) before the project builds its
+The engine's tools have to be built (`python dng.py build cdk` in the engine) before the project builds its
 shaders, vromfs and assets.
 
 ## The dng-empty template

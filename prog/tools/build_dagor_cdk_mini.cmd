@@ -57,9 +57,9 @@ jam -s Root=../.. -f ../3rdPartyLibs/scripts/duktape/jamfile
 
 rem common minimal gui shaders for tools
 pushd sceneTools\guiShaders_commonData
-call compile_gui_shaders_dx11.cmd
-call compile_gui_shaders_dx12.cmd
-call compile_gui_shaders_spirv.cmd
+call .\compile_gui_shaders_dx11.cmd
+call .\compile_gui_shaders_dx12.cmd
+call .\compile_gui_shaders_spirv.cmd
 popd
 
 rem utils
@@ -99,7 +99,7 @@ rem   if errorlevel 1 goto error
 
 rem Blender plugin
 pushd dag4blend
-__build_pack.py FINAL
+python __build_pack.py FINAL
 popd
 
 rem 3ds Max plugins, we don't care if these plugins fail to compile (this could happen due to missing SDK or compiler)

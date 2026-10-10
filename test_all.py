@@ -3,10 +3,9 @@
 import os
 import sys
 
-from build_all import DAGOR_HOST, DAGOR_HOST_ARCH, DAGOR_ROOT_FOLDER, DAGOR_TOOLS_FOLDER
-
-sys.path.insert(0, os.path.join(DAGOR_ROOT_FOLDER, 'prog', 'tools'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.realpath(__file__)), 'prog', 'tools'))
+from pythonCommon.dagorBuild import ENGINE_ROOT, HOST, HOST_ARCH, TOOLS_DIR  # noqa: E402
 from pythonCommon.dagorTest import cli  # noqa: E402
 
 if __name__ == '__main__':
-  sys.exit(cli.main(sys.argv[1:], DAGOR_ROOT_FOLDER, DAGOR_HOST, DAGOR_HOST_ARCH, DAGOR_TOOLS_FOLDER))
+  sys.exit(cli.main(sys.argv[1:], ENGINE_ROOT, HOST, HOST_ARCH, TOOLS_DIR))

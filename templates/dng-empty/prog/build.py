@@ -16,73 +16,59 @@ PROG_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(PROG_DIR))
 import project  # noqa: E402  ../project.py: the engine named by ../engine.blk
 sys.path.pop(0)
-dagorProject, PROJECT = project.load()
+dagorProject, PROJECT = project.load()  # puts the engine's prog/tools on sys.path
+from pythonCommon import dagorBuild  # noqa: E402
+from pythonCommon.dagorBuild import HOST, HOST_ARCH, tool  # noqa: E402
 
-sys.path.insert(0, project.engine_root())
-from build_all import (BUILD_TARGET_ARCH, DABUILD_CMD, DAGOR_HOST, DAGOR_HOST_ARCH, DAGOR_TOOLS_FOLDER,  # noqa: E402
-                       JAM_BUILD_TARGET_ARCH_OPTIONS, VROMFS_PACKER_EXE, run, run_per_platform)
-sys.path.pop(0)
-
-ALL_COMPONENTS = ['code', 'shaders', 'vromfs', 'tools', 'assets']
-COMPONENTS = [a for a in sys.argv[1:] if not a.startswith(('arch:', 'project:', '-'))] or ALL_COMPONENTS
-for c in COMPONENTS:
-  if c not in ALL_COMPONENTS + ['gui']:  # gui: a build_all.py component, nothing to build here (no fonts or UI packs)
-    sys.exit('unknown component "{}": expected {}'.format(c, ', '.join(ALL_COMPONENTS)))
-if 'shaders' in COMPONENTS and 'vromfs' in COMPONENTS and 'tools' not in COMPONENTS:
-  COMPONENTS.append('tools')  # the editor snapshot is made of both
-
-
-def tool(name):
-  return os.path.join(DAGOR_TOOLS_FOLDER, name + ('.exe' if DAGOR_HOST == 'windows' else ''))
-
+b = dagorBuild.parse(sys.argv[1:], ['code', 'shaders', 'vromfs', 'tools', 'assets'])
+if 'shaders' in b.components and 'vromfs' in b.components and 'tools' not in b.components:
+  b.components.append('tools')  # the editor snapshot is made of both
 
 os.chdir(PROG_DIR)
-dagorProject.setup(PROJECT)  # the generated engine glue is current before anything is built
-ok = True
+if not b.dry_run:
+  dagorProject.setup(PROJECT)  # the generated engine glue is current before anything is built
 
-if 'code' in COMPONENTS:
-  JAM = ['jam', '-sNeedDasAotCompile=yes'] + JAM_BUILD_TARGET_ARCH_OPTIONS
-  if DAGOR_HOST == 'windows' and BUILD_TARGET_ARCH == '':
-    JAM += ['-sPlatformArch=' + DAGOR_HOST_ARCH]
-  ok = run(JAM) and ok
-  ok = run(JAM + ['-sDedicated=yes']) and ok
+if 'code' in b.components:
+  JAM = ['jam', '-sNeedDasAotCompile=yes'] + b.jam_arch
+  if HOST == 'windows' and not b.arch:
+    JAM += ['-sPlatformArch=' + HOST_ARCH]
+  b.run(JAM)
+  b.run(JAM + ['-sDedicated=yes'])
 
-if 'shaders' in COMPONENTS:
+if 'shaders' in b.components:
   # outputs: ../game/compiledShaders (game), ../tools (daEditor, daViewer, dabuild, impostorBaker); intermediate files
   # go to <project>/_output/shaders. dx11 is the default windows driver and what daEditor renders levels with.
   OUT = '../../_output/shaders/' + PROJECT.codename
   DSC = ['-q', '-shaderOn', '-nodisassembly', '-commentPP', '-codeDumpErr', '-maxVSF', '4096']
   EXP = ['-q', '-shaderOn', '-no_sha1_cache', '-clearBlkHashInDump']  # dabuild only needs the shader descriptions
-  ok = run_per_platform(
-    cmds_windows=[[tool('dsc2-hlsl11-dev'), 'shaders_dx11.blk'] + DSC + ['-o', OUT + '-game~dx11'],
-                  [tool('dsc2-dx12-dev'), 'shaders_dx12.blk'] + DSC + ['-wx', '-o', OUT + '-game~dx12'],
-                  [tool('dsc2-hlsl11-dev'), 'shaders_tools11.blk'] + DSC + ['-o', OUT + '-tools~dx11'],
-                  [tool('dsc2-stub-dev'), 'shaders_tools_exp.blk'] + EXP + ['-o', OUT + '~exp'],
-                  [tool('dsc2-dx12-dev'), 'shaders_impostorbaker.blk'] + DSC + ['-o', OUT + '-impostorbaker~dx12']],
-    cmds_macOS=[[tool('dsc2-metal-dev'), 'shaders_metal.blk'] + DSC + ['-o', OUT + '-game~metal'],
-                [tool('dsc2-metal-dev'), 'shaders_tools11.blk'] + DSC + ['-o', OUT + '-tools~metal', '-out', '../../tools/toolsMTL'],
-                [tool('dsc2-stub-dev'), 'shaders_tools_exp.blk'] + EXP + ['-o', OUT + '~exp'],
-                [tool('dsc2-metal-dev'), 'shaders_impostorbaker.blk'] + DSC +
-                ['-o', OUT + '-impostorbaker~metal', '-out', '../../tools/tools.impostorbakerMTL']],
-    cmds_linux=[[tool('dsc2-spirv-dev'), 'shaders_spirv.blk'] + DSC + ['-o', OUT + '-game~spirv'],
-                [tool('dsc2-spirv-dev'), 'shaders_tools11.blk'] + DSC + ['-o', OUT + '-tools~spirv', '-out', '../../tools/toolsSpirV'],
-                [tool('dsc2-stub-dev'), 'shaders_tools_exp.blk'] + EXP + ['-o', OUT + '~exp'],
-                [tool('dsc2-spirv-dev'), 'shaders_impostorbaker.blk'] + DSC +
-                ['-o', OUT + '-impostorbaker~spirv', '-out', '../../tools/tools.impostorbakerSpirV']],
-    cwd='shaders') and ok
+  b.run_per_platform(
+    windows=[[tool('dsc2-hlsl11-dev'), 'shaders_dx11.blk'] + DSC + ['-o', OUT + '-game~dx11'],
+             [tool('dsc2-dx12-dev'), 'shaders_dx12.blk'] + DSC + ['-wx', '-o', OUT + '-game~dx12'],
+             [tool('dsc2-hlsl11-dev'), 'shaders_tools11.blk'] + DSC + ['-o', OUT + '-tools~dx11'],
+             [tool('dsc2-stub-dev'), 'shaders_tools_exp.blk'] + EXP + ['-o', OUT + '~exp'],
+             [tool('dsc2-dx12-dev'), 'shaders_impostorbaker.blk'] + DSC + ['-o', OUT + '-impostorbaker~dx12']],
+    macOS=[[tool('dsc2-metal-dev'), 'shaders_metal.blk'] + DSC + ['-o', OUT + '-game~metal'],
+           [tool('dsc2-metal-dev'), 'shaders_tools11.blk'] + DSC + ['-o', OUT + '-tools~metal', '-out', '../../tools/toolsMTL'],
+           [tool('dsc2-stub-dev'), 'shaders_tools_exp.blk'] + EXP + ['-o', OUT + '~exp'],
+           [tool('dsc2-metal-dev'), 'shaders_impostorbaker.blk'] + DSC +
+           ['-o', OUT + '-impostorbaker~metal', '-out', '../../tools/tools.impostorbakerMTL']],
+    linux=[[tool('dsc2-spirv-dev'), 'shaders_spirv.blk'] + DSC + ['-o', OUT + '-game~spirv'],
+           [tool('dsc2-spirv-dev'), 'shaders_tools11.blk'] + DSC + ['-o', OUT + '-tools~spirv', '-out', '../../tools/toolsSpirV'],
+           [tool('dsc2-stub-dev'), 'shaders_tools_exp.blk'] + EXP + ['-o', OUT + '~exp'],
+           [tool('dsc2-spirv-dev'), 'shaders_impostorbaker.blk'] + DSC +
+           ['-o', OUT + '-impostorbaker~spirv', '-out', '../../tools/tools.impostorbakerSpirV']],
+    cwd='shaders')
 
-if 'vromfs' in COMPONENTS:
-  ok = run([VROMFS_PACKER_EXE, 'prog.vromfs.blk', '-platform:PC', '-quiet', '-addpath:.']) and ok
+if 'vromfs' in b.components:
+  b.run([dagorBuild.VROMFS_PACKER, 'prog.vromfs.blk', '-platform:PC', '-quiet', '-addpath:.'])
 
-if 'tools' in COMPONENTS:
-  sys.path.insert(0, os.path.join(project.engine_root(), 'prog', 'tools'))
-  from update_dng_snapshots import update_dng_snapshot  # noqa: E402
-  sys.path.pop(0)
+if 'tools' in b.components and not b.dry_run:
+  from update_dng_snapshots import update_dng_snapshot  # noqa: E402  prog/tools is on sys.path
   print('--- Updating the daEditor snapshot', flush=True)
   update_dng_snapshot(PROJECT.root, 'game', glob.glob(PROJECT.root + '/game/*.vromfs.bin'), skip_cvs_update=True)
   os.chdir(PROG_DIR)  # update_dng_snapshot changes the cwd
 
-if 'assets' in COMPONENTS:
-  ok = run(DABUILD_CMD + ['../application.blk'], cwd='../develop') and ok
+if 'assets' in b.components:
+  b.run(dagorBuild.DABUILD_CMD + ['../application.blk'], cwd='../develop')
 
-sys.exit(0 if ok else 1)
+sys.exit(b.exit_code)

@@ -129,8 +129,11 @@ To build the **testGI** sample:
    After building, the executable file will be placed in the `testGI/game`
    directory.
 
-3. Run `DagorEngine/build_all.cmd` to build the entire project toolkit from the
-   source code. This process may take a considerable amount of time.
+3. Run `python dng.py build` in `DagorEngine` to build the engine toolkit,
+   dargbox and the project template from the source code, or
+   `python dng.py build testGI` for this sample (`python dng.py build -h` lists
+   the projects and options). This process may take a considerable amount of
+   time.
 
 To start a game of your own, see [Creating a Project](new_project.md).
 

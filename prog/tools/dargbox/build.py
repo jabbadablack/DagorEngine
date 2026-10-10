@@ -1,23 +1,29 @@
 #!/usr/bin/env python3
+# builds dargbox: python build.py [code] [shaders] [vromfs] [arch:<arch>] [--dry-run] (all when none is given)
+import os
 import sys
-sys.path.append('../../..')
-from build_all import run, run_per_platform, VROMFS_PACKER_EXE, BUILD_COMPONENTS, DAGOR_HOST, JAM_BUILD_TARGET_ARCH_OPTIONS
-sys.path.pop()
 
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, '..')
+from pythonCommon import dagorBuild  # noqa: E402
+
+b = dagorBuild.parse(sys.argv[1:], ['code', 'shaders', 'vromfs'])
 
 # build EXE
-if 'code' in BUILD_COMPONENTS:
-  run(['jam', '-sRoot=../..', '-f', 'dargbox/jamfile'] + JAM_BUILD_TARGET_ARCH_OPTIONS, cwd='..')
+if 'code' in b.components:
+  b.run(['jam', '-sRoot=../..', '-f', 'dargbox/jamfile'] + b.jam_arch, cwd='..')
 
 # build shaders
-if 'shaders' in BUILD_COMPONENTS:
-  run_per_platform(
-    cmds_windows = ['compile_shaders_dx11.bat', 'compile_shaders_dx12.bat',
-                    'compile_shaders_metal.bat', 'compile_shaders_spirV.bat'],
-    cmds_macOS   = ['./compile_shaders_metal.sh'],
-    cmds_linux   = ['./compile_shaders_spirv.sh'],
+if 'shaders' in b.components:
+  b.run_per_platform(
+    windows = ['compile_shaders_dx11.bat', 'compile_shaders_dx12.bat',
+               'compile_shaders_metal.bat', 'compile_shaders_spirV.bat'],
+    macOS   = ['./compile_shaders_metal.sh'],
+    linux   = ['./compile_shaders_spirv.sh'],
     cwd='./shaders')
 
 #build vromfs
-if 'vromfs' in BUILD_COMPONENTS:
-  run([VROMFS_PACKER_EXE, 'darg.vromfs.blk', '-platform:PC', '-quiet'], cwd='.')
+if 'vromfs' in b.components:
+  b.run([dagorBuild.VROMFS_PACKER, 'darg.vromfs.blk', '-platform:PC', '-quiet'], cwd='.')
+
+sys.exit(b.exit_code)

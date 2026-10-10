@@ -90,36 +90,28 @@ If you are going to run samples unpack [samples-base.7z](https://dagorenginedata
 
 To build and run OuterSpace sample project unpack also [outerSpace-devsrc.7z](https://dagorenginedata.cdn.gaijin.net/head-2026.09.20/outerSpace-devsrc.7z) to DagorEngine root.
 
-Then run `build_all.py` in DagorEngine root.
+Then build from the DagorEngine root:
+```
+python dng.py build
+```
 
-This builds the entire project toolkit from the source code. This process may take a considerable amount of time.
-After tools are built and ready to be used script builds game and UI resources using daBuild and other utilities.
+This builds the engine toolkit (`cdk`), the `dargbox` UI tool and the `dngEmpty` project template from the source code. This process may take a considerable amount of time.
+After the tools are built, each project's resources are built with daBuild and the other tools.
 
-You can use direct build commands instead of using Python script.<br>
-For example we will build "skiesSample" sample:<br>
+The samples are built only when named, and only when their content is unpacked (see above); `python dng.py build --list` shows which ones are:
+```
+python dng.py build samples
+python dng.py build outerSpace dngSceneViewer
+```
+
+Projects: `cdk`, `dargbox`, `dngEmpty`, `physTest`, `skiesSample`, `testGI`, `outerSpace`, `dngSceneViewer`, or `samples` for all of the samples.
+`-c` limits the components to build, `code`, `shaders`, `assets`, `vromfs`, `gui`, `tools` (default: everything each project builds), and `--arch` sets the target architecture, e.g. `x86_64`, `arm64`, `x86` (default: depends on the host OS and the jamfile).
+Example: `python dng.py build dngSceneViewer -c code -c shaders` builds only code and shaders for the **daNetGame-based Scene Viewer** project.
+
+You can also run a project's own build script, `prog/build.py` in its directory, with the same components and `arch:<arch>`, e.g. `python outerSpace/prog/build.py code arch:x86_64`, or the direct build commands:
 * **To build code**, navigate to the `X:\develop\DagorEngine\samples\skiesSample\prog` folder and run the `jam` command (it builds `jamfile` script found in that folder).<br>After building the executable file will be placed in the `skiesSample\game` folder.<br>
 * **To build shaders**, navigate to the `X:\develop\DagorEngine\samples\skiesSample\prog\shaders` folder and run any of `compile_shaders_*` scripts.<br>After building the shader-dump file will be placed in the `skiesSample\game\compiledShaders` folder.<br>
 * **To build resources**, navigate to the `X:\develop\DagorEngine\samples\skiesSample\develop` folder and run the `dabuild.cmd` script.<br>After building the game resources will be placed in the `skiesSample\game\res` folder.<br>
-
-You can also build everything for **Outer Space** sample game project or **daNetGame-based Scene Viewer** with their own scripts:<br>
-* `X:\develop\DagorEngine\outerSpace\prog\build.py`<br>
-* `X:\develop\DagorEngine\samples\dngSceneViewer\prog\build.py`<br>
-
-Just be aware that these scripts use DagorEngine tools so they must be built beforehand or downloaded as prebuilt archive as described earlier.
-
-`build*.py` script may accept optional parameters to limit components to be built:
-`code`, `shaders`, `assets`, `vromfs`, `gui`.
-If no parameters passed script builds all components.
-
-`build*.py` script may accept optional parameters to force target architecture to be built, e.g. `arch:x86_64`, `arch:arm64`, `arch:x86`.
-If none is specified code is built to default architecture (depends on host OS and jamfile settings).
-Not all code applies target architecture now (only **Outer Space** and **daNetGame-based Scene Viewer**).
-
-`build_all.py` script in addition to components accepts optional list of projects to be built:
-`project:dagorTools`, `project:physTest`, `project:skiesSample`, `project:testGI`, `project:outerSpace`, `project:dngSceneViewer`.
-If none is passed script builds all projects.
-
-Example: `build_all.py project:dngSceneViewer code shaders` will build only code and shaders for **daNetGame-based Scene Viewer** project.
 
 ### Basic dagor samples
 
