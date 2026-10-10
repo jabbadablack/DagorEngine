@@ -46,12 +46,12 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ${{ matrix.devtools }}/.packages # downloads only: the rest links to software of the runner machine (Visual Studio, SDKs, Xcode)
-          key: devtools-packages-${{ matrix.os }}-${{ hashFiles('make_devtools*.py') }}
+          key: devtools-packages-${{ matrix.os }}-${{ hashFiles('prog/tools/pythonCommon/dagorDevtools/**') }}
 
       - name: Set up devtools
         shell: bash
         run: |
-          python make_devtools.py "${{ matrix.devtools }}"
+          python dng.py devtools "${{ matrix.devtools }}"
           echo "GDEVTOOL=${{ matrix.devtools }}" >> "$GITHUB_ENV"
           echo "${{ matrix.devtools }}" >> "$GITHUB_PATH"
 

@@ -41,7 +41,7 @@ include $(Root)/prog/_jBuild/defaults.jam ;
 
 MaxLibDir = $(_DEVTOOL)/$(MaxVer).sdk/lib/x64/Release ;
 
-if ! [ GLOB $(_DEVTOOL)/$(MaxVer).sdk : * ] { exit \"$(_DEVTOOL)/$(MaxVer).sdk\" not found! Install Max SDK and re-run make_devtools.py. $(OutDir)/$(Target:D=) is skipped now... ; }
+if ! [ GLOB $(_DEVTOOL)/$(MaxVer).sdk : * ] { exit \"$(_DEVTOOL)/$(MaxVer).sdk\" not found! Install Max SDK and re-run dng.py devtools. $(OutDir)/$(Target:D=) is skipped now... ; }
 
 AddIncludes =
   $(_DEVTOOL)/$(MaxVer).sdk/include

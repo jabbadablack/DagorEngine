@@ -36,14 +36,14 @@ Requirements for building and using the Dagor Engine toolkit:
    cd DagorEngine
    ```
 
-7. Run the `make_devtools.py` script.
+7. Run `dng.py devtools`.
 
-   This script will download, install, and configure the build toolkit. You
-   should provide the path to the build toolkit directory as an argument, and
-   the script will create this directory if it doesn't exist.
+   It downloads, installs, and configures the build toolkit. Provide the path to
+   the build toolkit directory as an argument; it creates the directory if it
+   doesn't exist and skips what is already set up when run again.
 
    ```text
-   python3 make_devtools.py X:\develop\devtools
+   python dng.py devtools X:\develop\devtools
    ```
 
    ```{important}

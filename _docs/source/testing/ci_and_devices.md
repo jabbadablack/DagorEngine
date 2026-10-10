@@ -3,7 +3,7 @@
 ## GitHub Actions
 
 `.github/workflows/tests.yaml` runs on every push and pull request to `main` and on demand: on Windows, Linux and
-macOS hosted runners it sets up the devtools (`make_devtools.py` answers its questions itself in CI, see
+macOS hosted runners it sets up the devtools (`dng.py devtools` answers its questions itself in CI, see
 `DAGOR_NONINTERACTIVE`), then runs
 
 ```bash

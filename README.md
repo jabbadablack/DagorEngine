@@ -17,10 +17,10 @@ git clone https://github.com/GaijinEntertainment/DagorEngine.git
 cd DagorEngine
 ```
 
-Run the `make_devtools.py` script. This script will download, install, and configure the build toolkit. You should provide the path to the build toolkit folder as an argument, and the script will create this folder if it doesn't exist.
+Run `dng.py devtools`. It downloads, installs and configures the build toolkit. Give it the path of the build toolkit folder; it creates the folder if it doesn't exist, and skips what is already set up when run again.
 
 ```
-python3 make_devtools.py X:\develop\devtools
+python dng.py devtools X:\develop\devtools
 ```
 
 If the script is not run as an administrator, installers of certain programs may request permission for installation, which you should grant. If you plan to use plugins for 3ds Max, press 'Y' when the script asks if you want to install the 3ds Max SDK. The script will also ask to add the path X:\develop\devtools to the PATH environment variable and set the GDEVTOOL variable to point to this folder.

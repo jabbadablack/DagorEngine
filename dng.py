@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Dagor Engine commands: python dng.py <command> [arguments], python dng.py <command> -h for its arguments.
 
+  devtools  downloads and sets up the build toolkit (compilers, SDKs, jam)
   build     builds the engine tools, dargbox, the project template and, when named, the samples
   new       creates a game project from a template in templates/
   test      builds and runs the engine and project tests
@@ -11,6 +12,11 @@ import sys
 if sys.version_info < (3, 8):
   sys.exit('dng.py needs Python 3.8 or newer')
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'prog', 'tools'))
+
+
+def devtools(argv):
+  from pythonCommon import dagorDevtools
+  return dagorDevtools.main(argv)
 
 
 def build(argv):
@@ -29,7 +35,7 @@ def test(argv):
   return cli.main(argv, ENGINE_ROOT, HOST, HOST_ARCH, TOOLS_DIR)
 
 
-COMMANDS = {'build': build, 'new': new, 'test': test}
+COMMANDS = {'devtools': devtools, 'build': build, 'new': new, 'test': test}
 
 if __name__ == '__main__':
   if len(sys.argv) < 2 or sys.argv[1] not in COMMANDS:

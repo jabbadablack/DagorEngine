@@ -11,9 +11,10 @@ import sys
 
 ENGINE = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..'))
 
-ROOTS = ('prog/engine', 'prog/gameLibs', 'prog/daNetGame', 'prog/tools/dargbox', 'prog/1stPartyLibs/yuplay2auth', 'templates',
-         '.github')
-ROOT_FILES = 'make_devtools*.py'
+ROOTS = ('prog/engine', 'prog/gameLibs', 'prog/daNetGame', 'prog/tools/dargbox', 'prog/tools/pythonCommon',
+         'prog/1stPartyLibs/yuplay2auth', 'templates', '.github')
+ROOT_FILES = 'dng.py'
+BUILD_SCRIPTS = ('.github/', 'prog/tools/pythonCommon/dagorDevtools/', 'dng.py')  # the downloads of the toolkit
 PRUNED_DIRS = {'.git', '_output', '__pycache__', '3rdPartyLibs', 'node_modules', '.test_results'}
 ANY_GAIJIN = re.compile(rb'gaijin', re.IGNORECASE)  # cheap check before decoding and scanning a file
 
@@ -42,8 +43,7 @@ def _comment_style(rel):
 
 
 def _patterns(rel):
-  is_build_script = rel.startswith('.github/') or (os.path.basename(rel).startswith('make_devtools') and '/' not in rel)
-  return (GAIJIN_HOSTS, UPSTREAM_RELEASES) if is_build_script else (GAIJIN_HOSTS,)
+  return (GAIJIN_HOSTS, UPSTREAM_RELEASES) if rel.startswith(BUILD_SCRIPTS) else (GAIJIN_HOSTS,)
 
 
 def code_lines(text, style):

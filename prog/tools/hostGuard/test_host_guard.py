@@ -23,7 +23,8 @@ class ScannerTest(unittest.TestCase):
                      [(4, 'gaijin.net')])
 
   def test_hash_comments(self):
-    self.assertEqual(hosts('# gaijin.net\nx = "gaijin.net"  # gaijin.lan', 'make_devtools.py'), [(2, 'gaijin.net')])
+    self.assertEqual(hosts('# gaijin.net\nx = "gaijin.net"  # gaijin.lan', 'prog/tools/pythonCommon/dagorDevtools/windows.py'),
+                     [(2, 'gaijin.net')])
     self.assertEqual(hosts('x = \\# gaijin.net ;', 'prog/daNetGame/jamfile'), [(1, 'gaijin.net')])
 
   def test_java_packages_are_not_hosts(self):
@@ -31,7 +32,7 @@ class ScannerTest(unittest.TestCase):
 
   def test_upstream_releases_only_in_build_scripts(self):
     url = 'u = "https://github.com/GaijinEntertainment/jam/releases"'
-    self.assertEqual(hosts(url, 'make_devtools_linux.py'), [(1, 'github.com/GaijinEntertainment')])
+    self.assertEqual(hosts(url, 'prog/tools/pythonCommon/dagorDevtools/linux.py'), [(1, 'github.com/GaijinEntertainment')])
     self.assertEqual(hosts(url, '.github/workflows/tests.yaml'), [(1, 'github.com/GaijinEntertainment')])
     self.assertEqual(hosts(url, 'prog/engine/a.py'), [])
 
