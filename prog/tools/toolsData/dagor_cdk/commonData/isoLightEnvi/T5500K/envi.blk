@@ -1,0 +1,12 @@
+preparedLoss:t="../lin_float1111.ddsx"
+preparedInscatter0:t="../lin_float0000.ddsx"
+local_light_probe_tex:t="../lin_float0000.cube.ddsx"
+sun_color_0:p4=2.21011, 2.32186, 2.18357, 0
+sun_light_dir_0:p4=0, -1, 0, 0
+enviSPH0:p4=0, 0, 0, 0
+enviSPH1:p4=0, 0, 0, 0
+enviSPH2:p4=0, 0, 0, 0
+enviSPH3:p4=0, 0, 0, 0
+enviSPH4:p4=0, 0, 0, 0
+enviSPH5:p4=0, 0, 0, 0
+enviSPH6:p4=0, 0, 0, 0

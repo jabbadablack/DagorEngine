@@ -7,6 +7,7 @@ with every component of the project when none is named. dng.py build (cli.py) ru
 import multiprocessing
 import os
 import platform
+import shutil
 import subprocess
 import sys
 
@@ -30,6 +31,24 @@ def _host():
 
 HOST, HOST_ARCH = _host()
 TOOLS_DIR = os.path.join(ENGINE_ROOT, 'tools', 'dagor_cdk', '{}-{}'.format(HOST, HOST_ARCH))
+
+
+def sync_tools_data(dry_run=False):
+  """Copies prog/tools/toolsData into tools/: the files missing there or older than the tracked ones (see its README.md)."""
+  src_root = os.path.join(ENGINE_ROOT, 'prog', 'tools', 'toolsData')
+  copied = 0
+  for dirpath, _, files in os.walk(src_root):
+    for f in files:
+      src = os.path.join(dirpath, f)
+      rel = os.path.relpath(src, src_root)
+      dst = os.path.join(ENGINE_ROOT, 'tools', rel)
+      if rel == 'README.md' or (os.path.exists(dst) and os.path.getmtime(dst) >= os.path.getmtime(src)):
+        continue
+      copied += 1
+      if not dry_run:
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.copy2(src, dst)
+  print('--- tools data: {} file(s) {} prog/tools/toolsData'.format(copied, 'to copy from' if dry_run else 'copied from'), flush=True)
 
 
 def tool(name):

@@ -1,0 +1,92 @@
+
+heightmap_slope_fitter {
+  params {
+    _object_height_5808:r = 0.01
+    _object_radius_25143:r = 0.001
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _object_height_5808;
+      float _object_radius_25143;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_heightmap_slope_fitter _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._object_height_5808 = _object_height_5808; // 0.01
+  _in._object_radius_25143 = _object_radius_25143; // 0.001
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_heightmap_slope_fitter _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_heightmap_slope_fitter(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+
+  void _function_heightmap_slope_fitter(InputStruct_heightmap_slope_fitter _in, out OutputStruct_heightmap_slope_fitter _out) {
+
+  float2 _v_0_0 = _in.tc;
+  float _v_10_0 = -1.0;
+  float _v_25_0 = 1.0;
+  float _v_26_0 = 0.0;
+  float _v_27_0 = 0.0;
+  float4 _v_1_2 = linear_sample(_in.sampler0_t, _v_0_0, _in.sampler0_wrap);
+  float4 _v_6_4 = float4(_in._object_radius_25143, _v_27_0, _v_27_0, _v_27_0);
+  float4 _v_8_4 = float4(_v_27_0, _in._object_radius_25143, _v_27_0, _v_27_0);
+  float _v_9_2 = (_in._object_radius_25143 * _v_10_0);
+  float4 _v_12_4 = float4(_v_9_2, _v_27_0, _v_27_0, _v_27_0);
+  float4 _v_14_4 = float4(_v_27_0, _v_9_2, _v_27_0, _v_27_0);
+  float _v_22_1 = _v_1_2.x;
+  float _v_29_2 = (_v_22_1 + _in._object_height_5808);
+  float4 _v_5_2 = (float4(_v_0_0, 0.0, 0.0) + _v_6_4);
+  float4 _v_7_2 = (float4(_v_0_0, 0.0, 0.0) + _v_8_4);
+  float4 _v_11_2 = (float4(_v_0_0, 0.0, 0.0) + _v_12_4);
+  float4 _v_13_2 = (float4(_v_0_0, 0.0, 0.0) + _v_14_4);
+  float4 _v_15_2 = linear_sample(_in.sampler0_t, _v_5_2.xy, _in.sampler0_wrap);
+  float4 _v_16_2 = linear_sample(_in.sampler0_t, _v_7_2.xy, _in.sampler0_wrap);
+  float4 _v_17_2 = linear_sample(_in.sampler0_t, _v_11_2.xy, _in.sampler0_wrap);
+  float4 _v_18_2 = linear_sample(_in.sampler0_t, _v_13_2.xy, _in.sampler0_wrap);
+  float4 _v_19_2 = max(_v_15_2, _v_16_2);
+  float4 _v_20_2 = max(_v_17_2, _v_18_2);
+  float4 _v_21_2 = max(_v_19_2, _v_20_2);
+  float _v_24_1 = _v_21_2.x;
+  float _v_23_4 = ((_v_24_1 > _v_29_2) ? (_v_25_0) : (_v_26_0));
+  _out.col0 = float4(_v_23_4, _v_23_4, _v_23_4, _v_23_4);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_heightmap_slope_fitter {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _object_height_5808;
+  float _object_radius_25143;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_heightmap_slope_fitter {
+  float4 col0;
+};
+"""
+  }
+}

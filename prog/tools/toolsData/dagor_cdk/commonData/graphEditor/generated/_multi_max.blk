@@ -1,0 +1,124 @@
+
+multi_max {
+  params {
+  }
+  inputs:i=8
+  shaderPreMain:t="""
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+    Texture2D sampler1_t:register(t1);
+    SamplerState sampler1:register(s1);
+    Texture2D sampler2_t:register(t2);
+    SamplerState sampler2:register(s2);
+    Texture2D sampler3_t:register(t3);
+    SamplerState sampler3:register(s3);
+    Texture2D sampler4_t:register(t4);
+    SamplerState sampler4:register(s4);
+    Texture2D sampler5_t:register(t5);
+    SamplerState sampler5:register(s5);
+    Texture2D sampler6_t:register(t6);
+    SamplerState sampler6:register(s6);
+    Texture2D sampler7_t:register(t7);
+    SamplerState sampler7:register(s7);
+  """
+  shaderCode:t="""
+  InputStruct_multi_max _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+  _in.sampler1_t = sampler1_t;
+  _in.sampler1_wrap = wrap_t1;
+  _in.sampler1 = sampler1;
+  _in.sampler2_t = sampler2_t;
+  _in.sampler2_wrap = wrap_t2;
+  _in.sampler2 = sampler2;
+  _in.sampler3_t = sampler3_t;
+  _in.sampler3_wrap = wrap_t3;
+  _in.sampler3 = sampler3;
+  _in.sampler4_t = sampler4_t;
+  _in.sampler4_wrap = wrap_t4;
+  _in.sampler4 = sampler4;
+  _in.sampler5_t = sampler5_t;
+  _in.sampler5_wrap = wrap_t5;
+  _in.sampler5 = sampler5;
+  _in.sampler6_t = sampler6_t;
+  _in.sampler6_wrap = wrap_t6;
+  _in.sampler6 = sampler6;
+  _in.sampler7_t = sampler7_t;
+  _in.sampler7_wrap = wrap_t7;
+  _in.sampler7 = sampler7;
+
+
+  OutputStruct_multi_max _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_multi_max(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  """
+    shader_function:t="""
+
+  void _function_multi_max(InputStruct_multi_max _in, out OutputStruct_multi_max _out) {
+
+  float4 _v_1_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float4 _v_2_1 = linear_sample(_in.sampler1_t, _in.tc, _in.sampler1_wrap);
+  float4 _v_3_1 = linear_sample(_in.sampler2_t, _in.tc, _in.sampler2_wrap);
+  float4 _v_4_1 = linear_sample(_in.sampler3_t, _in.tc, _in.sampler3_wrap);
+  float4 _v_5_1 = linear_sample(_in.sampler4_t, _in.tc, _in.sampler4_wrap);
+  float4 _v_6_1 = linear_sample(_in.sampler5_t, _in.tc, _in.sampler5_wrap);
+  float4 _v_7_1 = linear_sample(_in.sampler6_t, _in.tc, _in.sampler6_wrap);
+  float4 _v_8_1 = linear_sample(_in.sampler7_t, _in.tc, _in.sampler7_wrap);
+  float4 _v_0_2 = max(_v_1_1, _v_2_1);
+  float4 _v_9_2 = max(_v_0_2, _v_3_1);
+  float4 _v_10_2 = max(_v_9_2, _v_4_1);
+  float4 _v_11_2 = max(_v_10_2, _v_5_1);
+  float4 _v_12_2 = max(_v_11_2, _v_6_1);
+  float4 _v_13_2 = max(_v_12_2, _v_7_1);
+  float4 _v_14_2 = max(_v_13_2, _v_8_1);
+  _out.col0 = _v_14_2;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_multi_max {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+  Texture2D sampler1_t;
+  bool sampler1_wrap;
+  SamplerState sampler1;
+  Texture2D sampler2_t;
+  bool sampler2_wrap;
+  SamplerState sampler2;
+  Texture2D sampler3_t;
+  bool sampler3_wrap;
+  SamplerState sampler3;
+  Texture2D sampler4_t;
+  bool sampler4_wrap;
+  SamplerState sampler4;
+  Texture2D sampler5_t;
+  bool sampler5_wrap;
+  SamplerState sampler5;
+  Texture2D sampler6_t;
+  bool sampler6_wrap;
+  SamplerState sampler6;
+  Texture2D sampler7_t;
+  bool sampler7_wrap;
+  SamplerState sampler7;
+};
+struct OutputStruct_multi_max {
+  float4 col0;
+};
+"""
+  }
+}

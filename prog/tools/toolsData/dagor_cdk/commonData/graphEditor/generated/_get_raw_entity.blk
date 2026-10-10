@@ -1,0 +1,118 @@
+
+get_raw_entity {
+  params {
+    _raw_entity_index_58468:i = 1
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      int _raw_entity_index_58468;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_get_raw_entity _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._raw_entity_index_58468 = _raw_entity_index_58468; // 1
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_get_raw_entity _out;
+  _out._exists_25861 = 0.0;
+  _out._pos_29481 = float4(0.0, 0.0, 0.0, 0.0);
+  _out._up_28576 = float4(0.0, 0.0, 0.0, 0.0);
+  _out._forward_16414 = float4(0.0, 0.0, 0.0, 0.0);
+  _out._place_type_6 = 0.0;
+  _out._entity_name_index_47879 = 0.0;
+  _out._entity_seed_27081 = 0.0;
+  _out._scale_20861 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_get_raw_entity(_in, _out);
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  """
+    shader_function:t="""
+
+
+  void _function_get_raw_entity(InputStruct_get_raw_entity _in, out OutputStruct_get_raw_entity _out) {
+
+  float _v_1_0 = 1.0;
+  int _v_32_0 = 4;
+  int _v_40_0 = 1;
+  int _v_43_0 = 2;
+  int _v_46_0 = 3;
+  float _v_50_0 = 0.0;
+  int _v_57_0 = 1;
+  float _v_59_0 = 0.001;
+  float _v_60_0 = 0.0;
+  float2 _v_33_1 = get_dimensions(_in.sampler0_t);
+  float _v_35_1 = float4(_v_33_1, 0.0, 0.0).x;
+  int _v_56_2 = (_in._raw_entity_index_58468 + _v_57_0);
+  int _v_31_2 = (_v_56_2 * _v_32_0);
+  int _v_36_2 = (_v_31_2 % int(_v_35_1));
+  int _v_37_2 = (_v_31_2 / (int(_v_35_1) == 0 ? 1 : int(_v_35_1)));
+  int _v_38_2 = (_v_36_2 + _v_40_0);
+  float4 _v_39_3 = _in.sampler0_t[int2(_v_36_2, _v_37_2)];
+  float4 _v_41_3 = _in.sampler0_t[int2(_v_38_2, _v_37_2)];
+  int _v_42_2 = (_v_36_2 + _v_43_0);
+  float4 _v_44_3 = _in.sampler0_t[int2(_v_42_2, _v_37_2)];
+  int _v_45_2 = (_v_36_2 + _v_46_0);
+  float4 _v_47_3 = _in.sampler0_t[int2(_v_45_2, _v_37_2)];
+  float _v_48_1 = _v_39_3.x;
+  float _v_48_2 = _v_39_3.y;
+  float _v_48_3 = _v_39_3.z;
+  float _v_48_4 = _v_39_3.w;
+  _out._pos_29481 = float4(_v_48_1, _v_48_2, _v_48_3, _v_50_0);
+  float _v_52_1 = _v_41_3.x;
+  float _v_52_2 = _v_41_3.y;
+  float _v_52_3 = _v_41_3.z;
+  float _v_52_4 = _v_41_3.w;
+  float _v_53_1 = _v_44_3.x;
+  _out._place_type_6 = _v_44_3.y;
+  _out._entity_name_index_47879 = _v_44_3.z;
+  _out._entity_seed_27081 = _v_44_3.w;
+  _out._forward_16414 = float4(_v_52_3, _v_52_4, _v_53_1, _v_50_0);
+  float _v_55_1 = _v_47_3.x;
+  float _v_55_2 = _v_47_3.y;
+  float _v_55_3 = _v_47_3.z;
+  float4 _v_62_4 = float4(_v_48_4, _v_52_1, _v_52_2, _v_50_0);
+  _out._scale_20861 = float4(_v_55_1, _v_55_2, _v_55_3, _v_50_0);
+  _out._up_28576 = float4(_v_48_4, _v_52_1, _v_52_2, _v_50_0);
+  float _v_61_1 = length(_v_62_4);
+  _out._exists_25861 = ((_v_61_1 > _v_59_0) ? (_v_1_0) : (_v_60_0));
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_get_raw_entity {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  int _raw_entity_index_58468;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_get_raw_entity {
+  float _exists_25861;
+  float4 _pos_29481;
+  float4 _up_28576;
+  float4 _forward_16414;
+  float _place_type_6;
+  float _entity_name_index_47879;
+  float _entity_seed_27081;
+  float4 _scale_20861;
+};
+"""
+  }
+}

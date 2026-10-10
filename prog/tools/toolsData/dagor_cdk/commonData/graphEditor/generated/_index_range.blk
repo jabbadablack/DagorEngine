@@ -1,0 +1,87 @@
+
+index_range {
+  params {
+    _high_limit_55998:i = 21
+    _low_limit_48932:i = 16
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      int _high_limit_55998;
+      int _low_limit_48932;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_index_range _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._high_limit_55998 = _high_limit_55998; // 21
+  _in._low_limit_48932 = _low_limit_48932; // 16
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_index_range _out;
+  _out._y_46556 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_index_range(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+  void _function_index_range(InputStruct_index_range _in, out OutputStruct_index_range _out) {
+
+  float4 _v_0_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float _v_1_1 = _v_0_1.x;
+  _out._y_46556 = _v_0_1.y;
+  _out._z_46559 = _v_0_1.z;
+  _out._w_46546 = _v_0_1.w;
+  float _v_3_0 = 1.0;
+  float _v_6_0 = 0.0;
+  float _v_10_0 = 255.0;
+  float _v_11_2 = (float(_in._low_limit_48932) / _v_10_0);
+  float _v_12_0 = 0.001;
+  float _v_13_2 = (_v_12_0 / _v_10_0);
+  float _v_15_2 = (_v_11_2 - _v_13_2);
+  float _v_4_4 = ((_v_1_1 >= _v_15_2) ? (_v_3_0) : (_v_6_0));
+  float _v_9_2 = (float(_in._high_limit_55998) / _v_10_0);
+  float _v_14_2 = (_v_9_2 + _v_13_2);
+  float _v_7_4 = ((_v_14_2 >= _v_1_1) ? (_v_4_4) : (_v_6_0));
+  _out.col0 = float4(_v_7_4, _v_7_4, _v_7_4, _v_7_4);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_index_range {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  int _high_limit_55998;
+  int _low_limit_48932;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_index_range {
+  float _y_46556;
+  float _z_46559;
+  float _w_46546;
+  float4 col0;
+};
+"""
+  }
+}

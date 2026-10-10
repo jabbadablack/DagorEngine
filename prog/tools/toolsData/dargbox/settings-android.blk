@@ -1,0 +1,91 @@
+//script:t=samples\_basic\render\images_advanced.ui.nut
+script:t=browser\filebrowser.ui.nut
+//script:t=autolayout.nut
+
+__allow_force_apply_all:b=yes
+
+drawFps:b=yes
+utf8mode:b=yes
+joystickRemap360:b=yes
+//touchScreen:b=yes
+
+guiBufQuads:i = 160000
+
+vulkan{
+  //executionMode:t="immediate"
+  allowCoherentMemory:b=no
+  //debugLevel:i=2
+}
+
+graphics{
+  limitfps:b=yes
+}
+workcycle{
+  act_rate:i=30
+}
+
+
+mountPoints {
+  darg{ forSource:t="..\..\prog\scripts\sq\daRg"; forVromfs:t="sq/daRg";}
+  sqstd{ forSource:t="..\..\prog\scripts\sq\std"; forVromfs:t="sq/std";}
+}
+
+gui-settings{
+  //dargdrop-start-len:i=5
+  //double-click-time:i=500
+
+  KeyRepeater{
+    useKeyRepeater:b=yes
+
+    keyRepeaterRepeatKeyboard:b=no
+    keyRepeaterRepeatJoystick:b=yes
+
+    repeatDelay:i=1000
+    repeatFrequency:i=30
+
+    Accelerator{
+      repeatDelay:i=500
+      buildUpTime:i=1000
+
+      repeatFinalFrequency:i=3000
+    }
+  }
+}
+
+//shaders:t=assets/shaders
+
+-effects {
+  res:t="resPacks.blk"
+  frameBlk:t=""
+  sceneBlk:t=""
+}
+
+
+debug {
+  http_server:b=no
+  vromfsFirstPriority:b=no
+}
+
+//vromfs:t=darg.and.vromfs.bin
+
+basevromfs{
+}
+
+
+sound {
+  //loglevel:t="all"
+  //fmodLoglevel:t="log"
+  banksFolder:t="file:///android_asset/sound"
+  banks {
+    presets {
+      master {
+        master_bank {}
+        cmn_gen_ui {}
+        bank:t="cmn_gen_ui.assets"
+        bank:t="master_bank.assets"
+        bank:t="master_bank.strings"
+      }
+    }
+  }
+}
+

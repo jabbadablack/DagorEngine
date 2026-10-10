@@ -1,0 +1,441 @@
+
+particle_scatter_by_heightmap {
+  params {
+    _random_seed_8886:r = 0.0
+    _particle_min_scale_58403:r = 0.0
+    _particle_max_scale_53821:r = 0.3
+    _scale_random_64441:r = 0.0
+    _scale_random_mul_18642:r = 0.0
+    _assymmetry_7815:r = 0.9
+    _assymmetry_random_11011:r = 0.2
+    _flip_x_random_51637:i = 1
+    _flip_y_random_60628:i = 1
+    _particle_min_brightness_58578:r = 0.0
+    _particle_max_brightness_32652:r = 1.0
+    _brightness_random_1192:r = 0.0
+    _brightness_random_mul_57603:r = 0.0
+    _append_brightness_threshold_501:r = 0.0001
+    _append_probability_39737:r = 0.1
+    _reduce_overlap_13961:r = 1.0
+    _angle_from_height_49901:r = 1.0
+    _angle_random_5728:r = 0.2
+    _angle_rotation_4143:r = 0.0
+    _grid_disorder_32626:r = 0.1
+    _particle_center_offset_48119:p2 = 1.0, 1.0
+  }
+  inputs:i=5
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _random_seed_8886;
+      float _particle_min_scale_58403;
+      float _particle_max_scale_53821;
+      float _scale_random_64441;
+      float _scale_random_mul_18642;
+      float _assymmetry_7815;
+      float _assymmetry_random_11011;
+      int _flip_x_random_51637;
+      int _flip_y_random_60628;
+      float _particle_min_brightness_58578;
+      float _particle_max_brightness_32652;
+      float _brightness_random_1192;
+      float _brightness_random_mul_57603;
+      float _append_brightness_threshold_501;
+      float _append_probability_39737;
+      float _reduce_overlap_13961;
+      float _angle_from_height_49901;
+      float _angle_random_5728;
+      float _angle_rotation_4143;
+      float _grid_disorder_32626;
+      float2 _particle_center_offset_48119;
+    };
+    #define ParticlesOutput_DEFINE u7
+    #define ParticlesOutputCounter_DEFINE u6
+    #define VOID_OUTPUT
+    #define WRAP 1
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+    Texture2D sampler1_t:register(t1);
+    SamplerState sampler1:register(s1);
+    Texture2D sampler2_t:register(t2);
+    SamplerState sampler2:register(s2);
+    Texture2D sampler3_t:register(t3);
+    SamplerState sampler3:register(s3);
+    Texture2D sampler4_t:register(t4);
+    SamplerState sampler4:register(s4);
+  """
+  shaderCode:t="""
+  InputStruct_particle_scatter_by_heightmap _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._random_seed_8886 = _random_seed_8886; // 0.0
+  _in._particle_min_scale_58403 = _particle_min_scale_58403; // 0.0
+  _in._particle_max_scale_53821 = _particle_max_scale_53821; // 0.3
+  _in._scale_random_64441 = _scale_random_64441; // 0.0
+  _in._scale_random_mul_18642 = _scale_random_mul_18642; // 0.0
+  _in._assymmetry_7815 = _assymmetry_7815; // 0.9
+  _in._assymmetry_random_11011 = _assymmetry_random_11011; // 0.2
+  _in._flip_x_random_51637 = _flip_x_random_51637; // 1
+  _in._flip_y_random_60628 = _flip_y_random_60628; // 1
+  _in._particle_min_brightness_58578 = _particle_min_brightness_58578; // 0.0
+  _in._particle_max_brightness_32652 = _particle_max_brightness_32652; // 1.0
+  _in._brightness_random_1192 = _brightness_random_1192; // 0.0
+  _in._brightness_random_mul_57603 = _brightness_random_mul_57603; // 0.0
+  _in._append_brightness_threshold_501 = _append_brightness_threshold_501; // 0.0001
+  _in._append_probability_39737 = _append_probability_39737; // 0.1
+  _in._reduce_overlap_13961 = _reduce_overlap_13961; // 1.0
+  _in._angle_from_height_49901 = _angle_from_height_49901; // 1.0
+  _in._angle_random_5728 = _angle_random_5728; // 0.2
+  _in._angle_rotation_4143 = _angle_rotation_4143; // 0.0
+  _in._grid_disorder_32626 = _grid_disorder_32626; // 0.1
+  _in._particle_center_offset_48119 = _particle_center_offset_48119; // float2(1.0, 1.0)
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+  _in.sampler1_t = sampler1_t;
+  _in.sampler1_wrap = wrap_t1;
+  _in.sampler1 = sampler1;
+  _in.sampler2_t = sampler2_t;
+  _in.sampler2_wrap = wrap_t2;
+  _in.sampler2 = sampler2;
+  _in.sampler3_t = sampler3_t;
+  _in.sampler3_wrap = wrap_t3;
+  _in.sampler3 = sampler3;
+  _in.sampler4_t = sampler4_t;
+  _in.sampler4_wrap = wrap_t4;
+  _in.sampler4 = sampler4;
+
+
+  OutputStruct_particle_scatter_by_heightmap _out;
+  _out._value_13390 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out._z_46559_6 = 0.0;
+  _out._z_46559_151 = 0.0;
+  _out._w_46546_151 = 0.0;
+  _out._y_46556 = 0.0;
+  _out._z_46559_146 = 0.0;
+  _out._w_46546_146 = 0.0;
+  _out._y_46556_120 = 0.0;
+  _out._z_46559_120 = 0.0;
+  _out._w_46546_120 = 0.0;
+  _out._y_46556_129 = 0.0;
+  _out._z_46559_129 = 0.0;
+  _out._w_46546_129 = 0.0;
+  _out._y_46556_127 = 0.0;
+  _out._z_46559_127 = 0.0;
+  _out._w_46546_127 = 0.0;
+  _out._y_46556_3 = 0.0;
+  _out._z_46559_3 = 0.0;
+  _out._w_46546_3 = 0.0;
+  _out._y_46556_15 = 0.0;
+  _out._z_46559_15 = 0.0;
+  _out._w_46546_15 = 0.0;
+  _out._y_46556_22 = 0.0;
+  _out._z_46559_22 = 0.0;
+  _out._w_46546_22 = 0.0;
+  _out._y_46556_132 = 0.0;
+  _out._z_46559_132 = 0.0;
+  _out._w_46546_132 = 0.0;
+  _out._y_46556_142 = 0.0;
+  _out._z_46559_142 = 0.0;
+  _out._w_46546_142 = 0.0;
+
+  _function_particle_scatter_by_heightmap(_in, _out);
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  """
+    shader_function:t="""
+
+
+  void _function_particle_scatter_by_heightmap(InputStruct_particle_scatter_by_heightmap _in, out OutputStruct_particle_scatter_by_heightmap _out) {
+
+  float2 _v_1_0 = _in.tc;
+  float _v_6_1 = float4(_v_1_0, 0.0, 0.0).x;
+  float _v_6_2 = float4(_v_1_0, 0.0, 0.0).y;
+  _out._z_46559_6 = float4(_v_1_0, 0.0, 0.0).z;
+  float _v_6_4 = float4(_v_1_0, 0.0, 0.0).w;
+  float _v_9_0 = 0.001;
+  float _v_10_0 = 0.0;
+  float4 _v_11_4 = float4(_v_10_0, _v_9_0, _v_10_0, _v_10_0);
+  float _v_27_0 = 3.14159265;
+  float _v_29_1 = _v_27_0 * (0.5);
+  float _v_36_0 = -0.5;
+  float _v_40_0 = 2.0;
+  float _v_51_1 = saturate(float(_in._flip_x_random_51637));
+  float _v_53_0 = rand(_in._random_seed_8886 + 5.6177 + _in.tc.x + _in.tc.y * 231.321);
+  float _v_56_0 = 1.0;
+  float _v_59_0 = 0.0;
+  float _v_60_0 = 1.0;
+  float _v_67_0 = -1.0;
+  float _v_70_0 = 1.0;
+  float _v_72_0 = rand(_in._random_seed_8886 + 13.0103 + _in.tc.x + _in.tc.y * 231.321);
+  float _v_74_2 = (_v_72_0 * _in._assymmetry_random_11011);
+  float _v_75_0 = 0.0;
+  float _v_78_1 = saturate(float(_in._flip_y_random_60628));
+  float _v_80_0 = rand(_in._random_seed_8886 + -1.7749 + _in.tc.x + _in.tc.y * 231.321);
+  float _v_81_0 = 0.5;
+  float _v_82_0 = -1.0;
+  float _v_83_0 = 1.0;
+  float _v_84_0 = 1.0;
+  float _v_85_2 = (_v_84_0 - _v_51_1);
+  float _v_87_0 = 2.0;
+  float _v_91_0 = 1.0;
+  float _v_92_2 = (_v_91_0 - _v_78_1);
+  float _v_94_0 = 2.0;
+  float _v_96_0 = rand(_in._random_seed_8886 + -4.2391 + _in.tc.x + _in.tc.y * 231.321);
+  float _v_100_0 = 0.0;
+  float _v_110_0 = rand(_in._random_seed_8886 + 7878.0 + _in.tc.x + _in.tc.y * 231.321);
+  float _v_112_2 = (_v_110_0 * _in._grid_disorder_32626);
+  float _v_114_0 = rand(_in._random_seed_8886 + 111.0 + _in.tc.x + _in.tc.y * 231.321);
+  _out._value_13390 = 1.0;
+  float _v_116_0 = 0.0;
+  float _v_133_0 = 1.0;
+  float _v_135_0 = 0.0;
+  float _v_138_0 = 0.0;
+  float _v_168_0 = 0.0;
+  float4 _v_7_4 = float4(_v_9_0, _v_10_0, _v_10_0, _v_10_0);
+  float _v_12_0 = rand(_in._random_seed_8886 + 111.0 + _in.tc.x + _in.tc.y * 231.321);
+  float _v_16_0 = rand(_in._random_seed_8886 + -3.007 + _in.tc.x + _in.tc.y * 231.321);
+  float _v_20_2 = (_v_16_0 + _v_36_0);
+  float _v_38_0 = rand(_in._random_seed_8886 + 0.0 + _in.tc.x + _in.tc.y * 231.321);
+  float _v_39_2 = (_v_20_2 * _v_40_0);
+  float _v_42_2 = (_in._angle_rotation_4143 * _v_27_0);
+  float _v_54_3 = lerp(_v_56_0, _v_53_0, _in._brightness_random_mul_57603);
+  float _v_69_3 = lerp(_v_70_0, _v_38_0, _in._scale_random_mul_18642);
+  float _v_73_3 = lerp(_in._assymmetry_7815, _v_75_0, _v_74_2);
+  float _v_86_2 = (_v_87_0 * _v_85_2);
+  float _v_88_2 = (_v_86_2 + _v_82_0);
+  float _v_93_2 = (_v_94_0 * _v_92_2);
+  float _v_95_2 = (_v_93_2 + _v_96_0);
+  float _v_109_2 = (_v_6_2 + _v_112_2);
+  float _v_111_2 = (_v_12_0 * _in._grid_disorder_32626);
+  float _v_121_2 = (_v_39_2 * _in._angle_random_5728);
+  float _v_151_1 = float4(_in._particle_center_offset_48119, 0.0, 0.0).x;
+  float _v_151_2 = float4(_in._particle_center_offset_48119, 0.0, 0.0).y;
+  _out._z_46559_151 = float4(_in._particle_center_offset_48119, 0.0, 0.0).z;
+  _out._w_46546_151 = float4(_in._particle_center_offset_48119, 0.0, 0.0).w;
+  float _v_58_2 = max(_v_73_3, _v_59_0);
+  float _v_61_2 = (_v_60_0 - _v_58_2);
+  float _v_62_2 = max(_v_61_2, _v_59_0);
+  float _v_66_2 = min(_v_73_3, _v_59_0);
+  float _v_79_4 = ((_v_80_0 > _v_81_0) ? (_v_88_2) : (_v_83_0));
+  float _v_90_4 = ((_v_82_0 > _v_83_0) ? (_v_95_2) : (_v_83_0));
+  float _v_108_2 = (_v_6_1 + _v_111_2);
+  float4 _v_8_4 = float4(_v_108_2, _v_109_2, _v_6_4, _v_6_4);
+  float4 _v_17_2 = (_v_8_4 + _v_7_4);
+  float4 _v_21_2 = (_v_8_4 + _v_11_4);
+  float _v_63_2 = (_v_66_2 * _v_67_0);
+  float _v_64_2 = (_v_60_0 - _v_63_2);
+  float _v_65_2 = max(_v_64_2, _v_59_0);
+  float4 _v_119_2 = linear_sample(_in.sampler1_t, _v_8_4.xy, _in.sampler1_wrap);
+  float _v_120_1 = _v_119_2.x;
+  _out._y_46556_120 = _v_119_2.y;
+  _out._z_46559_120 = _v_119_2.z;
+  _out._w_46546_120 = _v_119_2.w;
+  float4 _v_126_2 = linear_sample(_in.sampler3_t, _v_8_4.xy, _in.sampler3_wrap);
+  float _v_127_1 = _v_126_2.x;
+  _out._y_46556_127 = _v_126_2.y;
+  _out._z_46559_127 = _v_126_2.z;
+  _out._w_46546_127 = _v_126_2.w;
+  float4 _v_128_2 = linear_sample(_in.sampler2_t, _v_8_4.xy, _in.sampler2_wrap);
+  float _v_129_1 = _v_128_2.x;
+  _out._y_46556_129 = _v_128_2.y;
+  _out._z_46559_129 = _v_128_2.z;
+  _out._w_46546_129 = _v_128_2.w;
+  float4 _v_131_2 = linear_sample(_in.sampler0_t, _v_17_2.xy, _in.sampler0_wrap);
+  float _v_132_1 = _v_131_2.x;
+  _out._y_46556_132 = _v_131_2.y;
+  _out._z_46559_132 = _v_131_2.z;
+  _out._w_46546_132 = _v_131_2.w;
+  float4 _v_134_2 = linear_sample(_in.sampler0_t, _v_21_2.xy, _in.sampler0_wrap);
+  float _v_142_1 = _v_134_2.x;
+  _out._y_46556_142 = _v_134_2.y;
+  _out._z_46559_142 = _v_134_2.z;
+  _out._w_46546_142 = _v_134_2.w;
+  float4 _v_145_2 = linear_sample(_in.sampler0_t, _v_8_4.xy, _in.sampler0_wrap);
+  float _v_146_1 = _v_145_2.x;
+  _out._y_46556 = _v_145_2.y;
+  _out._z_46559_146 = _v_145_2.z;
+  _out._w_46546_146 = _v_145_2.w;
+  float _v_147_2 = max(_v_120_1, _v_146_1);
+  float _v_148_2 = max(_v_129_1, _v_146_1);
+  float _v_149_2 = max(_v_127_1, _v_146_1);
+  float _v_154_1 = _v_8_4.x;
+  float _v_154_2 = _v_8_4.y;
+  float _v_154_3 = _v_8_4.z;
+  float _v_154_4 = _v_8_4.w;
+  float4 _v_2_2 = linear_sample(_in.sampler4_t, _v_8_4.xy, _in.sampler4_wrap);
+  float _v_3_1 = _v_2_2.x;
+  _out._y_46556_3 = _v_2_2.y;
+  _out._z_46559_3 = _v_2_2.z;
+  _out._w_46546_3 = _v_2_2.w;
+  float4 _v_14_2 = linear_sample(_in.sampler4_t, _v_17_2.xy, _in.sampler4_wrap);
+  float _v_15_1 = _v_14_2.x;
+  _out._y_46556_15 = _v_14_2.y;
+  _out._z_46559_15 = _v_14_2.z;
+  _out._w_46546_15 = _v_14_2.w;
+  float4 _v_19_2 = linear_sample(_in.sampler4_t, _v_21_2.xy, _in.sampler4_wrap);
+  float _v_22_1 = _v_19_2.x;
+  _out._y_46556_22 = _v_19_2.y;
+  _out._z_46559_22 = _v_19_2.z;
+  _out._w_46546_22 = _v_19_2.w;
+  float _v_57_2 = (_v_148_2 * _v_54_3);
+  float _v_76_2 = (_v_149_2 * _v_69_3);
+  float _v_118_2 = (_in._append_probability_39737 * _v_147_2);
+  float _v_130_2 = max(_v_15_1, _v_132_1);
+  float _v_144_2 = max(_v_22_1, _v_142_1);
+  float _v_150_2 = max(_v_3_1, _v_146_1);
+  float _v_24_2 = (_v_130_2 - _v_150_2);
+  float _v_25_2 = (_v_144_2 - _v_150_2);
+  float _v_34_3 = lerp(_v_76_2, _v_38_0, _in._scale_random_64441);
+  float _v_50_3 = lerp(_v_57_2, _v_53_0, _in._brightness_random_1192);
+  float _v_137_1 = abs(_v_24_2);
+  float _v_140_1 = abs(_v_25_2);
+  float _v_31_3 = lerp(_in._particle_min_scale_58403, _in._particle_max_scale_53821, _v_34_3);
+  float _v_32_2 = (_v_31_3 * _v_62_2);
+  float _v_47_3 = lerp(_in._particle_min_brightness_58578, _in._particle_max_brightness_32652, _v_50_3);
+  float _v_55_2 = (_v_31_3 * _v_65_2);
+  float _v_89_2 = (_v_55_2 * _v_79_4);
+  float _v_97_2 = (_v_32_2 * _v_90_4);
+  float _v_103_2 = (_v_31_3 * _v_31_3);
+  float _v_104_2 = (_v_103_2 * _in._reduce_overlap_13961);
+  float _v_136_4 = ((_v_138_0 >= _v_137_1) ? (_v_133_0) : (_v_135_0));
+  float _v_139_4 = ((_v_138_0 >= _v_140_1) ? (_v_133_0) : (_v_135_0));
+  float _v_141_2 = (_v_136_4 * _v_139_4);
+  float _v_143_2 = (_v_24_2 + _v_141_2);
+  float _v_4_2 = (_v_47_3 - _in._append_brightness_threshold_501);
+  float _v_23_2 = atan2(_v_143_2, _v_25_2);
+  float _v_26_2 = (_v_23_2 + _v_29_1);
+  float4 _v_37_4 = float4(_v_89_2, _v_97_2, _v_75_0, _v_75_0);
+  float _v_41_1 = 1.0 - _v_104_2;
+  float _v_99_3 = lerp(_v_100_0, _v_26_2, _in._angle_from_height_49901);
+  float _v_122_2 = (_v_99_3 + _v_121_2);
+  float _v_172_1 = _v_37_4.x;
+  float _v_172_2 = _v_37_4.y;
+  _out._z_46559 = _v_37_4.z;
+  _out._w_46546 = _v_37_4.w;
+  float _v_173_2 = (_v_151_1 * _v_172_1);
+  float _v_13_2 = (_v_118_2 * _v_41_1);
+  float _v_102_2 = (_v_122_2 + _v_42_2);
+  float _v_113_4 = ((_v_13_2 >= _v_114_0) ? (_v_4_2) : (_v_116_0));
+  float _v_153_1 = sin(_v_102_2);
+  float _v_155_1 = sin(_v_102_2);
+  float _v_156_1 = cos(_v_102_2);
+  float _v_157_1 = cos(_v_102_2);
+  float _v_158_2 = (_v_173_2 * _v_156_1);
+  float _v_162_2 = (_v_173_2 * _v_155_1);
+  float _v_167_2 = (_v_151_2 * _v_172_2);
+  float _v_160_2 = (_v_167_2 * _v_153_1);
+  float _v_163_2 = (_v_167_2 * _v_157_1);
+  float _v_159_2 = (_v_160_2 + _v_158_2);
+  float _v_161_2 = (_v_163_2 - _v_162_2);
+  float _v_164_2 = (_v_154_1 + _v_159_2);
+  float _v_165_2 = (_v_154_2 + _v_161_2);
+  float4 _v_166_4 = float4(_v_164_2, _v_165_2, _v_154_3, _v_154_4);
+  {
+    ParticleInstance tmp_particle; tmp_particle.reserved0 = 0; tmp_particle.reserved1 = 0;;
+    tmp_particle.pos = _v_166_4.xy;
+    tmp_particle.scale = _v_37_4.xy;
+    tmp_particle.angle = _v_102_2;
+    tmp_particle.brightness = _v_47_3;
+    tmp_particle.depth = _v_6_1;
+;
+    tmp_particle.entityWorldPos = float3(_v_168_0, _v_168_0, _v_168_0);
+    tmp_particle.entityForward = float3(_v_168_0, _v_168_0, _v_168_0);
+    tmp_particle.entityUp = float3(_v_168_0, _v_168_0, _v_168_0);
+    tmp_particle.entityNameIndex = int(_v_168_0);
+    tmp_particle.entityPlaceType = int(_v_168_0);
+    tmp_particle.entitySeed = int(_v_168_0);
+    tmp_particle.entityScale = float3(_v_168_0, _v_168_0, _v_168_0);
+    [branch]
+    if (_v_113_4 > 0.0) { uint instIdx; InterlockedAdd(instancesCounter[1], 1, instIdx);instances[instIdx] = tmp_particle; wrap_particle(tmp_particle); }
+  };
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_particle_scatter_by_heightmap {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _random_seed_8886;
+  float _particle_min_scale_58403;
+  float _particle_max_scale_53821;
+  float _scale_random_64441;
+  float _scale_random_mul_18642;
+  float _assymmetry_7815;
+  float _assymmetry_random_11011;
+  int _flip_x_random_51637;
+  int _flip_y_random_60628;
+  float _particle_min_brightness_58578;
+  float _particle_max_brightness_32652;
+  float _brightness_random_1192;
+  float _brightness_random_mul_57603;
+  float _append_brightness_threshold_501;
+  float _append_probability_39737;
+  float _reduce_overlap_13961;
+  float _angle_from_height_49901;
+  float _angle_random_5728;
+  float _angle_rotation_4143;
+  float _grid_disorder_32626;
+  float2 _particle_center_offset_48119;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+  Texture2D sampler1_t;
+  bool sampler1_wrap;
+  SamplerState sampler1;
+  Texture2D sampler2_t;
+  bool sampler2_wrap;
+  SamplerState sampler2;
+  Texture2D sampler3_t;
+  bool sampler3_wrap;
+  SamplerState sampler3;
+  Texture2D sampler4_t;
+  bool sampler4_wrap;
+  SamplerState sampler4;
+};
+struct OutputStruct_particle_scatter_by_heightmap {
+  float _value_13390;
+  float _z_46559;
+  float _w_46546;
+  float _z_46559_6;
+  float _z_46559_151;
+  float _w_46546_151;
+  float _y_46556;
+  float _z_46559_146;
+  float _w_46546_146;
+  float _y_46556_120;
+  float _z_46559_120;
+  float _w_46546_120;
+  float _y_46556_129;
+  float _z_46559_129;
+  float _w_46546_129;
+  float _y_46556_127;
+  float _z_46559_127;
+  float _w_46546_127;
+  float _y_46556_3;
+  float _z_46559_3;
+  float _w_46546_3;
+  float _y_46556_15;
+  float _z_46559_15;
+  float _w_46546_15;
+  float _y_46556_22;
+  float _z_46559_22;
+  float _w_46546_22;
+  float _y_46556_132;
+  float _z_46559_132;
+  float _w_46546_132;
+  float _y_46556_142;
+  float _z_46559_142;
+  float _w_46546_142;
+};
+"""
+  }
+}

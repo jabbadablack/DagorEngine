@@ -1,0 +1,1077 @@
+vprog:t="""
+struct VsOutput
+{
+  float4 pos:SV_POSITION;
+  float3 tc:TEXCOORD0;
+  // [[particle_fields_with_semantics]]
+};
+float scale: register(c0);
+VsOutput main_vs(uint vertexId : SV_VertexID)
+{
+  VsOutput output;
+  float2 inpos = float2((vertexId == 2) ? +3.0 : -1.0, (vertexId == 1) ? -3.0 : 1.0);
+
+  output.pos = float4(inpos,0,1);
+  output.tc.xy = inpos * float2(0.5, -0.5) + float2(0.50000, 0.50000);
+  output.tc.z = scale;
+
+  return output;
+}
+"""
+particles_vprog:t="""
+struct VsOutput
+{
+  float4 pos:SV_POSITION;
+  float3 tc:TEXCOORD0;
+
+  float angle:TEXCOORD1;
+  float brightness:TEXCOORD2;
+  float index:TEXCOORD3;
+  float2 particlePos:TEXCOORD4;
+  float2 scale:TEXCOORD5;
+
+  //ENTITY_PROPERTIES
+  float3 entityWorldPos:TEXCOORD6;
+  float3 entityForward:TEXCOORD7;
+  float3 entityUp:TEXCOORD8;
+  int entityNameIndex:TEXCOORD9;
+  int entityPlaceType:TEXCOORD10;
+  int entitySeed:TEXCOORD11;
+  float3 entityScale:TEXCOORD12;
+  float reserved0:TEXCOORD13;
+  float reserved1:TEXCOORD14;
+};
+
+struct ParticleInstance
+{
+  float2 pos;
+  float2 scale;
+  float angle;
+  float brightness;
+  float depth;
+  //ENTITY_PROPERTIES
+  float3 entityWorldPos;
+  float3 entityForward;
+  float3 entityUp;
+  int entityNameIndex;
+  int entityPlaceType;
+  int entitySeed;
+  float3 entityScale;
+  float reserved0;
+  float reserved1;
+};
+float scale: register(c0);
+StructuredBuffer<ParticleInstance> instances : register(t0);
+VsOutput main_vs(uint subvertexId : SV_VertexID, uint instance : SV_InstanceID)
+{
+  VsOutput output;
+  float2 localPos = int2(subvertexId % 2, subvertexId > 1 && subvertexId < 5);
+  float2 rotSC;
+  sincos(instances[instance].angle, rotSC.x, rotSC.y);
+  float2 xPos = (localPos-float2(0.5,0.5))*instances[instance].scale;
+  float2 inpos = instances[instance].pos + 
+                 float2( rotSC.y * xPos.x + rotSC.x * xPos.y, -rotSC.x * xPos.x + rotSC.y * xPos.y);
+  //inpos = instances[instance].pos + xPos;
+  output.pos = float4(inpos*float2(2,-2) - float2(1,-1) ,0,1);
+  output.tc.xy = localPos;
+  output.tc.z = scale*instances[instance].brightness;
+  output.pos.z = instances[instance].depth;
+
+  output.angle = instances[instance].angle;
+  output.brightness = instances[instance].brightness;
+  output.index = float(instance);
+  output.particlePos = instances[instance].pos;
+  output.scale = instances[instance].scale;
+
+  //ENTITY_PROPERTIES
+  output.entityWorldPos = float3(0, 0, 0);
+  output.entityForward = float3(1, 0, 0);
+  output.entityUp = float3(0, 1, 0);
+  output.entityNameIndex = 0;
+  output.entityPlaceType = 0;
+  output.entitySeed = 0;
+  output.entityScale = float3(1, 1, 1);
+  output.reserved0 = 0;
+  output.reserved1 = 0;
+
+  return output;
+}
+"""
+premain:t="""
+cbuffer texure_params:register(b1)
+{
+  int wrap_t0;
+  int wrap_t1;
+  int wrap_t2;
+  int wrap_t3;
+  int wrap_t4;
+  int wrap_t5;
+  int wrap_t6;
+  int wrap_t7;
+  int wrap_t8;
+  int wrap_t9;
+  int wrap_t10;
+  int wrap_t11;
+  int wrap_t12;
+  int wrap_t13;
+  int wrap_t14;
+  int wrap_t15;
+};
+struct ParticleInstance
+{
+  float2 pos;
+  float2 scale;
+  float angle, brightness;
+  float depth;
+  //ENTITY_PROPERTIES
+  float3 entityWorldPos;
+  float3 entityForward;
+  float3 entityUp;
+  int entityNameIndex;
+  int entityPlaceType;
+  int entitySeed;
+  float3 entityScale;
+  float reserved0;
+  float reserved1;
+};
+float lengthSq(float2 v) {return dot(v,v);}
+float lengthSq(float3 v) {return dot(v,v);}
+float lengthSq(float4 v) {return dot(v,v);}
+#define PI 3.1415926535
+
+
+#define EPSILON 1e-10
+
+float3 HUEtoRGB(float hue)
+{
+    // Hue [0..1] to RGB [0..1]
+    // See http://www.chilliant.com/rgb2hsv.html
+    float3 rgb = abs(hue * 6. - float3(3, 2, 4)) * float3(1, -1, -1) + float3(-1, 2, 2);
+    return clamp(rgb, 0., 1.);
+}
+
+float3 RGBtoHCV(float3 rgb)
+{
+    // RGB [0..1] to Hue-Chroma-Value [0..1]
+    // Based on work by Sam Hocevar and Emil Persson
+    float4 p = (rgb.g < rgb.b) ? float4(rgb.bg, -1., 2. / 3.) : float4(rgb.gb, 0., -1. / 3.);
+    float4 q = (rgb.r < p.x) ? float4(p.xyw, rgb.r) : float4(rgb.r, p.yzx);
+    float c = q.x - min(q.w, q.y);
+    float h = abs((q.w - q.y) / (6. * c + EPSILON) + q.z);
+    return float3(h, c, q.x);
+}
+
+float3 HSVtoRGB(float3 hsv)
+{
+    // Hue-Saturation-Value [0..1] to RGB [0..1]
+    float3 rgb = HUEtoRGB(hsv.x);
+    return ((rgb - 1.) * hsv.y + 1.) * hsv.z;
+}
+
+float3 HSLtoRGB(float3 hsl)
+{
+    // Hue-Saturation-Lightness [0..1] to RGB [0..1]
+    float3 rgb = HUEtoRGB(hsl.x);
+    float c = (1. - abs(2. * hsl.z - 1.)) * hsl.y;
+    return (rgb - 0.5) * c + hsl.z;
+}
+
+float3 RGBtoHSV(float3 rgb)
+{
+    // RGB [0..1] to Hue-Saturation-Value [0..1]
+    float3 hcv = RGBtoHCV(rgb);
+    float s = hcv.y / (hcv.z + EPSILON);
+    return float3(hcv.x, s, hcv.z);
+}
+
+float3 RGBtoHSL(float3 rgb)
+{
+    // RGB [0..1] to Hue-Saturation-Lightness [0..1]
+    float3 hcv = RGBtoHCV(rgb);
+    float z = hcv.z - hcv.y * 0.5;
+    float s = hcv.y / (1. - abs(z * 2. - 1.) + EPSILON);
+    return float3(hcv.x, s, z);
+}
+
+float2x2 invMat(float2x2 m)
+{
+    float det = 1/(m._m00*m._m11 - m._m01*m._m10);
+    return m._m11_m01_m10_m00 * float2x2(1,-1,-1,1) *det;
+}
+
+float get_blur_kernel_weight(bool gauss, float invSqSigma, float x)
+{
+  if (gauss)
+  {
+   float d = x * x;
+   d = d * d;
+   d = d * d;
+   return exp(invSqSigma * (x * x + 1.0)) * max(1.0 - d, 0.0);
+  }
+  else
+  {
+   float d = 1.0 - x * x;
+   return max(d * d * d, 0.0);
+  }
+}
+
+float4 nearest_heighbor_sample(Texture2D tex, float2 tc, bool wrap)
+{
+  int w, h;
+  tex.GetDimensions(w, h);
+  float2 scaledTc = tc * float2(w, h);
+  int2 p00 = int2(floor(scaledTc));
+
+  if (wrap)
+    p00 = uint2(p00) & (uint2(w, h) - 1);
+  else
+    p00 = clamp(p00, int2(0, 0), int2(w, h) - 1);
+
+  return tex[p00];
+}
+
+float4 texel_fetch(Texture2D tex, int2 itc, bool wrap)
+{
+  int w, h;
+  tex.GetDimensions(w, h);
+
+  if (wrap)
+    itc = uint2(itc) & (uint2(w, h) - 1);
+  else
+    itc = clamp(itc, int2(0, 0), int2(w, h) - 1);
+
+  return tex[itc];
+}
+
+float4 CubicHermite(float4 A, float4 B, float4 C, float4 D, float t)
+{
+    float t2 = t * t;
+    float t3 = t2 * t;
+    float4 a = (B - C) * 1.5 + (D - A) * 0.5;
+    float4 b = A - B * 2.5 + C * 2.0 - D * 0.5;
+    float4 c = (C - A) * 0.5;
+    float4 d = B;
+    return a * t3 + b * t2 + c * t + d;
+}
+
+float4 bicubic_sample(Texture2D tex, float2 tc, bool wrap)
+{
+  int w, h;
+  tex.GetDimensions(w, h);
+  float2 scaledTc = tc * float2(w, h) - 0.5;
+  int2 intTc = int2(floor(scaledTc));
+  float2 delta = scaledTc - intTc;
+
+  float4 C00 = texel_fetch(tex, intTc + int2(-1, -1), wrap);
+  float4 C10 = texel_fetch(tex, intTc + int2( 0, -1), wrap);
+  float4 C20 = texel_fetch(tex, intTc + int2( 1, -1), wrap);
+  float4 C30 = texel_fetch(tex, intTc + int2( 2, -1), wrap);
+
+  float4 C01 = texel_fetch(tex, intTc + int2(-1, 0), wrap);
+  float4 C11 = texel_fetch(tex, intTc + int2( 0, 0), wrap);
+  float4 C21 = texel_fetch(tex, intTc + int2( 1, 0), wrap);
+  float4 C31 = texel_fetch(tex, intTc + int2( 2, 0), wrap);
+
+  float4 C02 = texel_fetch(tex, intTc + int2(-1, 1), wrap);
+  float4 C12 = texel_fetch(tex, intTc + int2( 0, 1), wrap);
+  float4 C22 = texel_fetch(tex, intTc + int2( 1, 1), wrap);
+  float4 C32 = texel_fetch(tex, intTc + int2( 2, 1), wrap);
+
+  float4 C03 = texel_fetch(tex, intTc + int2(-1, 2), wrap);
+  float4 C13 = texel_fetch(tex, intTc + int2( 0, 2), wrap);
+  float4 C23 = texel_fetch(tex, intTc + int2( 1, 2), wrap);
+  float4 C33 = texel_fetch(tex, intTc + int2( 2, 2), wrap);
+
+  float4 CP0X = CubicHermite(C00, C10, C20, C30, delta.x);
+  float4 CP1X = CubicHermite(C01, C11, C21, C31, delta.x);
+  float4 CP2X = CubicHermite(C02, C12, C22, C32, delta.x);
+  float4 CP3X = CubicHermite(C03, C13, C23, C33, delta.x);
+
+  return CubicHermite(CP0X, CP1X, CP2X, CP3X, delta.y);
+}
+
+float4 linear_sample(Texture2D tex, float2 tc, bool wrap, int2 offset = int2(0, 0))
+{
+  int w, h;
+  tex.GetDimensions(w, h);
+  float2 scaledTc = tc * float2(w, h) - 0.5;
+  int2 intTc = int2(floor(scaledTc));
+
+  int2 p00 = intTc + int2(0, 0) + offset;
+  int2 p10 = intTc + int2(1, 0) + offset;
+  int2 p01 = intTc + int2(0, 1) + offset;
+  int2 p11 = intTc + int2(1, 1) + offset;
+  if (wrap)
+  {
+    p00 = uint2(p00) & (uint2(w, h) - 1);
+    p10 = uint2(p10) & (uint2(w, h) - 1);
+    p01 = uint2(p01) & (uint2(w, h) - 1);
+    p11 = uint2(p11) & (uint2(w, h) - 1);
+  }
+  else
+  {
+    int2 maxIndex = int2(w, h) - 1;
+    p00 = clamp(p00, int2(0, 0), maxIndex);
+    p10 = clamp(p10, int2(0, 0), maxIndex);
+    p01 = clamp(p01, int2(0, 0), maxIndex);
+    p11 = clamp(p11, int2(0, 0), maxIndex);
+  }
+
+  float2 delta = scaledTc - intTc;
+
+  float4 v0 = lerp(tex[p00], tex[p10], delta.x);
+  float4 v1 = lerp(tex[p01], tex[p11], delta.x);
+  return lerp(v0, v1, delta.y);
+}
+
+float4 get_texel(Texture2D tex, float2 tc, bool wrap, int2 offset = int2(0, 0))
+{
+  int w, h;
+  tex.GetDimensions(w, h);
+  int2 intTc = int2(floor(tc * float2(w, h) - 0.5)) + offset;
+  int2 p00 = wrap ? uint2(intTc) & (uint2(w, h) - 1) : clamp(intTc, int2(0, 0), int2(w, h) - 1);
+  return tex[p00];
+}
+
+float2 get_dimensions(Texture2D tex)
+{
+  float2 dim;
+  tex.GetDimensions(dim.x, dim.y);
+  return dim;
+}
+
+float2 get_dimensions(Texture2D<float2> tex)
+{
+  float2 dim;
+  tex.GetDimensions(dim.x, dim.y);
+  return dim;
+}
+
+float2 wrappedVector(float2 tc0, float2 tc1, float2 dim)
+{
+  float2 tcTo = tc1-tc0;
+  tcTo = min(abs(tcTo-dim), min(abs(tcTo+dim), abs(tcTo)));
+  return tcTo;
+}
+float wrappedDistanceSq(float2 tc0, float2 tc1)
+{
+  return lengthSq(wrappedVector(tc0, tc1, float2(1,1)));
+}
+float wrappedDistanceSqi(float2 tc0, float2 tc1, float2 dim)
+{
+  return lengthSq(wrappedVector(tc0, tc1, dim));
+}
+ float2 encodeSDF(int2 tci, bool above, bool valid)
+ {
+   return float2(tci|int2(above?32768:0, valid?32768:0))/65535.0;
+ }
+ int2 decodeSDF(float2 tc, out bool above, out bool valid)
+ {
+   int2 tci = tc * 65535;
+   above = tci.x>=32768;
+   valid = tci.y>=32768;
+   return tci&0x7FFF;
+ }
+
+float3 safe_normalize(float3 v)
+{
+  v = normalize(v);
+  return isfinite(v) ? v : 0;
+}
+
+float3 getNormal(Texture2D tex, bool wrap, float2 tc, float cellSize) 
+{
+  float w,h;
+  tex.GetDimensions(w,h);
+  float hu = (get_texel(tex, tc, wrap, int2(-1,0)) - get_texel(tex, tc, wrap, int2(1,0))).r;
+  float hv = (get_texel(tex, tc, wrap, int2(0,-1)) - get_texel(tex, tc, wrap, int2(0,1))).r;
+  return safe_normalize(float3(hu*w, hv*h, cellSize));
+}
+
+float2 safe_normalize(float2 v)
+{
+  v = normalize(v);
+  return isfinite(v) ? v : 0;
+}
+
+float2 get2DGradient(Texture2D tex, bool wrap, float2 tc) 
+{
+  float w,h;
+  tex.GetDimensions(w,h);
+  float hu = (get_texel(tex, tc, wrap, int2(-1,0)) - get_texel(tex, tc, wrap, int2(1,0))).r;
+  float hv = (get_texel(tex, tc, wrap, int2(0,-1)) - get_texel(tex, tc, wrap, int2(0,1))).r;
+  return safe_normalize(float2(hu, hv));
+}
+
+float2 get2DGradient(Texture2D tex, bool wrap, float2 tc, uint comp) 
+{
+  // Central difference method
+  // |   | X |   |
+  // | X | O | X |
+  // |   | X |   |
+  float val_N = get_texel(tex, tc, wrap, int2( 0,-1))[comp];
+  float val_S = get_texel(tex, tc, wrap, int2( 0, 1))[comp];
+  float val_W = get_texel(tex, tc, wrap, int2(-1, 0))[comp];
+  float val_E = get_texel(tex, tc, wrap, int2( 1, 0))[comp];
+
+  // Lerp method
+  // | X |   | X |
+  // |   | O |   |
+  // | X |   | X |
+  float val_NW = get_texel(tex, tc, wrap, int2(-1,-1))[comp];
+  float val_SW = get_texel(tex, tc, wrap, int2(-1, 1))[comp];
+  float val_NE = get_texel(tex, tc, wrap, int2( 1,-1))[comp];
+  float val_SE = get_texel(tex, tc, wrap, int2( 1, 1))[comp];
+
+  // lerp alpha should probably account for diagonal distance
+  float du = (val_E-val_W)*sqrt(2) + (val_NE-val_NW + val_SE-val_SW);
+  float dv = (val_S-val_N)*sqrt(2) + (val_SW-val_NW + val_SE-val_NE);
+
+  return float2(du, dv);
+}
+
+float getEdgeDistance(float2 gradient, float coverage)
+{
+  // GUSTAVSON S., STRAND R. Anti-aliased Euclidean distance transform
+  // https://citeseerx.ist.psu.edu/document?repid=rep1&type=pdf&doi=f0569d200e748a0f8f37d2ad1597c1b0af11e128
+  // https://github.com/memononen/SDF/blob/master/src/sdf.h
+  // That shit is viable only when (gradient.y <= gradient.y) && (gradient.x > 0) && (gradient.y > 0)
+
+  float df;
+  
+  if( (gradient.x == 0) || (gradient.y == 0) ) {
+    df = 0.5 - coverage;
+  } else {
+    float2 grad2 = abs(gradient);
+    if( grad2.x < grad2.y )
+      grad2 = grad2.yx;
+
+    float a1 = 0.5 * grad2.y / grad2.x; // They have bug in formula
+    
+    if( coverage < a1 )
+      df = 0.5*(grad2.x + grad2.y) - sqrt(2.0*grad2.x*grad2.y*coverage);
+    else if(coverage < (1.0 - a1) )
+      df = (0.5 - coverage) * grad2.x;
+    else
+      df = -0.5*(grad2.x + grad2.y) + sqrt(2.0*grad2.x*grad2.y*(1.0-coverage));
+  }
+
+  return df;
+}
+
+float getCurvature(Texture2D tex, bool wrap, float2 tc, float curvScale) //curvScale = 1/gridCellSize
+{
+  #define FC 4
+  #define FSZ (FC*2+1)
+  float curvWt[FSZ][FSZ];
+  float wtSum = 0, kSum = 0;
+  int fx, fy;
+
+
+  [unroll]
+  for ( fy= -FC; fy <= FC; ++fy)
+  {
+    [unroll]
+    for (fx= -FC; fx <= FC; ++fx)
+    {
+      if (fx==0 && fy==0) continue;
+
+      int dx=fx;
+      int dy=fy;
+      float d=sqrt(float(dx*dx+dy*dy));
+
+      float k=max(0, (FC+1-d)/(FC+1));
+
+      k=(3-2*k)*k*k;
+
+      curvWt[fy + FC][fx + FC] = k / d;
+      wtSum += k / d;
+      kSum+=k;
+    }
+  }
+
+  curvWt[FC][FC] = -wtSum;
+
+  [unroll]
+  for (fy=0; fy<FSZ; ++fy)
+  {
+    [unroll]
+    for (fx=0; fx<FSZ; ++fx)
+      curvWt[fy][fx] /= kSum;
+  }
+
+  float curv=0;
+  [unroll]
+  for (fy= -FC; fy <= FC; ++fy)
+  {
+    [unroll]
+    for (fx = -FC; fx <= FC; ++fx)
+    {
+      curv += curvWt[fy + FC][fx + FC] * get_texel(tex, tc, wrap, int2(fx, fy)).r;
+    }
+  }
+
+  float w, h;
+  tex.GetDimensions(w, h);
+  return curv * (w * curvScale);
+}
+
+
+float calc_polynom4(in float4 a, float t) // t = [0..1]
+{
+  float t2 = t * t;
+  return saturate(a[0] + a[1] * t + a[2] * t2 + a[3] * t * t2);
+}
+
+
+uint wang_hash(uint seed)
+{
+  seed = (seed ^ 61) ^ (seed >> 16);
+  seed *= 9;
+  seed = seed ^ (seed >> 4);
+  seed *= 0x27d4eb2d;
+  seed = seed ^ (seed >> 15);
+  return seed;
+}
+
+uint uint_noise1D(uint position, uint seed)
+{
+  uint BIT_NOISE1 = 0x68E31DA4;
+  uint BIT_NOISE2 = 0xB5297A4D;
+  uint BIT_NOISE3 = 0x1B56C4E9;
+  uint mangled = position;
+  mangled *= BIT_NOISE1;
+  mangled += seed;
+  mangled ^= (mangled>>8);
+  mangled += BIT_NOISE2;
+  mangled ^= (mangled<<8);
+  mangled *= BIT_NOISE3;
+  mangled ^= (mangled>>8);
+  return mangled;
+}
+uint uint_noise2D(int posX, int posY, uint seed)
+{
+  int PRIME_NUMBER = 198491317;
+  return uint_noise1D(posX + (PRIME_NUMBER*posY), seed);
+}
+
+uint uint_noise3D(int posX, int posY, int posZ, uint seed)
+{
+  int PRIME_NUMBER1 = 198491317;
+  int PRIME_NUMBER2 = 6542989;
+  return uint_noise1D(posX + (PRIME_NUMBER1*posY) + (PRIME_NUMBER2*posZ), seed);
+}
+
+uint2 scramble_TEA(uint2 v)
+{
+  uint k[4] ={ 0xA341316Cu , 0xC8013EA4u , 0xAD90777Du , 0x7E95761Eu };
+
+  uint y = v[0];
+  uint z = v[1];
+  uint sum = 0;
+
+  #define TEA_ITERATIONS 4
+  [unroll]
+  for(uint i = 0; i < TEA_ITERATIONS; ++i)
+  {
+    sum += 0x9e3779b9;
+    y += (z << 4u) + k[0] ^ z + sum ^ (z >> 5u) + k[1];
+    z += (y << 4u) + k[2] ^ y + sum ^ (y >> 5u) + k[3];
+  }
+
+  return uint2(y, z);
+}
+uint reverse_bits16( uint bits )
+{
+  bits = ( (bits & 0x33333333) << 2 ) | ( (bits & 0xcccccccc) >> 2 );
+  bits = ( (bits & 0x55555555) << 1 ) | ( (bits & 0xaaaaaaaa) >> 1 );
+  return bits;
+}
+
+float2 rand2(float2 co)
+{
+  return frac(sin(co.xy*12.9898) * 43758.5453);
+}
+float rand2d(float2 co)
+{
+  return frac(sin(co.x*12.9898 - co.y * 43.44431) * 43758.5453);
+}
+float2 rand2d2(float2 co)
+{
+  return float2( frac(sin(co.x*12.9898 - co.y * 43.44431) * 43.758 + 15.9436), 
+                 frac(cos(co.y*14.3911 + co.x * 26.45734) * 67.255 - 25.1688) );
+}
+float rand(float co)
+{
+  return frac(sin(co*12.9898) * 43758.5453);
+}
+uint rand_seed(float2 texcoord)
+{
+  float2 seed = rand2(texcoord);
+  return uint(seed.x * 7829 + seed.y * 113);
+}
+uint rand_lcg(inout uint g_rng_state)
+{
+  // LCG values from Numerical Recipes
+  g_rng_state = 1664525U * g_rng_state + 1013904223U;
+  return g_rng_state;
+}
+
+float rand_lcg_float(inout uint g_rng_state)
+{
+  uint ret = rand_lcg(g_rng_state);
+  //return float(ret) * (1.0 / 4294967296.0);
+  return frac(float(ret) * (1.0 / 262144.0));
+}
+
+float distance_metric(float3 x, int metric)
+{
+    if(metric == 1)
+    {
+        // Manhattan
+        return abs(x.x) + abs(x.y) + abs(x.z);
+    }
+    else if(metric == 2)
+    {
+        // Chebyshev
+        float3 x2 = abs(x);
+        return max(x2.x, max(x2.y, x2.z));
+    }
+    // Euclid
+    return dot(x,x);
+}
+
+float4 voronoi(float2 x, float randomness)
+{
+  // https://www.shadertoy.com/view/ldl3W8
+
+  float2 n = floor(x);
+  float2 f = frac(x);
+
+  float2 mg, mr;
+  float2 index = float2(0.0, 0.0);
+
+  float md = 8.0;
+
+  //----------------------------------
+  // first pass: regular voronoi
+  //----------------------------------
+  {
+  for (int j = -1; j <= 1; j++)
+  {
+      for (int i = -1; i <= 1; i++)
+      {
+          float2 g = float2(float(i), float(j));
+          float2 o = rand2d(n + g) * randomness;
+          float2 r = g + o - f;
+          float d = dot(r, r);
+
+          if (d < md)
+          {
+              md = d;
+              mr = r;
+              mg = g;
+              index = float2((float(i) + n.x) * 9.5, (float(j) + n.y) * 3.5);
+          }
+      }
+  }
+  }
+
+  //----------------------------------
+  // second pass: distance to borders
+  //----------------------------------
+  {
+  md = 8.0;
+  for (int j = -2; j <= 2; j++)
+  {
+      for (int i = -2; i <= 2; i++)
+      {
+          float2 g = mg + float2(float(i), float(j));
+          float2 o = rand2d(n + g) * randomness;
+          float2 r = g + o - f;
+
+          if( dot(mr - r, mr - r) > 0.00001 )
+          {
+              md = min(md, dot(0.5 * (mr + r), normalize(r - mr)));
+          }
+      }
+  }
+  }
+
+  return float4(md, mr.x, mr.y, rand2d(index));
+}
+
+float voronoi_metric( float2 x, float randomness, bool output_only_F1, int metric)
+{
+    float2 p = floor( x );
+    float2 f = frac( x );
+
+    float2 res = 8;
+    for( int j =-1; j <= 1; j++ )
+    {
+        for( int i = -1; i <= 1; i++ )
+        {
+            float2 b = float2( float(i), float(j) );
+            float2 o = rand2d2(p + b) * randomness;
+            float2 r = b + o - f;
+            float d = distance_metric( float3(r,0), metric );
+            
+            if( d < res.x )
+            {
+                res.y = res.x;
+                res.x = d;
+            }
+            else if( d < res.y )
+            {
+                res.y = d;
+            }
+        }
+    }
+   
+    if(output_only_F1)
+        return res.x;
+
+    return res.y-res.x;
+}
+
+// Not very usable because voronoi discontinuity and bad derivatuves
+float4 voronoi_metric_deriv( float2 x, float randomness, bool output_only_F1, int metric, float2 invSize)
+{
+    float d = voronoi_metric(x, randomness, output_only_F1, metric);
+    
+    float heightNW = voronoi_metric(x + invSize*float2(-0.5,-0.5), randomness, output_only_F1, metric);
+    float heightNE = voronoi_metric(x + invSize*float2( 0.5,-0.5), randomness, output_only_F1, metric);
+    float heightSW = voronoi_metric(x + invSize*float2(-0.5, 0.5), randomness, output_only_F1, metric);
+    float heightSE = voronoi_metric(x + invSize*float2( 0.5, 0.5), randomness, output_only_F1, metric);
+    float gradientX = lerp( heightNE - heightNW, heightSE - heightSW, 0.5 ) /invSize.x;
+    float gradientY = lerp( heightSW - heightNW, heightSE - heightNE, 0.5 ) /invSize.y;
+    
+    //float heightN = voronoi_metric(x + invSize*float2( 0,-0.5), randomness, output_only_F1, metric);
+    //float heightW = voronoi_metric(x + invSize*float2(-0.5, 0), randomness, output_only_F1, metric);
+    //float heightS = voronoi_metric(x + invSize*float2( 0, 0.5), randomness, output_only_F1, metric);
+    //float heightE = voronoi_metric(x + invSize*float2( 0.5, 0), randomness, output_only_F1, metric);
+    //float gradientX = (heightE - heightW) *0.5 /invSize.x;
+    //float gradientY = (heightS - heightN) *0.5 /invSize.y;
+    /*
+    float gradientX_N = (heightNE - heightNW) *0.5 /invSize.x;
+    float gradientX_C = (heightE  - heightW ) *0.5 /invSize.x;
+    float gradientX_S = (heightSE - heightSW) *0.5 /invSize.x;
+    float gradientY_W = (heightSW - heightNW) *0.5 /invSize.y;
+    float gradientY_C = (heightS  - heightN ) *0.5 /invSize.y;
+    float gradientY_E = (heightSE - heightNE) *0.5 /invSize.y;
+    float gradientX = (gradientX_N + 2.0*gradientX_C + gradientX_S) / 4.0;
+    float gradientY = (gradientY_W + 2.0*gradientY_C + gradientY_E) / 4.0;
+    */
+    return float4(d, gradientX, gradientY, 1);    
+}
+
+float noise_Perlin2D( float2 P )
+{
+    //  https://github.com/BrianSharpe/Wombat/blob/master/Perlin2D.glsl
+
+    // establish our grid cell and unit position
+    float2 Pi = floor(P);
+    float4 Pf_Pfmin1 = P.xyxy - float4( Pi, Pi + 1.0 );
+
+    // calculate the hash
+    float4 Pt = float4( Pi.xy, Pi.xy + 1.0 );
+    Pt = Pt - floor(Pt * ( 1.0 / 71.0 )) * 71.0;
+    Pt += float2( 26.0, 161.0 ).xyxy;
+    Pt *= Pt;
+    Pt = Pt.xzxz * Pt.yyww;
+    float4 hash_x = frac( Pt * ( 1.0 / 951.135664 ) );
+    float4 hash_y = frac( Pt * ( 1.0 / 642.949883 ) );
+
+    // calculate the gradient results
+    float4 grad_x = hash_x - 0.49999;
+    float4 grad_y = hash_y - 0.49999;
+    float4 grad_results = rsqrt( grad_x * grad_x + grad_y * grad_y ) * ( grad_x * Pf_Pfmin1.xzxz + grad_y * Pf_Pfmin1.yyww );
+
+    // Classic Perlin Interpolation
+    grad_results *= 1.4142135623730950488016887242097;  // scale things to a strict -1.0->1.0 range  *= 1.0/sqrt(0.5)
+    float2 blend = Pf_Pfmin1.xy * Pf_Pfmin1.xy * Pf_Pfmin1.xy * (Pf_Pfmin1.xy * (Pf_Pfmin1.xy * 6.0 - 15.0) + 10.0);
+    float4 blend2 = float4( blend, float2( 1.0 - blend ) );
+    return dot( grad_results, blend2.zxzx * blend2.wwyy );
+}
+
+float3 noise_Perlin2D_Deriv( float2 P )
+{
+  //  https://github.com/BrianSharpe/Wombat/blob/master/Perlin2D_Deriv.glsl
+
+  // establish our grid cell and unit position
+  float2 Pi = floor(P);
+  float4 Pf_Pfmin1 = P.xyxy - float4( Pi, Pi + 1.0 );
+
+  // calculate the hash
+  float4 Pt = float4( Pi.xy, Pi.xy + 1.0 );
+  Pt = Pt - floor(Pt * ( 1.0 / 71.0 )) * 71.0;
+  Pt += float2( 26.0, 161.0 ).xyxy;
+  Pt *= Pt;
+  Pt = Pt.xzxz * Pt.yyww;
+  float4 hash_x = frac( Pt * ( 1.0 / 951.135664 ) );
+  float4 hash_y = frac( Pt * ( 1.0 / 642.949883 ) );
+
+  // calculate the gradient results
+  float4 grad_x = hash_x - 0.49999;
+  float4 grad_y = hash_y - 0.49999;
+  float4 norm = rsqrt( grad_x * grad_x + grad_y * grad_y );
+  grad_x *= norm;
+  grad_y *= norm;
+  float4 dotval = ( grad_x * Pf_Pfmin1.xzxz + grad_y * Pf_Pfmin1.yyww );
+
+  // C2 Interpolation
+  float4 blend = Pf_Pfmin1.xyxy * Pf_Pfmin1.xyxy * ( Pf_Pfmin1.xyxy * ( Pf_Pfmin1.xyxy * ( Pf_Pfmin1.xyxy * float2( 6.0, 0.0 ).xxyy + float2( -15.0, 30.0 ).xxyy ) + float2( 10.0, -60.0 ).xxyy ) + float2( 0.0, 30.0 ).xxyy );
+
+  // Convert our data to a more parallel format
+  float3 dotval0_grad0 = float3( dotval.x, grad_x.x, grad_y.x );
+  float3 dotval1_grad1 = float3( dotval.y, grad_x.y, grad_y.y );
+  float3 dotval2_grad2 = float3( dotval.z, grad_x.z, grad_y.z );
+  float3 dotval3_grad3 = float3( dotval.w, grad_x.w, grad_y.w );
+
+  // evaluate common constants
+  float3 k0_gk0 = dotval1_grad1 - dotval0_grad0;
+  float3 k1_gk1 = dotval2_grad2 - dotval0_grad0;
+  float3 k2_gk2 = dotval3_grad3 - dotval2_grad2 - k0_gk0;
+
+  // calculate final noise + deriv
+  float3 results = dotval0_grad0
+                  + blend.x * k0_gk0
+                  + blend.y * ( k1_gk1 + blend.x * k2_gk2 );
+  results.yz += blend.zw * ( float2( k0_gk0.x, k1_gk1.x ) + blend.yx * k2_gk2.xx );
+
+  return results * 1.4142135623730950488016887242097;  // scale things to a strict -1.0->1.0 range  *= 1.0/sqrt(0.5)
+}
+
+float4 noise_Perlin3D_Deriv( float3 P )
+{
+  //  https://github.com/BrianSharpe/Wombat/blob/master/Perlin3D_Deriv.glsl
+
+  // establish our grid cell and unit position
+  float3 Pi = floor(P);
+  float3 Pf = P - Pi;
+  float3 Pf_min1 = Pf - 1.0;
+
+  // clamp the domain
+  Pi.xyz = Pi.xyz - floor(Pi.xyz * ( 1.0 / 69.0 )) * 69.0;
+  float3 Pi_inc1 = float3( Pi.x <= ( 69.0 - 1.5 ),
+                           Pi.y <= ( 69.0 - 1.5 ), 
+                           Pi.z <= ( 69.0 - 1.5 ) ) * ( Pi + 1.0 );
+
+  // calculate the hash
+  float4 Pt = float4( Pi.xy, Pi_inc1.xy ) + float2( 50.0, 161.0 ).xyxy;
+  Pt *= Pt;
+  Pt = Pt.xzxz * Pt.yyww;
+  const float3 SOMELARGEFLOATS = float3( 635.298681, 682.357502, 668.926525 );
+  const float3 ZINC = float3( 48.500388, 65.294118, 63.934599 );
+  float3 lowz_mod = float3( 1.0 / ( SOMELARGEFLOATS + Pi.zzz * ZINC ) );
+  float3 highz_mod = float3( 1.0 / ( SOMELARGEFLOATS + Pi_inc1.zzz * ZINC ) );
+  float4 hashx0 = frac( Pt * lowz_mod.xxxx );
+  float4 hashx1 = frac( Pt * highz_mod.xxxx );
+  float4 hashy0 = frac( Pt * lowz_mod.yyyy );
+  float4 hashy1 = frac( Pt * highz_mod.yyyy );
+  float4 hashz0 = frac( Pt * lowz_mod.zzzz );
+  float4 hashz1 = frac( Pt * highz_mod.zzzz );
+
+  //	calculate the gradients
+  float4 grad_x0 = hashx0 - 0.49999;
+  float4 grad_y0 = hashy0 - 0.49999;
+  float4 grad_z0 = hashz0 - 0.49999;
+  float4 grad_x1 = hashx1 - 0.49999;
+  float4 grad_y1 = hashy1 - 0.49999;
+  float4 grad_z1 = hashz1 - 0.49999;
+  float4 norm_0 = rsqrt( grad_x0 * grad_x0 + grad_y0 * grad_y0 + grad_z0 * grad_z0 );
+  float4 norm_1 = rsqrt( grad_x1 * grad_x1 + grad_y1 * grad_y1 + grad_z1 * grad_z1 );
+  grad_x0 *= norm_0;
+  grad_y0 *= norm_0;
+  grad_z0 *= norm_0;
+  grad_x1 *= norm_1;
+  grad_y1 *= norm_1;
+  grad_z1 *= norm_1;
+
+  //	calculate the dot products
+  float4 dotval_0 = float2( Pf.x, Pf_min1.x ).xyxy * grad_x0 + float2( Pf.y, Pf_min1.y ).xxyy * grad_y0 + Pf.zzzz * grad_z0;
+  float4 dotval_1 = float2( Pf.x, Pf_min1.x ).xyxy * grad_x1 + float2( Pf.y, Pf_min1.y ).xxyy * grad_y1 + Pf_min1.zzzz * grad_z1;
+
+  //	C2 Interpolation
+  float3 blend = Pf * Pf * Pf * (Pf * (Pf * 6.0 - 15.0) + 10.0);
+  float3 blendDeriv = Pf * Pf * (Pf * (Pf * 30.0 - 60.0) + 30.0);
+
+  //  the following is based off Milo Yips derivation, but modified for parallel execution
+  //  http://stackoverflow.com/a/14141774
+
+  //	Convert our data to a more parallel format
+  float4 dotval0_grad0 = float4( dotval_0.x, grad_x0.x, grad_y0.x, grad_z0.x );
+  float4 dotval1_grad1 = float4( dotval_0.y, grad_x0.y, grad_y0.y, grad_z0.y );
+  float4 dotval2_grad2 = float4( dotval_0.z, grad_x0.z, grad_y0.z, grad_z0.z );
+  float4 dotval3_grad3 = float4( dotval_0.w, grad_x0.w, grad_y0.w, grad_z0.w );
+  float4 dotval4_grad4 = float4( dotval_1.x, grad_x1.x, grad_y1.x, grad_z1.x );
+  float4 dotval5_grad5 = float4( dotval_1.y, grad_x1.y, grad_y1.y, grad_z1.y );
+  float4 dotval6_grad6 = float4( dotval_1.z, grad_x1.z, grad_y1.z, grad_z1.z );
+  float4 dotval7_grad7 = float4( dotval_1.w, grad_x1.w, grad_y1.w, grad_z1.w );
+
+  //	evaluate common constants
+  float4 k0_gk0 = dotval1_grad1 - dotval0_grad0;
+  float4 k1_gk1 = dotval2_grad2 - dotval0_grad0;
+  float4 k2_gk2 = dotval4_grad4 - dotval0_grad0;
+  float4 k3_gk3 = dotval3_grad3 - dotval2_grad2 - k0_gk0;
+  float4 k4_gk4 = dotval5_grad5 - dotval4_grad4 - k0_gk0;
+  float4 k5_gk5 = dotval6_grad6 - dotval4_grad4 - k1_gk1;
+  float4 k6_gk6 = (dotval7_grad7 - dotval6_grad6) - (dotval5_grad5 - dotval4_grad4) - k3_gk3;
+
+  //	calculate final noise + deriv
+  float u = blend.x;
+  float v = blend.y;
+  float w = blend.z;
+  float4 result = dotval0_grad0
+      + u * ( k0_gk0 + v * k3_gk3 )
+      + v * ( k1_gk1 + w * k5_gk5 )
+      + w * ( k2_gk2 + u * ( k4_gk4 + v * k6_gk6 ) );
+  result.y += dot( float4( k0_gk0.x, k3_gk3.x * v, float2( k4_gk4.x, k6_gk6.x * v ) * w ), (float4)( blendDeriv.x ) );
+  result.z += dot( float4( k1_gk1.x, k3_gk3.x * u, float2( k5_gk5.x, k6_gk6.x * u ) * w ), (float4)( blendDeriv.y ) );
+  result.w += dot( float4( k2_gk2.x, k4_gk4.x * u, float2( k5_gk5.x, k6_gk6.x * u ) * v ), (float4)( blendDeriv.z ) );
+  return result * 1.1547005383792515290182975610039;  // scale things to a strict -1.0->1.0 range  *= 1.0/sqrt(0.75)
+}
+
+float noise_Value2D( float2 P )
+ {
+   //  https://github.com/BrianSharpe/Wombat/blob/master/Value2D.glsl
+
+   // establish our grid cell and unit position
+   float2 Pi = floor(P);
+   float2 Pf = P - Pi;
+
+   // calculate the hash.
+   float4 Pt = float4( Pi.xy, Pi.xy + 1.0 );
+   Pt = Pt - floor(Pt * ( 1.0 / 71.0 )) * 71.0;
+   Pt += float2( 26.0, 161.0 ).xyxy;
+   Pt *= Pt;
+   Pt = Pt.xzxz * Pt.yyww;
+   float4 hash = frac( Pt * ( 1.0 / 951.135664 ) );
+
+   // blend the results and return
+   float2 blend = Pf * Pf * Pf * (Pf * (Pf * 6.0 - 15.0) + 10.0);
+   float4 blend2 = float4( blend, float2( 1.0 - blend ) );
+   return dot( hash, blend2.zxzx * blend2.wwyy );
+ }
+
+float noise_Perlin2D_tile( float2 P, float2 offs, float tile )
+{
+    P.x %= tile;
+    P.y %= tile;
+    float2 Pi = floor(P);
+    float4 Pf_Pfmin1 = P.xyxy - float4( Pi, Pi + 1.0 );
+    float4 Pt = float4( Pi.xy, Pi.xy + 1.0 );
+    Pt.z %= tile;
+    Pt.w %= tile;
+    Pt += float4(offs, offs);
+    Pt = Pt - floor(Pt * ( 1.0 / 71.0 )) * 71.0;
+    Pt += float2( 26.0, 161.0 ).xyxy;
+    Pt *= Pt;
+    Pt = Pt.xzxz * Pt.yyww;
+    float4 hash_x = frac( Pt * ( 1.0 / 951.135664 ) );
+    float4 hash_y = frac( Pt * ( 1.0 / 642.949883 ) );
+    float4 grad_x = hash_x - 0.49999;
+    float4 grad_y = hash_y - 0.49999;
+    float4 grad_results = rsqrt( grad_x * grad_x + grad_y * grad_y ) * ( grad_x * Pf_Pfmin1.xzxz + grad_y * Pf_Pfmin1.yyww );
+    grad_results *= 1.4142135623730950488016887242097;  // scale things to a strict -1.0->1.0 range  *= 1.0/sqrt(0.5)
+    float2 blend = Pf_Pfmin1.xy * Pf_Pfmin1.xy * Pf_Pfmin1.xy * (Pf_Pfmin1.xy * (Pf_Pfmin1.xy * 6.0 - 15.0) + 10.0);
+    float4 blend2 = float4( blend, float2( 1.0 - blend ) );
+    return dot( grad_results, blend2.zxzx * blend2.wwyy );
+}
+
+
+#ifndef VOID_OUTPUT
+#ifndef MRTOutput_DEFINED
+  struct MRTOutput
+  {
+    float4 col0:SV_Target0;
+  };
+#endif
+#else
+  #define MRTOutput void
+#endif
+#ifdef ParticlesOutput_DEFINE
+  RWStructuredBuffer<ParticleInstance> instances : register( ParticlesOutput_DEFINE );
+  RWStructuredBuffer<uint> instancesCounter : register( ParticlesOutputCounter_DEFINE );
+  void wrap_particle_x(ParticleInstance particle)
+  {
+    ParticleInstance particle2 = particle;
+    [branch]
+    if (particle.pos.x - particle.scale.x < 0 )
+    {
+      particle2.pos.x = particle.pos.x+1;
+      uint instIdx;
+      InterlockedAdd(instancesCounter[1], 1, instIdx);
+      instances[instIdx] = particle2;
+    }
+    [branch]
+    if (particle.pos.x + particle.scale.x > 1 )
+    {
+      particle2.pos.x = particle.pos.x-1;
+      uint instIdx;
+      InterlockedAdd(instancesCounter[1], 1, instIdx);
+      instances[instIdx] = particle2;
+    }
+  }
+  void wrap_particle_y(ParticleInstance particle)
+  {
+    ParticleInstance particle2 = particle;
+    [branch]
+    if (particle.pos.y - particle.scale.y < 0 )
+    {
+      particle2.pos.y = particle.pos.y+1;
+      uint instIdx;
+      InterlockedAdd(instancesCounter[1], 1, instIdx);
+      instances[instIdx] = particle2;
+      wrap_particle_x(particle2);
+    }
+    [branch]
+    if (particle.pos.y + particle.scale.y > 1 )
+    {
+      particle2.pos.y = particle.pos.y-1;
+      uint instIdx;
+      InterlockedAdd(instancesCounter[1], 1, instIdx);
+      instances[instIdx] = particle2;
+      wrap_particle_x(particle2);
+    }
+    wrap_particle_x(particle);
+  }
+  void wrap_particle(ParticleInstance particle)
+  {
+    #if WRAP
+    wrap_particle_y(particle);
+    #endif
+  }
+#endif
+struct VsOutput
+{
+  float4 pos:SV_POSITION;
+  float3 tc:TEXCOORD0;
+  // [[particle_fields_with_semantics]]
+};
+struct VsOutputCopy
+{
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+};
+
+//[[structures_decl]]
+
+//[[shader_function]]
+
+MRTOutput main_ps(VsOutput input_, float4 pos:SV_Position) {
+  VsOutputCopy input;
+  input.pos = input_.pos;
+  input.tc = input_.tc;
+//  [[particle_fields_ps_copy]]
+
+#ifndef VOID_OUTPUT
+  MRTOutput result;
+#endif
+"""
+postmain:t=""";
+#ifndef VOID_OUTPUT
+return result;
+#endif
+}"""

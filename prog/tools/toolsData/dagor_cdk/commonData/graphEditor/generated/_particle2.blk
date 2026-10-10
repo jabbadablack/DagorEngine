@@ -1,0 +1,114 @@
+
+particle2 {
+  params {
+    _scale_20861:p2 = 1.0, 1.0
+    _brightness_50764:r = 1.0
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float2 _scale_20861;
+      float _brightness_50764;
+    };
+    #define ParticlesOutput_DEFINE u7
+    #define ParticlesOutputCounter_DEFINE u6
+    #define VOID_OUTPUT
+    #define WRAP 1
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_particle2 _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._scale_20861 = _scale_20861; // float2(1.0, 1.0)
+  _in._brightness_50764 = _brightness_50764; // 1.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_particle2 _out;
+  _out._y_46556 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out._y_46556_6 = 0.0;
+  _out._z_46559_6 = 0.0;
+
+  _function_particle2(_in, _out);
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  """
+    shader_function:t="""
+
+
+  void _function_particle2(InputStruct_particle2 _in, out OutputStruct_particle2 _out) {
+
+  float2 _v_1_0 = _in.tc;
+  float _v_5_0 = 0.1;
+  float _v_6_1 = float4(_v_1_0, 0.0, 0.0).x;
+  _out._y_46556_6 = float4(_v_1_0, 0.0, 0.0).y;
+  _out._z_46559_6 = float4(_v_1_0, 0.0, 0.0).z;
+  float _v_6_4 = float4(_v_1_0, 0.0, 0.0).w;
+  float _v_7_1 = _v_6_1 * (5235.0);
+  float _v_9_1 = sin(_v_7_1);
+  float _v_11_1 = _v_9_1 * (53235.0);
+  float _v_13_1 = _v_9_1 * (532435.0);
+  float _v_14_0 = 0.0;
+  float _v_10_1 = frac(_v_11_1);
+  float _v_12_1 = frac(_v_13_1);
+  float4 _v_8_4 = float4(_v_10_1, _v_6_1, _v_6_4, _v_6_4);
+  float4 _v_2_2 = linear_sample(_in.sampler0_t, _v_8_4.xy, _in.sampler0_wrap);
+  float _v_3_1 = _v_2_2.x;
+  _out._y_46556 = _v_2_2.y;
+  _out._z_46559 = _v_2_2.z;
+  _out._w_46546 = _v_2_2.w;
+  float _v_4_2 = (_v_3_1 - _v_5_0);
+  {
+    ParticleInstance tmp_particle; tmp_particle.reserved0 = 0; tmp_particle.reserved1 = 0;;
+    tmp_particle.pos = _v_8_4.xy;
+    tmp_particle.scale = _in._scale_20861;
+    tmp_particle.angle = _v_12_1;
+    tmp_particle.brightness = _in._brightness_50764;
+    tmp_particle.depth = _v_6_1;
+;
+    tmp_particle.entityWorldPos = float3(_v_14_0, _v_14_0, _v_14_0);
+    tmp_particle.entityForward = float3(_v_14_0, _v_14_0, _v_14_0);
+    tmp_particle.entityUp = float3(_v_14_0, _v_14_0, _v_14_0);
+    tmp_particle.entityNameIndex = int(_v_14_0);
+    tmp_particle.entityPlaceType = int(_v_14_0);
+    tmp_particle.entitySeed = int(_v_14_0);
+    tmp_particle.entityScale = float3(_v_14_0, _v_14_0, _v_14_0);
+    [branch]
+    if (_v_4_2 > 0.0) { uint instIdx; InterlockedAdd(instancesCounter[1], 1, instIdx);instances[instIdx] = tmp_particle; wrap_particle(tmp_particle); }
+  };
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_particle2 {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float2 _scale_20861;
+  float _brightness_50764;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_particle2 {
+  float _y_46556;
+  float _z_46559;
+  float _w_46546;
+  float _y_46556_6;
+  float _z_46559_6;
+};
+"""
+  }
+}

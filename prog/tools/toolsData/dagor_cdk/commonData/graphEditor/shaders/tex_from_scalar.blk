@@ -1,0 +1,95 @@
+templateUid:t = "7e42c5b6-5dc3-41b9-868e-e74fd8d3e3b0"
+
+node {
+  id:i = 0
+  x:r = 294.4969199178645
+  y:r = 328.0164271047228
+  templateUid:t = "e9c40e8f-d682-4021-b803-6701341256af"
+  descName:t = "result"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "val"
+  }
+  pin {
+    name:t = "color"
+    role:t = "in"
+    types:t = "float4"
+    data {
+      def_val:t = "float4(0.5, 0.5, 0.5, 0.5)"
+      def_val_blk:t = "0.5, 0.5, 0.5, 0.5"
+      code:t = "_out.col0 = $color$"
+    }
+  }
+  pin {
+    name:t = "out"
+    role:t = "out"
+    types:t = "texture2D"
+  }
+}
+node {
+  id:i = 1
+  x:r = 77.92197125256672
+  y:r = 311.19507186858317
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = "externVal"
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    customVarName:t = "_externVal_51950"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "0.333"
+  }
+  property {
+    name:t = "external name"
+    val:t = "externVal"
+  }
+}
+edge {
+  id:i = 0
+  elemA:i = 1
+  pinA:i = 0
+  elemB:i = 0
+  pinB:i = 0
+}
+
+description {
+  name:t = "[[description-name]]"
+  category:t = "[[description-category]]"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  allowLoop:b = no
+  width:i = 200
+  pin {
+    name:t = "out"
+    types:t = "texture2D"
+    role:t = "out"
+    singleConnect:b = no
+    subgraphElem:i = 0
+    subgraphPin:i = 1
+  }
+  pin {
+    name:t = "externVal"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    data {
+      blk_code:t = "%externVal%"
+      code:t = "%externVal%"
+    }
+  }
+  property {
+    name:t = "externVal"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.333
+  }
+}

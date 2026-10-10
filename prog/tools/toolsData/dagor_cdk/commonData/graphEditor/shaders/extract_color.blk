@@ -1,0 +1,987 @@
+templateUid:t = "89f6e6bb-2be8-4c78-994c-67d90844a42b"
+
+node {
+  id:i = 0
+  x:r = 2471.2718570318852
+  y:r = 261.0584136715204
+  templateUid:t = "e9c40e8f-d682-4021-b803-6701341256af"
+  descName:t = "result"
+  pin {
+    name:t = "color"
+    role:t = "in"
+    types:t = "float4"
+    data {
+      def_val:t = "float4(0.5, 0.5, 0.5, 0.5)"
+      def_val_blk:t = "0.5, 0.5, 0.5, 0.5"
+      code:t = "_out.col0 = $color$"
+    }
+  }
+  pin {
+    name:t = "out"
+    role:t = "out"
+    types:t = "texture2D"
+  }
+}
+node {
+  id:i = 1
+  x:r = -103.13945945945936
+  y:r = 167.16108108108105
+  descName:t = "texValue"
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler0"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 2
+  x:r = -106.68424775652832
+  y:r = 257.501391918234
+  templateUid:t = "b46631c8-db5f-485f-af5c-312f4a2fe10b"
+  descName:t = "const float4"
+  externalName:t = "color"
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float4"
+    customVarName:t = "_color_1752"
+    data {
+      code:t = "float4(%x%, %y%, %z%, %w%)"
+      blk_code:t = "%x%, %y%, %z%, %w%"
+    }
+  }
+  property {
+    name:t = "x"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "y"
+    val:t = "0.0"
+  }
+  property {
+    name:t = "z"
+    val:t = "0.0"
+  }
+  property {
+    name:t = "w"
+    val:t = "0.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = "color"
+  }
+}
+node {
+  id:i = 3
+  x:r = -107.1999999999999
+  y:r = 427.68
+  templateUid:t = "b46631c8-db5f-485f-af5c-312f4a2fe10b"
+  descName:t = "const float4"
+  externalName:t = "channels mask"
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float4"
+    customVarName:t = "_channels_mask_4481"
+    data {
+      code:t = "float4(%x%, %y%, %z%, %w%)"
+      blk_code:t = "%x%, %y%, %z%, %w%"
+    }
+  }
+  property {
+    name:t = "x"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "y"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "z"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "w"
+    val:t = "0.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = "channels mask"
+  }
+}
+node {
+  id:i = 4
+  x:r = 189.09912579245918
+  y:r = 348.9321798991974
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 5
+  x:r = 523.0769837362893
+  y:r = 263.79079852200994
+  descName:t = "length"
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "length($A$)"
+    }
+  }
+}
+node {
+  id:i = 6
+  x:r = 198.21933371968464
+  y:r = 198.36427866462952
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 7
+  x:r = 366.0503430605259
+  y:r = 262.460064278995
+  templateUid:t = "3f889697-686d-4d9a-b808-2ea09947acc3"
+  descName:t = "-"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A-B"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "($A$ - $B$)"
+    }
+  }
+}
+node {
+  id:i = 8
+  x:r = 673.5553396881572
+  y:r = -166.94555025011553
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 9
+  x:r = 894.351837537459
+  y:r = 249.15272184884554
+  templateUid:t = "3f889697-686d-4d9a-b808-2ea09947acc3"
+  descName:t = "-"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A-B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ - $B$)"
+    }
+  }
+}
+node {
+  id:i = 10
+  x:r = -107.56756756756756
+  y:r = 597.7945945945945
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = "sensitivity"
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    customVarName:t = "_sensitivity_16840"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = "sensitivity"
+  }
+}
+node {
+  id:i = 11
+  x:r = 682.8472369871579
+  y:r = 266.4522670080398
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 12
+  x:r = -107.16905851700753
+  y:r = 693.8371409623363
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = "threshold"
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    customVarName:t = "_threshold_12274"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "0.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = "threshold"
+  }
+}
+node {
+  id:i = 13
+  x:r = 1855.4541085327335
+  y:r = 315.212998282958
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 14
+  x:r = 2269.515283021678
+  y:r = 261.0246723817509
+  templateUid:t = "0478f23c-1301-4fbc-9c20-0ed74be734bf"
+  descName:t = "saturate"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "saturate($A$)"
+    }
+  }
+}
+node {
+  id:i = 15
+  x:r = 1048.5498820002845
+  y:r = 717.345836913656
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 16
+  x:r = 825.2193721719418
+  y:r = 799.4899259886527
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "0.001"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 17
+  x:r = 1186.5519516462791
+  y:r = 252.4102927491753
+  templateUid:t = "6f573bee-f143-43e5-8dae-d80aba16c077"
+  descName:t = "/"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A/B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ / $B$)"
+    }
+  }
+}
+node {
+  id:i = 19
+  x:r = 828.4037232792936
+  y:r = 699.2741373171566
+  templateUid:t = "3f889697-686d-4d9a-b808-2ea09947acc3"
+  descName:t = "-"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A-B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ - $B$)"
+    }
+  }
+}
+node {
+  id:i = 21
+  x:r = 1677.5578156432623
+  y:r = 257.12314942217927
+  templateUid:t = "3f889697-686d-4d9a-b808-2ea09947acc3"
+  descName:t = "-"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A-B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ - $B$)"
+    }
+  }
+}
+node {
+  id:i = 22
+  x:r = 1419.8411646192687
+  y:r = 140.69433160718
+  templateUid:t = "2ea9972a-70ff-4a14-9c9c-fbe1965d8e96"
+  descName:t = "min"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "min($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 23
+  x:r = 2063.013595801658
+  y:r = 260.19312431368337
+  templateUid:t = "3f889697-686d-4d9a-b808-2ea09947acc3"
+  descName:t = "-"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A-B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ - $B$)"
+    }
+  }
+}
+edge {
+  id:i = 0
+  elemA:i = 2
+  pinA:i = 0
+  elemB:i = 4
+  pinB:i = 0
+}
+edge {
+  id:i = 1
+  elemA:i = 3
+  pinA:i = 0
+  elemB:i = 4
+  pinB:i = 1
+}
+edge {
+  id:i = 2
+  elemA:i = 3
+  pinA:i = 0
+  elemB:i = 6
+  pinB:i = 1
+}
+edge {
+  id:i = 3
+  elemA:i = 5
+  pinA:i = 1
+  elemB:i = 11
+  pinB:i = 0
+}
+edge {
+  id:i = 4
+  elemA:i = 1
+  pinA:i = 1
+  elemB:i = 6
+  pinB:i = 0
+}
+edge {
+  id:i = 5
+  elemA:i = 6
+  pinA:i = 2
+  elemB:i = 7
+  pinB:i = 0
+}
+edge {
+  id:i = 6
+  elemA:i = 7
+  pinA:i = 1
+  elemB:i = 4
+  pinB:i = 2
+}
+edge {
+  id:i = 7
+  elemA:i = 7
+  pinA:i = 2
+  elemB:i = 5
+  pinB:i = 0
+}
+edge {
+  id:i = 8
+  elemA:i = 8
+  pinA:i = 0
+  elemB:i = 9
+  pinB:i = 0
+}
+edge {
+  id:i = 9
+  elemA:i = 23
+  pinA:i = 0
+  elemB:i = 8
+  pinB:i = 0
+}
+edge {
+  id:i = 10
+  elemA:i = 19
+  pinA:i = 0
+  elemB:i = 8
+  pinB:i = 0
+}
+edge {
+  id:i = 11
+  elemA:i = 11
+  pinA:i = 1
+  elemB:i = 12
+  pinB:i = 0
+}
+edge {
+  id:i = 12
+  elemA:i = 11
+  pinA:i = 2
+  elemB:i = 9
+  pinB:i = 1
+}
+edge {
+  id:i = 13
+  elemA:i = 13
+  pinA:i = 1
+  elemB:i = 10
+  pinB:i = 0
+}
+edge {
+  id:i = 14
+  elemA:i = 9
+  pinA:i = 2
+  elemB:i = 17
+  pinB:i = 0
+}
+edge {
+  id:i = 16
+  elemA:i = 16
+  pinA:i = 0
+  elemB:i = 15
+  pinB:i = 1
+}
+edge {
+  id:i = 17
+  elemA:i = 22
+  pinA:i = 0
+  elemB:i = 8
+  pinB:i = 0
+}
+edge {
+  id:i = 18
+  elemA:i = 17
+  pinA:i = 1
+  elemB:i = 15
+  pinB:i = 2
+}
+edge {
+  id:i = 21
+  elemA:i = 14
+  pinA:i = 1
+  elemB:i = 0
+  pinB:i = 0
+}
+edge {
+  id:i = 22
+  elemA:i = 19
+  pinA:i = 1
+  elemB:i = 12
+  pinB:i = 0
+}
+edge {
+  id:i = 23
+  elemA:i = 19
+  pinA:i = 2
+  elemB:i = 15
+  pinB:i = 0
+}
+edge {
+  id:i = 24
+  elemA:i = 22
+  pinA:i = 1
+  elemB:i = 17
+  pinB:i = 2
+}
+edge {
+  id:i = 25
+  elemA:i = 21
+  pinA:i = 0
+  elemB:i = 8
+  pinB:i = 0
+}
+edge {
+  id:i = 26
+  elemA:i = 21
+  pinA:i = 1
+  elemB:i = 22
+  pinB:i = 2
+}
+edge {
+  id:i = 27
+  elemA:i = 21
+  pinA:i = 2
+  elemB:i = 13
+  pinB:i = 0
+}
+edge {
+  id:i = 28
+  elemA:i = 23
+  pinA:i = 1
+  elemB:i = 13
+  pinB:i = 2
+}
+edge {
+  id:i = 29
+  elemA:i = 23
+  pinA:i = 2
+  elemB:i = 14
+  pinB:i = 0
+}
+
+description {
+  name:t = "[[description-name]]"
+  category:t = "[[description-category]]"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  allowLoop:b = no
+  width:i = 200
+  pin {
+    name:t = "out"
+    types:t = "texture2D"
+    role:t = "out"
+    singleConnect:b = no
+    subgraphElem:i = 0
+    subgraphPin:i = 1
+  }
+  pin {
+    name:t = "texture"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    subgraphElem:i = 1
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "color"
+    types:t = "float4"
+    role:t = "in"
+    singleConnect:b = yes
+    data {
+      blk_code:t = "%color.x%, %color.y%, %color.z%, %color.w%"
+      code:t = "float4(%color.x%, %color.y%, %color.z%, %color.w%)"
+    }
+  }
+  pin {
+    name:t = "channels mask"
+    types:t = "float4"
+    role:t = "in"
+    singleConnect:b = yes
+    data {
+      blk_code:t = "%channels mask.x%, %channels mask.y%, %channels mask.z%, %channels mask.w%"
+      code:t = "float4(%channels mask.x%, %channels mask.y%, %channels mask.z%, %channels mask.w%)"
+    }
+  }
+  pin {
+    name:t = "sensitivity"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    data {
+      blk_code:t = "%sensitivity%"
+      code:t = "%sensitivity%"
+    }
+  }
+  pin {
+    name:t = "threshold"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    data {
+      blk_code:t = "%threshold%"
+      code:t = "%threshold%"
+    }
+  }
+  property {
+    name:t = "color.x"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "color.y"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "color.z"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "color.w"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "channels mask.x"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "channels mask.y"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "channels mask.z"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "channels mask.w"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "sensitivity"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "threshold"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+}

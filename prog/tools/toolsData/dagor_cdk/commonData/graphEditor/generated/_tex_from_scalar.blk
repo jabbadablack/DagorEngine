@@ -1,0 +1,46 @@
+
+tex_from_scalar {
+  params {
+    _externVal_51950:r = 0.333
+  }
+  inputs:i=0
+  shaderPreMain:t="""
+    cbuffer global {
+      float _externVal_51950;
+    };
+  """
+  shaderCode:t="""
+  InputStruct_tex_from_scalar _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  _in._externVal_51950 = _externVal_51950; // 0.333
+
+
+  OutputStruct_tex_from_scalar _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_tex_from_scalar(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    shader_function:t="""
+
+  void _function_tex_from_scalar(InputStruct_tex_from_scalar _in, out OutputStruct_tex_from_scalar _out) {
+
+  _out.col0 = float4(_in._externVal_51950, _in._externVal_51950, _in._externVal_51950, _in._externVal_51950);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_tex_from_scalar {
+  float4 pos;
+  float3 tc;
+  float _externVal_51950;
+};
+struct OutputStruct_tex_from_scalar {
+  float4 col0;
+};
+"""
+  }
+}

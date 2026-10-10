@@ -1,0 +1,5911 @@
+node {
+  templateUid:t = "e9c40e8f-d682-4021-b803-6701341256af"
+  name:t = "result"
+  category:t = "Output"
+  synonyms:t = "final,result,output"
+  allowLoop:b = no
+  width:i = 120
+  dynSizeToRight:b = yes
+
+  pin {
+    name:t = "result"
+    caption:t = "(%texture name%)"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      final:b = yes
+    }
+  }
+
+  property {
+    name:t = "texture name"
+    val:t = "finalResult"
+  }
+  property {
+    name:t = "skip when exporting"
+    val:b = no
+  }
+}
+
+node {
+  templateUid:t = "0a3557dc-8c4f-46a2-9f2b-030af5dbaa86"
+  name:t = "export texture"
+  category:t = "Output"
+  synonyms:t = "final,result,output"
+  allowLoop:b = no
+  width:i = 420
+  dynSizeToRight:b = yes
+
+  pin {
+    name:t = "name"
+    caption:t = "%texture name%%file format% (%channels%)"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      final:b = yes
+    }
+  }
+
+  property {
+    name:t = "texture name"
+    val:t = "untitled"
+  }
+  property {
+    name:t = "file format"
+    type:t = "combobox"
+    val:t = ".tif"
+    items {
+      item:t = ".tif"
+      item:t = ".tga"
+      item:t = ".raw"
+    }
+  }
+  property {
+    name:t = "channels"
+    type:t = "combobox"
+    val:t = "ARGB8"
+    items {
+      item:t = "bitmap"
+      item:t = "R8"
+      item:t = "R16"
+      item:t = "R16F"
+      item:t = "R32"
+      item:t = "R32F"
+      item:t = "RGB8"
+      item:t = "RGB16"
+      item:t = "RGB16F"
+      item:t = "RGB32"
+      item:t = "RGB32F"
+      item:t = "ARGB8"
+      item:t = "ARGB16"
+      item:t = "ARGB16F"
+      item:t = "ARGB32"
+      item:t = "ARGB32F"
+    }
+  }
+}
+
+node {
+  templateUid:t = "325f1121-1713-4276-aa31-9b09f637dda3"
+  name:t = "kill"
+  category:t = "Output"
+  synonyms:t = "stub,output"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "kill"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+
+}
+
+node {
+  templateUid:t = "9f3a2b1c-d4e5-4f60-a7b8-c9d0e1f23456"
+  name:t = "reroute in: texture2D"
+  category:t = "Relay"
+  synonyms:t = "publish,named,bookmark,relay"
+  allowLoop:b = no
+  width:i = 200
+  dynSizeToRight:b = yes
+  relayOut:b = yes
+
+  pin {
+    name:t = "in"
+    caption:t = "(%name%)"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+
+  property {
+    name:t = "name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d"
+  name:t = "reroute out: texture2D"
+  category:t = "Relay"
+  synonyms:t = "subscribe,named,bookmark,relay"
+  allowLoop:b = no
+  width:i = 200
+  dynSizeToLeft:b = yes
+  relayIn:b = yes
+
+  pin {
+    name:t = "out"
+    caption:t = "(%name%)"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+  property {
+    name:t = "name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "7ad1c0b7-7365-44b1-8ac8-14bb177b41eb"
+  name:t = "subgraph out"
+  category:t = "Output"
+  synonyms:t = "output,exit,result,pin"
+  allowLoop:b = no
+  width:i = 320
+  dynSizeToRight:b = yes
+  inOutMarker:b = yes
+
+  pin {
+    name:t = "subgraph out"
+    caption:t = "(%name%)"
+    types:t = "texture2D,particles,bool,int,float,float2,float3,float4"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+
+  property {
+    name:t = "name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "0adb6e52-80e2-4fce-8c12-7c98c640f766"
+  name:t = "subgraph separator"
+  category:t = "Input"
+  synonyms:t = "separator,divider,section,label,line"
+  allowLoop:b = no
+  width:i = 320
+  addHeight:i = 20
+  inOutMarker:b = yes
+  separatorMarker:b = yes
+
+  property {
+    name:t = "name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "d10a2031-bacf-4f26-bfa1-54488f9087ea"
+  name:t = "subgraph in: texture2D"
+  category:t = "Input"
+  synonyms:t = "input,enter,pin"
+  allowLoop:b = no
+  width:i = 320
+  dynSizeToLeft:b = yes
+  inOutMarker:b = yes
+
+  pin {
+    name:t = "subgraph in"
+    caption:t = "(%name%)"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "out"
+  }
+
+  property {
+    name:t = "name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "3f12df1c-aa2c-480b-8cb5-15ff4008b98e"
+  name:t = "subgraph in: particles"
+  category:t = "Input"
+  synonyms:t = "input,enter,pin"
+  allowLoop:b = no
+  width:i = 320
+  dynSizeToLeft:b = yes
+  inOutMarker:b = yes
+
+  pin {
+    name:t = "subgraph in"
+    caption:t = "(%name%)"
+    types:t = "particles"
+    singleConnect:b = yes
+    role:t = "out"
+  }
+
+  property {
+    name:t = "name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "f577f520-cf65-402c-b18b-7cb9ace56f23"
+  name:t = "subgraph in: bool"
+  category:t = "Input"
+  synonyms:t = "input,enter,pin"
+  allowLoop:b = no
+  width:i = 320
+  dynSizeToLeft:b = yes
+  inOutMarker:b = yes
+
+  pin {
+    name:t = "subgraph in"
+    caption:t = "(%name%)"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "out"
+  }
+
+  property {
+    name:t = "name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "294a1b67-bb88-45e3-b2eb-ba1a4036dc7c"
+  name:t = "subgraph in: int"
+  category:t = "Input"
+  synonyms:t = "input,enter,pin"
+  allowLoop:b = no
+  width:i = 320
+  dynSizeToLeft:b = yes
+  inOutMarker:b = yes
+
+  pin {
+    name:t = "subgraph in"
+    caption:t = "(%name%)"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "out"
+  }
+
+  property {
+    name:t = "name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "f63a710d-1030-4c0f-afda-7d79d86ebe13"
+  name:t = "subgraph in: float"
+  category:t = "Input"
+  synonyms:t = "input,enter,pin"
+  allowLoop:b = no
+  width:i = 320
+  dynSizeToLeft:b = yes
+  inOutMarker:b = yes
+
+  pin {
+    name:t = "subgraph in"
+    caption:t = "(%name%)"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "out"
+  }
+
+  property {
+    name:t = "name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "bcf0b203-1732-4592-a3af-81611f1e0a10"
+  name:t = "subgraph in: float2"
+  category:t = "Input"
+  synonyms:t = "input,enter,pin"
+  allowLoop:b = no
+  width:i = 320
+  dynSizeToLeft:b = yes
+  inOutMarker:b = yes
+
+  pin {
+    name:t = "subgraph in"
+    caption:t = "(%name%)"
+    types:t = "float2"
+    singleConnect:b = yes
+    role:t = "out"
+  }
+
+  property {
+    name:t = "name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "f94ce1c1-4d6d-420e-a5fb-713ee9e88c9c"
+  name:t = "subgraph in: float3"
+  category:t = "Input"
+  synonyms:t = "input,enter,pin"
+  allowLoop:b = no
+  width:i = 320
+  dynSizeToLeft:b = yes
+  inOutMarker:b = yes
+
+  pin {
+    name:t = "subgraph in"
+    caption:t = "(%name%)"
+    types:t = "float3"
+    singleConnect:b = yes
+    role:t = "out"
+  }
+
+  property {
+    name:t = "name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "0e19d9e7-70d2-4501-9ca7-a811b374872b"
+  name:t = "subgraph in: float4"
+  category:t = "Input"
+  synonyms:t = "input,enter,pin"
+  allowLoop:b = no
+  width:i = 320
+  dynSizeToLeft:b = yes
+  inOutMarker:b = yes
+
+  pin {
+    name:t = "subgraph in"
+    caption:t = "(%name%)"
+    types:t = "float4"
+    singleConnect:b = yes
+    role:t = "out"
+  }
+
+  property {
+    name:t = "name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "2df458f3-80cc-4259-bb25-fdc9d009a4ce"
+  name:t = "gradient"
+  category:t = "Input"
+  synonyms:t = "map,color"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      isGradient:b = yes
+    }
+  }
+
+  property {
+    name:t = "gradient"
+    type:t = "gradient_editor"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "94e0cc5d-f457-4305-9939-0562c9fa79b4"
+  name:t = "monotonic curve"
+  category:t = "Input"
+  synonyms:t = ""
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      isCurve:b = yes
+    }
+  }
+
+  property {
+    name:t = "curve"
+    type:t = "monotonic_curve"
+    style:t = "gray"
+    val:t = "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0  /*0.0,0.0, 0.333, 0.0, 0.666, 0.0, 1.0, 0.0 M*/"
+    background {}
+  }
+  property {
+    name:t = "preview"
+    type:t = "gradient_preview"
+    background {
+      ref:t = "curve"
+      ref:t = "curve"
+      ref:t = "curve"
+    }
+  }
+}
+
+node {
+  templateUid:t = "5bc51449-da1c-4e3f-8ffe-c4d6f450c917"
+  name:t = "linear curve"
+  category:t = "Input"
+  synonyms:t = ""
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      isCurve:b = yes
+    }
+  }
+
+  property {
+    name:t = "curve"
+    type:t = "linear_curve"
+    style:t = "gray"
+    val:t = "0,0,0,0,0,0,0,0,0  /*0.0,0.0, 0.333, 0.0, 0.666, 0.0, 1.0, 0.0 L*/"
+    background {}
+  }
+  property {
+    name:t = "preview"
+    type:t = "gradient_preview"
+    background {
+      ref:t = "curve"
+      ref:t = "curve"
+      ref:t = "curve"
+    }
+  }
+}
+
+node {
+  templateUid:t = "6208a371-0e5c-42ad-b52a-7b51cf02924f"
+  name:t = "polynom curve"
+  category:t = "Input"
+  synonyms:t = ""
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      isCurve:b = yes
+    }
+  }
+
+  property {
+    name:t = "curve"
+    type:t = "polynom_curve"
+    style:t = "gray"
+    val:t = "0,0,0,0  /*0.0,0.0, 0.333, 0.0, 0.666, 0.0, 1.0, 0.0 P*/"
+    background {}
+  }
+  property {
+    name:t = "preview"
+    type:t = "gradient_preview"
+    background {
+      ref:t = "curve"
+      ref:t = "curve"
+      ref:t = "curve"
+    }
+  }
+}
+
+node {
+  templateUid:t = "5d6c5141-38b6-4ce5-9185-a102147d626a"
+  name:t = "steps curve"
+  category:t = "Input"
+  synonyms:t = ""
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      isCurve:b = yes
+    }
+  }
+
+  property {
+    name:t = "curve"
+    type:t = "steps_curve"
+    style:t = "gray"
+    val:t = "0.0,0.0, 0.333, 0.0, 0.666, 0.0, 1.0, 0.0  /*0.0,0.0, 0.333, 0.0, 0.666, 0.0, 1.0, 0.0 S*/"
+    background {}
+  }
+  property {
+    name:t = "preview"
+    type:t = "gradient_preview"
+    background {
+      ref:t = "curve"
+      ref:t = "curve"
+      ref:t = "curve"
+    }
+  }
+}
+
+node {
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  name:t = "const float"
+  category:t = "Input"
+  synonyms:t = "scalar,1"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "value"
+    caption:t = "%value%"
+    types:t = "float"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      blk_code:t = "%value%"
+    }
+  }
+
+  property {
+    name:t = "value"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "126dfb8f-1d7e-4bac-a011-c00e4cf0c288"
+  name:t = "const float2"
+  category:t = "Input"
+  synonyms:t = "vector,2"
+  allowLoop:b = no
+  width:i = 120
+  addHeight:i = 20
+
+  pin {
+    name:t = "value"
+    caption:t = """
+%x%
+%y%
+"""
+    types:t = "float2"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      blk_code:t = "%x%, %y%"
+    }
+  }
+
+  property {
+    name:t = "x"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "y"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "5d1556c3-b704-4007-b9b5-341c9cc9601e"
+  name:t = "const float3"
+  category:t = "Input"
+  synonyms:t = "vector,3"
+  allowLoop:b = no
+  width:i = 120
+  addHeight:i = 40
+
+  pin {
+    name:t = "value"
+    caption:t = """
+%x%
+%y%
+%z%
+"""
+    types:t = "float3"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      blk_code:t = "%x%, %y%, %z%"
+    }
+  }
+
+  property {
+    name:t = "x"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "y"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "z"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "0ad72415-ca11-4238-837d-9fafa9c45795"
+  name:t = "const rgba"
+  category:t = "Input"
+  synonyms:t = "color,solid"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      isColor:b = yes
+    }
+  }
+  pin {
+    name:t = "vect"
+    types:t = "float4"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      blk_code:t = "%color%"
+    }
+  }
+
+  property {
+    name:t = "color"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.001
+    val:p4 = 0.5, 0.5, 0.5, 1.0
+  }
+}
+
+node {
+  templateUid:t = "b46631c8-db5f-485f-af5c-312f4a2fe10b"
+  name:t = "const float4"
+  category:t = "Input"
+  synonyms:t = "vector,4"
+  allowLoop:b = no
+  width:i = 120
+  addHeight:i = 60
+
+  pin {
+    name:t = "value"
+    caption:t = """
+%x%
+%y%
+%z%
+%w%
+"""
+    types:t = "float4"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      blk_code:t = "%x%, %y%, %z%, %w%"
+    }
+  }
+
+  property {
+    name:t = "x"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "y"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "z"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "w"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "49d2391e-594c-488b-acb8-19aba0c3db5d"
+  name:t = "const int"
+  category:t = "Input"
+  synonyms:t = ""
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "value"
+    caption:t = "%value%"
+    types:t = "int"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      blk_code:t = "%value%"
+    }
+  }
+
+  property {
+    name:t = "value"
+    minVal:i = -65535
+    maxVal:i = 65535
+    step:i = 1
+    val:i = 1
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "6261cc03-663f-4d3d-9523-625911a56d62"
+  name:t = "const bool"
+  category:t = "Input"
+  synonyms:t = "true,false"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "value"
+    caption:t = "%value%"
+    types:t = "bool"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      blk_code:t = "%value%"
+    }
+  }
+
+  property {
+    name:t = "value"
+    val:b = no
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+
+node {
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  name:t = "+"
+  category:t = "Math"
+  synonyms:t = "addition,plus"
+  nativeShader:t = "add"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "a"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "b"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "a+b"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "3f889697-686d-4d9a-b808-2ea09947acc3"
+  name:t = "-"
+  category:t = "Math"
+  synonyms:t = "subtraction,minus"
+  nativeShader:t = "sub"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "a"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "b"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "a-b"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  name:t = "*"
+  category:t = "Math"
+  synonyms:t = "multiplication,scale"
+  nativeShader:t = "mul"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "a"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "b"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "a*b"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "6f573bee-f143-43e5-8dae-d80aba16c077"
+  name:t = "/"
+  category:t = "Math"
+  synonyms:t = "divide,scale"
+  nativeShader:t = "div"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "a"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "b"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "a/b"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  name:t = "max"
+  category:t = "Math"
+  synonyms:t = "select"
+  nativeShader:t = "max"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "a"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "b"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "max(a,b)"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "2ea9972a-70ff-4a14-9c9c-fbe1965d8e96"
+  name:t = "min"
+  category:t = "Math"
+  synonyms:t = "select"
+  nativeShader:t = "min"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "a"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "b"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "min(a,b)"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "0c0e9c86-2d10-4313-8607-fe7fc4185af7"
+  name:t = "abs"
+  category:t = "Math"
+  synonyms:t = "positive"
+  nativeShader:t = "abs"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "a"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "abs(a)"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "d9bc47b8-6077-4d10-9933-e926d51e763d"
+  name:t = "1-x"
+  category:t = "Math"
+  synonyms:t = "negate,invert"
+  nativeShader:t = "invert"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "x"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "1-x"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "c9c56a2e-a000-48ce-8f83-4da370e8d0a8"
+  name:t = "x^2"
+  category:t = "Math"
+  synonyms:t = "square,power,^2,sqr"
+  nativeShader:t = "pow2"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "x"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "x^2"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "91f18ed1-b41a-4c69-a30b-58ecb8a664ac"
+  name:t = "x^3"
+  category:t = "Math"
+  synonyms:t = "cubic,power,^3"
+  nativeShader:t = "pow3"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "x"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "x^3"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "c6bca1b0-d5d0-41ae-9222-2f032c606674"
+  name:t = "linear to srgb"
+  category:t = "Convert"
+  synonyms:t = "gamma"
+  nativeShader:t = "linear_to_srgb"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "linear"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "sRGB"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "dbf10df3-16cd-43d8-8849-4a4b380a9c2f"
+  name:t = "srgb to linear"
+  category:t = "Convert"
+  synonyms:t = "gamma"
+  nativeShader:t = "srgb_to_linear"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "sRGB"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "linear"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "91d71830-5b02-4a7b-a9de-11b82c6401fa"
+  name:t = "sqrt"
+  category:t = "Math"
+  synonyms:t = "square,root,power"
+  nativeShader:t = "sqrt"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "x"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "sqrt(x)"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "dadd0ee7-e575-480c-b8d1-ef144e60f292"
+  name:t = ".R"
+  category:t = "Convert"
+  synonyms:t = "r,x,swizzle,vec2float"
+  nativeShader:t = "get_r"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = ".R"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "311eaefd-e3b2-4d87-a399-7a82c2d5e2c3"
+  name:t = ".G"
+  category:t = "Convert"
+  synonyms:t = "g,y,swizzle,vec2float"
+  nativeShader:t = "get_g"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = ".G"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "42f35794-a575-46c9-8049-dde7acb21eb7"
+  name:t = ".B"
+  category:t = "Convert"
+  synonyms:t = "b,z,swizzle,vec2float"
+  nativeShader:t = "get_b"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = ".B"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "d8ef3b93-3ae2-4528-af63-ac2d8259fedc"
+  name:t = ".A"
+  category:t = "Convert"
+  synonyms:t = "a,w,swizzle,vec2float"
+  nativeShader:t = "get_a"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = ".A"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "bebbbcd1-ca48-42f9-a880-c095540d5b45"
+  name:t = "separate RGBA"
+  category:t = "Convert"
+  synonyms:t = "split,swizzle,vec2float"
+  nativeShader:t = "separate_channels"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = ".R"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = ".G"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = ".B"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = ".A"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "221ab10f-3199-43ea-a811-67475671b87c"
+  name:t = "make RGBA"
+  category:t = "Convert"
+  synonyms:t = "combine,swizzle,rgba,float2vec,4"
+  nativeShader:t = "makeRGBA"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "R"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "G"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "B"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "A"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "RGBA"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "db1fa31e-2d40-43c5-8a1b-415508a8bfc4"
+  name:t = "pass"
+  category:t = "Convert"
+  synonyms:t = "fork,empty,bypass,nop,through,thru"
+  nativeShader:t = "unary"
+  allowLoop:b = no
+  width:i = 60
+  bypass:b = yes
+
+  pin {
+    name:t = ">>"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = ">>>"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "daba0271-04d5-4905-a528-57bf31183ffd"
+  name:t = "nearest neighbor"
+  category:t = "Convert"
+  synonyms:t = "resample,upscale,downscale,filter"
+  nativeShader:t = "resample_nearest_neighbor"
+  allowLoop:b = no
+  width:i = 140
+
+  pin {
+    name:t = "in"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "out"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "9372f43d-6687-4319-ac21-326f0e9737c9"
+  name:t = "bicubic"
+  category:t = "Convert"
+  synonyms:t = "resample,upscale,downscale,filter,cubic"
+  nativeShader:t = "resample_bicubic"
+  allowLoop:b = no
+  width:i = 140
+
+  pin {
+    name:t = "in"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "out"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "7aed45b3-418f-435a-a48a-4190820979d6"
+  name:t = "smoothstep"
+  category:t = "Native"
+  synonyms:t = "soft"
+  nativeShader:t = "smoothstep"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "x"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "smoothstep"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "0478f23c-1301-4fbc-9c20-0ed74be734bf"
+  name:t = "saturate"
+  category:t = "Native"
+  synonyms:t = "clamp"
+  nativeShader:t = "saturate"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "x"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "saturate(x)"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "c2734973-d6fe-4fce-9401-e523ffe60340"
+  name:t = "lerp tex"
+  category:t = "Native"
+  synonyms:t = "interpolate,mix"
+  nativeShader:t = "lerp_tex"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "a"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "b"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "t"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "lerp(a,b,t)"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "a728cec2-40cd-4f24-8e3b-fd5917c853a9"
+  name:t = "lerp scalar"
+  category:t = "Native"
+  synonyms:t = "interpolate,mix"
+  nativeShader:t = "lerp_scalar"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "a"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "b"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "t"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%t%"
+    }
+  }
+  pin {
+    name:t = "lerp(a,b,t)"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+  property {
+    name:t = "t"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 0.5
+  }
+}
+
+node {
+  templateUid:t = "487f8b6f-ed3c-4e15-bb1d-89454769abf4"
+  name:t = "smooth min"
+  category:t = "Native"
+  synonyms:t = "blur,soft"
+  nativeShader:t = "polynomial_smooth_min"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "a"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "b"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "smin"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "smooth"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%smooth%"
+    }
+  }
+
+  property {
+    name:t = "smooth"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.1
+  }
+}
+
+node {
+  templateUid:t = "fb953b64-85b2-4d1a-b632-6cee3ae88891"
+  name:t = "smooth max"
+  category:t = "Native"
+  synonyms:t = "blur,polynomial,soft"
+  nativeShader:t = "polynomial_smooth_max"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "a"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "b"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "smax"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "smooth"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%smooth%"
+    }
+  }
+
+  property {
+    name:t = "smooth"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.1
+  }
+}
+
+node {
+  templateUid:t = "5efd1da0-848a-4c7a-80e6-7ebc16dc2458"
+  name:t = "convolution"
+  category:t = "Native"
+  synonyms:t = "minimum,maximum,average,avg"
+  nativeShader:t = "tex_convolution"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "in"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "result"
+    caption:t = "%function%"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "function"
+    types:t = "string"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%function%"
+    }
+  }
+
+  property {
+    name:t = "function"
+    type:t = "combobox"
+    val:t = "max"
+    items {
+      item:t = "max"
+      item:t = "min"
+      item:t = "average"
+    }
+  }
+}
+
+node {
+  templateUid:t = "2ef1c65f-78d8-46cd-80fe-69c3be69f887"
+  name:t = "autolevels"
+  category:t = "Native"
+  synonyms:t = "levels,normalize"
+  nativeShader:t = "tex_autolevels"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "0e45e6a8-81b3-46fa-a82e-f5f79204cd08"
+  name:t = "heightmap occlusion"
+  category:t = "Native"
+  synonyms:t = "occlusion,hbao,ambient occlusion,heightmap,ao"
+  nativeShader:t = "heightmap_occlusion"
+  allowLoop:b = no
+  width:i = 180
+
+  pin {
+    name:t = "heightmap"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "strength"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%strength%"
+    }
+  }
+  pin {
+    name:t = "octaves"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%octaves%"
+    }
+  }
+
+  property {
+    name:t = "strength"
+    minVal:r = 0.1
+    maxVal:r = 20.0
+    step:r = 0.1
+    val:r = 2.0
+  }
+  property {
+    name:t = "octaves"
+    minVal:i = 1
+    maxVal:i = 8
+    step:i = 1
+    val:i = 2
+  }
+}
+
+node {
+  templateUid:t = "d9375f8d-1e9f-4c5e-b35b-454c94db0cf0"
+  name:t = "pseudo DLA"
+  category:t = "Native"
+  synonyms:t = "errosion,erosion"
+  nativeShader:t = "pseudo_dla"
+  allowLoop:b = no
+  width:i = 220
+
+  pin {
+    name:t = "mask"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "noise"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "shape_height"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%shape_height%"
+    }
+  }
+  pin {
+    name:t = "slope_factor"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%slope_factor%"
+    }
+  }
+  pin {
+    name:t = "slope_distance"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%slope_distance%"
+    }
+  }
+  pin {
+    name:t = "slope_detail_filter"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%slope_detail_filter%"
+    }
+  }
+  pin {
+    name:t = "slope_detail_intensity"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%slope_detail_intensity%"
+    }
+  }
+  pin {
+    name:t = "height_offset"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%height_offset%"
+    }
+  }
+  pin {
+    name:t = "iterations"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%iterations%"
+    }
+  }
+
+  property {
+    name:t = "shape_height"
+    minVal:r = 0.0
+    maxVal:r = 100.0
+    step:r = 0.001
+    val:r = 0.025
+  }
+  property {
+    name:t = "slope_factor"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.001
+    val:r = 0.55
+  }
+  property {
+    name:t = "slope_distance"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.001
+    val:r = 0.025
+  }
+  property {
+    name:t = "slope_detail_filter"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.001
+    val:r = 0.02
+  }
+  property {
+    name:t = "slope_detail_intensity"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.001
+    val:r = 0.005
+  }
+  property {
+    name:t = "height_offset"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.001
+    val:r = 0.01
+  }
+  property {
+    name:t = "iterations"
+    minVal:i = 1
+    maxVal:i = 10
+    step:i = 1
+    val:i = 4
+  }
+}
+
+node {
+  templateUid:t = "54a5c3e0-1504-4d62-ac2b-1210d14ca014"
+  name:t = "fill areas"
+  category:t = "Native"
+  synonyms:t = "flood"
+  nativeShader:t = "fill_areas"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "mask"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "result"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "seed"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%seed%"
+    }
+  }
+  pin {
+    name:t = "steps"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%steps%"
+    }
+  }
+  pin {
+    name:t = "quantization"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%quantization%"
+    }
+  }
+
+  property {
+    name:t = "seed"
+    minVal:r = -10000.0
+    maxVal:r = 10000.0
+    step:r = 0.13451
+    val:r = 0.12345
+  }
+  property {
+    name:t = "quantization"
+    minVal:i = 0
+    maxVal:i = 500000
+    step:i = 1
+    val:i = 500000
+  }
+  property {
+    name:t = "steps"
+    minVal:i = 2
+    maxVal:i = 32
+    step:i = 1
+    val:i = 8
+  }
+}
+
+node {
+  templateUid:t = "f4e1b0cc-551c-485a-9615-2e1026ff141b"
+  name:t = "median"
+  category:t = "Native"
+  synonyms:t = "denoise,reduce"
+  nativeShader:t = "median_3x3_5x5"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "in"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "out"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "size"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%size%"
+    }
+  }
+
+  property {
+    name:t = "size"
+    minVal:i = 3
+    maxVal:i = 5
+    step:i = 2
+    val:i = 3
+  }
+}
+
+node {
+  templateUid:t = "86ba9742-bcb1-4abf-839f-7206ceaa6488"
+  name:t = "max square"
+  category:t = "Native"
+  synonyms:t = "denoise,extend"
+  nativeShader:t = "max_square"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "in"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "out"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "size"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%size%"
+    }
+  }
+
+  property {
+    name:t = "size"
+    minVal:i = 3
+    maxVal:i = 16
+    step:i = 1
+    val:i = 3
+  }
+}
+
+node {
+  templateUid:t = "867138b7-c4c5-4290-a667-82584824d41e"
+  name:t = "min square"
+  category:t = "Native"
+  synonyms:t = "denoise,extend"
+  nativeShader:t = "min_square"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "in"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "out"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "size"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%size%"
+    }
+  }
+
+  property {
+    name:t = "size"
+    minVal:i = 3
+    maxVal:i = 16
+    step:i = 1
+    val:i = 3
+  }
+}
+
+node {
+  templateUid:t = "69330ae3-2b54-4032-b3b4-bcdef0a52d98"
+  name:t = "render text"
+  category:t = "Native"
+  synonyms:t = "text,font,label,watermark,type"
+  nativeShader:t = "render_text"
+  allowLoop:b = no
+  width:i = 160
+
+  pin {
+    name:t = "result"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "text"
+    types:t = "string"
+    singleConnect:b = no
+    role:t = "in"
+    hidden:b = yes
+    data {
+      blk_code:t = '"%text%"'
+    }
+  }
+  pin {
+    name:t = "font_path"
+    types:t = "string"
+    singleConnect:b = no
+    role:t = "in"
+    hidden:b = yes
+    data {
+      blk_code:t = '"%font_path%"'
+    }
+  }
+  pin {
+    name:t = "font_size"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%font_size%"
+    }
+  }
+  pin {
+    name:t = "pos_x"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%pos_x%"
+    }
+  }
+  pin {
+    name:t = "pos_y"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%pos_y%"
+    }
+  }
+  pin {
+    name:t = "rotation"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%rotation%"
+    }
+  }
+
+  property {
+    name:t = "text"
+    val:t = "Hello Dagor"
+  }
+  property {
+    name:t = "font_path"
+    type:t = "filepath"
+    root:t = "none"
+    mask:t = "Font (*.ttf, *.otf)|*.ttf;*.otf"
+    val:t = "C:/Windows/Fonts/impact.ttf"
+  }
+  property {
+    name:t = "font_size"
+    minVal:r = 4.0
+    maxVal:r = 512.0
+    step:r = 1.0
+    val:r = 256.0
+  }
+  property {
+    name:t = "pos_x"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.5
+  }
+  property {
+    name:t = "pos_y"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.5
+  }
+  property {
+    name:t = "rotation"
+    minVal:r = -180.0
+    maxVal:r = 180.0
+    step:r = 1.0
+    val:r = 0.0
+  }
+}
+
+node {
+  templateUid:t = "0942c694-6ac4-44af-95dd-db827e2f5335"
+  name:t = "image to gradient"
+  category:t = "Native"
+  synonyms:t = "palette,extract,color,gradient,img"
+  nativeShader:t = "img_to_gradient"
+  allowLoop:b = no
+  width:i = 160
+
+  pin {
+    name:t = "image"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "gradient"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "sort_mode"
+    types:t = "string"
+    singleConnect:b = no
+    role:t = "in"
+    hidden:b = yes
+    data {
+      blk_code:t = "%sort_mode%"
+    }
+  }
+  pin {
+    name:t = "clip_left"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%clip_left%"
+    }
+  }
+  pin {
+    name:t = "clip_right"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%clip_right%"
+    }
+  }
+  pin {
+    name:t = "bias"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%bias%"
+    }
+  }
+  pin {
+    name:t = "invert"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%invert%"
+    }
+  }
+  pin {
+    name:t = "color_influence"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%color_influence%"
+    }
+  }
+  pin {
+    name:t = "bandwidth"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%bandwidth%"
+    }
+  }
+
+  property {
+    name:t = "sort_mode"
+    type:t = "combobox"
+    val:t = "luminance"
+    items {
+      item:t = "luminance"
+      item:t = "temperature"
+      item:t = "hue"
+      item:t = "saturation"
+    }
+  }
+  property {
+    name:t = "clip_left"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.0
+  }
+  property {
+    name:t = "clip_right"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 1.0
+  }
+  property {
+    name:t = "bias"
+    minVal:r = 0.01
+    maxVal:r = 0.99
+    step:r = 0.01
+    val:r = 0.5
+  }
+  property {
+    name:t = "invert"
+    val:b = no
+  }
+  property {
+    name:t = "color_influence"
+    minVal:r = 0.0
+    maxVal:r = 10.0
+    step:r = 0.1
+    val:r = 3.0
+  }
+  property {
+    name:t = "bandwidth"
+    minVal:r = 0.01
+    maxVal:r = 0.5
+    step:r = 0.01
+    val:r = 0.005
+  }
+}
+
+node {
+  templateUid:t = "d0011c64-7b50-457e-8e9c-c006cb0f2c6d"
+  name:t = "apply gradient"
+  category:t = "Native"
+  synonyms:t = "map,remap"
+  nativeShader:t = "apply_gradient"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "gradient"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "8eb14e16-bda0-4e24-981c-26ef2d386f3c"
+  name:t = "gradient map"
+  category:t = "Native"
+  synonyms:t = "slope"
+  nativeShader:t = "gradient_map"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "in"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "grad"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "multiplier"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%multiplier%"
+    }
+  }
+  pin {
+    name:t = "wrap"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%wrap%"
+    }
+  }
+  pin {
+    name:t = "signed"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%signed%"
+    }
+  }
+
+  property {
+    name:t = "multiplier"
+    minVal:r = 0.0
+    maxVal:r = 1000.0
+    step:r = 0.01
+    val:r = 0.01
+  }
+  property {
+    name:t = "wrap"
+    val:b = yes
+  }
+  property {
+    name:t = "signed"
+    val:b = no
+  }
+}
+
+node {
+  templateUid:t = "516f4d52-4589-466e-ba6a-99a3df36d933"
+  name:t = "curvature"
+  category:t = "Native"
+  synonyms:t = "slope"
+  nativeShader:t = "get_curvature"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "curvature"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "scale"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%scale%"
+    }
+  }
+
+  property {
+    name:t = "scale"
+    minVal:r = 0.0
+    maxVal:r = 1000.0
+    step:r = 0.01
+    val:r = 1.0
+  }
+}
+
+node {
+  templateUid:t = "66000b2b-3b52-4fd0-b1b6-5c17f5d20afb"
+  name:t = "get normal"
+  category:t = "Native"
+  synonyms:t = "direction,slope"
+  nativeShader:t = "get_normal"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "normal"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "cell_size"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%cell_size%"
+    }
+  }
+
+  property {
+    name:t = "cell_size"
+    minVal:r = 0.0
+    maxVal:r = 8000.0
+    step:r = 1.0
+    val:r = 128.0
+  }
+}
+
+node {
+  templateUid:t = "f2ef3677-b8ca-4991-881c-1a022b9dc329"
+  name:t = "gradient blur"
+  category:t = "Native"
+  synonyms:t = "slope"
+  nativeShader:t = "gradient_blur"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "color"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "dist map"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "gradient"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "distance"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%distance%"
+    }
+  }
+  pin {
+    name:t = "wrap"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%wrap%"
+    }
+  }
+
+  property {
+    name:t = "distance"
+    minVal:r = 0.0
+    maxVal:r = 0.5
+    step:r = 0.01
+    val:r = 0.05
+  }
+  property {
+    name:t = "wrap"
+    val:b = yes
+  }
+}
+
+node {
+  templateUid:t = "3a9832c0-0faf-4140-8714-8849c50eb0cf"
+  name:t = "blur iterational"
+  category:t = "Native"
+  synonyms:t = "smooth"
+  nativeShader:t = "blur_iterational"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "base"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "dist map"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "wrap"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%wrap%"
+    }
+  }
+  pin {
+    name:t = "distance"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%distance%"
+    }
+  }
+  pin {
+    name:t = "random"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%random%"
+    }
+  }
+  pin {
+    name:t = "start_turn"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%start_turn%"
+    }
+  }
+  pin {
+    name:t = "step_turn"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%step_turn%"
+    }
+  }
+  pin {
+    name:t = "step_scale"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%step_scale%"
+    }
+  }
+  pin {
+    name:t = "steps"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%steps%"
+    }
+  }
+  pin {
+    name:t = "rays"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%rays%"
+    }
+  }
+
+  property {
+    name:t = "wrap"
+    val:b = yes
+  }
+  property {
+    name:t = "distance"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.01
+  }
+  property {
+    name:t = "random"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.0
+  }
+  property {
+    name:t = "start_turn"
+    minVal:r = -1.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.12345
+  }
+  property {
+    name:t = "step_turn"
+    minVal:r = -1.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.12345
+  }
+  property {
+    name:t = "step_scale"
+    minVal:r = 0.01
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.62
+  }
+  property {
+    name:t = "steps"
+    minVal:i = 1
+    maxVal:i = 14
+    step:i = 1
+    val:i = 8
+  }
+  property {
+    name:t = "rays"
+    minVal:i = 1
+    maxVal:i = 16
+    step:i = 1
+    val:i = 7
+  }
+}
+
+node {
+  templateUid:t = "d65ddfe1-232f-4e52-844a-1c17888807d1"
+  name:t = "erosion"
+  category:t = "Native"
+  synonyms:t = "erosion"
+  nativeShader:t = "erosion"
+  allowLoop:b = no
+  width:i = 250
+
+  pin {
+    name:t = "height map"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "hardness map"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "eroded height map"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      is_uav:b = yes
+    }
+  }
+  pin {
+    name:t = "sedimention map"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      is_uav:b = yes
+    }
+  }
+  pin {
+    name:t = "deposition map"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      is_uav:b = yes
+    }
+  }
+  pin {
+    name:t = "flow map X"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      is_uav:b = yes
+    }
+  }
+  pin {
+    name:t = "flow map Y"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      is_uav:b = yes
+    }
+  }
+  pin {
+    name:t = "water flow"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      is_uav:b = yes
+    }
+  }
+  pin {
+    name:t = "inertia"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%inertia%"
+    }
+  }
+  pin {
+    name:t = "erosion_speed"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%erosion_speed%"
+    }
+  }
+  pin {
+    name:t = "deposit_speed"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%deposit_speed%"
+    }
+  }
+  pin {
+    name:t = "evaporate_speed"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%evaporate_speed%"
+    }
+  }
+  pin {
+    name:t = "start_drop_speed"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%start_drop_speed%"
+    }
+  }
+  pin {
+    name:t = "start_drop_water"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%start_drop_water%"
+    }
+  }
+  pin {
+    name:t = "min_sediment_capacity"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%min_sediment_capacity%"
+    }
+  }
+  pin {
+    name:t = "sediment_capacity_factor"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%sediment_capacity_factor%"
+    }
+  }
+  pin {
+    name:t = "gravity"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%gravity%"
+    }
+  }
+  pin {
+    name:t = "drops_multiplier"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%drops_multiplier%"
+    }
+  }
+  pin {
+    name:t = "erosion_radius"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%erosion_radius%"
+    }
+  }
+  pin {
+    name:t = "drop_lifetime"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%drop_lifetime%"
+    }
+  }
+  pin {
+    name:t = "flow_map_inertion"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%flow_map_inertion%"
+    }
+  }
+  pin {
+    name:t = "flow_map_normalized"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%flow_map_normalized%"
+    }
+  }
+  pin {
+    name:t = "flow_map_signed"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%flow_map_signed%"
+    }
+  }
+  pin {
+    name:t = "use_gpu"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%use_gpu%"
+    }
+  }
+  pin {
+    name:t = "physical_width"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%physical_width%"
+    }
+  }
+  pin {
+    name:t = "physical_height"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%physical_height%"
+    }
+  }
+  pin {
+    name:t = "gravity_influence_on_flow"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%gravity_influence_on_flow%"
+    }
+  }
+  pin {
+    name:t = "precipitation map"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "use_unorm_direction_map"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%use_unorm_direction_map%"
+    }
+  }
+  pin {
+    name:t = "direction map"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "direction_speed"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%direction_speed%"
+    }
+  }
+
+  property {
+    name:t = "inertia"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.3
+  }
+  property {
+    name:t = "erosion_speed"
+    minVal:r = 0.0
+    maxVal:r = 10.0
+    step:r = 0.01
+    val:r = 0.3
+  }
+  property {
+    name:t = "deposit_speed"
+    minVal:r = 0.0
+    maxVal:r = 10.0
+    step:r = 0.01
+    val:r = 0.3
+  }
+  property {
+    name:t = "evaporate_speed"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.01
+  }
+  property {
+    name:t = "start_drop_speed"
+    minVal:r = 0.1
+    maxVal:r = 5.0
+    step:r = 0.1
+    val:r = 1.0
+  }
+  property {
+    name:t = "start_drop_water"
+    minVal:r = 0.1
+    maxVal:r = 50.0
+    step:r = 0.1
+    val:r = 1.0
+  }
+  property {
+    name:t = "min_sediment_capacity"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.01
+  }
+  property {
+    name:t = "sediment_capacity_factor"
+    minVal:r = 0.0
+    maxVal:r = 100.0
+    step:r = 0.1
+    val:r = 4.0
+  }
+  property {
+    name:t = "gravity"
+    minVal:r = 0.0
+    maxVal:r = 100.0
+    step:r = 0.1
+    val:r = 4.0
+  }
+  property {
+    name:t = "drops_multiplier"
+    minVal:r = 0.0
+    maxVal:r = 100.0
+    step:r = 1.0
+    val:r = 1.0
+  }
+  property {
+    name:t = "erosion_radius"
+    minVal:i = 1
+    maxVal:i = 7
+    step:i = 1
+    val:i = 4
+  }
+  property {
+    name:t = "drop_lifetime"
+    minVal:i = 1
+    maxVal:i = 70
+    step:i = 1
+    val:i = 15
+  }
+  property {
+    name:t = "flow_map_inertion"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.5
+  }
+  property {
+    name:t = "flow_map_normalized"
+    val:b = no
+  }
+  property {
+    name:t = "flow_map_signed"
+    val:b = no
+  }
+  property {
+    name:t = "use_gpu"
+    val:b = yes
+  }
+  property {
+    name:t = "physical_width"
+    minVal:r = 1.0
+    maxVal:r = 16384.0
+    step:r = 64.0
+    val:r = 1.0
+  }
+  property {
+    name:t = "physical_height"
+    minVal:r = 0.0
+    maxVal:r = 16384.0
+    step:r = 64.0
+    val:r = 1.0
+  }
+  property {
+    name:t = "gravity_influence_on_flow"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.0
+  }
+  property {
+    name:t = "use_unorm_direction_map"
+    val:b = yes
+  }
+  property {
+    name:t = "direction_speed"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.05
+  }
+}
+
+node {
+  templateUid:t = "ab87e4ce-15ce-46f5-a7c0-44de98a093ea"
+  name:t = "cache"
+  category:t = "Native"
+  synonyms:t = "save,load"
+  nativeShader:t = "cache_node"
+  allowLoop:b = no
+  width:i = 200
+
+  pin {
+    name:t = "save"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "load"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "preceding_subgraph_hash"
+    types:t = "string"
+    singleConnect:b = yes
+    role:t = "in"
+    hidden:b = yes
+    data {
+      blk_code:t = "%id%-%hash%"
+    }
+  }
+
+  property {
+    name:t = "hash"
+    val:t = "%graph_hash%"
+    hidden:b = yes
+  }
+  property {
+    name:t = "id"
+    val:t = "%this_elem_id%"
+    hidden:b = yes
+  }
+}
+
+node {
+  templateUid:t = "807f8944-a6ff-499d-934c-98310c6e9ea8"
+  name:t = "gaussian blur"
+  category:t = "Native"
+  synonyms:t = "blur"
+  nativeShader:t = "gaussianBlur"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "base"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      second_pass_in:b = yes
+    }
+  }
+  pin {
+    name:t = "dist"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "distance"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%distance%"
+    }
+  }
+  pin {
+    name:t = "sigma"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%sigma%"
+    }
+  }
+  pin {
+    name:t = "gaussian"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%gaussian%"
+    }
+  }
+  pin {
+    name:t = "wrap"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%wrap%"
+    }
+  }
+  pin {
+    name:t = "vertical"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    hidden:b = yes
+    data {
+      blk_code:t = "true"
+      second_pass_blk_code:t = "false"
+    }
+  }
+
+  property {
+    name:t = "distance"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.05
+  }
+  property {
+    name:t = "sigma"
+    minVal:r = 0.2
+    maxVal:r = 3.0
+    step:r = 0.01
+    val:r = 0.227761
+  }
+  property {
+    name:t = "gaussian"
+    val:b = no
+  }
+  property {
+    name:t = "wrap"
+    val:b = yes
+  }
+}
+
+node {
+  templateUid:t = "1562ad15-b215-47e5-9a2d-e519b99f5ddd"
+  name:t = "gaussian blur 1-dir"
+  category:t = "Native"
+  synonyms:t = "blur"
+  nativeShader:t = "gaussianBlur"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "base"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "dist"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "distance"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%distance%"
+    }
+  }
+  pin {
+    name:t = "sigma"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%sigma%"
+    }
+  }
+  pin {
+    name:t = "gaussian"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%gaussian%"
+    }
+  }
+  pin {
+    name:t = "wrap"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%wrap%"
+    }
+  }
+  pin {
+    name:t = "vertical"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%vertical%"
+    }
+  }
+
+  property {
+    name:t = "distance"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.05
+  }
+  property {
+    name:t = "sigma"
+    minVal:r = 0.2
+    maxVal:r = 3.0
+    step:r = 0.01
+    val:r = 0.227761
+  }
+  property {
+    name:t = "gaussian"
+    val:b = no
+  }
+  property {
+    name:t = "wrap"
+    val:b = yes
+  }
+  property {
+    name:t = "vertical"
+    val:b = yes
+  }
+}
+
+node {
+  templateUid:t = "22110a5d-047a-4b71-a808-494790d7adb4"
+  name:t = "gaussian max"
+  category:t = "Native"
+  synonyms:t = "area"
+  nativeShader:t = "gaussian_max"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "base"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      second_pass_in:b = yes
+    }
+  }
+  pin {
+    name:t = "dist"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "distance"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%distance%"
+    }
+  }
+  pin {
+    name:t = "sigma"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%sigma%"
+    }
+  }
+  pin {
+    name:t = "gaussian"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%gaussian%"
+    }
+  }
+  pin {
+    name:t = "wrap"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%wrap%"
+    }
+  }
+  pin {
+    name:t = "vertical"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    hidden:b = yes
+    data {
+      blk_code:t = "true"
+      second_pass_blk_code:t = "false"
+    }
+  }
+
+  property {
+    name:t = "distance"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.05
+  }
+  property {
+    name:t = "sigma"
+    minVal:r = 0.2
+    maxVal:r = 3.0
+    step:r = 0.01
+    val:r = 0.227761
+  }
+  property {
+    name:t = "gaussian"
+    val:b = no
+  }
+  property {
+    name:t = "wrap"
+    val:b = yes
+  }
+  property {
+    name:t = "vertical"
+    val:b = yes
+  }
+}
+
+node {
+  templateUid:t = "0bb70142-3aa2-45df-80f3-984ea26158da"
+  name:t = "gaussian max 1-dir"
+  category:t = "Native"
+  synonyms:t = "area"
+  nativeShader:t = "gaussian_max"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "base"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "dist"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "distance"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%distance%"
+    }
+  }
+  pin {
+    name:t = "sigma"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%sigma%"
+    }
+  }
+  pin {
+    name:t = "gaussian"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%gaussian%"
+    }
+  }
+  pin {
+    name:t = "wrap"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%wrap%"
+    }
+  }
+  pin {
+    name:t = "vertical"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%vertical%"
+    }
+  }
+
+  property {
+    name:t = "distance"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.05
+  }
+  property {
+    name:t = "sigma"
+    minVal:r = 0.2
+    maxVal:r = 3.0
+    step:r = 0.01
+    val:r = 0.227761
+  }
+  property {
+    name:t = "gaussian"
+    val:b = no
+  }
+  property {
+    name:t = "wrap"
+    val:b = yes
+  }
+  property {
+    name:t = "vertical"
+    val:b = yes
+  }
+}
+
+node {
+  templateUid:t = "ddd1b85a-bce0-4d2e-bb9b-2a6d1dee0a74"
+  name:t = "gaussian min"
+  category:t = "Native"
+  synonyms:t = "area"
+  nativeShader:t = "gaussian_min"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "base"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      second_pass_in:b = yes
+    }
+  }
+  pin {
+    name:t = "dist"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "distance"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%distance%"
+    }
+  }
+  pin {
+    name:t = "sigma"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%sigma%"
+    }
+  }
+  pin {
+    name:t = "gaussian"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%gaussian%"
+    }
+  }
+  pin {
+    name:t = "wrap"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%wrap%"
+    }
+  }
+  pin {
+    name:t = "vertical"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    hidden:b = yes
+    data {
+      blk_code:t = "true"
+      second_pass_blk_code:t = "false"
+    }
+  }
+
+  property {
+    name:t = "distance"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.05
+  }
+  property {
+    name:t = "sigma"
+    minVal:r = 0.2
+    maxVal:r = 3.0
+    step:r = 0.01
+    val:r = 0.227761
+  }
+  property {
+    name:t = "gaussian"
+    val:b = no
+  }
+  property {
+    name:t = "wrap"
+    val:b = yes
+  }
+  property {
+    name:t = "vertical"
+    val:b = yes
+  }
+}
+
+node {
+  templateUid:t = "6869167e-dec0-4df7-9bba-3b7da4f3d71f"
+  name:t = "gaussian min 1-dir"
+  category:t = "Native"
+  synonyms:t = "area"
+  nativeShader:t = "gaussian_min"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "base"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "dist"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "distance"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%distance%"
+    }
+  }
+  pin {
+    name:t = "sigma"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%sigma%"
+    }
+  }
+  pin {
+    name:t = "gaussian"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%gaussian%"
+    }
+  }
+  pin {
+    name:t = "wrap"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%wrap%"
+    }
+  }
+  pin {
+    name:t = "vertical"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%vertical%"
+    }
+  }
+
+  property {
+    name:t = "distance"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.05
+  }
+  property {
+    name:t = "sigma"
+    minVal:r = 0.2
+    maxVal:r = 3.0
+    step:r = 0.01
+    val:r = 0.227761
+  }
+  property {
+    name:t = "gaussian"
+    val:b = no
+  }
+  property {
+    name:t = "wrap"
+    val:b = yes
+  }
+  property {
+    name:t = "vertical"
+    val:b = yes
+  }
+}
+
+node {
+  templateUid:t = "b255e753-2a87-463f-ba6b-17bc91f6a531"
+  name:t = "native gauss"
+  category:t = "Native"
+  nativeShader:t = "native_gauss"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "sigma"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%sigma%"
+    }
+  }
+
+  property {
+    name:t = "sigma"
+    minVal:r = 0.1
+    maxVal:r = 1000.0
+    step:r = 0.01
+    val:r = 20.0
+  }
+}
+
+node {
+  templateUid:t = "5ac5382e-a144-4f10-b10e-d5617a26cb99"
+  name:t = "distance field"
+  category:t = "Native"
+  synonyms:t = "voronoi"
+  nativeShader:t = "distance_field"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "base"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "color"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "wrap"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%wrap%"
+    }
+  }
+  pin {
+    name:t = "signed"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%signed%"
+    }
+  }
+  pin {
+    name:t = "distance"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%distance%"
+    }
+  }
+  pin {
+    name:t = "threshold"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%threshold%"
+    }
+  }
+
+  property {
+    name:t = "wrap"
+    val:b = yes
+  }
+  property {
+    name:t = "signed"
+    val:b = yes
+  }
+  property {
+    name:t = "distance"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.5
+  }
+  property {
+    name:t = "threshold"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.5
+  }
+}
+
+node {
+  templateUid:t = "b702bc40-47cd-45d8-9395-7c14e895fd53"
+  name:t = "distance field AA"
+  category:t = "Native"
+  synonyms:t = "voronoi"
+  nativeShader:t = "distance_field_aa"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "base"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "color"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "wrap"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%wrap%"
+    }
+  }
+  pin {
+    name:t = "signed"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%signed%"
+    }
+  }
+  pin {
+    name:t = "distance"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%distance%"
+    }
+  }
+  pin {
+    name:t = "gradient_threshold"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%gradient_threshold%"
+    }
+  }
+  pin {
+    name:t = "iterations"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%iterations%"
+    }
+  }
+  pin {
+    name:t = "error_tolerance"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%error_tolerance%"
+    }
+  }
+
+  property {
+    name:t = "wrap"
+    val:b = yes
+  }
+  property {
+    name:t = "signed"
+    val:b = yes
+  }
+  property {
+    name:t = "distance"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.5
+  }
+  property {
+    name:t = "gradient_threshold"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.01
+  }
+  property {
+    name:t = "iterations"
+    minVal:i = 0
+    maxVal:i = 100
+    step:i = 1
+    val:i = 100
+  }
+  property {
+    name:t = "error_tolerance"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.01
+  }
+}
+
+node {
+  templateUid:t = "b42909bd-3b2c-4716-a7cc-3098d608f7d7"
+  name:t = "perlin"
+  category:t = "Native"
+  synonyms:t = "noise"
+  nativeShader:t = "perlin"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "octaves"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%octaves%"
+    }
+  }
+  pin {
+    name:t = "persistence"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%persistence%"
+    }
+  }
+  pin {
+    name:t = "frequency"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%frequency%"
+    }
+  }
+  pin {
+    name:t = "scale"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%scale%"
+    }
+  }
+  pin {
+    name:t = "ofs"
+    types:t = "float2"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%offset X%, %offset Y%"
+    }
+  }
+
+  property {
+    name:t = "octaves"
+    minVal:i = 1
+    maxVal:i = 8
+    step:i = 1
+    val:i = 2
+  }
+  property {
+    name:t = "persistence"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.5
+  }
+  property {
+    name:t = "frequency"
+    minVal:r = 0.0001
+    maxVal:r = 10000.0
+    step:r = 0.01
+    val:r = 1.0
+  }
+  property {
+    name:t = "scale"
+    minVal:r = 0.0001
+    maxVal:r = 10000.0
+    step:r = 0.01
+    val:r = 1.0
+  }
+  property {
+    name:t = "offset X"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "offset Y"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+}
+
+node {
+  templateUid:t = "ecc7a6b9-1650-47db-bc36-97d175a16e1c"
+  name:t = "perlin terrain"
+  category:t = "Native"
+  synonyms:t = "noise"
+  nativeShader:t = "perlin_terrain"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "height_scale"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%height_scale%"
+    }
+  }
+  pin {
+    name:t = "tiling"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%tiling%"
+    }
+  }
+  pin {
+    name:t = "offset"
+    types:t = "float2"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%offset X%, %offset Y%"
+    }
+  }
+  pin {
+    name:t = "octaves"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%octaves%"
+    }
+  }
+  pin {
+    name:t = "roughness"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%roughness%"
+    }
+  }
+  pin {
+    name:t = "frequency"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%frequency%"
+    }
+  }
+  pin {
+    name:t = "gradient"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%gradient%"
+    }
+  }
+  pin {
+    name:t = "use_3d_noise"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%use_3d_noise%"
+    }
+  }
+  pin {
+    name:t = "type"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%type%"
+    }
+  }
+
+  property {
+    name:t = "height_scale"
+    minVal:r = 0.0001
+    maxVal:r = 10000.0
+    step:r = 0.01
+    val:r = 1.0
+  }
+  property {
+    name:t = "tiling"
+    minVal:r = 0.0001
+    maxVal:r = 10000.0
+    step:r = 0.1
+    val:r = 1.0
+  }
+  property {
+    name:t = "offset X"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "offset Y"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "octaves"
+    minVal:i = 1
+    maxVal:i = 8
+    step:i = 1
+    val:i = 2
+  }
+  property {
+    name:t = "roughness"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.5
+  }
+  property {
+    name:t = "frequency"
+    minVal:r = 0.0001
+    maxVal:r = 16.0
+    step:r = 0.1
+    val:r = 2.0
+  }
+  property {
+    name:t = "gradient"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.1
+    val:r = 1.0
+  }
+  property {
+    name:t = "use_3d_noise"
+    val:b = yes
+  }
+  property {
+    name:t = "type"
+    minVal:i = 0
+    maxVal:i = 4
+    step:i = 1
+    val:i = 0
+  }
+}
+
+node {
+  templateUid:t = "266e720e-c600-4074-b36b-dd175f9d8ab5"
+  name:t = "tileable perlin"
+  category:t = "Native"
+  synonyms:t = "noise"
+  nativeShader:t = "perlin_tile"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "octaves"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%octaves%"
+    }
+  }
+  pin {
+    name:t = "persistence"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%persistence%"
+    }
+  }
+  pin {
+    name:t = "frequency"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%frequency%"
+    }
+  }
+  pin {
+    name:t = "scale"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%scale%"
+    }
+  }
+  pin {
+    name:t = "ofs"
+    types:t = "float2"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%offset X%, %offset Y%"
+    }
+  }
+
+  property {
+    name:t = "octaves"
+    minVal:i = 1
+    maxVal:i = 8
+    step:i = 1
+    val:i = 5
+  }
+  property {
+    name:t = "persistence"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.5
+  }
+  property {
+    name:t = "frequency"
+    minVal:i = 1
+    maxVal:i = 1000
+    step:i = 1
+    val:i = 1
+  }
+  property {
+    name:t = "scale"
+    minVal:r = 0.0001
+    maxVal:r = 10000.0
+    step:r = 0.01
+    val:r = 1.0
+  }
+  property {
+    name:t = "offset X"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "offset Y"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+}
+
+node {
+  templateUid:t = "2b0ebe7b-69db-44a9-af8a-6afb29c6e097"
+  name:t = "tileable perlin octaves"
+  category:t = "Native"
+  synonyms:t = "noise"
+  nativeShader:t = "perlin_tile_octaves"
+  allowLoop:b = no
+  width:i = 160
+
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "amp1"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%amp1%"
+    }
+  }
+  pin {
+    name:t = "amp2"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%amp2%"
+    }
+  }
+  pin {
+    name:t = "amp3"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%amp3%"
+    }
+  }
+  pin {
+    name:t = "amp4"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%amp4%"
+    }
+  }
+  pin {
+    name:t = "amp5"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%amp5%"
+    }
+  }
+  pin {
+    name:t = "amp6"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%amp6%"
+    }
+  }
+  pin {
+    name:t = "amp7"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%amp7%"
+    }
+  }
+  pin {
+    name:t = "amp8"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%amp8%"
+    }
+  }
+  pin {
+    name:t = "amp9"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%amp9%"
+    }
+  }
+  pin {
+    name:t = "amp10"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%amp10%"
+    }
+  }
+  pin {
+    name:t = "frequency"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%frequency%"
+    }
+  }
+  pin {
+    name:t = "scale"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%scale%"
+    }
+  }
+  pin {
+    name:t = "ofs"
+    types:t = "float2"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%offset X%, %offset Y%"
+    }
+  }
+
+  property {
+    name:t = "amp1"
+    minVal:r = 0.0001
+    maxVal:r = 10.0
+    step:r = 0.01
+    val:r = 1.0
+  }
+  property {
+    name:t = "amp2"
+    minVal:r = 0.0001
+    maxVal:r = 10.0
+    step:r = 0.01
+    val:r = 0.5
+  }
+  property {
+    name:t = "amp3"
+    minVal:r = 0.0001
+    maxVal:r = 10.0
+    step:r = 0.01
+    val:r = 0.25
+  }
+  property {
+    name:t = "amp4"
+    minVal:r = 0.0001
+    maxVal:r = 10.0
+    step:r = 0.01
+    val:r = 0.125
+  }
+  property {
+    name:t = "amp5"
+    minVal:r = 0.0001
+    maxVal:r = 10.0
+    step:r = 0.01
+    val:r = 0.0625
+  }
+  property {
+    name:t = "amp6"
+    minVal:r = 0.0001
+    maxVal:r = 10.0
+    step:r = 0.01
+    val:r = 0.03125
+  }
+  property {
+    name:t = "amp7"
+    minVal:r = 0.0001
+    maxVal:r = 10.0
+    step:r = 0.01
+    val:r = 0.015625
+  }
+  property {
+    name:t = "amp8"
+    minVal:r = 0.0001
+    maxVal:r = 10.0
+    step:r = 0.01
+    val:r = 0.0078125
+  }
+  property {
+    name:t = "amp9"
+    minVal:r = 0.0001
+    maxVal:r = 10.0
+    step:r = 0.01
+    val:r = 0.00390625
+  }
+  property {
+    name:t = "amp10"
+    minVal:r = 0.0001
+    maxVal:r = 10.0
+    step:r = 0.01
+    val:r = 0.001953125
+  }
+  property {
+    name:t = "frequency"
+    minVal:i = 1
+    maxVal:i = 1000
+    step:i = 1
+    val:i = 1
+  }
+  property {
+    name:t = "scale"
+    minVal:r = 0.0001
+    maxVal:r = 10000.0
+    step:r = 0.01
+    val:r = 1.0
+  }
+  property {
+    name:t = "offset X"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "offset Y"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+}
+
+node {
+  templateUid:t = "34bc289f-71ef-4b2b-ad94-7001981a75e2"
+  name:t = "voronoi"
+  category:t = "Native"
+  synonyms:t = "noise,worley"
+  nativeShader:t = "voronoi"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "offset"
+    types:t = "float2"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%offset X%, %offset Y%"
+    }
+  }
+  pin {
+    name:t = "scale"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%scale%"
+    }
+  }
+  pin {
+    name:t = "randomness"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%randomness%"
+    }
+  }
+
+  property {
+    name:t = "offset X"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "offset Y"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "scale"
+    minVal:r = 0.0001
+    maxVal:r = 10000.0
+    step:r = 0.01
+    val:r = 64.0
+  }
+  property {
+    name:t = "randomness"
+    minVal:r = 0.0
+    maxVal:r = 2.0
+    step:r = 0.01
+    val:r = 0.9
+  }
+}
+
+node {
+  templateUid:t = "5dd98ce3-2833-4ee4-a2b1-b8b9a6cc7193"
+  name:t = "cellular"
+  category:t = "Native"
+  synonyms:t = "noise,worley,cellular"
+  nativeShader:t = "cellular"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "height_scale"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%height_scale%"
+    }
+  }
+  pin {
+    name:t = "tiling"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%tiling%"
+    }
+  }
+  pin {
+    name:t = "offset"
+    types:t = "float2"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%offset X%, %offset Y%"
+    }
+  }
+  pin {
+    name:t = "randomness"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%randomness%"
+    }
+  }
+  pin {
+    name:t = "metric"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%metric%"
+    }
+  }
+  pin {
+    name:t = "output_only_F1"
+    types:t = "bool"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%output_only_F1%"
+    }
+  }
+  pin {
+    name:t = "octaves"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%octaves%"
+    }
+  }
+  pin {
+    name:t = "roughness"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%roughness%"
+    }
+  }
+  pin {
+    name:t = "frequency"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%frequency%"
+    }
+  }
+  pin {
+    name:t = "rotation"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%rotation%"
+    }
+  }
+
+  property {
+    name:t = "height_scale"
+    minVal:r = 0.0001
+    maxVal:r = 10000.0
+    step:r = 0.01
+    val:r = 1.0
+  }
+  property {
+    name:t = "tiling"
+    minVal:r = 0.0001
+    maxVal:r = 10000.0
+    step:r = 0.1
+    val:r = 1.0
+  }
+  property {
+    name:t = "offset X"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "offset Y"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "randomness"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.1
+    val:r = 1.0
+  }
+  property {
+    name:t = "metric"
+    minVal:i = 0
+    maxVal:i = 2
+    step:i = 1
+    val:i = 0
+  }
+  property {
+    name:t = "output_only_F1"
+    val:b = yes
+  }
+  property {
+    name:t = "octaves"
+    minVal:i = 1
+    maxVal:i = 8
+    step:i = 1
+    val:i = 2
+  }
+  property {
+    name:t = "roughness"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.5
+  }
+  property {
+    name:t = "frequency"
+    minVal:r = 0.0001
+    maxVal:r = 16.0
+    step:r = 0.1
+    val:r = 2.0
+  }
+  property {
+    name:t = "rotation"
+    minVal:r = -180.0
+    maxVal:r = 180.0
+    step:r = 1.0
+    val:r = 0.0
+  }
+}
+
+node {
+  templateUid:t = "5f7c0d30-ef7e-4258-b38f-211a36be923f"
+  name:t = "wt_rgb_masks_to_indices"
+  category:t = "Native"
+  synonyms:t = "convert"
+  nativeShader:t = "wt_rgb_masks_to_indices"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "color"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+}
+
+node {
+  templateUid:t = "3d50e642-b397-420c-8168-c5e1fb3263d8"
+  name:t = "blur particles"
+  category:t = "Native"
+  synonyms:t = "emitter,scatter"
+  nativeShader:t = "blurParticles"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "color"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "distance"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "res"
+    types:t = "particles"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "minSize"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%minSize%"
+    }
+  }
+  pin {
+    name:t = "maxSize"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%maxSize%"
+    }
+  }
+  pin {
+    name:t = "scale"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%scale%"
+    }
+  }
+
+  property {
+    name:t = "minSize"
+    minVal:r = 0.0001
+    maxVal:r = 0.5
+    step:r = 0.0025
+    val:r = 0.01
+  }
+  property {
+    name:t = "maxSize"
+    minVal:r = 0.0001
+    maxVal:r = 0.5
+    step:r = 0.0025
+    val:r = 0.02
+  }
+  property {
+    name:t = "scale"
+    minVal:r = 1e-05
+    maxVal:r = 10.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+}
+
+node {
+  templateUid:t = "e4697683-6dac-48a6-ba70-99545dc38ae5"
+  name:t = "particles"
+  category:t = "Native"
+  synonyms:t = "emitter,scatter"
+  nativeShader:t = "particles"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "res"
+    types:t = "particles"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "octaves"
+    types:t = "int"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%octaves%"
+    }
+  }
+  pin {
+    name:t = "persistence"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%persistence%"
+    }
+  }
+  pin {
+    name:t = "frequency"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%frequency%"
+    }
+  }
+  pin {
+    name:t = "scale"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%scale%"
+    }
+  }
+  pin {
+    name:t = "ofs"
+    types:t = "float2"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%offset X%, %offset Y%"
+    }
+  }
+  pin {
+    name:t = "size"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%size%"
+    }
+  }
+  pin {
+    name:t = "threshold"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%threshold%"
+    }
+  }
+
+  property {
+    name:t = "octaves"
+    minVal:i = 1
+    maxVal:i = 8
+    step:i = 1
+    val:i = 2
+  }
+  property {
+    name:t = "persistence"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.01
+    val:r = 0.5
+  }
+  property {
+    name:t = "frequency"
+    minVal:r = 0.0001
+    maxVal:r = 10000.0
+    step:r = 0.01
+    val:r = 1.0
+  }
+  property {
+    name:t = "scale"
+    minVal:r = 0.0001
+    maxVal:r = 10000.0
+    step:r = 0.01
+    val:r = 1.0
+  }
+  property {
+    name:t = "offset X"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "offset Y"
+    minVal:r = -10000000000.0
+    maxVal:r = 10000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "size"
+    minVal:r = 0.0001
+    maxVal:r = 10000.0
+    step:r = 0.0025
+    val:r = 0.0125
+  }
+  property {
+    name:t = "threshold"
+    minVal:r = 0.0001
+    maxVal:r = 10000.0
+    step:r = 0.01
+    val:r = 0.5
+  }
+}
+
+node {
+  templateUid:t = "e473450d-af4f-4968-ae16-be8052bbfa35"
+  name:t = "export entities"
+  category:t = "Output"
+  synonyms:t = "particles,result,save"
+  nativeShader:t = "unary"
+  allowLoop:b = no
+  width:i = 320
+  addHeight:i = 20
+  dynSizeToRight:b = yes
+
+  pin {
+    name:t = "particles"
+    caption:t = """
+(%blk name%)
+%names list%
+"""
+    types:t = "particles"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      customParam:t = 'saveEntitiesToFile:t="%blk name%"; entitiesNames:t="%names list%";'
+      customBlkParams:t = 'particles {reg:t="$particles$";} blending:t="add";'
+    }
+  }
+  pin {
+    name:t = "tmp_reg"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    hidden:b = yes
+    data {
+      def_val:t = "tex:color:0.5,0.5,0.5,1"
+    }
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+    hidden:b = yes
+    data {
+      final:b = yes
+    }
+  }
+
+  property {
+    name:t = "blk name"
+    type:t = "filepath"
+    root:t = "entityDir"
+    mask:t = "Entities (*.blk)|*.blk"
+    val:t = "entities.blk"
+  }
+  property {
+    name:t = "names list"
+    val:t = "name1,name2"
+  }
+}
+
+node {
+  templateUid:t = "402a6149-c322-4adf-8030-af583a4d70d4"
+  name:t = "blend"
+  category:t = "Native"
+  synonyms:t = "particles,add,max,scatter"
+  nativeShader:t = "%blend type%"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "foreground"
+    caption:t = "%blend type%"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      particleTexture:b = yes
+    }
+  }
+  pin {
+    name:t = "background"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "particles"
+    types:t = "particles"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      particleCode:t = 'particles{reg:t="$particles$";} blending:t="%blend type%";'
+    }
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+  property {
+    name:t = "blend type"
+    type:t = "combobox"
+    val:t = "add"
+    items {
+      item:t = "add"
+      item:t = "max"
+      item:t = "min"
+      item:t = "mul"
+      item:t = "alpha"
+    }
+  }
+}
+
+node {
+  templateUid:t = "846ef7d4-5db9-4277-8b8d-6aee5b1924e2"
+  name:t = "blend weights"
+  category:t = "Native"
+  synonyms:t = "particles,add,max,scatter"
+  nativeShader:t = "%blend type%"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "foreground"
+    caption:t = "%blend type%"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      particleTexture:b = yes
+      particleShader:t = "unary_weights"
+    }
+  }
+  pin {
+    name:t = "background"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "particles"
+    types:t = "particles"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      particleCode:t = 'particles{reg:t="$particles$";} blending:t="%blend type%";'
+    }
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+  property {
+    name:t = "blend type"
+    type:t = "combobox"
+    val:t = "add"
+    items {
+      item:t = "add"
+      item:t = "max"
+      item:t = "min"
+      item:t = "mul"
+      item:t = "alpha"
+    }
+  }
+}
+
+node {
+  templateUid:t = "20d52de6-e705-4f03-a910-a5c3f4e34e65"
+  name:t = "blend screen"
+  category:t = "Native"
+  synonyms:t = "photoshop,layer"
+  nativeShader:t = "blend_screen"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "top"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = no
+    }
+  }
+  pin {
+    name:t = "bottom"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = no
+    }
+  }
+  pin {
+    name:t = "apply"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%apply%"
+    }
+  }
+  pin {
+    name:t = "mask"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+  property {
+    name:t = "apply"
+    minVal:r = -10.0
+    maxVal:r = 10.0
+    step:r = 0.05
+    val:r = 1.0
+  }
+}
+
+node {
+  templateUid:t = "479a5bdd-66eb-4c7e-989a-a995a8d9b470"
+  name:t = "blend overlay"
+  category:t = "Native"
+  synonyms:t = "photoshop,layer"
+  nativeShader:t = "blend_overlay"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "top"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = no
+    }
+  }
+  pin {
+    name:t = "bottom"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = no
+    }
+  }
+  pin {
+    name:t = "apply"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%apply%"
+    }
+  }
+  pin {
+    name:t = "mask"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+  property {
+    name:t = "apply"
+    minVal:r = -10.0
+    maxVal:r = 10.0
+    step:r = 0.05
+    val:r = 1.0
+  }
+}
+
+node {
+  templateUid:t = "be87697a-099c-4486-a9c8-fa2ea930cabf"
+  name:t = "blend multiply"
+  category:t = "Native"
+  synonyms:t = "photoshop,layer"
+  nativeShader:t = "blend_multiply"
+  allowLoop:b = no
+  width:i = 120
+
+  pin {
+    name:t = "top"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = no
+    }
+  }
+  pin {
+    name:t = "bottom"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = no
+    }
+  }
+  pin {
+    name:t = "apply"
+    types:t = "float"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      blk_code:t = "%apply%"
+    }
+  }
+  pin {
+    name:t = "mask"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "res"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+  property {
+    name:t = "apply"
+    minVal:r = -10.0
+    maxVal:r = 10.0
+    step:r = 0.05
+    val:r = 1.0
+  }
+}
+
+node {
+  templateUid:t = "134b1816-124d-4b60-a37c-0b0756192d66"
+  name:t = "texture"
+  category:t = "Input"
+  synonyms:t = "input,file"
+  allowLoop:b = no
+  width:i = 240
+  dynSizeToLeft:b = yes
+
+  pin {
+    name:t = "texture out"
+    caption:t = "%texture name%"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      isTextureName:b = yes
+    }
+  }
+
+  property {
+    name:t = "texture name"
+    type:t = "filepath"
+    root:t = "app"
+    mask:t = "Texture (*.dds, *.ddsx, *.tga, *.tif)|*.dds;*.ddsx;*.tga;*.tif"
+    val:t = ""
+    onchange:t = "check_texture"
+  }
+}
+
+node {
+  templateUid:t = "e2140317-214f-475e-9a9d-95ffd4322762"
+  name:t = "raw texture"
+  category:t = "Input"
+  synonyms:t = "input,file"
+  allowLoop:b = no
+  width:i = 240
+  dynSizeToLeft:b = yes
+
+  pin {
+    name:t = "texture out"
+    caption:t = "%texture name%"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+    data {
+      isRawTextureName:b = yes
+    }
+  }
+
+  property {
+    name:t = "texture name"
+    type:t = "filepath"
+    root:t = "app"
+    mask:t = "Raw heightmap (*.raw, *.r16, *.r32)|*.raw;*.r16;*.r32"
+    val:t = ""
+    onchange:t = "check_texture"
+  }
+  property {
+    name:t = "texture width"
+    type:t = "combobox"
+    val:t = "= 1024"
+    items {
+      item:t = "= 1"
+      item:t = "= 2"
+      item:t = "= 4"
+      item:t = "= 8"
+      item:t = "= 16"
+      item:t = "= 32"
+      item:t = "= 64"
+      item:t = "= 128"
+      item:t = "= 256"
+      item:t = "= 512"
+      item:t = "= 1024"
+      item:t = "= 2048"
+      item:t = "= 4096"
+      item:t = "= 8192"
+    }
+  }
+  property {
+    name:t = "texture height"
+    type:t = "combobox"
+    val:t = "= 1024"
+    items {
+      item:t = "= 1"
+      item:t = "= 2"
+      item:t = "= 4"
+      item:t = "= 8"
+      item:t = "= 16"
+      item:t = "= 32"
+      item:t = "= 64"
+      item:t = "= 128"
+      item:t = "= 256"
+      item:t = "= 512"
+      item:t = "= 1024"
+      item:t = "= 2048"
+      item:t = "= 4096"
+      item:t = "= 8192"
+    }
+  }
+  property {
+    name:t = "texture type"
+    type:t = "combobox"
+    val:t = "R16"
+    items {
+      item:t = "R8"
+      item:t = "R16"
+      item:t = "R16F"
+      item:t = "R32F"
+      item:t = "RG16"
+      item:t = "RG16F"
+      item:t = "RG32F"
+      item:t = "ARGB8"
+      item:t = "ARGB16"
+      item:t = "ARGB16F"
+      item:t = "ARGB32F"
+    }
+  }
+  property {
+    name:t = "channels order"
+    type:t = "combobox"
+    val:t = "RGBA"
+    items {
+      item:t = "RGBA"
+      item:t = "ABGR"
+      item:t = "BGRA"
+      item:t = "ARGB"
+    }
+  }
+  property {
+    name:t = "header (bytes)"
+    minVal:i = 0
+    maxVal:i = 1024
+    step:i = 1
+    val:i = 0
+  }
+}
+
+node {
+  templateUid:t = "3ed567f4-4141-44ed-8ff5-a52af72f9cef"
+  name:t = "create new shader"
+  category:t = "Creation"
+  synonyms:t = ""
+  allowLoop:b = no
+  width:i = 120
+
+
+}
+
+node {
+  templateUid:t = "108602b3-b6bf-4b00-9a43-f47e99105967"
+  name:t = "<graph properties>"
+  category:t = "Input"
+  synonyms:t = ""
+  plugin:t = "main_editor"
+  width:i = 120
+  hidden:b = yes
+
+
+}
+
+node {
+  templateUid:t = "32fdc2b6-2bbe-4dd7-8cdd-4bffaeeeeeb2"
+  name:t = "comment"
+  category:t = "Comment"
+  synonyms:t = "remark,text"
+  width:i = 100
+
+
+  property {
+    name:t = "comment string"
+    val:t = "//"
+  }
+  property {
+    name:t = "font size"
+    minVal:i = 10
+    maxVal:i = 512
+    step:i = 10
+    val:i = 35
+  }
+}
+
+node {
+  templateUid:t = "e3d3b809-2cb9-4121-8548-18000c76c321"
+  name:t = "block"
+  category:t = "Comment"
+  synonyms:t = "group"
+  width:i = 200
+
+
+  property {
+    name:t = "comment string"
+    val:t = "Block"
+  }
+  property {
+    name:t = "font size"
+    minVal:i = 10
+    maxVal:i = 512
+    step:i = 10
+    val:i = 80
+  }
+  property {
+    name:t = "color"
+    minVal:r = 0.0
+    maxVal:r = 1.0
+    step:r = 0.001
+    val:p4 = 0.0, 0.0, 0.0, 1.0
+  }
+}
+
+node {
+  templateUid:t = "142e6335-444b-40c7-8d0c-5b2a00ade2d5"
+  name:t = "<dummy>"
+  category:t = "Input"
+  synonyms:t = ""
+  plugin:t = "main_editor"
+  width:i = 120
+  hidden:b = yes
+
+  pin {
+    name:t = "0"
+    caption:t = "[%missed%]"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "1"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "2"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "3"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "4"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "5"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "6"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "7"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "8"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "9"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "10"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "11"
+    types:t = "texture2D"
+    singleConnect:b = yes
+    role:t = "in"
+  }
+  pin {
+    name:t = "a"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "b"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "c"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+  pin {
+    name:t = "d"
+    types:t = "texture2D"
+    singleConnect:b = no
+    role:t = "out"
+  }
+
+  property {
+    name:t = "missed"
+    val:t = ""
+  }
+}

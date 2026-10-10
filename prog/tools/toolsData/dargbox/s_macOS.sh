@@ -1,0 +1,1 @@
+open dargbox-$(uname -m).app --args -config:script:t=browser/filebrowser.ui.nut -path:.

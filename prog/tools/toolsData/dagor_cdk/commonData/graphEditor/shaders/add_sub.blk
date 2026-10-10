@@ -1,0 +1,538 @@
+templateUid:t = "c28725a8-7588-40a1-98f1-8f07dd5a4c20"
+hint:t = "/*--------------------*/"
+
+node {
+  id:i = 0
+  x:r = -103.7221052631578
+  y:r = 125.03578947368422
+  descName:t = "const texture"
+  externalName:t = "a"
+  pin {
+    name:t = "texture"
+    role:t = "out"
+    types:t = "texture2D"
+    customVarName:t = "sampler0"
+  }
+  property {
+    name:t = "external name"
+    val:t = "a"
+  }
+}
+node {
+  id:i = 1
+  x:r = -100.73263157894729
+  y:r = 223.95789473684212
+  descName:t = "const texture"
+  externalName:t = "b"
+  pin {
+    name:t = "texture"
+    role:t = "out"
+    types:t = "texture2D"
+    customVarName:t = "sampler1"
+  }
+  property {
+    name:t = "external name"
+    val:t = "b"
+  }
+}
+node {
+  id:i = 2
+  x:r = 123.71368421052654
+  y:r = 223.12421052631578
+  descName:t = "texValue"
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 3
+  x:r = 123.46947368421075
+  y:r = 123.71368421052625
+  descName:t = "texValue"
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 4
+  x:r = 434.1473684210527
+  y:r = 248.99368421052634
+  templateUid:t = "3f889697-686d-4d9a-b808-2ea09947acc3"
+  descName:t = "-"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A-B"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "($A$ - $B$)"
+    }
+  }
+}
+node {
+  id:i = 5
+  x:r = 122.63578947368418
+  y:r = 330.9136842105264
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "0.5"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 6
+  x:r = 771.7440000000001
+  y:r = 170.41515789473686
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 7
+  x:r = 1119.9279532163741
+  y:r = 201.5423625730994
+  descName:t = "lerp"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "t"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "lerp($A$, $B$, $t$)"
+    }
+  }
+}
+node {
+  id:i = 8
+  x:r = 770.7452631578947
+  y:r = 286.3680000000001
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = "intensity"
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    customVarName:t = "_intensity_15818"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = "intensity"
+  }
+}
+node {
+  id:i = 9
+  x:r = 1392.5275321637423
+  y:r = 185.05057309941526
+  templateUid:t = "e9c40e8f-d682-4021-b803-6701341256af"
+  descName:t = "result"
+  pin {
+    name:t = "color"
+    role:t = "in"
+    types:t = "float4"
+    data {
+      def_val:t = "float4(0.5, 0.5, 0.5, 0.5)"
+      def_val_blk:t = "0.5, 0.5, 0.5, 0.5"
+      code:t = "_out.col0 = $color$"
+    }
+  }
+  pin {
+    name:t = "out"
+    role:t = "out"
+    types:t = "texture2D"
+  }
+}
+node {
+  id:i = 10
+  x:r = -100.73263157894729
+  y:r = 464.32842105263165
+  descName:t = "const texture"
+  externalName:t = "intensity_mask"
+  pin {
+    name:t = "texture"
+    role:t = "out"
+    types:t = "texture2D"
+    customVarName:t = "sampler2"
+  }
+  property {
+    name:t = "external name"
+    val:t = "intensity_mask"
+  }
+}
+node {
+  id:i = 11
+  x:r = 126.45894736842126
+  y:r = 463.00631578947366
+  descName:t = "texValue"
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 12
+  x:r = 954.4261563892962
+  y:r = 416.9146899733088
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 13
+  x:r = 434.8808932314019
+  y:r = 462.1862689206773
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+edge {
+  id:i = 0
+  elemA:i = 2
+  pinA:i = 0
+  elemB:i = 1
+  pinB:i = 0
+}
+edge {
+  id:i = 1
+  elemA:i = 3
+  pinA:i = 0
+  elemB:i = 0
+  pinB:i = 0
+}
+edge {
+  id:i = 2
+  elemA:i = 2
+  pinA:i = 1
+  elemB:i = 4
+  pinB:i = 0
+}
+edge {
+  id:i = 3
+  elemA:i = 5
+  pinA:i = 0
+  elemB:i = 4
+  pinB:i = 1
+}
+edge {
+  id:i = 4
+  elemA:i = 3
+  pinA:i = 1
+  elemB:i = 6
+  pinB:i = 0
+}
+edge {
+  id:i = 5
+  elemA:i = 6
+  pinA:i = 1
+  elemB:i = 4
+  pinB:i = 2
+}
+edge {
+  id:i = 6
+  elemA:i = 6
+  pinA:i = 2
+  elemB:i = 7
+  pinB:i = 1
+}
+edge {
+  id:i = 7
+  elemA:i = 7
+  pinA:i = 0
+  elemB:i = 3
+  pinB:i = 1
+}
+edge {
+  id:i = 9
+  elemA:i = 9
+  pinA:i = 0
+  elemB:i = 7
+  pinB:i = 3
+}
+edge {
+  id:i = 10
+  elemA:i = 11
+  pinA:i = 0
+  elemB:i = 10
+  pinB:i = 0
+}
+edge {
+  id:i = 11
+  elemA:i = 13
+  pinA:i = 0
+  elemB:i = 11
+  pinB:i = 1
+}
+edge {
+  id:i = 12
+  elemA:i = 12
+  pinA:i = 2
+  elemB:i = 7
+  pinB:i = 2
+}
+edge {
+  id:i = 13
+  elemA:i = 12
+  pinA:i = 0
+  elemB:i = 8
+  pinB:i = 0
+}
+edge {
+  id:i = 14
+  elemA:i = 13
+  pinA:i = 1
+  elemB:i = 12
+  pinB:i = 1
+}
+
+description {
+  name:t = "[[description-name]]"
+  category:t = "[[description-category]]"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  allowLoop:b = no
+  width:i = 200
+  pin {
+    name:t = "a"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+  }
+  pin {
+    name:t = "b"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+  }
+  pin {
+    name:t = "intensity"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    data {
+      blk_code:t = "%intensity%"
+      code:t = "%intensity%"
+    }
+  }
+  pin {
+    name:t = "out"
+    types:t = "texture2D"
+    role:t = "out"
+    singleConnect:b = no
+    subgraphElem:i = 9
+    subgraphPin:i = 1
+  }
+  pin {
+    name:t = "intensity_mask"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    subgraphElem:i = 13
+    subgraphPin:i = 2
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    subgraphElem:i = 13
+    subgraphPin:i = 3
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    subgraphElem:i = 13
+    subgraphPin:i = 4
+  }
+  property {
+    name:t = "intensity"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+}

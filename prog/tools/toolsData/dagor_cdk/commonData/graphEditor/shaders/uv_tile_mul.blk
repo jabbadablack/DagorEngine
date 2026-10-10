@@ -1,0 +1,231 @@
+templateUid:t = "d309c50d-2f3d-4744-af09-1827087bf001"
+hint:t = "/*--------------------*/"
+
+node {
+  id:i = 0
+  x:r = 365.9876796714579
+  y:r = 467.8439425051335
+  descName:t = "const texture"
+  externalName:t = "tex"
+  pin {
+    name:t = "texture"
+    role:t = "out"
+    types:t = "texture2D"
+    customVarName:t = "sampler0"
+  }
+  property {
+    name:t = "external name"
+    val:t = "tex"
+  }
+}
+node {
+  id:i = 1
+  x:r = 363.88501026694047
+  y:r = 554.0533880903491
+  descName:t = "uv"
+  pin {
+    name:t = "tc"
+    role:t = "out"
+    types:t = "float2"
+    data {
+      code:t = "_in.tc"
+    }
+  }
+}
+node {
+  id:i = 2
+  x:r = 738.1601642710473
+  y:r = 477.30595482546204
+  descName:t = "tex2D"
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+  }
+  pin {
+    name:t = "coord"
+    role:t = "in"
+    types:t = "float2"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, $coord$, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 3
+  x:r = 569.946611909651
+  y:r = 572.9774127310062
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float2"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float2"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float2"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 4
+  x:r = 363.88501026694047
+  y:r = 627.64681724846
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = "uv_mul"
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    customVarName:t = "_uv_mul_35213"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = "uv_mul"
+  }
+}
+node {
+  id:i = 5
+  x:r = 909.5277207392197
+  y:r = 472.0492813141684
+  templateUid:t = "e9c40e8f-d682-4021-b803-6701341256af"
+  descName:t = "result"
+  externalName:t = ""
+  pin {
+    name:t = "color"
+    role:t = "in"
+    types:t = "float4"
+    data {
+      def_val:t = "float4(0.5, 0.5, 0.5, 0.5)"
+      def_val_blk:t = "0.5, 0.5, 0.5, 0.5"
+      code:t = "_out.col%MRT index% = $color$"
+      result_color:b = yes
+    }
+  }
+  pin {
+    name:t = "out"
+    role:t = "out"
+    types:t = "texture2D"
+  }
+  property {
+    name:t = "MRT index"
+    val:t = "0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+edge {
+  id:i = 0
+  elemA:i = 3
+  pinA:i = 0
+  elemB:i = 1
+  pinB:i = 0
+}
+edge {
+  id:i = 1
+  elemA:i = 4
+  pinA:i = 0
+  elemB:i = 3
+  pinB:i = 1
+}
+edge {
+  id:i = 2
+  elemA:i = 3
+  pinA:i = 2
+  elemB:i = 2
+  pinB:i = 1
+}
+edge {
+  id:i = 3
+  elemA:i = 2
+  pinA:i = 0
+  elemB:i = 0
+  pinB:i = 0
+}
+edge {
+  id:i = 4
+  elemA:i = 2
+  pinA:i = 2
+  elemB:i = 5
+  pinB:i = 0
+}
+
+description {
+  name:t = "[[description-name]]"
+  category:t = "[[description-category]]"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  allowLoop:b = no
+  width:i = 200
+  pin {
+    name:t = "tex"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 467
+  }
+  pin {
+    name:t = "out"
+    types:t = "texture2D"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 472
+    subgraphElem:i = 5
+    subgraphPin:i = 1
+  }
+  pin {
+    name:t = "uv_mul"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 627
+    data {
+      blk_code:t = "%uv_mul%"
+      code:t = "%uv_mul%"
+    }
+  }
+  property {
+    name:t = "uv_mul"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+}

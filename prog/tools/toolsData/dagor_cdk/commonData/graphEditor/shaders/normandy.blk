@@ -1,0 +1,11 @@
+templateUid:t = "77e7d147-dcc4-4185-b9a6-195444b7a361"
+
+
+description {
+  name:t = "[[description-name]]"
+  category:t = "[[description-category]]"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  allowLoop:b = no
+  width:i = 200
+}

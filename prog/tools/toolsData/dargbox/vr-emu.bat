@@ -1,0 +1,2 @@
+taskkill /f /im dargbox-dev.exe
+call dargbox.cmd -config:script:t=browser\filebrowser.ui.nut -path:. %1 %2 %3 -config:gameplay/enableVR:b=yes -config:video/vreye:t=both -config:xr/emulatorProfile:t=2064,2096,0.0681346512074297,-0.907571197,0.785398185,0.837758064,-0.872664630,-0.785398185,0.907571197,0.837758064,-0.872664630

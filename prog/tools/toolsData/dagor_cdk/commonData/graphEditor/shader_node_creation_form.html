@@ -1,0 +1,349 @@
+<html>
+<body>
+Name:<input id="node_name" size=40><br>
+Synonyms (separated by commas):<input id="node_synonyms" size=80><br>
+Category:
+<select id="node_category">
+  <option value="Math">Math</option>
+  <option value="Input">Input</option>
+  <option value="Output">Output</option>
+  <option value="Built-in">Built-in</option>
+  <option value="Curves">Curves</option>
+  <option value="Conversion">Conversion</option>
+  <option value="Periodic">Periodic</option>
+  <option value="Branching">Branching</option>
+</select><br>
+Width:<input id="node_width" size=5 value="120"><br>
+
+<br>
+Input pins:
+<div id="input_pin">
+  <div id="input_div_NNN" style="display:none;">
+    Name:<input id="input_pin_name_NNN" size=20>
+    Types:
+    <select id="input_pin_type_NNN">
+      <option value="&#34;int&#34;">int</option>
+      <option value="&#34;float&#34;">float</option>
+      <option value="&#34;float2&#34;">float2</option>
+      <option value="&#34;float3&#34;">float3</option>
+      <option value="&#34;float4&#34;">float4</option>
+      <option value="&#34;float&#34;, &#34;float2&#34;, &#34;float3&#34;, &#34;float4&#34;">float, float2, float3, float4</option>
+      <option value="&#34;float2&#34;, &#34;float3&#34;, &#34;float4&#34;">float2, float3, float4</option>
+      <option value="&#34;float3&#34;, &#34;float4&#34;">float3, float4</option>
+      <option value="&#34;texture2D&#34;">texture2D</option>
+    </select>
+    Type group:
+    <select id="input_pin_types_group_NNN">
+      <option value="none">none</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+    </select>
+    1 by default: <input id="input_pin_one_by_default_NNN" type="checkbox">
+  </div>
+</div>
+
+<br>
+Output pins:
+<div id="output_pin">
+  <div id="output_div_NNN" style="display:none;">
+    Name:<input id="output_pin_name_NNN" size=20>
+    Types:
+    <select id="output_pin_type_NNN">
+      <option value="&#34;int&#34;">int</option>
+      <option value="&#34;float&#34;">float</option>
+      <option value="&#34;float2&#34;">float2</option>
+      <option value="&#34;float3&#34;">float3</option>
+      <option value="&#34;float4&#34;">float4</option>
+      <option value="&#34;float&#34;, &#34;float2&#34;, &#34;float3&#34;, &#34;float4&#34;">float, float2, float3, float4</option>
+      <option value="&#34;float2&#34;, &#34;float3&#34;, &#34;float4&#34;">float2, float3, float4</option>
+      <option value="&#34;float3&#34;, &#34;float4&#34;">float3, float4</option>
+      <option value="&#34;texture2D&#34;">texture2D</option>
+    </select>
+    Type group:
+    <select id="output_pin_types_group_NNN">
+      <option value="none">none</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+    </select>
+    Code:<input id="output_pin_code_NNN" size=30>
+  </div>
+</div>
+
+<br>
+Properties:
+<div id="property">
+  <div id="property_div_NNN" style="display:none;">
+    Name:<input id="property_name_NNN" size=20>
+    Types:
+    <select id="property_type_NNN" onchange="display_property_type_ui('_NNN')">
+      <option value="&#34;int&#34;">int</option>
+      <option value="&#34;float&#34;">float</option>
+      <option value="&#34;float2&#34;">float2</option>
+      <option value="&#34;float3&#34;">float3</option>
+      <option value="&#34;float4&#34;">float4</option>
+      <option value="&#34;color&#34;">color</option>
+      <option value="&#34;string&#34;">string</option>
+      <option value="&#34;combobox&#34;">combobox</option>
+    </select>
+    Create input pin: <input id="property_create_input_NNN" type="checkbox">
+    <span id="property_num_NNN" style="display:inline;">
+      Min:<input id="property_min_NNN" size=5 value="0">
+      Max:<input id="property_max_NNN" size=5 value="1">
+      step:<input id="property_step_NNN" size=5 value="0.01">
+      default:<input id="property_def_NNN" size=5 value="0.5">
+    </span>
+    <span id="property_color_NNN" style="display:none;">
+      default:<input id="property_color_def_NNN" size=20 value="0.5, 0.5, 0.5, 1.0">
+    </span>
+    <span id="property_string_NNN" style="display:none;">
+      default:<input id="property_string_def_NNN" size=20 value="">
+    </span>
+    <span id="property_combobox_NNN" style="display:none;">
+      Values (separated by comma):<input id="property_values_NNN" size=30 value="">
+    </span>
+  </div>
+</div>
+
+<br>
+<br>
+<div id="node_text" style="font-family:monospace; white-space: pre;">
+</div>
+<br>
+<br>
+<br>
+<br>
+
+</body>
+
+<script>
+
+function instantiate(divName, count)
+{
+  var elem = document.getElementById(divName);
+  var html = elem.innerHTML;
+  var sum = "";
+  var a = html.split("_NNN");
+  for (var i = 0; i < count; i++)
+    sum += a.join("_" + i);
+
+  elem.innerHTML = sum;
+}
+
+var prevNodeText = "";
+
+function update()
+{
+  var s = '{\n';
+  s += '  name: "' + document.getElementById("node_name").value + '",\n';
+  s += '  synonyms: "' + document.getElementById("node_synonyms").value + '",\n';
+  s += '  category: "' + document.getElementById("node_category").value + '",\n';
+  s += '  pins: [\n';
+
+  for (var i = 0; document.getElementById("input_pin_name_" + i); i++)
+    if (document.getElementById("input_pin_name_" + i).value != "")
+    {
+      s += '    { ';
+      s += 'name: "' + document.getElementById("input_pin_name_" + i).value + '", ';
+      s += 'types: [' + document.getElementById("input_pin_type_" + i).value + '], ';
+      s += 'singleConnect: true, ';
+      s += 'role: "in", ';
+      s += 'data: {' + (document.getElementById("input_pin_one_by_default_" + i).checked ? "def_1:true": "") + '}';
+      s += ' },\n';
+
+      var next = document.getElementById("input_div_" + (i + 1));
+      if (next)
+        next.style.display = 'block';
+    }
+
+  for (var i = 0; document.getElementById("property_name_" + i); i++)
+    if (document.getElementById("property_name_" + i).value != "" && document.getElementById("property_create_input_" + i).checked)
+    {
+      var type = document.getElementById("property_type_" + i).value;
+      if (type === '"string"' || type === '"combobox"')
+        continue;
+
+      var comp = ["", ".x", ".y", ".z", ".w"];
+      var minComp = 0;
+      var maxComp = 0;
+      var addType = false;
+
+      if (type === '"float2"')
+      {
+        minComp = 1;
+        maxComp = 2;
+      }
+      if (type === '"float3"')
+      {
+        minComp = 1;
+        maxComp = 3;
+      }
+      if (type === '"float4"')
+      {
+        minComp = 1;
+        maxComp = 4;
+      }
+
+      if (type === '"color"')
+      {
+        type = '"float4"';
+        addType = true;
+      }
+
+      var code = "";
+      if (minComp !== maxComp || addType)
+      {
+        code = type.split('"').join('') + "(";
+        for (var c = minComp; c <= maxComp; c++)
+        {
+          code += '%' + document.getElementById("property_name_" + i).value + comp[c] + '%';
+          if (c != maxComp)
+            code += ', ';
+        }
+        code += ")";
+      }
+      else
+        code = '%' + document.getElementById("property_name_" + i).value + '%';
+
+      s += '    { ';
+      s += 'name: "' + document.getElementById("property_name_" + i).value + '", ';
+      s += 'types: [' + type + '], ';
+      s += 'singleConnect: true, ';
+      s += 'role: "in", ';
+      s += 'data: {def_val:"' + code + '"}';
+      s += ' },\n';
+    }
+
+  for (var i = 0; document.getElementById("output_pin_name_" + i); i++)
+    if (document.getElementById("output_pin_name_" + i).value != "")
+    {
+      s += '    { ';
+      s += 'name: "' + document.getElementById("output_pin_name_" + i).value + '", ';
+      s += 'types: [' + document.getElementById("output_pin_type_" + i).value + '], ';
+      s += 'singleConnect: false, ';
+      s += 'role: "out", ';
+      s += 'data: {code:....}';
+      s += ' },\n';
+
+      var next = document.getElementById("output_div_" + (i + 1));
+      if (next)
+        next.style.display = 'block';
+    }
+
+  s += '  ],\n';
+  s += '  properties: [\n';
+
+  for (var i = 0; document.getElementById("property_name_" + i); i++)
+    if (document.getElementById("property_name_" + i).value != "")
+    {
+      var comp = ["", ".x", ".y", ".z", ".w"];
+      var minComp = 0;
+      var maxComp = 0;
+
+      var type = document.getElementById("property_type_" + i).value;
+      if (type === '"float2"')
+      {
+        minComp = 1;
+        maxComp = 2;
+      }
+      if (type === '"float3"')
+      {
+        minComp = 1;
+        maxComp = 3;
+      }
+      if (type === '"float4"')
+      {
+        minComp = 1;
+        maxComp = 4;
+      }
+
+      for (var c = minComp; c <= maxComp; c++)
+      {
+        s += '    { ';
+        s += 'name: "' + document.getElementById("property_name_" + i).value + comp[c] + '", ';
+        s += 'type: ' + document.getElementById("property_type_" + i).value + ', ';
+
+        if (type === '"string"')
+        {
+          s += 'val:"' + document.getElementById("property_string_def_" + i).value + '", ';
+        }
+        else if (type === '"color"')
+        {
+          s += 'minVal:"' + document.getElementById("property_min_" + i).value + '", ';
+          s += 'maxVal:"' + document.getElementById("property_max_" + i).value + '", ';
+          s += 'step:"' + document.getElementById("property_step_" + i).value + '", ';
+          s += 'val:"' + document.getElementById("property_color_def_" + i).value + '", ';
+        }
+        else if (type === '"combobox"')
+        {
+          var values = document.getElementById("property_values_" + i).value.split(',');
+          s += 'items:[';
+          for (var j = 0; j < values.length; j++)
+            s += (j === 0 ? "" : ", ") + '"' + values[j].trim() + '"';
+          s += '], ';
+          s += 'val:"' + values[0] + '"';
+        }
+        else
+        {
+          s += 'minVal:"' + document.getElementById("property_min_" + i).value + '", ';
+          s += 'maxVal:"' + document.getElementById("property_max_" + i).value + '", ';
+          s += 'step:"' + document.getElementById("property_step_" + i).value + '", ';
+          s += 'val:"' + document.getElementById("property_def_" + i).value + '", ';
+        }
+        s += ' },\n';
+      }
+
+      var next = document.getElementById("property_div_" + (i + 1));
+      if (next)
+        next.style.display = 'block';
+    }
+
+  s += '  ],\n';
+  s += '  allowLoop: false,\n';
+  s += '  width: ' + document.getElementById("node_width").value + ',\n';
+  s += '}\n';
+
+  if (s !== prevNodeText)
+  {
+    prevNodeText = s;
+    document.getElementById("node_text").innerText = s;
+  }
+}
+
+function display_property_type_ui(n)
+{
+  var type = document.getElementById("property_type" + n).value;
+
+  document.getElementById("property_num" + n).style.display = 'none';
+  document.getElementById("property_color" + n).style.display = 'none';
+  document.getElementById("property_combobox" + n).style.display = 'none';
+  document.getElementById("property_string" + n).style.display = 'none';
+
+  if (type == '"color"')
+    document.getElementById("property_color" + n).style.display = 'inline';
+  else if (type == '"combobox"')
+    document.getElementById("property_combobox" + n).style.display = 'inline';
+  else if (type == '"string"')
+    document.getElementById("property_string" + n).style.display = 'inline';
+  else
+    document.getElementById("property_num" + n).style.display = 'inline';
+}
+
+window.onload = function()
+{
+  instantiate("input_pin", 40);
+  instantiate("output_pin", 40);
+  instantiate("property", 40);
+
+  document.getElementById("input_div_0").style.display = 'block';
+  document.getElementById("output_div_0").style.display = 'block';
+  document.getElementById("property_div_0").style.display = 'block';
+  
+  setInterval(update, 100);
+}
+
+</script>
+
+
+</html>

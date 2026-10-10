@@ -1,0 +1,3681 @@
+graphTextureWidth:i=4096
+graphTextureHeight:i=4096
+graphTextureDepth:i=4096
+graphTextureType:t="R32F"
+graphTextureWrap:t="clamp"
+
+node{
+  id:i=0
+  x:r=680
+  y:r=1040
+  descName:t="slope"
+  plugin:t="shader_editor"
+
+  pin{
+    name:t="tex"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="dist"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%dist%"
+      code:t="%dist%"
+    }
+  }
+
+  pin{
+    name:t="out"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="mult"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%mult%"
+      code:t="%mult%"
+    }
+  }
+
+  property{
+    name:t="dist"
+    val:t="0.0002"
+  }
+
+  property{
+    name:t="mult"
+    val:t="2048.0"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=1
+  x:r=1400
+  y:r=1660
+  descName:t="subgraph out"
+
+  pin{
+    name:t="subgraph out"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="name"
+    val:t="Flat surface"
+  }
+}
+
+node{
+  id:i=2
+  x:r=320
+  y:r=1100
+  descName:t="gaussian blur"
+
+  pin{
+    name:t="base"
+    role:t="in"
+    types:t="texture2D"
+
+    data{
+      second_pass_in:b=yes
+    }
+  }
+
+  pin{
+    name:t="dist"
+    role:t="in"
+    types:t="texture2D"
+
+    data{
+      def_1:b=yes
+    }
+  }
+
+  pin{
+    name:t="res"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="distance"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%distance%"
+    }
+  }
+
+  pin{
+    name:t="sigma"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%sigma%"
+    }
+  }
+
+  pin{
+    name:t="gaussian"
+    role:t="in"
+    types:t="bool"
+
+    data{
+      blk_code:t="%gaussian%"
+    }
+  }
+
+  pin{
+    name:t="wrap"
+    role:t="in"
+    types:t="bool"
+
+    data{
+      blk_code:t="%wrap%"
+    }
+  }
+
+  pin{
+    name:t="vertical"
+    role:t="in"
+    types:t="bool"
+
+    data{
+      blk_code:t="true"
+      second_pass_blk_code:t="false"
+    }
+  }
+
+  property{
+    name:t="distance"
+    val:t="0.001"
+  }
+
+  property{
+    name:t="sigma"
+    val:t="0.227761"
+  }
+
+  property{
+    name:t="gaussian"
+    val:t="false"
+  }
+
+  property{
+    name:t="wrap"
+    val:t="true"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=3
+  x:r=500
+  y:r=1040
+  descName:t="-"
+
+  pin{
+    name:t="a"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="b"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="a-b"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=4
+  x:r=180
+  y:r=1040
+  descName:t="pass"
+
+  pin{
+    name:t=">>"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t=">>>"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=5
+  x:r=320
+  y:r=160
+  descName:t="gaussian blur"
+
+  pin{
+    name:t="base"
+    role:t="in"
+    types:t="texture2D"
+
+    data{
+      second_pass_in:b=yes
+    }
+  }
+
+  pin{
+    name:t="dist"
+    role:t="in"
+    types:t="texture2D"
+
+    data{
+      def_1:b=yes
+    }
+  }
+
+  pin{
+    name:t="res"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="distance"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%distance%"
+    }
+  }
+
+  pin{
+    name:t="sigma"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%sigma%"
+    }
+  }
+
+  pin{
+    name:t="gaussian"
+    role:t="in"
+    types:t="bool"
+
+    data{
+      blk_code:t="%gaussian%"
+    }
+  }
+
+  pin{
+    name:t="wrap"
+    role:t="in"
+    types:t="bool"
+
+    data{
+      blk_code:t="%wrap%"
+    }
+  }
+
+  pin{
+    name:t="vertical"
+    role:t="in"
+    types:t="bool"
+
+    data{
+      blk_code:t="true"
+      second_pass_blk_code:t="false"
+    }
+  }
+
+  property{
+    name:t="distance"
+    val:t="0.003"
+  }
+
+  property{
+    name:t="sigma"
+    val:t="0.227761"
+  }
+
+  property{
+    name:t="gaussian"
+    val:t="false"
+  }
+
+  property{
+    name:t="wrap"
+    val:t="true"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=6
+  x:r=520
+  y:r=100
+  descName:t="-"
+
+  pin{
+    name:t="a"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="b"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="a-b"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=7
+  x:r=160
+  y:r=100
+  descName:t="pass"
+
+  pin{
+    name:t=">>"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t=">>>"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=8
+  x:r=220
+  y:r=3280
+  descName:t="pass"
+
+  pin{
+    name:t=">>"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t=">>>"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="/ 2"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=9
+  x:r=680
+  y:r=3380
+  descName:t="autolevels"
+
+  pin{
+    name:t="tex"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="res"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=10
+  x:r=440
+  y:r=660
+  descName:t="slope"
+  plugin:t="shader_editor"
+
+  pin{
+    name:t="tex"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="dist"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%dist%"
+      code:t="%dist%"
+    }
+  }
+
+  pin{
+    name:t="out"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="mult"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%mult%"
+      code:t="%mult%"
+    }
+  }
+
+  property{
+    name:t="dist"
+    val:t="0.0002"
+  }
+
+  property{
+    name:t="mult"
+    val:t="128.0"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=11
+  x:r=180
+  y:r=660
+  descName:t="pass"
+
+  pin{
+    name:t=">>"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t=">>>"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=12
+  x:r=720
+  y:r=100
+  descName:t="curvature"
+
+  pin{
+    name:t="tex"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="curvature"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="scale"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%scale%"
+    }
+  }
+
+  property{
+    name:t="scale"
+    val:t="2.0"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=13
+  x:r=340
+  y:r=1660
+  descName:t="get normal"
+
+  pin{
+    name:t="tex"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="normal"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="cell_size"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%cell_size%"
+    }
+  }
+
+  property{
+    name:t="cell_size"
+    val:t="8.0"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=14
+  x:r=180
+  y:r=1660
+  descName:t="pass"
+
+  pin{
+    name:t=">>"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t=">>>"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="ARGB32F"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=15
+  x:r=680
+  y:r=3940
+  descName:t="1-x"
+
+  pin{
+    name:t="x"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="1-x"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=16
+  x:r=560
+  y:r=1660
+  descName:t="extract_color"
+  plugin:t="shader_editor"
+
+  pin{
+    name:t="out"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="texture"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="color"
+    role:t="in"
+    types:t="float4"
+
+    data{
+      blk_code:t="%color.x%, %color.y%, %color.z%, %color.w%"
+      code:t="float4(%color.x%, %color.y%, %color.z%, %color.w%)"
+    }
+  }
+
+  pin{
+    name:t="channels mask"
+    role:t="in"
+    types:t="float4"
+
+    data{
+      blk_code:t="%channels mask.x%, %channels mask.y%, %channels mask.z%, %channels mask.w%"
+      code:t="float4(%channels mask.x%, %channels mask.y%, %channels mask.z%, %channels mask.w%)"
+    }
+  }
+
+  pin{
+    name:t="sensitivity"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%sensitivity%"
+      code:t="%sensitivity%"
+    }
+  }
+
+  pin{
+    name:t="threshold"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%threshold%"
+      code:t="%threshold%"
+    }
+  }
+
+  property{
+    name:t="color.x"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="color.y"
+    val:t="0.0"
+  }
+
+  property{
+    name:t="color.z"
+    val:t="0.0"
+  }
+
+  property{
+    name:t="color.w"
+    val:t="0.0"
+  }
+
+  property{
+    name:t="channels mask.x"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="channels mask.y"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="channels mask.z"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="channels mask.w"
+    val:t="0.0"
+  }
+
+  property{
+    name:t="sensitivity"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="threshold"
+    val:t="0.0"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=17
+  x:r=560
+  y:r=1840
+  descName:t="const rgba"
+
+  pin{
+    name:t="tex"
+    role:t="out"
+    types:t="texture2D"
+
+    data{
+      isColor:b=yes
+    }
+  }
+
+  pin{
+    name:t="vect"
+    role:t="out"
+    types:t="float4"
+
+    data{
+      blk_code:t="%color%"
+    }
+  }
+
+  property{
+    name:t="color"
+    val:t="0.502, 0.498, 1.000, 1.000"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="ARGB32F"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=18
+  x:r=200
+  y:r=2320
+  descName:t="pass"
+
+  pin{
+    name:t=">>"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t=">>>"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=19
+  x:r=220
+  y:r=2980
+  descName:t="pass"
+
+  pin{
+    name:t=">>"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t=">>>"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=20
+  x:r=200
+  y:r=3940
+  descName:t="pass"
+
+  pin{
+    name:t=">>"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t=">>>"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=21
+  x:r=-460
+  y:r=-440
+  descName:t="autolevels"
+
+  pin{
+    name:t="tex"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="res"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=22
+  x:r=320
+  y:r=-440
+  descName:t="curvature"
+
+  pin{
+    name:t="tex"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="curvature"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="scale"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%scale%"
+    }
+  }
+
+  property{
+    name:t="scale"
+    val:t="2.0"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=23
+  x:r=160
+  y:r=-440
+  descName:t="pass"
+
+  pin{
+    name:t=">>"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t=">>>"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=24
+  x:r=320
+  y:r=-300
+  descName:t="curvature"
+
+  pin{
+    name:t="tex"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="curvature"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="scale"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%scale%"
+    }
+  }
+
+  property{
+    name:t="scale"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=25
+  x:r=160
+  y:r=-300
+  descName:t="pass"
+
+  pin{
+    name:t=">>"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t=">>>"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="/ 2"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=26
+  x:r=540
+  y:r=-440
+  descName:t="*"
+
+  pin{
+    name:t="a"
+    role:t="in"
+    types:t="texture2D"
+
+    data{
+      def_1:b=yes
+    }
+  }
+
+  pin{
+    name:t="b"
+    role:t="in"
+    types:t="texture2D"
+
+    data{
+      def_1:b=yes
+    }
+  }
+
+  pin{
+    name:t="a*b"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=27
+  x:r=-1020
+  y:r=-300
+  descName:t="subgraph in: float"
+
+  pin{
+    name:t="subgraph in"
+    role:t="out"
+    types:t="float"
+  }
+
+  property{
+    name:t="name"
+    val:t="curvature scale"
+  }
+}
+
+node{
+  id:i=28
+  x:r=-1020
+  y:r=-440
+  descName:t="subgraph in: texture2D"
+
+  pin{
+    name:t="subgraph in"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="name"
+    val:t="heightmap"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=29
+  x:r=1400
+  y:r=-440
+  descName:t="subgraph out"
+
+  pin{
+    name:t="subgraph out"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="name"
+    val:t="Curvature"
+  }
+}
+
+node{
+  id:i=30
+  x:r=1400
+  y:r=100
+  descName:t="subgraph out"
+
+  pin{
+    name:t="subgraph out"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="name"
+    val:t="Highpass height"
+  }
+}
+
+node{
+  id:i=31
+  x:r=1400
+  y:r=660
+  descName:t="subgraph out"
+
+  pin{
+    name:t="subgraph out"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="name"
+    val:t="Slope"
+  }
+}
+
+node{
+  id:i=32
+  x:r=1400
+  y:r=1040
+  descName:t="subgraph out"
+
+  pin{
+    name:t="subgraph out"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="name"
+    val:t="Highpass slope"
+  }
+}
+
+node{
+  id:i=33
+  x:r=960
+  y:r=660
+  descName:t="saturate"
+
+  pin{
+    name:t="x"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="saturate(x)"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=34
+  x:r=960
+  y:r=1040
+  descName:t="saturate"
+
+  pin{
+    name:t="x"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="saturate(x)"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=35
+  x:r=320
+  y:r=2320
+  descName:t="curvature"
+
+  pin{
+    name:t="tex"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="curvature"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="scale"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%scale%"
+    }
+  }
+
+  property{
+    name:t="scale"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=36
+  x:r=1260
+  y:r=1660
+  descName:t="pass"
+
+  pin{
+    name:t=">>"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t=">>>"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="R32F"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=37
+  x:r=620
+  y:r=2320
+  descName:t="levels"
+  plugin:t="shader_editor"
+
+  pin{
+    name:t="input"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="out"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="in_low"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%in_low%"
+      code:t="%in_low%"
+    }
+  }
+
+  pin{
+    name:t="mid"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%mid%"
+      code:t="%mid%"
+    }
+  }
+
+  pin{
+    name:t="in_high"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%in_high%"
+      code:t="%in_high%"
+    }
+  }
+
+  pin{
+    name:t="out_low"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%out_low%"
+      code:t="%out_low%"
+    }
+  }
+
+  pin{
+    name:t="out_high"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%out_high%"
+      code:t="%out_high%"
+    }
+  }
+
+  property{
+    name:t="in_low"
+    val:t="0.5"
+  }
+
+  property{
+    name:t="mid"
+    val:t="0.5"
+  }
+
+  property{
+    name:t="in_high"
+    val:t="0.0"
+  }
+
+  property{
+    name:t="out_low"
+    val:t="0.0"
+  }
+
+  property{
+    name:t="out_high"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=38
+  x:r=620
+  y:r=2540
+  descName:t="levels"
+  plugin:t="shader_editor"
+
+  pin{
+    name:t="input"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="out"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="in_low"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%in_low%"
+      code:t="%in_low%"
+    }
+  }
+
+  pin{
+    name:t="mid"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%mid%"
+      code:t="%mid%"
+    }
+  }
+
+  pin{
+    name:t="in_high"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%in_high%"
+      code:t="%in_high%"
+    }
+  }
+
+  pin{
+    name:t="out_low"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%out_low%"
+      code:t="%out_low%"
+    }
+  }
+
+  pin{
+    name:t="out_high"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%out_high%"
+      code:t="%out_high%"
+    }
+  }
+
+  property{
+    name:t="in_low"
+    val:t="0.5"
+  }
+
+  property{
+    name:t="mid"
+    val:t="0.5"
+  }
+
+  property{
+    name:t="in_high"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="out_low"
+    val:t="0.0"
+  }
+
+  property{
+    name:t="out_high"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=39
+  x:r=360
+  y:r=2980
+  descName:t="heightmap occlusion"
+
+  pin{
+    name:t="heightmap"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="res"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="strength"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%strength%"
+    }
+  }
+
+  pin{
+    name:t="octaves"
+    role:t="in"
+    types:t="int"
+
+    data{
+      blk_code:t="%octaves%"
+    }
+  }
+
+  property{
+    name:t="strength"
+    val:t="4.0"
+  }
+
+  property{
+    name:t="octaves"
+    val:t="8"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=40
+  x:r=360
+  y:r=3280
+  descName:t="erosion"
+
+  pin{
+    name:t="height map"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="hardness map"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="eroded height map"
+    role:t="out"
+    types:t="texture2D"
+
+    data{
+      is_uav:b=yes
+    }
+  }
+
+  pin{
+    name:t="sedimention map"
+    role:t="out"
+    types:t="texture2D"
+
+    data{
+      is_uav:b=yes
+    }
+  }
+
+  pin{
+    name:t="deposition map"
+    role:t="out"
+    types:t="texture2D"
+
+    data{
+      is_uav:b=yes
+    }
+  }
+
+  pin{
+    name:t="flow map X"
+    role:t="out"
+    types:t="texture2D"
+
+    data{
+      is_uav:b=yes
+    }
+  }
+
+  pin{
+    name:t="flow map Y"
+    role:t="out"
+    types:t="texture2D"
+
+    data{
+      is_uav:b=yes
+    }
+  }
+
+  pin{
+    name:t="water flow"
+    role:t="out"
+    types:t="texture2D"
+
+    data{
+      is_uav:b=yes
+    }
+  }
+
+  pin{
+    name:t="inertia"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%inertia%"
+    }
+  }
+
+  pin{
+    name:t="erosion_speed"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%erosion_speed%"
+    }
+  }
+
+  pin{
+    name:t="deposit_speed"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%deposit_speed%"
+    }
+  }
+
+  pin{
+    name:t="evaporate_speed"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%evaporate_speed%"
+    }
+  }
+
+  pin{
+    name:t="start_drop_speed"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%start_drop_speed%"
+    }
+  }
+
+  pin{
+    name:t="start_drop_water"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%start_drop_water%"
+    }
+  }
+
+  pin{
+    name:t="min_sediment_capacity"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%min_sediment_capacity%"
+    }
+  }
+
+  pin{
+    name:t="sediment_capacity_factor"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%sediment_capacity_factor%"
+    }
+  }
+
+  pin{
+    name:t="gravity"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%gravity%"
+    }
+  }
+
+  pin{
+    name:t="drops_multiplier"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%drops_multiplier%"
+    }
+  }
+
+  pin{
+    name:t="erosion_radius"
+    role:t="in"
+    types:t="int"
+
+    data{
+      blk_code:t="%erosion_radius%"
+    }
+  }
+
+  pin{
+    name:t="drop_lifetime"
+    role:t="in"
+    types:t="int"
+
+    data{
+      blk_code:t="%drop_lifetime%"
+    }
+  }
+
+  pin{
+    name:t="flow_map_inertion"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%flow_map_inertion%"
+    }
+  }
+
+  pin{
+    name:t="flow_map_normalized"
+    role:t="in"
+    types:t="bool"
+
+    data{
+      blk_code:t="%flow_map_normalized%"
+    }
+  }
+
+  pin{
+    name:t="flow_map_signed"
+    role:t="in"
+    types:t="bool"
+
+    data{
+      blk_code:t="%flow_map_signed%"
+    }
+  }
+
+  pin{
+    name:t="use_gpu"
+    role:t="in"
+    types:t="bool"
+
+    data{
+      blk_code:t="%use_gpu%"
+    }
+  }
+
+  pin{
+    name:t="physical_width"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%physical_width%"
+    }
+  }
+
+  pin{
+    name:t="physical_height"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%physical_height%"
+    }
+  }
+
+  pin{
+    name:t="gravity_influence_on_flow"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%gravity_influence_on_flow%"
+    }
+  }
+
+  pin{
+    name:t="precipitation map"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="use_unorm_direction_map"
+    role:t="in"
+    types:t="bool"
+
+    data{
+      blk_code:t="%use_unorm_direction_map%"
+    }
+  }
+
+  pin{
+    name:t="direction map"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="direction_speed"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%direction_speed%"
+    }
+  }
+
+  property{
+    name:t="inertia"
+    val:t="0.01"
+  }
+
+  property{
+    name:t="erosion_speed"
+    val:t="0.005"
+  }
+
+  property{
+    name:t="deposit_speed"
+    val:t="0.1"
+  }
+
+  property{
+    name:t="evaporate_speed"
+    val:t="0.1"
+  }
+
+  property{
+    name:t="start_drop_speed"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="start_drop_water"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="min_sediment_capacity"
+    val:t="0.001"
+  }
+
+  property{
+    name:t="sediment_capacity_factor"
+    val:t="6.0"
+  }
+
+  property{
+    name:t="gravity"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="drops_multiplier"
+    val:t="8.0"
+  }
+
+  property{
+    name:t="erosion_radius"
+    val:t="1"
+  }
+
+  property{
+    name:t="drop_lifetime"
+    val:t="25"
+  }
+
+  property{
+    name:t="flow_map_inertion"
+    val:t="0.6"
+  }
+
+  property{
+    name:t="flow_map_normalized"
+    val:t="false"
+  }
+
+  property{
+    name:t="flow_map_signed"
+    val:t="false"
+  }
+
+  property{
+    name:t="use_gpu"
+    val:t="true"
+  }
+
+  property{
+    name:t="physical_width"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="physical_height"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="gravity_influence_on_flow"
+    val:t="0.0"
+  }
+
+  property{
+    name:t="use_unorm_direction_map"
+    val:t="true"
+  }
+
+  property{
+    name:t="direction_speed"
+    val:t="0.05"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=41
+  x:r=400
+  y:r=4120
+  descName:t="const rgba"
+
+  pin{
+    name:t="tex"
+    role:t="out"
+    types:t="texture2D"
+
+    data{
+      isColor:b=yes
+    }
+  }
+
+  pin{
+    name:t="vect"
+    role:t="out"
+    types:t="float4"
+
+    data{
+      blk_code:t="%color%"
+    }
+  }
+
+  property{
+    name:t="color"
+    val:t="0.5,1.0,0.5,0"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="ARGB32F"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=42
+  x:r=400
+  y:r=4460
+  descName:t="const rgba"
+
+  pin{
+    name:t="tex"
+    role:t="out"
+    types:t="texture2D"
+
+    data{
+      isColor:b=yes
+    }
+  }
+
+  pin{
+    name:t="vect"
+    role:t="out"
+    types:t="float4"
+
+    data{
+      blk_code:t="%color%"
+    }
+  }
+
+  property{
+    name:t="color"
+    val:t="1.0,0.5,0.5,0"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="ARGB32F"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=43
+  x:r=400
+  y:r=3940
+  descName:t="extract_color"
+  plugin:t="shader_editor"
+
+  pin{
+    name:t="out"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="texture"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="color"
+    role:t="in"
+    types:t="float4"
+
+    data{
+      blk_code:t="%color.x%, %color.y%, %color.z%, %color.w%"
+      code:t="float4(%color.x%, %color.y%, %color.z%, %color.w%)"
+    }
+  }
+
+  pin{
+    name:t="channels mask"
+    role:t="in"
+    types:t="float4"
+
+    data{
+      blk_code:t="%channels mask.x%, %channels mask.y%, %channels mask.z%, %channels mask.w%"
+      code:t="float4(%channels mask.x%, %channels mask.y%, %channels mask.z%, %channels mask.w%)"
+    }
+  }
+
+  pin{
+    name:t="sensitivity"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%sensitivity%"
+      code:t="%sensitivity%"
+    }
+  }
+
+  pin{
+    name:t="threshold"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%threshold%"
+      code:t="%threshold%"
+    }
+  }
+
+  property{
+    name:t="color.x"
+    val:t="0.5"
+  }
+
+  property{
+    name:t="color.y"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="color.z"
+    val:t="0.5"
+  }
+
+  property{
+    name:t="color.w"
+    val:t="0.0"
+  }
+
+  property{
+    name:t="channels mask.x"
+    val:t="0"
+  }
+
+  property{
+    name:t="channels mask.y"
+    val:t="1"
+  }
+
+  property{
+    name:t="channels mask.z"
+    val:t="0"
+  }
+
+  property{
+    name:t="channels mask.w"
+    val:t="0"
+  }
+
+  property{
+    name:t="sensitivity"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="threshold"
+    val:t="0.0"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=44
+  x:r=400
+  y:r=4280
+  descName:t="extract_color"
+  plugin:t="shader_editor"
+
+  pin{
+    name:t="out"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="texture"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t="color"
+    role:t="in"
+    types:t="float4"
+
+    data{
+      blk_code:t="%color.x%, %color.y%, %color.z%, %color.w%"
+      code:t="float4(%color.x%, %color.y%, %color.z%, %color.w%)"
+    }
+  }
+
+  pin{
+    name:t="channels mask"
+    role:t="in"
+    types:t="float4"
+
+    data{
+      blk_code:t="%channels mask.x%, %channels mask.y%, %channels mask.z%, %channels mask.w%"
+      code:t="float4(%channels mask.x%, %channels mask.y%, %channels mask.z%, %channels mask.w%)"
+    }
+  }
+
+  pin{
+    name:t="sensitivity"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%sensitivity%"
+      code:t="%sensitivity%"
+    }
+  }
+
+  pin{
+    name:t="threshold"
+    role:t="in"
+    types:t="float"
+
+    data{
+      blk_code:t="%threshold%"
+      code:t="%threshold%"
+    }
+  }
+
+  property{
+    name:t="color.x"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="color.y"
+    val:t="0.5"
+  }
+
+  property{
+    name:t="color.z"
+    val:t="0.5"
+  }
+
+  property{
+    name:t="color.w"
+    val:t="0.0"
+  }
+
+  property{
+    name:t="channels mask.x"
+    val:t="1"
+  }
+
+  property{
+    name:t="channels mask.y"
+    val:t="0"
+  }
+
+  property{
+    name:t="channels mask.z"
+    val:t="0"
+  }
+
+  property{
+    name:t="channels mask.w"
+    val:t="0"
+  }
+
+  property{
+    name:t="sensitivity"
+    val:t="1.0"
+  }
+
+  property{
+    name:t="threshold"
+    val:t="0.0"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="parent type"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=45
+  x:r=1180
+  y:r=3940
+  descName:t="pass"
+
+  pin{
+    name:t=">>"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t=">>>"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="R32F"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=46
+  x:r=1180
+  y:r=4280
+  descName:t="pass"
+
+  pin{
+    name:t=">>"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  pin{
+    name:t=">>>"
+    role:t="out"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="texture width"
+    val:t="parent size"
+  }
+
+  property{
+    name:t="texture height"
+    val:t="width"
+  }
+
+  property{
+    name:t="texture type"
+    val:t="R32F"
+  }
+
+  property{
+    name:t="texture wrap"
+    val:t="parent wrap"
+  }
+}
+
+node{
+  id:i=47
+  x:r=1400
+  y:r=2540
+  descName:t="subgraph out"
+
+  pin{
+    name:t="subgraph out"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="name"
+    val:t="Concave (valleys)"
+  }
+}
+
+node{
+  id:i=48
+  x:r=1400
+  y:r=2320
+  descName:t="subgraph out"
+
+  pin{
+    name:t="subgraph out"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="name"
+    val:t="Convex (ridges)"
+  }
+}
+
+node{
+  id:i=49
+  x:r=1400
+  y:r=2980
+  descName:t="subgraph out"
+
+  pin{
+    name:t="subgraph out"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="name"
+    val:t="Occlusion"
+  }
+}
+
+node{
+  id:i=50
+  x:r=1400
+  y:r=3380
+  descName:t="subgraph out"
+
+  pin{
+    name:t="subgraph out"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="name"
+    val:t="Flow"
+  }
+}
+
+node{
+  id:i=53
+  x:r=1380
+  y:r=3940
+  descName:t="subgraph out"
+
+  pin{
+    name:t="subgraph out"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="name"
+    val:t="aspect (north)"
+  }
+}
+
+node{
+  id:i=54
+  x:r=1380
+  y:r=4280
+  descName:t="subgraph out"
+
+  pin{
+    name:t="subgraph out"
+    role:t="in"
+    types:t="texture2D"
+  }
+
+  property{
+    name:t="name"
+    val:t="aspect (east)"
+  }
+}
+
+node{
+  id:i=55
+  x:r=-1020
+  y:r=-100
+  descName:t="subgraph in: float"
+
+  pin{
+    name:t="subgraph in"
+    role:t="out"
+    types:t="float"
+  }
+
+  property{
+    name:t="name"
+    val:t="slope distance"
+  }
+}
+
+node{
+  id:i=56
+  x:r=-1020
+  y:r=0
+  descName:t="subgraph in: float"
+
+  pin{
+    name:t="subgraph in"
+    role:t="out"
+    types:t="float"
+  }
+
+  property{
+    name:t="name"
+    val:t="highpass slope distance"
+  }
+}
+
+node{
+  id:i=57
+  x:r=-1020
+  y:r=100
+  descName:t="subgraph in: float"
+
+  pin{
+    name:t="subgraph in"
+    role:t="out"
+    types:t="float"
+  }
+
+  property{
+    name:t="name"
+    val:t="highpass slope radius"
+  }
+}
+
+node{
+  id:i=58
+  x:r=-1020
+  y:r=-200
+  descName:t="subgraph in: float"
+
+  pin{
+    name:t="subgraph in"
+    role:t="out"
+    types:t="float"
+  }
+
+  property{
+    name:t="name"
+    val:t="highpass height radius"
+  }
+}
+
+node{
+  id:i=59
+  x:r=-1020
+  y:r=400
+  descName:t="subgraph in: float"
+
+  pin{
+    name:t="subgraph in"
+    role:t="out"
+    types:t="float"
+  }
+
+  property{
+    name:t="name"
+    val:t="ridge/valley curvature scale"
+  }
+}
+
+node{
+  id:i=61
+  x:r=-1020
+  y:r=300
+  descName:t="subgraph in: float"
+
+  pin{
+    name:t="subgraph in"
+    role:t="out"
+    types:t="float"
+  }
+
+  property{
+    name:t="name"
+    val:t="occlusion strength"
+  }
+}
+
+node{
+  id:i=62
+  x:r=-1020
+  y:r=200
+  descName:t="subgraph in: float"
+
+  pin{
+    name:t="subgraph in"
+    role:t="out"
+    types:t="float"
+  }
+
+  property{
+    name:t="name"
+    val:t="normal detail"
+  }
+}
+
+edge{
+  id:i=0
+  elemA:i=3
+  pinA:i=2
+  elemB:i=0
+  pinB:i=0
+}
+
+edge{
+  id:i=1
+  elemA:i=56
+  pinA:i=0
+  elemB:i=0
+  pinB:i=1
+}
+
+edge{
+  id:i=2
+  elemA:i=15
+  pinA:i=1
+  elemB:i=45
+  pinB:i=0
+}
+
+edge{
+  id:i=3
+  elemA:i=4
+  pinA:i=1
+  elemB:i=2
+  pinB:i=0
+}
+
+edge{
+  id:i=4
+  elemA:i=57
+  pinA:i=0
+  elemB:i=2
+  pinB:i=3
+}
+
+edge{
+  id:i=5
+  elemA:i=4
+  pinA:i=1
+  elemB:i=3
+  pinB:i=0
+}
+
+edge{
+  id:i=6
+  elemA:i=2
+  pinA:i=2
+  elemB:i=3
+  pinB:i=1
+}
+
+edge{
+  id:i=7
+  elemA:i=21
+  pinA:i=1
+  elemB:i=4
+  pinB:i=0
+}
+
+edge{
+  id:i=8
+  elemA:i=7
+  pinA:i=1
+  elemB:i=5
+  pinB:i=0
+}
+
+edge{
+  id:i=9
+  elemA:i=58
+  pinA:i=0
+  elemB:i=5
+  pinB:i=3
+}
+
+edge{
+  id:i=10
+  elemA:i=7
+  pinA:i=1
+  elemB:i=6
+  pinB:i=0
+}
+
+edge{
+  id:i=11
+  elemA:i=5
+  pinA:i=2
+  elemB:i=6
+  pinB:i=1
+}
+
+edge{
+  id:i=12
+  elemA:i=21
+  pinA:i=1
+  elemB:i=7
+  pinB:i=0
+}
+
+edge{
+  id:i=13
+  elemA:i=11
+  pinA:i=1
+  elemB:i=10
+  pinB:i=0
+}
+
+edge{
+  id:i=14
+  elemA:i=55
+  pinA:i=0
+  elemB:i=10
+  pinB:i=1
+}
+
+edge{
+  id:i=15
+  elemA:i=21
+  pinA:i=1
+  elemB:i=11
+  pinB:i=0
+}
+
+edge{
+  id:i=16
+  elemA:i=43
+  pinA:i=0
+  elemB:i=15
+  pinB:i=0
+}
+
+edge{
+  id:i=17
+  elemA:i=62
+  pinA:i=0
+  elemB:i=13
+  pinB:i=2
+}
+
+edge{
+  id:i=18
+  elemA:i=13
+  pinA:i=1
+  elemB:i=16
+  pinB:i=1
+}
+
+edge{
+  id:i=19
+  elemA:i=17
+  pinA:i=1
+  elemB:i=16
+  pinB:i=2
+}
+
+edge{
+  id:i=20
+  elemA:i=21
+  pinA:i=1
+  elemB:i=8
+  pinB:i=0
+}
+
+edge{
+  id:i=21
+  elemA:i=8
+  pinA:i=1
+  elemB:i=40
+  pinB:i=0
+}
+
+edge{
+  id:i=22
+  elemA:i=28
+  pinA:i=0
+  elemB:i=21
+  pinB:i=0
+}
+
+edge{
+  id:i=23
+  elemA:i=23
+  pinA:i=1
+  elemB:i=22
+  pinB:i=0
+}
+
+edge{
+  id:i=24
+  elemA:i=21
+  pinA:i=1
+  elemB:i=23
+  pinB:i=0
+}
+
+edge{
+  id:i=25
+  elemA:i=25
+  pinA:i=1
+  elemB:i=24
+  pinB:i=0
+}
+
+edge{
+  id:i=26
+  elemA:i=21
+  pinA:i=1
+  elemB:i=25
+  pinB:i=0
+}
+
+edge{
+  id:i=27
+  elemA:i=22
+  pinA:i=1
+  elemB:i=26
+  pinB:i=0
+}
+
+edge{
+  id:i=28
+  elemA:i=24
+  pinA:i=1
+  elemB:i=26
+  pinB:i=1
+}
+
+edge{
+  id:i=29
+  elemA:i=26
+  pinA:i=2
+  elemB:i=29
+  pinB:i=0
+}
+
+edge{
+  id:i=30
+  elemA:i=21
+  pinA:i=1
+  elemB:i=14
+  pinB:i=0
+}
+
+edge{
+  id:i=31
+  elemA:i=33
+  pinA:i=1
+  elemB:i=31
+  pinB:i=0
+}
+
+edge{
+  id:i=32
+  elemA:i=34
+  pinA:i=1
+  elemB:i=32
+  pinB:i=0
+}
+
+edge{
+  id:i=33
+  elemA:i=10
+  pinA:i=2
+  elemB:i=33
+  pinB:i=0
+}
+
+edge{
+  id:i=34
+  elemA:i=0
+  pinA:i=2
+  elemB:i=34
+  pinB:i=0
+}
+
+edge{
+  id:i=35
+  elemA:i=21
+  pinA:i=1
+  elemB:i=19
+  pinB:i=0
+}
+
+edge{
+  id:i=36
+  elemA:i=59
+  pinA:i=0
+  elemB:i=35
+  pinB:i=2
+}
+
+edge{
+  id:i=37
+  elemA:i=35
+  pinA:i=1
+  elemB:i=37
+  pinB:i=0
+}
+
+edge{
+  id:i=38
+  elemA:i=35
+  pinA:i=1
+  elemB:i=38
+  pinB:i=0
+}
+
+edge{
+  id:i=39
+  elemA:i=20
+  pinA:i=1
+  elemB:i=43
+  pinB:i=1
+}
+
+edge{
+  id:i=40
+  elemA:i=61
+  pinA:i=0
+  elemB:i=39
+  pinB:i=2
+}
+
+edge{
+  id:i=41
+  elemA:i=40
+  pinA:i=7
+  elemB:i=9
+  pinB:i=0
+}
+
+edge{
+  id:i=42
+  elemA:i=20
+  pinA:i=1
+  elemB:i=44
+  pinB:i=1
+}
+
+edge{
+  id:i=43
+  elemA:i=41
+  pinA:i=1
+  elemB:i=43
+  pinB:i=2
+}
+
+edge{
+  id:i=44
+  elemA:i=27
+  pinA:i=0
+  elemB:i=22
+  pinB:i=2
+}
+
+edge{
+  id:i=45
+  elemA:i=42
+  pinA:i=1
+  elemB:i=44
+  pinB:i=2
+}
+
+edge{
+  id:i=46
+  elemA:i=9
+  pinA:i=1
+  elemB:i=50
+  pinB:i=0
+}
+
+edge{
+  id:i=47
+  elemA:i=6
+  pinA:i=2
+  elemB:i=12
+  pinB:i=0
+}
+
+edge{
+  id:i=48
+  elemA:i=38
+  pinA:i=1
+  elemB:i=47
+  pinB:i=0
+}
+
+edge{
+  id:i=49
+  elemA:i=37
+  pinA:i=1
+  elemB:i=48
+  pinB:i=0
+}
+
+edge{
+  id:i=50
+  elemA:i=39
+  pinA:i=1
+  elemB:i=49
+  pinB:i=0
+}
+
+edge{
+  id:i=51
+  elemA:i=12
+  pinA:i=1
+  elemB:i=30
+  pinB:i=0
+}
+
+edge{
+  id:i=52
+  elemA:i=14
+  pinA:i=1
+  elemB:i=13
+  pinB:i=0
+}
+
+edge{
+  id:i=53
+  elemA:i=46
+  pinA:i=1
+  elemB:i=54
+  pinB:i=0
+}
+
+edge{
+  id:i=54
+  elemA:i=21
+  pinA:i=1
+  elemB:i=18
+  pinB:i=0
+}
+
+edge{
+  id:i=56
+  elemA:i=18
+  pinA:i=1
+  elemB:i=35
+  pinB:i=0
+}
+
+edge{
+  id:i=57
+  elemA:i=19
+  pinA:i=1
+  elemB:i=39
+  pinB:i=0
+}
+
+edge{
+  id:i=58
+  elemA:i=13
+  pinA:i=1
+  elemB:i=20
+  pinB:i=0
+}
+
+edge{
+  id:i=61
+  elemA:i=16
+  pinA:i=0
+  elemB:i=36
+  pinB:i=0
+}
+
+edge{
+  id:i=62
+  elemA:i=36
+  pinA:i=1
+  elemB:i=1
+  pinB:i=0
+}
+
+edge{
+  id:i=63
+  elemA:i=45
+  pinA:i=1
+  elemB:i=53
+  pinB:i=0
+}
+
+edge{
+  id:i=64
+  elemA:i=44
+  pinA:i=0
+  elemB:i=46
+  pinB:i=0
+}

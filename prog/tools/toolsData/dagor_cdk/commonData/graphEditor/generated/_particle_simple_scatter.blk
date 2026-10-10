@@ -1,0 +1,176 @@
+
+particle_simple_scatter {
+  params {
+    _particle_min_scale_58403:r = 0.0
+    _z_46559:r = 0.0
+    _w_46546:r = 0.0
+    _particle_max_scale_53821:r = 0.3
+    _outer_seed_42603:r = 0.0
+    _scale_random_64441:r = 1.0
+    _seed_30098:r = 0.0
+    _x_46557:r = 0.0
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _particle_min_scale_58403;
+      float _z_46559;
+      float _w_46546;
+      float _particle_max_scale_53821;
+      float _outer_seed_42603;
+      float _scale_random_64441;
+      float _seed_30098;
+      float _x_46557;
+    };
+    #define ParticlesOutput_DEFINE u7
+    #define ParticlesOutputCounter_DEFINE u6
+    #define VOID_OUTPUT
+    #define WRAP 1
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_particle_simple_scatter _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._particle_min_scale_58403 = _particle_min_scale_58403; // 0.0
+  _in._z_46559 = _z_46559; // 0.0
+  _in._w_46546 = _w_46546; // 0.0
+  _in._particle_max_scale_53821 = _particle_max_scale_53821; // 0.3
+  _in._outer_seed_42603 = _outer_seed_42603; // 0.0
+  _in._scale_random_64441 = _scale_random_64441; // 1.0
+  _in._seed_30098 = _seed_30098; // 0.0
+  _in._x_46557 = _x_46557; // 0.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_particle_simple_scatter _out;
+  _out._rand_2716 = 0.0;
+  _out._y_46556 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out._rand_2716_7 = 0.0;
+  _out._y_46556_6 = 0.0;
+  _out._z_46559_6 = 0.0;
+  _out._y_46556_15 = 0.0;
+  _out._z_46559_15 = 0.0;
+  _out._w_46546_15 = 0.0;
+  _out._y_46556_22 = 0.0;
+  _out._z_46559_22 = 0.0;
+  _out._w_46546_22 = 0.0;
+
+  _function_particle_simple_scatter(_in, _out);
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  """
+    shader_function:t="""
+
+
+  void _function_particle_simple_scatter(InputStruct_particle_simple_scatter _in, out OutputStruct_particle_simple_scatter _out) {
+
+  float2 _v_1_0 = _in.tc;
+  float _v_5_0 = 0.1;
+  float _v_6_1 = float4(_v_1_0, 0.0, 0.0).x;
+  _out._y_46556_6 = float4(_v_1_0, 0.0, 0.0).y;
+  _out._z_46559_6 = float4(_v_1_0, 0.0, 0.0).z;
+  float _v_6_4 = float4(_v_1_0, 0.0, 0.0).w;
+  _out._rand_2716_7 = rand(_in._seed_30098);
+  float4 _v_8_4 = float4(_in._x_46557, _v_6_1, _v_6_4, _v_6_4);
+  float _v_9_0 = rand(_in._outer_seed_42603 + 8.0819 + _in.tc.x + _in.tc.y * 231.321);
+  float _v_10_0 = 0.0;
+  float2 _v_16_0 = float2(0.001, 0.0);
+  float4 _v_17_2 = (_v_8_4 + float4(_v_16_0, 0.0, 0.0));
+  float2 _v_20_0 = float2(0.0, 0.001);
+  float4 _v_21_2 = (_v_8_4 + float4(_v_20_0, 0.0, 0.0));
+  float _v_27_0 = 3.14159265;
+  float _v_29_1 = _v_27_0 * (0.5);
+  float _v_35_0 = 0.5;
+  _out._rand_2716 = rand(_v_6_1);
+  float4 _v_2_2 = linear_sample(_in.sampler0_t, _v_8_4.xy, _in.sampler0_wrap);
+  float _v_3_1 = _v_2_2.x;
+  _out._y_46556 = _v_2_2.y;
+  _out._z_46559 = _v_2_2.z;
+  _out._w_46546 = _v_2_2.w;
+  float _v_4_2 = (_v_3_1 - _v_5_0);
+  float4 _v_14_2 = linear_sample(_in.sampler0_t, _v_17_2.xy, _in.sampler0_wrap);
+  float _v_15_1 = _v_14_2.x;
+  _out._y_46556_15 = _v_14_2.y;
+  _out._z_46559_15 = _v_14_2.z;
+  _out._w_46546_15 = _v_14_2.w;
+  float4 _v_19_2 = linear_sample(_in.sampler0_t, _v_21_2.xy, _in.sampler0_wrap);
+  float _v_22_1 = _v_19_2.x;
+  _out._y_46556_22 = _v_19_2.y;
+  _out._z_46559_22 = _v_19_2.z;
+  _out._w_46546_22 = _v_19_2.w;
+  float _v_24_2 = (_v_15_1 - _v_3_1);
+  float _v_25_2 = (_v_22_1 - _v_3_1);
+  float _v_34_3 = lerp(_v_3_1, _v_9_0, _in._scale_random_64441);
+  float _v_23_2 = atan2(_v_24_2, _v_25_2);
+  float _v_26_2 = (_v_23_2 + _v_29_1);
+  float _v_31_3 = lerp(_in._particle_min_scale_58403, _in._particle_max_scale_53821, _v_34_3);
+  float _v_32_2 = (_v_31_3 * _v_35_0);
+  float4 _v_37_4 = float4(_v_31_3, _v_32_2, _in._z_46559, _in._w_46546);
+  {
+    ParticleInstance tmp_particle; tmp_particle.reserved0 = 0; tmp_particle.reserved1 = 0;;
+    tmp_particle.pos = _v_8_4.xy;
+    tmp_particle.scale = _v_37_4.xy;
+    tmp_particle.angle = _v_26_2;
+    tmp_particle.brightness = _v_3_1;
+    tmp_particle.depth = _v_6_1;
+;
+    tmp_particle.entityWorldPos = float3(_v_10_0, _v_10_0, _v_10_0);
+    tmp_particle.entityForward = float3(_v_10_0, _v_10_0, _v_10_0);
+    tmp_particle.entityUp = float3(_v_10_0, _v_10_0, _v_10_0);
+    tmp_particle.entityNameIndex = int(_v_10_0);
+    tmp_particle.entityPlaceType = int(_v_10_0);
+    tmp_particle.entitySeed = int(_v_10_0);
+    tmp_particle.entityScale = float3(_v_10_0, _v_10_0, _v_10_0);
+    [branch]
+    if (_v_4_2 > 0.0) { uint instIdx; InterlockedAdd(instancesCounter[1], 1, instIdx);instances[instIdx] = tmp_particle; wrap_particle(tmp_particle); }
+  };
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_particle_simple_scatter {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _particle_min_scale_58403;
+  float _z_46559;
+  float _w_46546;
+  float _particle_max_scale_53821;
+  float _outer_seed_42603;
+  float _scale_random_64441;
+  float _seed_30098;
+  float _x_46557;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_particle_simple_scatter {
+  float _rand_2716;
+  float _y_46556;
+  float _z_46559;
+  float _w_46546;
+  float _rand_2716_7;
+  float _y_46556_6;
+  float _z_46559_6;
+  float _y_46556_15;
+  float _z_46559_15;
+  float _w_46546_15;
+  float _y_46556_22;
+  float _z_46559_22;
+  float _w_46546_22;
+};
+"""
+  }
+}

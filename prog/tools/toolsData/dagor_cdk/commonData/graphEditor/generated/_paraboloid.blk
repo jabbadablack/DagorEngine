@@ -1,0 +1,59 @@
+
+paraboloid {
+  params {
+    _inv_scale_3187:r = 1.0
+  }
+  inputs:i=0
+  shaderPreMain:t="""
+    cbuffer global {
+      float _inv_scale_3187;
+    };
+  """
+  shaderCode:t="""
+  InputStruct_paraboloid _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._inv_scale_3187 = _inv_scale_3187; // 1.0
+
+
+  OutputStruct_paraboloid _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_paraboloid(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  """
+    shader_function:t="""
+
+  void _function_paraboloid(InputStruct_paraboloid _in, out OutputStruct_paraboloid _out) {
+
+  float2 _v_0_0 = _in.tc;
+  float _v_3_0 = 2.0;
+  float _v_4_0 = -1.0;
+  float2 _v_2_3 = (_v_0_0 * float2(_v_3_0, _v_3_0) + float2(_v_4_0, _v_4_0));
+  float2 _v_7_2 = (_v_2_3 * float2(_in._inv_scale_3187, _in._inv_scale_3187));
+  float _v_5_2 = dot(_v_7_2, _v_7_2);
+  float _v_6_1 = 1.0 - _v_5_2;
+  float _v_9_1 = saturate(_v_6_1);
+  _out.col0 = float4(_v_9_1, _v_9_1, _v_9_1, _v_9_1);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_paraboloid {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _inv_scale_3187;
+};
+struct OutputStruct_paraboloid {
+  float4 col0;
+};
+"""
+  }
+}

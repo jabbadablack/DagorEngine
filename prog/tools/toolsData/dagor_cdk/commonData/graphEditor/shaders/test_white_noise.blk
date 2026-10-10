@@ -1,0 +1,349 @@
+templateUid:t = "3de384fc-e75d-4106-b92c-3dd799bd1de8"
+hint:t = "/*--------------------*/"
+
+node {
+  id:i = 3
+  x:r = 192.47072220149394
+  y:r = 240.20145652657277
+  templateUid:t = "49d2391e-594c-488b-acb8-19aba0c3db5d"
+  descName:t = "const int"
+  externalName:t = "seed"
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "int"
+    customPinOutput:t = "_value_13390"
+    customVarName:t = "_seed_30098_3"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "1"
+  }
+  property {
+    name:t = "external name"
+    val:t = "seed"
+  }
+}
+node {
+  id:i = 4
+  x:r = 1118.12950589788
+  y:r = 91.9006846490143
+  templateUid:t = "e9c40e8f-d682-4021-b803-6701341256af"
+  descName:t = "result"
+  externalName:t = ""
+  pin {
+    name:t = "color"
+    role:t = "in"
+    types:t = "float4"
+    data {
+      def_val:t = "float4(0.5, 0.5, 0.5, 0.5)"
+      def_val_blk:t = "0.5, 0.5, 0.5, 0.5"
+      code:t = "_out.col%MRT index% = $color$"
+      result_color:b = yes
+    }
+  }
+  pin {
+    name:t = "out"
+    role:t = "out"
+    types:t = "texture2D"
+  }
+  property {
+    name:t = "MRT index"
+    val:t = "0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 11
+  x:r = -236.19891625207754
+  y:r = 145.75873662224865
+  descName:t = "uv"
+  pin {
+    name:t = "tc"
+    role:t = "out"
+    types:t = "float2"
+    data {
+      code:t = "_in.tc"
+    }
+  }
+}
+node {
+  id:i = 12
+  x:r = 101.47382701829002
+  y:r = 28.911971520101247
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_x_46557"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 13
+  x:r = 560.6115542035302
+  y:r = 123.23405901219621
+  templateUid:t = "78e0502b-fe7c-475d-97a8-87a73320cb27"
+  descName:t = "float_noise2d"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  pin {
+    name:t = "seed"
+    role:t = "in"
+    types:t = "int"
+    customPinInput:t = "_seed_30098"
+    data {
+      blk_code:t = "%seed%"
+      code:t = "%seed%"
+    }
+  }
+  pin {
+    name:t = "rand01"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "frac($A$)"
+    }
+  }
+  pin {
+    name:t = "pos x"
+    role:t = "in"
+    types:t = "float"
+    customPinInput:t = "_pos_x_58865"
+    data {
+      blk_code:t = "%pos x%"
+      code:t = "%pos x%"
+    }
+  }
+  pin {
+    name:t = "pos y"
+    role:t = "in"
+    types:t = "float"
+    customPinInput:t = "_pos_y_58864"
+    data {
+      blk_code:t = "%pos y%"
+      code:t = "%pos y%"
+    }
+  }
+  property {
+    name:t = "seed"
+    val:t = "1"
+  }
+  property {
+    name:t = "pos x"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "pos y"
+    val:t = "1.0"
+  }
+}
+edge {
+  id:i = 4
+  elemA:i = 11
+  pinA:i = 0
+  elemB:i = 12
+  pinB:i = 0
+}
+edge {
+  id:i = 17
+  elemA:i = 13
+  pinA:i = 1
+  elemB:i = 4
+  pinB:i = 0
+}
+
+description {
+  name:t = "[[description-name]]"
+  category:t = "[[description-category]]"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  allowLoop:b = no
+  width:i = 200
+  pin {
+    name:t = "x"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 28
+    subgraphElem:i = 12
+    subgraphPin:i = 1
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 28
+    subgraphElem:i = 12
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 28
+    subgraphElem:i = 12
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 28
+    subgraphElem:i = 12
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "out"
+    types:t = "texture2D"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 91
+    subgraphElem:i = 4
+    subgraphPin:i = 1
+  }
+  pin {
+    name:t = "seed"
+    types:t = "int"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 123
+    subgraphElem:i = 13
+    subgraphPin:i = 0
+    data {
+      blk_code:t = "%seed%"
+      code:t = "%seed%"
+    }
+  }
+  pin {
+    name:t = "pos x"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 123
+    subgraphElem:i = 13
+    subgraphPin:i = 2
+    data {
+      blk_code:t = "%pos x%"
+      code:t = "%pos x%"
+    }
+  }
+  pin {
+    name:t = "pos y"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 123
+    subgraphElem:i = 13
+    subgraphPin:i = 3
+    data {
+      blk_code:t = "%pos y%"
+      code:t = "%pos y%"
+    }
+  }
+  pin {
+    name:t = "seed"
+    types:t = "int"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 240
+  }
+  pin {
+    name:t = "seed"
+    types:t = "int"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 240
+    subgraphElem:i = 3
+    subgraphPin:i = 0
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "seed"
+    minVal:i = -65535
+    maxVal:i = 65535
+    step:i = 1
+    val:i = 0
+  }
+  property {
+    name:t = "pos x"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "pos y"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "seed"
+    minVal:i = -65535
+    maxVal:i = 65535
+    step:i = 1
+    val:i = 1
+  }
+}

@@ -1,0 +1,101 @@
+
+warp_2 {
+  params {
+    _gradient_mul_40279:r = 0.5
+  }
+  inputs:i=2
+  shaderPreMain:t="""
+    cbuffer global {
+      float _gradient_mul_40279;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+    Texture2D sampler1_t:register(t1);
+    SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="""
+  InputStruct_warp_2 _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._gradient_mul_40279 = _gradient_mul_40279; // 0.5
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+  _in.sampler1_t = sampler1_t;
+  _in.sampler1_wrap = wrap_t1;
+  _in.sampler1 = sampler1;
+
+
+  OutputStruct_warp_2 _out;
+  _out._y_46556 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out._y_46556_11 = 0.0;
+  _out._z_46559_11 = 0.0;
+  _out._w_46546_11 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_warp_2(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  """
+    shader_function:t="""
+
+  void _function_warp_2(InputStruct_warp_2 _in, out OutputStruct_warp_2 _out) {
+
+  float2 _v_0_0 = _in.tc;
+  float2 _v_3_0 = float2(0.01, 0.0);
+  float2 _v_6_0 = float2(0.0, 0.01);
+  float2 _v_7_2 = (_v_0_0 + _v_6_0);
+  float _v_13_0 = 0.0;
+  float2 _v_1_2 = (_v_0_0 + _v_3_0);
+  float4 _v_2_2 = linear_sample(_in.sampler0_t, _v_0_0, _in.sampler0_wrap);
+  float4 _v_4_2 = linear_sample(_in.sampler0_t, _v_1_2, _in.sampler0_wrap);
+  float4 _v_5_2 = linear_sample(_in.sampler0_t, _v_7_2, _in.sampler0_wrap);
+  float4 _v_8_2 = (_v_2_2 - _v_4_2);
+  float _v_9_1 = _v_8_2.x;
+  _out._y_46556 = _v_8_2.y;
+  _out._z_46559 = _v_8_2.z;
+  _out._w_46546 = _v_8_2.w;
+  float4 _v_10_2 = (_v_2_2 - _v_5_2);
+  float _v_11_1 = _v_10_2.x;
+  _out._y_46556_11 = _v_10_2.y;
+  _out._z_46559_11 = _v_10_2.z;
+  _out._w_46546_11 = _v_10_2.w;
+  float4 _v_12_4 = float4(_v_9_1, _v_11_1, _v_13_0, _v_13_0);
+  float4 _v_17_3 = (_v_12_4 * float4(_in._gradient_mul_40279, _in._gradient_mul_40279, _in._gradient_mul_40279, _in._gradient_mul_40279) + float4(_v_0_0, 0.0, 0.0));
+  float4 _v_14_2 = linear_sample(_in.sampler1_t, _v_17_3.xy, _in.sampler1_wrap);
+  _out.col0 = _v_14_2;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_warp_2 {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _gradient_mul_40279;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+  Texture2D sampler1_t;
+  bool sampler1_wrap;
+  SamplerState sampler1;
+};
+struct OutputStruct_warp_2 {
+  float _y_46556;
+  float _z_46559;
+  float _w_46546;
+  float _y_46556_11;
+  float _z_46559_11;
+  float _w_46546_11;
+  float4 col0;
+};
+"""
+  }
+}

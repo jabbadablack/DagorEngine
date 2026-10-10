@@ -1,0 +1,85 @@
+
+square_shape {
+  params {
+    _center_48974:p2 = 0.5, 0.5
+    _size_42272:p2 = 0.0, 0.0
+    _bevel_59357:r = 0.01
+  }
+  inputs:i=0
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float2 _center_48974;
+      float2 _size_42272;
+      float _bevel_59357;
+    };
+  """
+  shaderCode:t="""
+  InputStruct_square_shape _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._center_48974 = _center_48974; // float2(0.5, 0.5)
+  _in._size_42272 = _size_42272; // float2(0.0, 0.0)
+  _in._bevel_59357 = _bevel_59357; // 0.01
+
+
+  OutputStruct_square_shape _out;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_square_shape(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+
+  void _function_square_shape(InputStruct_square_shape _in, out OutputStruct_square_shape _out) {
+
+  float2 _v_0_0 = _in.tc;
+  float2 _v_4_2 = (_v_0_0 - _in._center_48974);
+  float2 _v_5_1 = abs(_v_4_2);
+  float _v_14_0 = 1.0;
+  float _v_16_0 = 0.00000001;
+  float2 _v_17_0 = float2(1.0, 1.0);
+  float2 _v_18_1 = _in._size_42272 * (0.5);
+  float2 _v_19_2 = (_v_18_1 - _v_17_0);
+  float2 _v_10_2 = (_v_5_1 - _v_19_2);
+  float _v_15_2 = max(_in._bevel_59357, _v_16_0);
+  float2 _v_6_1 = 1.0 - _v_10_2;
+  float _v_11_2 = (_v_14_0 / _v_15_2);
+  float2 _v_9_2 = (_v_6_1 * float2(_v_11_2, _v_11_2));
+  float2 _v_8_1 = saturate(_v_9_2);
+  float _v_7_1 = float4(_v_8_1, 0.0, 0.0).x;
+  float _v_7_2 = float4(_v_8_1, 0.0, 0.0).y;
+  _out._z_46559 = float4(_v_8_1, 0.0, 0.0).z;
+  _out._w_46546 = float4(_v_8_1, 0.0, 0.0).w;
+  float _v_12_2 = min(_v_7_1, _v_7_2);
+  _out.col0 = float4(_v_12_2, _v_12_2, _v_12_2, _v_12_2);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_square_shape {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float2 _center_48974;
+  float2 _size_42272;
+  float _bevel_59357;
+};
+struct OutputStruct_square_shape {
+  float _z_46559;
+  float _w_46546;
+  float4 col0;
+};
+"""
+  }
+}

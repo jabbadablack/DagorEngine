@@ -1,0 +1,110 @@
+
+quantize {
+  params {
+    _quantize_step_55681:r = 0.01
+  }
+  inputs:i=2
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _quantize_step_55681;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+    Texture2D sampler1_t:register(t1);
+    SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="""
+  InputStruct_quantize _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._quantize_step_55681 = _quantize_step_55681; // 0.01
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+  _in.sampler1_t = sampler1_t;
+  _in.sampler1_wrap = wrap_t1;
+  _in.sampler1 = sampler1;
+
+
+  OutputStruct_quantize _out;
+  _out._y_46556 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out._z_46559_15 = 0.0;
+  _out._w_46546_15 = 0.0;
+  _out._y_46556_11 = 0.0;
+  _out._z_46559_11 = 0.0;
+  _out._w_46546_11 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_quantize(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+
+  void _function_quantize(InputStruct_quantize _in, out OutputStruct_quantize _out) {
+
+  float4 _v_2_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float _v_3_1 = _v_2_1.x;
+  _out._y_46556 = _v_2_1.y;
+  _out._z_46559 = _v_2_1.z;
+  _out._w_46546 = _v_2_1.w;
+  float _v_8_0 = 0.00001;
+  float4 _v_10_1 = linear_sample(_in.sampler1_t, _in.tc, _in.sampler1_wrap);
+  float _v_11_1 = _v_10_1.x;
+  _out._y_46556_11 = _v_10_1.y;
+  _out._z_46559_11 = _v_10_1.z;
+  _out._w_46546_11 = _v_10_1.w;
+  float2 _v_13_1 = get_dimensions(_in.sampler1_t);
+  float _v_14_0 = 1.0;
+  float _v_15_1 = float4(_v_13_1, 0.0, 0.0).x;
+  float _v_15_2 = float4(_v_13_1, 0.0, 0.0).y;
+  _out._z_46559_15 = float4(_v_13_1, 0.0, 0.0).z;
+  _out._w_46546_15 = float4(_v_13_1, 0.0, 0.0).w;
+  float _v_16_2 = (_v_15_1 * _v_15_2);
+  float _v_18_0 = 1.0;
+  float _v_17_4 = ((_v_14_0 >= _v_16_2) ? (_v_18_0) : (_v_11_1));
+  float _v_12_2 = (_in._quantize_step_55681 * _v_17_4);
+  float _v_7_2 = max(_v_12_2, _v_8_0);
+  float _v_1_2 = fmod(_v_3_1, _v_7_2);
+  float _v_5_2 = (_v_3_1 - _v_1_2);
+  _out.col0 = float4(_v_5_2, _v_5_2, _v_5_2, _v_5_2);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_quantize {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _quantize_step_55681;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+  Texture2D sampler1_t;
+  bool sampler1_wrap;
+  SamplerState sampler1;
+};
+struct OutputStruct_quantize {
+  float _y_46556;
+  float _z_46559;
+  float _w_46546;
+  float _z_46559_15;
+  float _w_46546_15;
+  float _y_46556_11;
+  float _z_46559_11;
+  float _w_46546_11;
+  float4 col0;
+};
+"""
+  }
+}

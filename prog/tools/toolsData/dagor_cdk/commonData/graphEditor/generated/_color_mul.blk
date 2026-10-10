@@ -1,0 +1,56 @@
+
+color_mul {
+  params {
+    _color_1752:p4 = 1.0, 1.0, 1.0, 1.0
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    cbuffer global {
+      float4 _color_1752;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_color_mul _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  _in._color_1752 = _color_1752; // float4(1.0, 1.0, 1.0, 1.0)
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_color_mul _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_color_mul(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    shader_function:t="""
+
+  void _function_color_mul(InputStruct_color_mul _in, out OutputStruct_color_mul _out) {
+
+  float4 _v_0_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float4 _v_2_2 = (_v_0_1 * _in._color_1752);
+  _out.col0 = _v_2_2;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_color_mul {
+  float4 pos;
+  float3 tc;
+  float4 _color_1752;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_color_mul {
+  float4 col0;
+};
+"""
+  }
+}

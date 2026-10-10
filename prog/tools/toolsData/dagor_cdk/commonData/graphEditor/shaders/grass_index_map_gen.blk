@@ -1,0 +1,5589 @@
+templateUid:t = "612664d9-c4cd-4cf5-babe-bf3d8f0772bd"
+hint:t = "/*--------------------*/"
+
+node {
+  id:i = 0
+  x:r = -492.71183758447495
+  y:r = 21.943539632296336
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_1"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler0"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 1
+  x:r = -501.6342297361322
+  y:r = 179.31200604180157
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_2"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler1"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 2
+  x:r = -494.42929479040043
+  y:r = 315.4352774703734
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_3"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler2"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 3
+  x:r = -493.2547568027207
+  y:r = 436.4825565038152
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_4"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler3"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 4
+  x:r = -492.4498286713039
+  y:r = 570.1335486716066
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_5"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler4"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 5
+  x:r = -489.31142690685687
+  y:r = 709.4108242069549
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_6"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler5"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 6
+  x:r = -489.17381567611426
+  y:r = 839.6659163556465
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_7"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler6"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 7
+  x:r = -493.93409285470165
+  y:r = 962.9637395338327
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_8"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler7"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 8
+  x:r = -491.1508930011958
+  y:r = 1107.2797487514508
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_9"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler8"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 9
+  x:r = -498.94077660413114
+  y:r = 1239.6663912026806
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_10"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler9"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 10
+  x:r = -505.67932550480765
+  y:r = 1386.7034750459356
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_11"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler10"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 11
+  x:r = -498.56997235086067
+  y:r = 1513.9578416682994
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_12"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler11"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 12
+  x:r = -502.7729223658809
+  y:r = 1666.0625400918457
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_13"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler12"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 13
+  x:r = -494.73663219210357
+  y:r = 1798.4491825430755
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_14"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler13"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 14
+  x:r = -499.4969093706912
+  y:r = 1933.6166360537954
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_15"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler14"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 15
+  x:r = -496.3440996609223
+  y:r = 2070.7623612866055
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "index_16"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler15"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 16
+  x:r = -502.4290017663643
+  y:r = -768.4662893788523
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 17
+  x:r = -501.72172364635526
+  y:r = -671.9707383863814
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "255.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 18
+  x:r = -338.88804808167345
+  y:r = -728.7492006268559
+  templateUid:t = "6f573bee-f143-43e5-8dae-d80aba16c077"
+  descName:t = "/"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A/B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ / $B$)"
+    }
+  }
+}
+node {
+  id:i = 19
+  x:r = 421.4298301256621
+  y:r = 47.944037389367566
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 20
+  x:r = 269.96357577479165
+  y:r = -364.984753345784
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "0.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 21
+  x:r = 424.49451574329873
+  y:r = 174.98524190881773
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 22
+  x:r = 425.5809296388462
+  y:r = 326.05245246869174
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 23
+  x:r = 424.68907181230463
+  y:r = 424.07418074660256
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 24
+  x:r = 431.5618394582881
+  y:r = 587.05372380675
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 25
+  x:r = 434.62652507592475
+  y:r = 692.9885389730172
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 26
+  x:r = 441.7433359295245
+  y:r = 892.2989251973095
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 27
+  x:r = 444.05627829276716
+  y:r = 999.935054044573
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 28
+  x:r = 440.7859226695597
+  y:r = 1131.0018515980669
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 29
+  x:r = 440.41850902385704
+  y:r = 1289.5686027580346
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 30
+  x:r = 435.51463286513695
+  y:r = 1448.3889310822067
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 31
+  x:r = 439.81455134604585
+  y:r = 1573.6674849742326
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 32
+  x:r = 431.6113265968986
+  y:r = 1706.4950432441187
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 33
+  x:r = 434.67601221453526
+  y:r = 1812.4298584103863
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 34
+  x:r = 435.76242611008274
+  y:r = 1990.633855281495
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 35
+  x:r = 434.87056828354116
+  y:r = 2088.6555835594063
+  templateUid:t = "7a2280a9-340a-42a7-982b-92041470b74a"
+  descName:t = "+"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A+B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ + $B$)"
+    }
+  }
+}
+node {
+  id:i = 36
+  x:r = -137.85553064031706
+  y:r = 31.330162300704075
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 37
+  x:r = -258.8118195057332
+  y:r = 32.13318919642636
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 38
+  x:r = -521.7611968533719
+  y:r = -370.77695354868484
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "0.5"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 39
+  x:r = -519.8280826607704
+  y:r = -177.03654799749523
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "0.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 40
+  x:r = -519.3371285535717
+  y:r = -274.6124796976949
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 41
+  x:r = -137.5604254336052
+  y:r = 168.7194978481871
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 42
+  x:r = -258.5167142990213
+  y:r = 169.5225247439094
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556_42"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559_42"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546_42"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 43
+  x:r = -139.34086998348533
+  y:r = 302.252839089198
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 44
+  x:r = -260.29715884890146
+  y:r = 303.05586598492033
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556_44"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559_44"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546_44"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 45
+  x:r = -139.04576477677347
+  y:r = 439.64217463668103
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 46
+  x:r = -260.0020536421896
+  y:r = 440.44520153240336
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556_46"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559_46"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546_46"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 47
+  x:r = -137.5604254336052
+  y:r = 572.8804106709799
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 48
+  x:r = -258.5167142990213
+  y:r = 573.6834375667022
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556_48"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559_48"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546_48"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 49
+  x:r = -137.26532022689332
+  y:r = 710.269746218463
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 50
+  x:r = -258.22160909230945
+  y:r = 711.0727731141852
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556_50"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559_50"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546_50"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 51
+  x:r = -139.04576477677347
+  y:r = 843.8030874594739
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 52
+  x:r = -260.0020536421896
+  y:r = 844.6061143551962
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556_52"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559_52"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546_52"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 53
+  x:r = -138.7506595700616
+  y:r = 981.1924230069569
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 54
+  x:r = -259.7069484354777
+  y:r = 981.9954499026792
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556_54"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559_54"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546_54"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 55
+  x:r = -139.9645467027471
+  y:r = 1116.2949987825762
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 56
+  x:r = -261.2769244781393
+  y:r = 1115.1395366734303
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556_56"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559_56"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546_56"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 57
+  x:r = -138.06704140114311
+  y:r = 1253.684334330059
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 58
+  x:r = -259.02333026655924
+  y:r = 1254.4873612257813
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556_58"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559_58"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546_58"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 59
+  x:r = -139.84748595102326
+  y:r = 1387.21767557107
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 60
+  x:r = -260.8037748164394
+  y:r = 1388.0207024667923
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556_60"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559_60"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546_60"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 61
+  x:r = -139.5523807443114
+  y:r = 1524.607011118553
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 62
+  x:r = -260.5086696097275
+  y:r = 1525.4100380142754
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556_62"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559_62"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546_62"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 63
+  x:r = -138.06704140114311
+  y:r = 1657.845247152852
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 64
+  x:r = -259.02333026655924
+  y:r = 1658.6482740485742
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556_64"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559_64"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546_64"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 65
+  x:r = -137.77193619443125
+  y:r = 1795.2345827003348
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 66
+  x:r = -258.7282250598474
+  y:r = 1796.037609596057
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556_66"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559_66"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546_66"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 67
+  x:r = -139.5523807443114
+  y:r = 1928.7679239413462
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 68
+  x:r = -260.5086696097275
+  y:r = 1929.5709508370685
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556_68"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559_68"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546_68"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 69
+  x:r = -139.25727553759953
+  y:r = 2066.1572594888285
+  descName:t = "if A>B"
+  groupTypes {
+    group2:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 70
+  x:r = -260.21356440301565
+  y:r = 2066.9602863845503
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_y_46556_70"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559_70"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546_70"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 71
+  x:r = 701.541518740492
+  y:r = 39.34941477618162
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 72
+  x:r = 909.8535310764693
+  y:r = 34.54221449150532
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 73
+  x:r = 708.6023132367485
+  y:r = 161.7830161046714
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 74
+  x:r = 916.9143255727257
+  y:r = 156.9758158199951
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 75
+  x:r = 705.3975130469643
+  y:r = 307.6014247398553
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 76
+  x:r = 913.7095253829415
+  y:r = 302.794224455179
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 77
+  x:r = 712.4583075432207
+  y:r = 430.0350260683451
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 78
+  x:r = 915.9631195945216
+  y:r = 428.432625973453
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 79
+  x:r = 711.4202514008797
+  y:r = 583.3615124006128
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 80
+  x:r = 919.7322637368569
+  y:r = 578.5543121159365
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 81
+  x:r = 718.4810458971361
+  y:r = 705.7951137291025
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 82
+  x:r = 926.7930582331134
+  y:r = 700.9879134444262
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 83
+  x:r = 715.2762457073519
+  y:r = 851.6135223642865
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 84
+  x:r = 923.5882580433291
+  y:r = 846.8063220796101
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 85
+  x:r = 722.3370402036084
+  y:r = 974.0471236927763
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 86
+  x:r = 925.8418522549092
+  y:r = 970.842323502992
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 87
+  x:r = 717.1159613277601
+  y:r = 1154.9074600924123
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 88
+  x:r = 925.4279736637374
+  y:r = 1150.1002598077362
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 89
+  x:r = 724.1767558240166
+  y:r = 1277.3410614209022
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 90
+  x:r = 932.4887681599938
+  y:r = 1272.5338611362258
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 91
+  x:r = 720.9719556342324
+  y:r = 1423.159470056086
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 92
+  x:r = 929.2839679702096
+  y:r = 1418.3522697714097
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 93
+  x:r = 728.0327501304888
+  y:r = 1545.593071384576
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 94
+  x:r = 931.5375621817897
+  y:r = 1543.9906712896836
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 95
+  x:r = 726.9946939881478
+  y:r = 1698.9195577168434
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 96
+  x:r = 935.306706324125
+  y:r = 1694.1123574321673
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 97
+  x:r = 734.0554884844042
+  y:r = 1821.3531590453333
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 98
+  x:r = 942.3675008203813
+  y:r = 1816.545958760657
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 99
+  x:r = 730.85068829462
+  y:r = 1967.1715676805168
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 100
+  x:r = 939.1627006305972
+  y:r = 1962.364367395841
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 101
+  x:r = 737.9114827908764
+  y:r = 2089.605169009008
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 102
+  x:r = 941.4162948421772
+  y:r = 2088.002768914115
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 103
+  x:r = 1234.0871255504076
+  y:r = 2091.8661473939137
+  templateUid:t = "e9c40e8f-d682-4021-b803-6701341256af"
+  descName:t = "result"
+  externalName:t = "mask_indexes"
+  pin {
+    name:t = "color"
+    role:t = "in"
+    types:t = "float4"
+    data {
+      def_val:t = "float4(0.5, 0.5, 0.5, 0.5)"
+      def_val_blk:t = "0.5, 0.5, 0.5, 0.5"
+      code:t = "_out.col%MRT index% = $color$"
+      result_color:b = yes
+    }
+  }
+  pin {
+    name:t = "out"
+    role:t = "out"
+    types:t = "texture2D"
+  }
+  property {
+    name:t = "MRT index"
+    val:t = "0"
+  }
+  property {
+    name:t = "external name"
+    val:t = "mask_indexes"
+  }
+}
+edge {
+  id:i = 0
+  elemA:i = 16
+  pinA:i = 0
+  elemB:i = 18
+  pinB:i = 0
+}
+edge {
+  id:i = 1
+  elemA:i = 18
+  pinA:i = 1
+  elemB:i = 17
+  pinB:i = 0
+}
+edge {
+  id:i = 2
+  elemA:i = 19
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 3
+  elemA:i = 22
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 4
+  elemA:i = 21
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 5
+  elemA:i = 21
+  pinA:i = 0
+  elemB:i = 19
+  pinB:i = 2
+}
+edge {
+  id:i = 6
+  elemA:i = 19
+  pinA:i = 0
+  elemB:i = 20
+  pinB:i = 0
+}
+edge {
+  id:i = 7
+  elemA:i = 23
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 8
+  elemA:i = 21
+  pinA:i = 2
+  elemB:i = 22
+  pinB:i = 0
+}
+edge {
+  id:i = 9
+  elemA:i = 24
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 10
+  elemA:i = 22
+  pinA:i = 2
+  elemB:i = 23
+  pinB:i = 0
+}
+edge {
+  id:i = 11
+  elemA:i = 26
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 12
+  elemA:i = 25
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 13
+  elemA:i = 25
+  pinA:i = 0
+  elemB:i = 24
+  pinB:i = 2
+}
+edge {
+  id:i = 14
+  elemA:i = 0
+  pinA:i = 1
+  elemB:i = 37
+  pinB:i = 0
+}
+edge {
+  id:i = 15
+  elemA:i = 27
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 16
+  elemA:i = 25
+  pinA:i = 2
+  elemB:i = 26
+  pinB:i = 0
+}
+edge {
+  id:i = 17
+  elemA:i = 26
+  pinA:i = 2
+  elemB:i = 27
+  pinB:i = 0
+}
+edge {
+  id:i = 18
+  elemA:i = 24
+  pinA:i = 0
+  elemB:i = 23
+  pinB:i = 2
+}
+edge {
+  id:i = 19
+  elemA:i = 30
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 20
+  elemA:i = 29
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 21
+  elemA:i = 29
+  pinA:i = 0
+  elemB:i = 28
+  pinB:i = 2
+}
+edge {
+  id:i = 22
+  elemA:i = 28
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 23
+  elemA:i = 31
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 24
+  elemA:i = 29
+  pinA:i = 2
+  elemB:i = 30
+  pinB:i = 0
+}
+edge {
+  id:i = 25
+  elemA:i = 32
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 26
+  elemA:i = 30
+  pinA:i = 2
+  elemB:i = 31
+  pinB:i = 0
+}
+edge {
+  id:i = 27
+  elemA:i = 34
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 28
+  elemA:i = 33
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 29
+  elemA:i = 33
+  pinA:i = 0
+  elemB:i = 32
+  pinB:i = 2
+}
+edge {
+  id:i = 30
+  elemA:i = 35
+  pinA:i = 1
+  elemB:i = 18
+  pinB:i = 2
+}
+edge {
+  id:i = 31
+  elemA:i = 33
+  pinA:i = 2
+  elemB:i = 34
+  pinB:i = 0
+}
+edge {
+  id:i = 32
+  elemA:i = 34
+  pinA:i = 2
+  elemB:i = 35
+  pinB:i = 0
+}
+edge {
+  id:i = 33
+  elemA:i = 32
+  pinA:i = 0
+  elemB:i = 31
+  pinB:i = 2
+}
+edge {
+  id:i = 35
+  elemA:i = 37
+  pinA:i = 1
+  elemB:i = 36
+  pinB:i = 0
+}
+edge {
+  id:i = 36
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 36
+  pinB:i = 1
+}
+edge {
+  id:i = 37
+  elemA:i = 36
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 38
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 36
+  pinB:i = 3
+}
+edge {
+  id:i = 39
+  elemA:i = 2
+  pinA:i = 1
+  elemB:i = 44
+  pinB:i = 0
+}
+edge {
+  id:i = 40
+  elemA:i = 42
+  pinA:i = 1
+  elemB:i = 41
+  pinB:i = 0
+}
+edge {
+  id:i = 41
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 41
+  pinB:i = 1
+}
+edge {
+  id:i = 42
+  elemA:i = 41
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 43
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 41
+  pinB:i = 3
+}
+edge {
+  id:i = 44
+  elemA:i = 3
+  pinA:i = 1
+  elemB:i = 46
+  pinB:i = 0
+}
+edge {
+  id:i = 45
+  elemA:i = 44
+  pinA:i = 1
+  elemB:i = 43
+  pinB:i = 0
+}
+edge {
+  id:i = 46
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 43
+  pinB:i = 1
+}
+edge {
+  id:i = 47
+  elemA:i = 43
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 48
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 43
+  pinB:i = 3
+}
+edge {
+  id:i = 49
+  elemA:i = 48
+  pinA:i = 0
+  elemB:i = 4
+  pinB:i = 1
+}
+edge {
+  id:i = 50
+  elemA:i = 46
+  pinA:i = 1
+  elemB:i = 45
+  pinB:i = 0
+}
+edge {
+  id:i = 51
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 45
+  pinB:i = 1
+}
+edge {
+  id:i = 52
+  elemA:i = 45
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 53
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 45
+  pinB:i = 3
+}
+edge {
+  id:i = 54
+  elemA:i = 5
+  pinA:i = 1
+  elemB:i = 50
+  pinB:i = 0
+}
+edge {
+  id:i = 55
+  elemA:i = 48
+  pinA:i = 1
+  elemB:i = 47
+  pinB:i = 0
+}
+edge {
+  id:i = 56
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 47
+  pinB:i = 1
+}
+edge {
+  id:i = 57
+  elemA:i = 47
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 58
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 47
+  pinB:i = 3
+}
+edge {
+  id:i = 59
+  elemA:i = 6
+  pinA:i = 1
+  elemB:i = 52
+  pinB:i = 0
+}
+edge {
+  id:i = 60
+  elemA:i = 50
+  pinA:i = 1
+  elemB:i = 49
+  pinB:i = 0
+}
+edge {
+  id:i = 61
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 49
+  pinB:i = 1
+}
+edge {
+  id:i = 62
+  elemA:i = 49
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 63
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 49
+  pinB:i = 3
+}
+edge {
+  id:i = 64
+  elemA:i = 7
+  pinA:i = 1
+  elemB:i = 54
+  pinB:i = 0
+}
+edge {
+  id:i = 65
+  elemA:i = 52
+  pinA:i = 1
+  elemB:i = 51
+  pinB:i = 0
+}
+edge {
+  id:i = 66
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 51
+  pinB:i = 1
+}
+edge {
+  id:i = 67
+  elemA:i = 51
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 68
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 51
+  pinB:i = 3
+}
+edge {
+  id:i = 69
+  elemA:i = 8
+  pinA:i = 1
+  elemB:i = 56
+  pinB:i = 0
+}
+edge {
+  id:i = 70
+  elemA:i = 54
+  pinA:i = 1
+  elemB:i = 53
+  pinB:i = 0
+}
+edge {
+  id:i = 71
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 53
+  pinB:i = 1
+}
+edge {
+  id:i = 72
+  elemA:i = 53
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 73
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 53
+  pinB:i = 3
+}
+edge {
+  id:i = 74
+  elemA:i = 15
+  pinA:i = 1
+  elemB:i = 70
+  pinB:i = 0
+}
+edge {
+  id:i = 75
+  elemA:i = 56
+  pinA:i = 1
+  elemB:i = 55
+  pinB:i = 0
+}
+edge {
+  id:i = 76
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 55
+  pinB:i = 1
+}
+edge {
+  id:i = 77
+  elemA:i = 55
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 78
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 55
+  pinB:i = 3
+}
+edge {
+  id:i = 79
+  elemA:i = 71
+  pinA:i = 2
+  elemB:i = 72
+  pinB:i = 0
+}
+edge {
+  id:i = 80
+  elemA:i = 58
+  pinA:i = 1
+  elemB:i = 57
+  pinB:i = 0
+}
+edge {
+  id:i = 81
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 57
+  pinB:i = 1
+}
+edge {
+  id:i = 82
+  elemA:i = 57
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 83
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 57
+  pinB:i = 3
+}
+edge {
+  id:i = 84
+  elemA:i = 9
+  pinA:i = 1
+  elemB:i = 58
+  pinB:i = 0
+}
+edge {
+  id:i = 85
+  elemA:i = 60
+  pinA:i = 1
+  elemB:i = 59
+  pinB:i = 0
+}
+edge {
+  id:i = 86
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 59
+  pinB:i = 1
+}
+edge {
+  id:i = 87
+  elemA:i = 59
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 88
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 59
+  pinB:i = 3
+}
+edge {
+  id:i = 89
+  elemA:i = 10
+  pinA:i = 1
+  elemB:i = 60
+  pinB:i = 0
+}
+edge {
+  id:i = 90
+  elemA:i = 62
+  pinA:i = 1
+  elemB:i = 61
+  pinB:i = 0
+}
+edge {
+  id:i = 91
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 61
+  pinB:i = 1
+}
+edge {
+  id:i = 92
+  elemA:i = 61
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 93
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 61
+  pinB:i = 3
+}
+edge {
+  id:i = 94
+  elemA:i = 11
+  pinA:i = 1
+  elemB:i = 62
+  pinB:i = 0
+}
+edge {
+  id:i = 95
+  elemA:i = 64
+  pinA:i = 1
+  elemB:i = 63
+  pinB:i = 0
+}
+edge {
+  id:i = 96
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 63
+  pinB:i = 1
+}
+edge {
+  id:i = 97
+  elemA:i = 63
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 98
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 63
+  pinB:i = 3
+}
+edge {
+  id:i = 99
+  elemA:i = 12
+  pinA:i = 1
+  elemB:i = 64
+  pinB:i = 0
+}
+edge {
+  id:i = 100
+  elemA:i = 66
+  pinA:i = 1
+  elemB:i = 65
+  pinB:i = 0
+}
+edge {
+  id:i = 101
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 65
+  pinB:i = 1
+}
+edge {
+  id:i = 102
+  elemA:i = 65
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 103
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 65
+  pinB:i = 3
+}
+edge {
+  id:i = 104
+  elemA:i = 13
+  pinA:i = 1
+  elemB:i = 66
+  pinB:i = 0
+}
+edge {
+  id:i = 105
+  elemA:i = 68
+  pinA:i = 1
+  elemB:i = 67
+  pinB:i = 0
+}
+edge {
+  id:i = 106
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 67
+  pinB:i = 1
+}
+edge {
+  id:i = 107
+  elemA:i = 67
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 108
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 67
+  pinB:i = 3
+}
+edge {
+  id:i = 109
+  elemA:i = 14
+  pinA:i = 1
+  elemB:i = 68
+  pinB:i = 0
+}
+edge {
+  id:i = 110
+  elemA:i = 70
+  pinA:i = 1
+  elemB:i = 69
+  pinB:i = 0
+}
+edge {
+  id:i = 111
+  elemA:i = 38
+  pinA:i = 0
+  elemB:i = 69
+  pinB:i = 1
+}
+edge {
+  id:i = 112
+  elemA:i = 69
+  pinA:i = 2
+  elemB:i = 40
+  pinB:i = 0
+}
+edge {
+  id:i = 113
+  elemA:i = 39
+  pinA:i = 0
+  elemB:i = 69
+  pinB:i = 3
+}
+edge {
+  id:i = 114
+  elemA:i = 1
+  pinA:i = 1
+  elemB:i = 42
+  pinB:i = 0
+}
+edge {
+  id:i = 115
+  elemA:i = 71
+  pinA:i = 0
+  elemB:i = 36
+  pinB:i = 4
+}
+edge {
+  id:i = 116
+  elemA:i = 19
+  pinA:i = 2
+  elemB:i = 71
+  pinB:i = 1
+}
+edge {
+  id:i = 117
+  elemA:i = 72
+  pinA:i = 1
+  elemB:i = 20
+  pinB:i = 0
+}
+edge {
+  id:i = 118
+  elemA:i = 73
+  pinA:i = 2
+  elemB:i = 74
+  pinB:i = 0
+}
+edge {
+  id:i = 119
+  elemA:i = 75
+  pinA:i = 0
+  elemB:i = 43
+  pinB:i = 4
+}
+edge {
+  id:i = 120
+  elemA:i = 74
+  pinA:i = 1
+  elemB:i = 72
+  pinB:i = 2
+}
+edge {
+  id:i = 121
+  elemA:i = 75
+  pinA:i = 2
+  elemB:i = 76
+  pinB:i = 0
+}
+edge {
+  id:i = 122
+  elemA:i = 73
+  pinA:i = 1
+  elemB:i = 21
+  pinB:i = 2
+}
+edge {
+  id:i = 123
+  elemA:i = 77
+  pinA:i = 0
+  elemB:i = 45
+  pinB:i = 4
+}
+edge {
+  id:i = 124
+  elemA:i = 77
+  pinA:i = 1
+  elemB:i = 23
+  pinB:i = 2
+}
+edge {
+  id:i = 125
+  elemA:i = 79
+  pinA:i = 2
+  elemB:i = 80
+  pinB:i = 0
+}
+edge {
+  id:i = 126
+  elemA:i = 77
+  pinA:i = 2
+  elemB:i = 78
+  pinB:i = 0
+}
+edge {
+  id:i = 127
+  elemA:i = 76
+  pinA:i = 1
+  elemB:i = 74
+  pinB:i = 2
+}
+edge {
+  id:i = 128
+  elemA:i = 78
+  pinA:i = 1
+  elemB:i = 76
+  pinB:i = 2
+}
+edge {
+  id:i = 129
+  elemA:i = 73
+  pinA:i = 0
+  elemB:i = 41
+  pinB:i = 4
+}
+edge {
+  id:i = 130
+  elemA:i = 75
+  pinA:i = 1
+  elemB:i = 22
+  pinB:i = 2
+}
+edge {
+  id:i = 131
+  elemA:i = 81
+  pinA:i = 0
+  elemB:i = 25
+  pinB:i = 2
+}
+edge {
+  id:i = 132
+  elemA:i = 87
+  pinA:i = 2
+  elemB:i = 88
+  pinB:i = 0
+}
+edge {
+  id:i = 133
+  elemA:i = 96
+  pinA:i = 1
+  elemB:i = 94
+  pinB:i = 2
+}
+edge {
+  id:i = 134
+  elemA:i = 81
+  pinA:i = 2
+  elemB:i = 82
+  pinB:i = 0
+}
+edge {
+  id:i = 135
+  elemA:i = 85
+  pinA:i = 0
+  elemB:i = 27
+  pinB:i = 2
+}
+edge {
+  id:i = 136
+  elemA:i = 82
+  pinA:i = 1
+  elemB:i = 80
+  pinB:i = 2
+}
+edge {
+  id:i = 137
+  elemA:i = 83
+  pinA:i = 2
+  elemB:i = 84
+  pinB:i = 0
+}
+edge {
+  id:i = 138
+  elemA:i = 79
+  pinA:i = 1
+  elemB:i = 47
+  pinB:i = 4
+}
+edge {
+  id:i = 139
+  elemA:i = 85
+  pinA:i = 1
+  elemB:i = 53
+  pinB:i = 4
+}
+edge {
+  id:i = 140
+  elemA:i = 83
+  pinA:i = 1
+  elemB:i = 51
+  pinB:i = 4
+}
+edge {
+  id:i = 141
+  elemA:i = 85
+  pinA:i = 2
+  elemB:i = 86
+  pinB:i = 0
+}
+edge {
+  id:i = 142
+  elemA:i = 84
+  pinA:i = 1
+  elemB:i = 82
+  pinB:i = 2
+}
+edge {
+  id:i = 143
+  elemA:i = 86
+  pinA:i = 1
+  elemB:i = 84
+  pinB:i = 2
+}
+edge {
+  id:i = 144
+  elemA:i = 83
+  pinA:i = 0
+  elemB:i = 26
+  pinB:i = 2
+}
+edge {
+  id:i = 145
+  elemA:i = 81
+  pinA:i = 1
+  elemB:i = 49
+  pinB:i = 4
+}
+edge {
+  id:i = 146
+  elemA:i = 79
+  pinA:i = 0
+  elemB:i = 24
+  pinB:i = 2
+}
+edge {
+  id:i = 147
+  elemA:i = 89
+  pinA:i = 0
+  elemB:i = 29
+  pinB:i = 2
+}
+edge {
+  id:i = 148
+  elemA:i = 88
+  pinA:i = 1
+  elemB:i = 86
+  pinB:i = 2
+}
+edge {
+  id:i = 149
+  elemA:i = 80
+  pinA:i = 1
+  elemB:i = 78
+  pinB:i = 2
+}
+edge {
+  id:i = 150
+  elemA:i = 89
+  pinA:i = 2
+  elemB:i = 90
+  pinB:i = 0
+}
+edge {
+  id:i = 151
+  elemA:i = 93
+  pinA:i = 0
+  elemB:i = 31
+  pinB:i = 2
+}
+edge {
+  id:i = 152
+  elemA:i = 90
+  pinA:i = 1
+  elemB:i = 88
+  pinB:i = 2
+}
+edge {
+  id:i = 153
+  elemA:i = 91
+  pinA:i = 2
+  elemB:i = 92
+  pinB:i = 0
+}
+edge {
+  id:i = 154
+  elemA:i = 87
+  pinA:i = 1
+  elemB:i = 55
+  pinB:i = 4
+}
+edge {
+  id:i = 155
+  elemA:i = 95
+  pinA:i = 0
+  elemB:i = 32
+  pinB:i = 2
+}
+edge {
+  id:i = 156
+  elemA:i = 91
+  pinA:i = 1
+  elemB:i = 59
+  pinB:i = 4
+}
+edge {
+  id:i = 157
+  elemA:i = 95
+  pinA:i = 2
+  elemB:i = 96
+  pinB:i = 0
+}
+edge {
+  id:i = 158
+  elemA:i = 93
+  pinA:i = 2
+  elemB:i = 94
+  pinB:i = 0
+}
+edge {
+  id:i = 159
+  elemA:i = 92
+  pinA:i = 1
+  elemB:i = 90
+  pinB:i = 2
+}
+edge {
+  id:i = 160
+  elemA:i = 94
+  pinA:i = 1
+  elemB:i = 92
+  pinB:i = 2
+}
+edge {
+  id:i = 161
+  elemA:i = 91
+  pinA:i = 0
+  elemB:i = 30
+  pinB:i = 2
+}
+edge {
+  id:i = 162
+  elemA:i = 89
+  pinA:i = 1
+  elemB:i = 57
+  pinB:i = 4
+}
+edge {
+  id:i = 163
+  elemA:i = 99
+  pinA:i = 0
+  elemB:i = 34
+  pinB:i = 2
+}
+edge {
+  id:i = 164
+  elemA:i = 102
+  pinA:i = 2
+  elemB:i = 103
+  pinB:i = 0
+}
+edge {
+  id:i = 165
+  elemA:i = 97
+  pinA:i = 2
+  elemB:i = 98
+  pinB:i = 0
+}
+edge {
+  id:i = 166
+  elemA:i = 101
+  pinA:i = 1
+  elemB:i = 69
+  pinB:i = 4
+}
+edge {
+  id:i = 167
+  elemA:i = 98
+  pinA:i = 1
+  elemB:i = 96
+  pinB:i = 2
+}
+edge {
+  id:i = 168
+  elemA:i = 99
+  pinA:i = 2
+  elemB:i = 100
+  pinB:i = 0
+}
+edge {
+  id:i = 169
+  elemA:i = 93
+  pinA:i = 1
+  elemB:i = 61
+  pinB:i = 4
+}
+edge {
+  id:i = 170
+  elemA:i = 99
+  pinA:i = 1
+  elemB:i = 67
+  pinB:i = 4
+}
+edge {
+  id:i = 171
+  elemA:i = 97
+  pinA:i = 1
+  elemB:i = 65
+  pinB:i = 4
+}
+edge {
+  id:i = 172
+  elemA:i = 101
+  pinA:i = 2
+  elemB:i = 102
+  pinB:i = 0
+}
+edge {
+  id:i = 173
+  elemA:i = 100
+  pinA:i = 1
+  elemB:i = 98
+  pinB:i = 2
+}
+edge {
+  id:i = 174
+  elemA:i = 102
+  pinA:i = 1
+  elemB:i = 100
+  pinB:i = 2
+}
+edge {
+  id:i = 175
+  elemA:i = 101
+  pinA:i = 0
+  elemB:i = 35
+  pinB:i = 2
+}
+edge {
+  id:i = 176
+  elemA:i = 95
+  pinA:i = 1
+  elemB:i = 63
+  pinB:i = 4
+}
+edge {
+  id:i = 177
+  elemA:i = 97
+  pinA:i = 0
+  elemB:i = 33
+  pinB:i = 2
+}
+edge {
+  id:i = 178
+  elemA:i = 87
+  pinA:i = 0
+  elemB:i = 28
+  pinB:i = 2
+}
+edge {
+  id:i = 179
+  elemA:i = 27
+  pinA:i = 2
+  elemB:i = 28
+  pinB:i = 0
+}
+
+description {
+  name:t = "[[description-name]]"
+  category:t = "[[description-category]]"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  allowLoop:b = no
+  width:i = 200
+  pin {
+    name:t = "index_1"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 21
+    subgraphElem:i = 0
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 32
+    subgraphElem:i = 37
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 32
+    subgraphElem:i = 37
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 32
+    subgraphElem:i = 37
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 169
+    subgraphElem:i = 42
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 169
+    subgraphElem:i = 42
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 169
+    subgraphElem:i = 42
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "index_2"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 179
+    subgraphElem:i = 1
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 303
+    subgraphElem:i = 44
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 303
+    subgraphElem:i = 44
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 303
+    subgraphElem:i = 44
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "index_3"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 315
+    subgraphElem:i = 2
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "index_4"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 436
+    subgraphElem:i = 3
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 440
+    subgraphElem:i = 46
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 440
+    subgraphElem:i = 46
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 440
+    subgraphElem:i = 46
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "index_5"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 570
+    subgraphElem:i = 4
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 573
+    subgraphElem:i = 48
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 573
+    subgraphElem:i = 48
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 573
+    subgraphElem:i = 48
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "index_6"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 709
+    subgraphElem:i = 5
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 711
+    subgraphElem:i = 50
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 711
+    subgraphElem:i = 50
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 711
+    subgraphElem:i = 50
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "index_7"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 839
+    subgraphElem:i = 6
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 844
+    subgraphElem:i = 52
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 844
+    subgraphElem:i = 52
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 844
+    subgraphElem:i = 52
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "index_8"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 962
+    subgraphElem:i = 7
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 982
+    subgraphElem:i = 54
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 982
+    subgraphElem:i = 54
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 982
+    subgraphElem:i = 54
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "index_9"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 1107
+    subgraphElem:i = 8
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1115
+    subgraphElem:i = 56
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1115
+    subgraphElem:i = 56
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1115
+    subgraphElem:i = 56
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "index_10"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 1239
+    subgraphElem:i = 9
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1254
+    subgraphElem:i = 58
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1254
+    subgraphElem:i = 58
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1254
+    subgraphElem:i = 58
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "index_11"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 1386
+    subgraphElem:i = 10
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1388
+    subgraphElem:i = 60
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1388
+    subgraphElem:i = 60
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1388
+    subgraphElem:i = 60
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "index_12"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 1513
+    subgraphElem:i = 11
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1525
+    subgraphElem:i = 62
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1525
+    subgraphElem:i = 62
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1525
+    subgraphElem:i = 62
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1658
+    subgraphElem:i = 64
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1658
+    subgraphElem:i = 64
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1658
+    subgraphElem:i = 64
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "index_13"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 1666
+    subgraphElem:i = 12
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1796
+    subgraphElem:i = 66
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1796
+    subgraphElem:i = 66
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1796
+    subgraphElem:i = 66
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "index_14"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 1798
+    subgraphElem:i = 13
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1929
+    subgraphElem:i = 68
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1929
+    subgraphElem:i = 68
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 1929
+    subgraphElem:i = 68
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "index_15"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 1933
+    subgraphElem:i = 14
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 2066
+    subgraphElem:i = 70
+    subgraphPin:i = 2
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 2066
+    subgraphElem:i = 70
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 2067
+    subgraphElem:i = 70
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "index_16"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 2070
+    subgraphElem:i = 15
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "mask_indexes"
+    types:t = "texture2D"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 2091
+    subgraphElem:i = 103
+    subgraphPin:i = 1
+  }
+}

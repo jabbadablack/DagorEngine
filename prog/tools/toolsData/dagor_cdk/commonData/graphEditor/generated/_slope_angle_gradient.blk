@@ -1,0 +1,87 @@
+
+slope_angle_gradient {
+  params {
+    _height_scale_56093:r = 1000.0
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _height_scale_56093;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_slope_angle_gradient _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._height_scale_56093 = _height_scale_56093; // 1000.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_slope_angle_gradient _out;
+  _out._y_46556 = 0.0;
+  _out._z_46559 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_slope_angle_gradient(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+
+  void _function_slope_angle_gradient(InputStruct_slope_angle_gradient _in, out OutputStruct_slope_angle_gradient _out) {
+
+  int _v_6_0 = 2;
+  float4 _v_8_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float _v_11_0 = 0.0;
+  float _v_23_0 = 3.14159265;
+  int _v_25_0 = 2;
+  float _v_7_1 = _v_8_1.x;
+  _out._y_46556 = _v_8_1.y;
+  _out._z_46559 = _v_8_1.z;
+  float _v_7_4 = _v_8_1.w;
+  float _v_24_2 = (_v_23_0 / float(_v_25_0));
+  float _v_5_1 = ddx_fine(_v_7_1);
+  float _v_5_2 = ddy_fine(_v_7_1);
+  float _v_20_2 = (_v_5_1 * _in._height_scale_56093);
+  float _v_28_2 = (_v_5_2 * _in._height_scale_56093);
+  float _v_9_2 = pow(_v_20_2, float(_v_6_0));
+  float _v_10_2 = pow(_v_28_2, float(_v_6_0));
+  float _v_18_2 = (_v_9_2 + _v_10_2);
+  float _v_21_1 = sqrt(_v_18_2);
+  float _v_22_1 = atan(_v_21_1);
+  float _v_26_2 = (_v_22_1 / _v_24_2);
+  float4 _v_13_4 = float4(_v_26_2, _v_11_0, _v_11_0, _v_7_4);
+  _out.col0 = _v_13_4;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_slope_angle_gradient {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _height_scale_56093;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_slope_angle_gradient {
+  float _y_46556;
+  float _z_46559;
+  float4 col0;
+};
+"""
+  }
+}

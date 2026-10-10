@@ -1,0 +1,492 @@
+templateUid:t = "78e0502b-fe7c-475d-97a8-87a73320cb27"
+hint:t = "[[generated_graph_hint]]"
+
+node {
+  id:i = 0
+  x:r = 642.3102536453625
+  y:r = 580.8133160717799
+  descName:t = "imod"
+  groupTypes {
+    group1:t = "int"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "int"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "int"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A mod B"
+    role:t = "out"
+    types:t = "int"
+    group:t = "group1"
+    data {
+      code:t = "($A$ % $B$)"
+    }
+  }
+}
+node {
+  id:i = 1
+  x:r = 951.8271499031646
+  y:r = 497.75356738471135
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "int"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 2
+  x:r = 863.3336526940029
+  y:r = 762.4185293028283
+  templateUid:t = "6f573bee-f143-43e5-8dae-d80aba16c077"
+  descName:t = "/"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "int"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A/B"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "($A$ / $B$)"
+    }
+  }
+}
+node {
+  id:i = 3
+  x:r = 63.6301496333424
+  y:r = 510.0908474423246
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = "pos x"
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    customVarName:t = "_pos_x_58865"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = "pos x"
+  }
+}
+node {
+  id:i = 4
+  x:r = 63.13428186474735
+  y:r = 630.1900209960438
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = "pos y"
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    customVarName:t = "_pos_y_58864"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = "pos y"
+  }
+}
+node {
+  id:i = 5
+  x:r = 467.0412936009119
+  y:r = 497.450301347244
+  descName:t = "int_noise2d"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "seed"
+  }
+  pin {
+    name:t = "seed"
+    role:t = "in"
+    types:t = "int"
+    customPinInput:t = "_seed_30098"
+  }
+  pin {
+    name:t = "positionX"
+    role:t = "in"
+    types:t = "int"
+  }
+  pin {
+    name:t = "positionY"
+    role:t = "in"
+    types:t = "int"
+  }
+  pin {
+    name:t = "outer seed"
+    role:t = "out"
+    types:t = "int"
+    data {
+      code:t = "uint_noise2D($positionX$, $positionY$, $seed$)"
+    }
+  }
+}
+node {
+  id:i = 6
+  x:r = 439.3874574850688
+  y:r = 784.935179006088
+  templateUid:t = "49d2391e-594c-488b-acb8-19aba0c3db5d"
+  descName:t = "const int"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "int"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "524288"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 7
+  x:r = 275.9313359923862
+  y:r = 512.761221401082
+  descName:t = "scale"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "$A$ * (%scale%)"
+    }
+  }
+  property {
+    name:t = "scale"
+    val:t = "524288.0"
+  }
+}
+node {
+  id:i = 8
+  x:r = 274.6768892051056
+  y:r = 626.4347536459846
+  descName:t = "scale"
+  groupTypes {
+    group1:t = "float"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    data {
+      code:t = "$A$ * (%scale%)"
+    }
+  }
+  property {
+    name:t = "scale"
+    val:t = "524288.0"
+  }
+}
+node {
+  id:i = 9
+  x:r = 709.8842864755201
+  y:r = 693.4367041220424
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 10
+  x:r = 1127.7161912503045
+  y:r = 499.23985556981484
+  descName:t = "frac"
+  groupTypes {
+    group1:t = "float"
+  }
+  pinComment {
+    pinIndex:i = 1
+    text:t = "rand01"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "frac(A)"
+    role:t = "out"
+    types:t = "float"
+    group:t = "group1"
+    customPinOutput:t = "_rand01_9117"
+    data {
+      code:t = "frac($A$)"
+    }
+  }
+}
+edge {
+  id:i = 0
+  elemA:i = 9
+  pinA:i = 0
+  elemB:i = 2
+  pinB:i = 0
+}
+edge {
+  id:i = 1
+  elemA:i = 3
+  pinA:i = 0
+  elemB:i = 7
+  pinB:i = 0
+}
+edge {
+  id:i = 2
+  elemA:i = 5
+  pinA:i = 1
+  elemB:i = 7
+  pinB:i = 1
+}
+edge {
+  id:i = 3
+  elemA:i = 8
+  pinA:i = 1
+  elemB:i = 5
+  pinB:i = 2
+}
+edge {
+  id:i = 4
+  elemA:i = 5
+  pinA:i = 3
+  elemB:i = 0
+  pinB:i = 0
+}
+edge {
+  id:i = 5
+  elemA:i = 6
+  pinA:i = 0
+  elemB:i = 2
+  pinB:i = 1
+}
+edge {
+  id:i = 6
+  elemA:i = 6
+  pinA:i = 0
+  elemB:i = 0
+  pinB:i = 1
+}
+edge {
+  id:i = 7
+  elemA:i = 0
+  pinA:i = 2
+  elemB:i = 1
+  pinB:i = 0
+}
+edge {
+  id:i = 8
+  elemA:i = 1
+  pinA:i = 2
+  elemB:i = 10
+  pinB:i = 0
+}
+edge {
+  id:i = 9
+  elemA:i = 2
+  pinA:i = 2
+  elemB:i = 1
+  pinB:i = 1
+}
+edge {
+  id:i = 10
+  elemA:i = 4
+  pinA:i = 0
+  elemB:i = 8
+  pinB:i = 0
+}
+
+description {
+  name:t = "[[description-name]]"
+  category:t = "[[description-category]]"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  allowLoop:b = no
+  width:i = 200
+  pin {
+    name:t = "seed"
+    types:t = "int"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 497
+    subgraphElem:i = 5
+    subgraphPin:i = 0
+    data {
+      blk_code:t = "%seed%"
+      code:t = "%seed%"
+    }
+  }
+  pin {
+    name:t = "rand01"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 499
+    subgraphElem:i = 10
+    subgraphPin:i = 1
+    data {
+      code:t = "frac($A$)"
+    }
+  }
+  pin {
+    name:t = "pos x"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 510
+    subgraphPin {
+      elem:i = 7
+      pin:i = 0
+    }
+    data {
+      blk_code:t = "%pos x%"
+      code:t = "%pos x%"
+    }
+  }
+  pin {
+    name:t = "pos y"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 630
+    subgraphPin {
+      elem:i = 8
+      pin:i = 0
+    }
+    data {
+      blk_code:t = "%pos y%"
+      code:t = "%pos y%"
+    }
+  }
+  property {
+    name:t = "seed"
+    minVal:i = -65535
+    maxVal:i = 65535
+    step:i = 1
+    val:i = 0
+  }
+  property {
+    name:t = "pos x"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "pos y"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+}

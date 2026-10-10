@@ -1,0 +1,168 @@
+
+append_heightmap_particles {
+  params {
+    _detail_strength_62030:r = 1.0
+    _pos_x_58865:r = 1.0
+    _pos_y_58864:r = 1.0
+  }
+  inputs:i=2
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _detail_strength_62030;
+      float _pos_x_58865;
+      float _pos_y_58864;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+    Texture2D sampler1_t:register(t1);
+    SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="""
+  InputStruct_append_heightmap_particles _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._detail_strength_62030 = _detail_strength_62030; // 1.0
+  _in._pos_x_58865 = _pos_x_58865; // 1.0
+  _in._pos_y_58864 = _pos_y_58864; // 1.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+  _in.sampler1_t = sampler1_t;
+  _in.sampler1_wrap = wrap_t1;
+  _in.sampler1 = sampler1;
+
+
+  OutputStruct_append_heightmap_particles _out;
+  _out._y_46556 = 0.0;
+  _out._vec_31605 = float4(0.0, 0.0, 0.0, 0.0);
+  _out._value_13390 = 0.0;
+  _out._value_13390_23 = 0.0;
+  _out._index_10363 = 0.0;
+  _out._scale_20861 = float2(0.0, 0.0);
+  _out._angle_11396 = 0.0;
+  _out._depth_31976 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_append_heightmap_particles(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+
+  void _function_append_heightmap_particles(InputStruct_append_heightmap_particles _in, out OutputStruct_append_heightmap_particles _out) {
+
+  _out._index_10363 = _in.index;
+  float2 _v_1_2 = _in.particlePos;
+  _out._scale_20861 = _in.scale;
+  _out._angle_11396 = _in.angle;
+  float _v_1_5 = _in.brightness;
+  _out._depth_31976 = _in.pos.z;
+  float4 _v_3_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  int _v_5_0 = 1;
+  float _v_6_1 = 1.0 - _v_1_5;
+  float2 _v_10_0 = _in.tc;
+  float _v_12_1 = float4(_v_1_2, 0.0, 0.0).x;
+  float _v_12_2 = float4(_v_1_2, 0.0, 0.0).y;
+  _out._value_13390 = 1.0;
+  _out._value_13390_23 = 1.0;
+  int _v_25_0 = 524288;
+  float _v_26_1 = _v_12_1 * (524288.0);
+  float _v_27_1 = _v_12_2 * (524288.0);
+  float _v_28_0 = 1.0;
+  float _v_21_2 = (_v_28_0 / float(_v_25_0));
+  int _v_24_3 = uint_noise2D(int(_v_26_1), int(_v_27_1), _v_5_0);
+  int _v_19_2 = (_v_24_3 % _v_25_0);
+  float _v_20_2 = (float(_v_19_2) * _v_21_2);
+  float _v_29_1 = frac(_v_20_2);
+  float2 _v_11_2 = (_v_10_0 + float2(_v_29_1, _v_29_1));
+  float4 _v_8_2 = linear_sample(_in.sampler1_t, _v_11_2, _in.sampler1_wrap);
+  float4 _v_9_2 = (_v_3_1 * _v_8_2);
+  float4 _v_14_1 = _v_9_2 * (2.0);
+  float4 _v_15_3 = lerp(_v_3_1, _v_14_1, _in._detail_strength_62030);
+  float4 _v_4_2 = (_v_15_3 - float4(_v_6_1, _v_6_1, _v_6_1, _v_6_1));
+  float _v_17_1 = _v_4_2.x;
+  _out._y_46556 = _v_4_2.y;
+  float _v_17_3 = _v_4_2.z;
+  float _v_17_4 = _v_4_2.w;
+  _out._vec_31605 = float4(_v_17_1, _v_29_1, _v_17_3, _v_17_4);
+  _out.col0 = _v_4_2;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_append_heightmap_particles {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _detail_strength_62030;
+  float _pos_x_58865;
+  float _pos_y_58864;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+  Texture2D sampler1_t;
+  bool sampler1_wrap;
+  SamplerState sampler1;
+};
+struct OutputStruct_append_heightmap_particles {
+  float _y_46556;
+  float4 _vec_31605;
+  float _value_13390;
+  float _value_13390_23;
+  float _index_10363;
+  float2 _scale_20861;
+  float _angle_11396;
+  float _depth_31976;
+  float4 col0;
+};
+"""
+    particle_fields:t="""
+
+  float angle;
+  float brightness;
+  float index;
+  float2 particlePos;
+  float2 scale;
+  """
+    particle_fields_with_semantics:t="""
+
+  float angle:TEXCOORD1;
+  float brightness:TEXCOORD2;
+  float index:TEXCOORD3;
+  float2 particlePos:TEXCOORD4;
+  float2 scale:TEXCOORD5;
+  """
+    particle_fields_vs_initialization:t="""
+
+  output.angle = instances[instance].angle;
+  output.brightness = instances[instance].brightness;
+  output.index = float(instance);
+  output.particlePos = instances[instance].pos;
+  output.scale = instances[instance].scale;
+  """
+    particle_fields_ps_copy:t="""
+
+  input.angle = input_.angle;
+  input.brightness = input_.brightness;
+  input.index = input_.index;
+  input.particlePos = input_.particlePos;
+  input.scale = input_.scale;
+  """
+    particle_fields_initialization:t="""
+
+  _in.angle = input.angle;
+  _in.brightness = input.brightness;
+  _in.index = input.index;
+  _in.particlePos = input.particlePos;
+  _in.scale = input.scale;
+  """
+  }
+}

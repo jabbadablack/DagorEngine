@@ -1,0 +1,123 @@
+
+noise_microerosion {
+  params {
+    _erosion_strength_47676:r = 1.0
+  }
+  inputs:i=3
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _erosion_strength_47676;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+    Texture2D sampler1_t:register(t1);
+    SamplerState sampler1:register(s1);
+    Texture2D sampler2_t:register(t2);
+    SamplerState sampler2:register(s2);
+  """
+  shaderCode:t="""
+  InputStruct_noise_microerosion _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._erosion_strength_47676 = _erosion_strength_47676; // 1.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+  _in.sampler1_t = sampler1_t;
+  _in.sampler1_wrap = wrap_t1;
+  _in.sampler1 = sampler1;
+  _in.sampler2_t = sampler2_t;
+  _in.sampler2_wrap = wrap_t2;
+  _in.sampler2 = sampler2;
+
+
+  OutputStruct_noise_microerosion _out;
+  _out._y_46556 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out._y_46556_17 = 0.0;
+  _out._z_46559_17 = 0.0;
+  _out._w_46546_17 = 0.0;
+  _out._z_46559_22 = 0.0;
+  _out._w_46546_22 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_noise_microerosion(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+
+  void _function_noise_microerosion(InputStruct_noise_microerosion _in, out OutputStruct_noise_microerosion _out) {
+
+  float4 _v_2_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float _v_3_1 = _v_2_1.x;
+  float _v_3_2 = _v_2_1.y;
+  float _v_3_3 = _v_2_1.z;
+  float _v_3_4 = _v_2_1.w;
+  float4 _v_8_1 = linear_sample(_in.sampler2_t, _in.tc, _in.sampler2_wrap);
+  float4 _v_16_1 = linear_sample(_in.sampler1_t, _in.tc, _in.sampler1_wrap);
+  float _v_17_1 = _v_8_1.x;
+  _out._y_46556_17 = _v_8_1.y;
+  _out._z_46559_17 = _v_8_1.z;
+  _out._w_46546_17 = _v_8_1.w;
+  float2 _v_19_1 = get_dimensions(_in.sampler2_t);
+  float _v_21_0 = 1.0;
+  float _v_22_1 = float4(_v_19_1, 0.0, 0.0).x;
+  float _v_22_2 = float4(_v_19_1, 0.0, 0.0).y;
+  _out._z_46559_22 = float4(_v_19_1, 0.0, 0.0).z;
+  _out._w_46546_22 = float4(_v_19_1, 0.0, 0.0).w;
+  float _v_23_2 = (_v_22_1 * _v_22_2);
+  float _v_25_0 = 0.0;
+  float _v_26_1 = 1.0 - _v_17_1;
+  float _v_9_1 = _v_16_1.x;
+  _out._y_46556 = _v_16_1.y;
+  _out._z_46559 = _v_16_1.z;
+  _out._w_46546 = _v_16_1.w;
+  float _v_10_2 = (_v_9_1 * _in._erosion_strength_47676);
+  float _v_24_4 = ((_v_21_0 >= _v_23_2) ? (_v_25_0) : (_v_26_1));
+  float _v_20_3 = lerp(_v_10_2, _v_25_0, _v_24_4);
+  float _v_11_2 = (_v_3_1 - _v_20_3);
+  float4 _v_12_4 = float4(_v_11_2, _v_3_2, _v_3_3, _v_3_4);
+  _out.col0 = _v_12_4;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_noise_microerosion {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _erosion_strength_47676;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+  Texture2D sampler1_t;
+  bool sampler1_wrap;
+  SamplerState sampler1;
+  Texture2D sampler2_t;
+  bool sampler2_wrap;
+  SamplerState sampler2;
+};
+struct OutputStruct_noise_microerosion {
+  float _y_46556;
+  float _z_46559;
+  float _w_46546;
+  float _y_46556_17;
+  float _z_46559_17;
+  float _w_46546_17;
+  float _z_46559_22;
+  float _w_46546_22;
+  float4 col0;
+};
+"""
+  }
+}

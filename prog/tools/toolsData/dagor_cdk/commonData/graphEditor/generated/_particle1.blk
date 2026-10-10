@@ -1,0 +1,115 @@
+
+particle1 {
+  params {
+    _scale_20861:p2 = 1.0, 1.0
+    _angle_11396:r = 0.0
+    _brightness_50764:r = 1.0
+    _depth_31976:r = 0.5
+  }
+  inputs:i=0
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float2 _scale_20861;
+      float _angle_11396;
+      float _brightness_50764;
+      float _depth_31976;
+    };
+    #define ParticlesOutput_DEFINE u7
+    #define ParticlesOutputCounter_DEFINE u6
+    #define VOID_OUTPUT
+    #define WRAP 1
+  """
+  shaderCode:t="""
+  InputStruct_particle1 _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._scale_20861 = _scale_20861; // float2(1.0, 1.0)
+  _in._angle_11396 = _angle_11396; // 0.0
+  _in._brightness_50764 = _brightness_50764; // 1.0
+  _in._depth_31976 = _depth_31976; // 0.5
+
+
+  OutputStruct_particle1 _out;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out._z_46559_11 = 0.0;
+  _out._w_46546_11 = 0.0;
+
+  _function_particle1(_in, _out);
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  """
+    shader_function:t="""
+
+
+  void _function_particle1(InputStruct_particle1 _in, out OutputStruct_particle1 _out) {
+
+  float2 _v_1_0 = _in.tc;
+  float2 _v_7_0 = float2(1323442.0, 5412231.0);
+  float _v_8_0 = 0.9;
+  float _v_11_1 = float4(_v_1_0, 0.0, 0.0).x;
+  float _v_11_2 = float4(_v_1_0, 0.0, 0.0).y;
+  _out._z_46559_11 = float4(_v_1_0, 0.0, 0.0).z;
+  _out._w_46546_11 = float4(_v_1_0, 0.0, 0.0).w;
+  float _v_13_1 = _v_11_2 * (8.0);
+  float _v_16_0 = 1.0;
+  float _v_17_0 = 0.0;
+  float _v_0_1 = sin(_v_13_1);
+  float2 _v_6_2 = (_v_7_0 * _v_1_0);
+  float _v_15_1 = _v_0_1 * (0.05);
+  float2 _v_2_1 = sin(_v_6_2);
+  float2 _v_9_1 = frac(_v_2_1);
+  float _v_14_2 = (_v_15_1 + _v_11_1);
+  float2 _v_3_2 = (_v_9_1 - float2(_v_8_0, _v_8_0));
+  float _v_5_1 = float4(_v_3_2, 0.0, 0.0).x;
+  float _v_5_2 = float4(_v_3_2, 0.0, 0.0).y;
+  _out._z_46559 = float4(_v_3_2, 0.0, 0.0).z;
+  _out._w_46546 = float4(_v_3_2, 0.0, 0.0).w;
+  float4 _v_12_4 = float4(_v_14_2, _v_11_2, _v_16_0, _v_16_0);
+  float _v_4_2 = min(_v_5_1, _v_5_2);
+  {
+    ParticleInstance tmp_particle; tmp_particle.reserved0 = 0; tmp_particle.reserved1 = 0;;
+    tmp_particle.pos = _v_12_4.xy;
+    tmp_particle.scale = _in._scale_20861;
+    tmp_particle.angle = _in._angle_11396;
+    tmp_particle.brightness = _in._brightness_50764;
+    tmp_particle.depth = _in._depth_31976;
+;
+    tmp_particle.entityWorldPos = float3(_v_17_0, _v_17_0, _v_17_0);
+    tmp_particle.entityForward = float3(_v_17_0, _v_17_0, _v_17_0);
+    tmp_particle.entityUp = float3(_v_17_0, _v_17_0, _v_17_0);
+    tmp_particle.entityNameIndex = int(_v_17_0);
+    tmp_particle.entityPlaceType = int(_v_17_0);
+    tmp_particle.entitySeed = int(_v_17_0);
+    tmp_particle.entityScale = float3(_v_17_0, _v_17_0, _v_17_0);
+    [branch]
+    if (_v_4_2 > 0.0) { uint instIdx; InterlockedAdd(instancesCounter[1], 1, instIdx);instances[instIdx] = tmp_particle; wrap_particle(tmp_particle); }
+  };
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_particle1 {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float2 _scale_20861;
+  float _angle_11396;
+  float _brightness_50764;
+  float _depth_31976;
+};
+struct OutputStruct_particle1 {
+  float _z_46559;
+  float _w_46546;
+  float _z_46559_11;
+  float _w_46546_11;
+};
+"""
+  }
+}

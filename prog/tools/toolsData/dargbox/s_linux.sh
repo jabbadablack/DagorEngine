@@ -1,0 +1,1 @@
+./linux-$(uname -m)/dargbox-dev -config:script:t=browser/filebrowser.ui.nut -path:.

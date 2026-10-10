@@ -1,0 +1,392 @@
+templateUid:t = "045b4164-c5e4-417d-b379-6137d7781316"
+hint:t = "/*--------------------*/"
+
+node {
+  id:i = 0
+  x:r = -220.0
+  y:r = 440.0
+  descName:t = "texValue"
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler0"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 1
+  x:r = 560.0
+  y:r = 440.0
+  descName:t = "float to vec"
+  pin {
+    name:t = "x"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "y"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "z"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "w"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "vec"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "float4($x$, $y$, $z$, $w$)"
+    }
+  }
+}
+node {
+  id:i = 2
+  x:r = 400.0
+  y:r = 440.0
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_z_46559"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    customPinOutput:t = "_w_46546"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 3
+  x:r = 760.0
+  y:r = 440.0
+  descName:t = "length"
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "length($A$)"
+    }
+  }
+}
+node {
+  id:i = 4
+  x:r = 980.0
+  y:r = 440.0
+  templateUid:t = "e9c40e8f-d682-4021-b803-6701341256af"
+  descName:t = "result"
+  externalName:t = ""
+  pin {
+    name:t = "color"
+    role:t = "in"
+    types:t = "float4"
+    data {
+      def_val:t = "float4(0.5, 0.5, 0.5, 0.5)"
+      def_val_blk:t = "0.5, 0.5, 0.5, 0.5"
+      code:t = "_out.col%MRT index% = $color$"
+      result_color:b = yes
+    }
+  }
+  pin {
+    name:t = "out"
+    role:t = "out"
+    types:t = "texture2D"
+  }
+  property {
+    name:t = "MRT index"
+    val:t = "0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 5
+  x:r = 360.0
+  y:r = 680.0
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "0.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 6
+  x:r = -40.0
+  y:r = 440.0
+  templateUid:t = "3f889697-686d-4d9a-b808-2ea09947acc3"
+  descName:t = "-"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float3"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A-B"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "($A$ - $B$)"
+    }
+  }
+}
+node {
+  id:i = 7
+  x:r = -220.0
+  y:r = 580.0
+  templateUid:t = "5d1556c3-b704-4007-b9b5-341c9cc9601e"
+  descName:t = "const float3"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float3"
+    data {
+      code:t = "float3(%x%, %y%, %z%)"
+      blk_code:t = "%x%, %y%, %z%"
+    }
+  }
+  property {
+    name:t = "x"
+    val:t = "0.5"
+  }
+  property {
+    name:t = "y"
+    val:t = "0.5"
+  }
+  property {
+    name:t = "z"
+    val:t = "0.5"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 8
+  x:r = 140.0
+  y:r = 440.0
+  descName:t = "scale"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "$A$ * (%scale%)"
+    }
+  }
+  property {
+    name:t = "scale"
+    val:t = "2.0"
+  }
+}
+edge {
+  id:i = 0
+  elemA:i = 2
+  pinA:i = 0
+  elemB:i = 8
+  pinB:i = 1
+}
+edge {
+  id:i = 1
+  elemA:i = 2
+  pinA:i = 1
+  elemB:i = 1
+  pinB:i = 0
+}
+edge {
+  id:i = 2
+  elemA:i = 1
+  pinA:i = 1
+  elemB:i = 2
+  pinB:i = 2
+}
+edge {
+  id:i = 3
+  elemA:i = 1
+  pinA:i = 3
+  elemB:i = 5
+  pinB:i = 0
+}
+edge {
+  id:i = 4
+  elemA:i = 1
+  pinA:i = 4
+  elemB:i = 3
+  pinB:i = 0
+}
+edge {
+  id:i = 5
+  elemA:i = 3
+  pinA:i = 1
+  elemB:i = 4
+  pinB:i = 0
+}
+edge {
+  id:i = 6
+  elemA:i = 1
+  pinA:i = 2
+  elemB:i = 5
+  pinB:i = 0
+}
+edge {
+  id:i = 7
+  elemA:i = 0
+  pinA:i = 1
+  elemB:i = 6
+  pinB:i = 0
+}
+edge {
+  id:i = 8
+  elemA:i = 6
+  pinA:i = 1
+  elemB:i = 7
+  pinB:i = 0
+}
+edge {
+  id:i = 9
+  elemA:i = 6
+  pinA:i = 2
+  elemB:i = 8
+  pinB:i = 0
+}
+
+description {
+  name:t = "[[description-name]]"
+  category:t = "[[description-category]]"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  allowLoop:b = no
+  width:i = 200
+  pin {
+    name:t = "texture"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 440
+    subgraphElem:i = 0
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "out"
+    types:t = "texture2D"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 440
+    subgraphElem:i = 4
+    subgraphPin:i = 1
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 440
+    subgraphElem:i = 2
+    subgraphPin:i = 3
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 440
+    subgraphElem:i = 2
+    subgraphPin:i = 4
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}

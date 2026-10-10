@@ -1,0 +1,2966 @@
+perlin
+{
+ outputs:i=1
+ params
+ {
+   octaves:i=5
+   persistence:r=0.5
+   frequency:r=1
+   scale:r=1
+   ofs:p2=0,0
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     int octaves;
+     float persistence;
+     float frequency;
+     float scale;
+     float2 ofs;
+   };
+
+ """
+ shaderCode:t="""
+ float2 pt = input.tc*frequency+ofs;
+ int totalOctaves = min(octaves, 16);
+ float ret = 0;
+ float cscale = 1, totalScale = 0;
+ float cosFib, sinFib;
+ sincos((sqrt(5)*1 + 1)*2*PI, sinFib, cosFib);
+ [loop]
+ for (int i = 0; i < totalOctaves; ++i)
+ {
+   ret += noise_Perlin2D(pt)*cscale;
+   //ret += (noise_Value2D(pt)*2-1)*cscale;
+   totalScale += cscale;
+   pt += pt;
+   pt = float2(pt.x*cosFib + pt.y*sinFib, -sinFib*pt.x + pt.y*cosFib);
+   cscale *= persistence;
+ }
+ result.col0 = input.tc.z*scale*(ret/max(0.0001,totalScale)*0.5+0.5);
+// result.col0 = length(input.tc.xy-float2(0.75,0.5))<0.21;
+"""
+}
+
+perlin_terrain
+{
+ outputs:i=1
+ params
+ {
+    height_scale:r=1
+    tiling:r=1
+    offset:p2=0,0
+
+    octaves:i=5
+    roughness:r=0.5
+    frequency:r=2
+    gradient:r=0
+
+    use_3d_noise:b=no
+    type:i=0
+ }
+ shaderPreMain:t="""
+  cbuffer global
+  {
+    float height_scale;
+    float tiling;
+    float2 offset;
+
+    int octaves;
+    float roughness;
+    float frequency;
+    float gradient;
+
+    bool use_3d_noise;
+    int type;
+  };
+ """
+ shaderCode:t="""
+  static float cosFib, sinFib;
+  sincos(0.6472222*2*PI, sinFib, cosFib); // Some bs rotation coeffs
+  const float2x2 m = {cosFib, sinFib, -sinFib, cosFib};
+
+  float2 P = input.tc.xy*tiling + offset;
+
+  //// fBm(P)
+  // https://iquilezles.org/articles/morenoise/
+
+  int idx0 = type > 3;
+  int idx1 = idx0 ? 3 : clamp(type, 0, 3);
+
+  int totalOctaves = min(octaves, 16);
+  float height = 0, mult = 1;
+  float3 derivatives = 0;
+  float4 noise = 0;
+  float curScale = 1, totalScale = 0;
+  float2x2 curM = {1,0,0,1};
+  float3 curDerivatives;
+
+  [loop]
+  for (int i = 0; i < totalOctaves; ++i)
+  {
+    // Switch noise type, og article uses 3d noise, but it doesnt morph into existing 2d noise
+    if(use_3d_noise) {
+      noise = noise_Perlin3D_Deriv(float3(P, 0.5));
+    } else {
+      noise = float4(noise_Perlin2D_Deriv(P), 0);
+    }
+    curDerivatives = float3(mul(noise.yz, invMat(curM)), noise.w);
+
+    // Og article have no derivative scaling, but resulting derivatives will be incorrect this way
+    if(idx0 == 1) {
+      derivatives += curDerivatives*curScale; // Accumulate derivatives
+    } else {
+      derivatives += curDerivatives; // Accumulate derivatives
+    }
+
+    mult = 1.0 / (1.0 + gradient*dot(derivatives,derivatives) );
+    height += noise.x*curScale*mult; // Accumulate height
+
+    // Og article have no derivative correction, but after applying height with derivative coeff, it should be recalculated (idx1=3)
+    // All these methods produce drastically different results, so let users worry about them :o)
+    if(idx1 == 1) {
+      derivatives += curDerivatives*curScale*(-1 + mult);
+    } else if(idx1 == 2) {
+      derivatives += curDerivatives*(-1 + mult);
+    } else if(idx1 == 3) {        
+      derivatives += curDerivatives*(-1 + mult*curScale);
+    }      
+
+    totalScale += curScale; // Accumulate height scale
+
+    curScale *= roughness; // Next current scale
+    curM = mul(m, curM); // Next rot matrix
+    P = mul(P*frequency, curM); // Rotate P by some bs coeffs    
+  } // end fBm
+
+  result.col0 = float4(input.tc.z*height_scale * (height /max(0.0001,totalScale) *0.5 + 0.5), derivatives);
+"""
+}
+
+voronoi
+{
+ outputs:i=1
+ params
+ {
+   randomness:r=1
+   scale:r=1
+   offset:p2=0,0
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     float randomness;
+     float scale;
+     float2 offset;
+   };
+
+ """
+ shaderCode:t="""
+ float2 P = ( input.tc.xy + offset ) * scale;
+ result.col0 = voronoi( P, randomness);
+"""
+}
+
+cellular
+{
+ outputs:i=1
+ params
+ {
+    height_scale:r=1
+    tiling:r=1
+    offset:p2=0,0
+    randomness:r=1.0
+    metric:i=0
+    output_only_F1:b="no"
+
+    octaves:i=5
+    roughness:r=0.5
+    frequency:r=2
+    rotation:r=0  
+ }
+ shaderPreMain:t="""
+  cbuffer global
+  {
+    float height_scale;
+    float tiling;
+    float2 offset;
+    float randomness;
+    int metric;
+    bool output_only_F1;
+
+    int octaves;
+    float roughness;
+    float frequency;
+    float rotation;  
+  };
+ """
+ shaderCode:t="""
+  static float cosFib, sinFib;
+  sincos(rotation/180*PI, sinFib, cosFib);
+  const float2x2 m = {cosFib, sinFib, -sinFib, cosFib};
+
+  float2 invDims = input.tc.xy / input.pos.xy;
+  float2 P = input.tc.xy * tiling + offset;
+  
+  //// fBm(P)
+  int totalOctaves = min(octaves, 16);
+  float height = 0;
+  
+  float4 noise = 0;
+  float curScale = 1, totalScale = 0;
+
+  [loop]
+  for (int i = 0; i < totalOctaves; ++i)
+  {
+    noise = voronoi_metric( P, randomness, output_only_F1, metric);
+    height += noise.x*curScale; // Accumulate height
+    totalScale += curScale; // Accumulate height scale
+
+    curScale *= roughness; // Next current scale
+    P = mul(P*frequency, m);  
+  } // end fBm
+
+  result.col0 = input.tc.z*height_scale * height /max(0.0001,totalScale);
+"""
+}
+
+perlin_tile
+{
+ outputs:i=1
+ params
+ {
+   octaves:i=5
+   persistence:r=0.5
+   frequency:i=1
+   scale:r=1
+   ofs:p2=0,0
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     int octaves;
+     float persistence;
+     int frequency;
+     float scale;
+     float2 ofs;
+   };
+
+ """
+ shaderCode:t="""
+ float2 pt = input.tc * float(frequency);
+ int totalOctaves = min(octaves, 16);
+ float ret = 0;
+ float cscale = 1, totalScale = 0;
+ float tile = float(frequency);
+ [loop]
+ for (int i = 0; i < totalOctaves; ++i)
+ {
+   ret += noise_Perlin2D_tile(pt, ofs, tile) * cscale;
+   totalScale += cscale;
+   pt += pt;
+   cscale *= persistence;
+   tile += tile;
+ }
+ result.col0 = input.tc.z*scale*(ret/max(0.0001,totalScale)*0.5+0.5);
+// result.col0 = length(input.tc.xy-float2(0.75,0.5))<0.21;
+"""
+}
+
+perlin_tile_octaves
+{
+ outputs:i=1
+ params
+ {
+   amp1:r=1.0
+   amp2:r=0.5
+   amp3:r=0.25
+   amp4:r=0.125
+   amp5:r=0.0625
+   amp6:r=0.03125
+   amp7:r=0.015625
+   amp8:r=0.0078125
+   amp9:r=0.00390625
+   amp10:r=0.001953125
+   frequency:i=1
+   scale:r=1
+   ofs:p2=0,0
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     float amp1;
+     float amp2;
+     float amp3;
+     float amp4;
+     float amp5;
+     float amp6;
+     float amp7;
+     float amp8;
+     float amp9;
+     float amp10;
+     int frequency;
+     float scale;
+     float2 ofs;
+   };
+
+ """
+ shaderCode:t="""
+ float2 pt = input.tc * float(frequency);
+ float ret = 0;
+ float totalScale = 0;
+ float tile = float(frequency);
+
+ ret += noise_Perlin2D_tile(pt, ofs, tile) * amp1;
+ totalScale += amp1; pt += pt; tile += tile;
+
+ ret += noise_Perlin2D_tile(pt, ofs, tile) * amp2;
+ totalScale += amp2; pt += pt; tile += tile;
+
+ ret += noise_Perlin2D_tile(pt, ofs, tile) * amp3;
+ totalScale += amp3; pt += pt; tile += tile;
+
+ ret += noise_Perlin2D_tile(pt, ofs, tile) * amp4;
+ totalScale += amp4; pt += pt; tile += tile;
+
+ ret += noise_Perlin2D_tile(pt, ofs, tile) * amp5;
+ totalScale += amp5; pt += pt; tile += tile;
+
+ ret += noise_Perlin2D_tile(pt, ofs, tile) * amp6;
+ totalScale += amp6; pt += pt; tile += tile;
+
+ ret += noise_Perlin2D_tile(pt, ofs, tile) * amp7;
+ totalScale += amp7; pt += pt; tile += tile;
+
+ ret += noise_Perlin2D_tile(pt, ofs, tile) * amp8;
+ totalScale += amp8; pt += pt; tile += tile;
+
+ ret += noise_Perlin2D_tile(pt, ofs, tile) * amp9;
+ totalScale += amp9; pt += pt; tile += tile;
+
+ ret += noise_Perlin2D_tile(pt, ofs, tile) * amp10;
+ totalScale += amp10; pt += pt; tile += tile;
+
+ result.col0 = input.tc.z*scale*(ret/max(0.0001,totalScale)*0.5+0.5);
+"""
+}
+
+particles
+{
+ outputs:i=1
+ params
+ {
+   octaves:i=5
+   persistence:r=0.5
+   frequency:r=1
+   scale:r=1
+   threshold:r=0.75
+   size:r=0.01
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     int octaves;
+     float persistence;
+     float frequency;
+     float scale;
+     float threshold;
+     float size;
+   };
+  #define ParticlesOutput_DEFINE u7
+  #define ParticlesOutputCounter_DEFINE u6
+  #define VOID_OUTPUT
+  #define WRAP 1
+
+ """
+ shaderCode:t="""
+ uint2 screenPos = (uint2)pos.xy;
+ uint2 screenRand = scramble_TEA(screenPos);
+ uint g_rng_state = screenRand.x^screenRand.y;
+ rand_lcg(g_rng_state);
+ float randProb = rand_lcg_float(g_rng_state);
+ float2 randPos2 = float2(rand_lcg_float(g_rng_state), rand_lcg_float(g_rng_state));
+ //float2 pt = (input.tc+(randPos2-0.5)/128)*frequency;
+ float2 pt = (input.tc)*frequency;
+ int totalOctaves = min(octaves, 16);
+ float ret = 0;
+ float cscale = 1, totalScale = 0;
+ [loop]
+ for (int i = 0; i < totalOctaves; ++i)
+ {
+   ret += (noise_Value2D(pt)*2-1)*cscale;
+   totalScale += cscale;
+   pt += pt;
+   cscale *= persistence;
+ }
+ ret/=max(0.0001,totalScale);
+ float probability = scale*(ret*0.5+0.5);
+ 
+ ParticleInstance particle;
+ particle.pos = input.tc + size*(randPos2-0.5)/sqrt(2);
+ particle.scale = size*(-0.5*ret + 0.5);
+ particle.angle = ret;
+ particle.brightness = 1;
+ particle.depth = frac(input.tc.x/4096.0 + input.tc.y);
+ //ENTITY_PROPERTIES
+ particle.entityWorldPos = float3(0, 0, 0);
+ particle.entityForward = float3(0, 0, 0);
+ particle.entityUp = float3(0, 0, 0);
+ particle.entityNameIndex = 0;
+ particle.entityPlaceType = 0;
+ particle.entitySeed = 0;
+ particle.entityScale = float3(0, 0, 0);
+ particle.reserved0 = 0;
+ particle.reserved1 = 0;
+
+
+ [branch]
+ if (probability>threshold*randProb)
+ {
+   uint instIdx;
+   InterlockedAdd(instancesCounter[1], 1, instIdx);
+   instances[instIdx] = particle;
+   wrap_particle(particle);
+ }
+"""
+}
+
+min_value_x8_step
+{
+  inputs:i = 1
+
+  params
+  {
+    resultWidth:i = 1
+    resultHeight:i = 1
+  }
+  shaderPreMain:t="""
+    cbuffer global
+    {
+      int resultWidth;
+      int resultHeight;
+    };
+
+    Texture2D tex0:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+
+  shaderCode:t="""
+    int w, h;
+    tex0.GetDimensions(w, h);
+    int startX = int(input.tc.x * resultWidth) * 8;
+    int startY = int(input.tc.y * resultHeight) * 8;
+
+    float4 res = tex0[int2(startX, startY)];
+
+    for (int x = startX; x < min(startX + 8, w); x++)
+      for (int y = startY; y < min(startY + 8, h); y++)
+        res = min(res, tex0[int2(x, y)]);
+
+    result.col0 = input.tc.z * res;
+  """
+}
+
+max_value_x8_step
+{
+  inputs:i = 1
+
+  params
+  {
+    resultWidth:i = 1
+    resultHeight:i = 1
+  }
+  shaderPreMain:t="""
+    cbuffer global
+    {
+      int resultWidth;
+      int resultHeight;
+    };
+
+    Texture2D tex0:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+
+  shaderCode:t="""
+    int w, h;
+    tex0.GetDimensions(w, h);
+    int startX = int(input.tc.x * resultWidth) * 8;
+    int startY = int(input.tc.y * resultHeight) * 8;
+
+    float4 res = tex0[int2(startX, startY)];
+
+    for (int x = startX; x < min(startX + 8, w); x++)
+      for (int y = startY; y < min(startY + 8, h); y++)
+        res = max(res, tex0[int2(x, y)]);
+
+    result.col0 = input.tc.z * res;
+  """
+}
+
+average_value_x8_step
+{
+  inputs:i = 1
+
+  params
+  {
+    resultWidth:i = 1
+    resultHeight:i = 1
+  }
+  shaderPreMain:t="""
+    cbuffer global
+    {
+      int resultWidth;
+      int resultHeight;
+    };
+
+    Texture2D tex0:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+
+  shaderCode:t="""
+    int w, h;
+    tex0.GetDimensions(w, h);
+    int startX = int(input.tc.x * resultWidth) * 8;
+    int startY = int(input.tc.y * resultHeight) * 8;
+
+    float4 res = float4(0, 0, 0, 0);
+
+    for (int x = startX; x < min(startX + 8, w); x++)
+      for (int y = startY; y < min(startY + 8, h); y++)
+        res += tex0[int2(x, y)];
+
+    int count = max((min(startX + 8, w) - startX) * (min(startY + 8, h) - startY), 1);
+
+    result.col0 = input.tc.z * res / float(count);
+  """
+}
+
+autolevels_final_shader
+{
+  inputs:i = 3
+
+  shaderPreMain:t="""
+    Texture2D tex0:register(t0);
+    Texture2D tex1:register(t1);
+    Texture2D tex2:register(t2);
+    SamplerState sampler0:register(s0);
+    SamplerState sampler1:register(s1);
+    SamplerState sampler2:register(s2);
+  """
+
+  shaderCode:t="""
+    float4 minVal = tex1[int2(0, 0)];
+    float4 maxVal = tex2[int2(0, 0)];
+    result.col0 = saturate((linear_sample(tex0, input.tc, wrap_t0) - minVal) / (maxVal - minVal + 1e-6));
+  """
+}
+
+add
+{
+  inputs:i=2
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  Texture2D tex1:register(t1);
+  SamplerState sampler0:register(s0);
+  SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="result.col0 = input.tc.z * (linear_sample(tex0, input.tc, wrap_t0) + linear_sample(tex1, input.tc, wrap_t1));"
+}
+
+mul
+{
+  inputs:i=2
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  Texture2D tex1:register(t1);
+  SamplerState sampler0:register(s0);
+  SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="result.col0 = input.tc.z * (linear_sample(tex0, input.tc, wrap_t0) * linear_sample(tex1, input.tc, wrap_t1));"
+}
+
+sub
+{
+  inputs:i=2
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  Texture2D tex1:register(t1);
+  SamplerState sampler0:register(s0);
+  SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="result.col0 = input.tc.z * (linear_sample(tex0, input.tc, wrap_t0) - linear_sample(tex1, input.tc, wrap_t1));"
+}
+
+div
+{
+  inputs:i=2
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  Texture2D tex1:register(t1);
+  SamplerState sampler0:register(s0);
+  SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="result.col0 = input.tc.z * (linear_sample(tex0, input.tc, wrap_t0) / linear_sample(tex1, input.tc, wrap_t1));"
+}
+
+blend
+{
+  inputs:i=2
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  Texture2D tex1:register(t1);
+  SamplerState sampler0:register(s0);
+  SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="""
+    float4 v0 = linear_sample(tex0, input.tc, wrap_t0);
+    result.col0 = input.tc.z * lerp(v0, linear_sample(tex1, input.tc, wrap_t1), 1.0 - v0.a);
+  """
+}
+
+max
+{
+  inputs:i=2
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  Texture2D tex1:register(t1);
+  SamplerState sampler0:register(s0);
+  SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="result.col0 = input.tc.z * max(linear_sample(tex0, input.tc, wrap_t0), linear_sample(tex1, input.tc, wrap_t1));"
+}
+
+
+blend_screen
+{
+ inputs:i=3
+ outputs:i=1
+ params
+ {
+   apply:r=1.0
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     float apply;
+   };
+
+   Texture2D tex0:register(t0);
+   Texture2D tex1:register(t1);
+   Texture2D tex2:register(t2);
+   SamplerState sampler0:register(s0);
+   SamplerState sampler1:register(s1);
+   SamplerState sampler2:register(s2);
+ """
+ shaderCode:t="""
+ float4 a = linear_sample(tex0, input.tc, wrap_t0);
+ float4 b = linear_sample(tex1, input.tc, wrap_t1);
+ float alhpa = apply * linear_sample(tex2, input.tc, wrap_t2);
+ result.col0 = (1.0 - (1.0 - a) * (1.0 - b)) * alhpa + b * (1.0 - alhpa);
+"""
+}
+
+blend_overlay
+{
+ inputs:i=3
+ outputs:i=1
+ params
+ {
+   apply:r=1.0
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     float apply;
+   };
+
+   Texture2D tex0:register(t0);
+   Texture2D tex1:register(t1);
+   Texture2D tex2:register(t2);
+   SamplerState sampler0:register(s0);
+   SamplerState sampler1:register(s1);
+   SamplerState sampler2:register(s2);
+ """
+ shaderCode:t="""
+ float4 a = linear_sample(tex0, input.tc, wrap_t0);
+ float4 b = linear_sample(tex1, input.tc, wrap_t1);
+ result.col0.r = (a.r < 0.5) ? (2.0 * a.r * b.r) : (1.0 - 2.0 * (1.0 - a.r) * (1.0 - b.r));
+ result.col0.g = (a.g < 0.5) ? (2.0 * a.g * b.g) : (1.0 - 2.0 * (1.0 - a.g) * (1.0 - b.g));
+ result.col0.b = (a.b < 0.5) ? (2.0 * a.b * b.b) : (1.0 - 2.0 * (1.0 - a.b) * (1.0 - b.b));
+ result.col0.a = (a.a < 0.5) ? (2.0 * a.a * b.a) : (1.0 - 2.0 * (1.0 - a.a) * (1.0 - b.a));
+
+ float alhpa = apply * linear_sample(tex2, input.tc, wrap_t2);
+
+ result.col0 = result.col0 * alhpa + b * (1.0 - alhpa);
+"""
+}
+
+
+blend_multiply
+{
+ inputs:i=3
+ outputs:i=1
+ params
+ {
+   apply:r=1.0
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     float apply;
+   };
+
+   Texture2D tex0:register(t0);
+   Texture2D tex1:register(t1);
+   Texture2D tex2:register(t2);
+   SamplerState sampler0:register(s0);
+   SamplerState sampler1:register(s1);
+   SamplerState sampler2:register(s2);
+ """
+ shaderCode:t="""
+ float4 a = linear_sample(tex0, input.tc, wrap_t0);
+ float4 b = linear_sample(tex1, input.tc, wrap_t1);
+ float alhpa = apply * linear_sample(tex2, input.tc, wrap_t2);
+ result.col0 = a * b * alhpa + b * (1.0 - alhpa);
+"""
+}
+
+
+
+
+wt_rgb_masks_to_indices
+{
+  inputs:i=1
+  shaderPreMain:t="""
+  void swap(inout float a, inout float b) {float c = a; a = b; b = c;}
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  float4 w;
+  w.rgb = linear_sample(tex0, input.tc, wrap_t0);
+  w.w = saturate(1 - dot(w.rgb, 1));
+  float4 ind = float4(0,1,2,3);
+  for (uint i = 0; i < 4; ++i)
+    for (uint j = i+1; j < 4; ++j)
+      if (w[i] < w[j])
+      {
+        swap(w[i],w[j]);
+        swap(ind[i],ind[j]);
+      }
+
+  result.col0.xy = ind.xy/255.;
+  result.col0.z = 0;
+  result.col0.w = w.x/(w.x+w.y+0.00001);
+  """
+}
+
+masks_to_indices
+{
+  params
+  {
+    layer_delta:r = 0.01
+    ht_mask_scale:r = 2
+    layer_index0:i = 0
+    layer_index1:i = 1
+    layer_index2:i = 2
+    layer_index3:i = 3
+    layer_index4:i = 4
+    layer_index5:i = 5
+    layer_index6:i = 6
+    layer_index7:i = 7
+    layer_index8:i = 8
+    layer_index9:i = 9
+    layer_index10:i = 10
+    layer_index11:i = 11
+    layer_index12:i = 12
+    layer_index13:i = 13
+    layer_index14:i = 14
+    layer_index15:i = 15
+  }
+  inputs:i=16
+  shaderPreMain:t="""
+    cbuffer global
+    {
+      float layer_delta;
+      float ht_mask_scale;
+      int index0;
+      int index1;
+      int index2;
+      int index3;
+      int index4;
+      int index5;
+      int index6;
+      int index7;
+      int index8;
+      int index9;
+      int index10;
+      int index11;
+      int index12;
+      int index13;
+      int index14;
+      int index15;
+    };
+
+    Texture2D tex0:register(t0);
+    Texture2D tex1:register(t1);
+    Texture2D tex2:register(t2);
+    Texture2D tex3:register(t3);
+    Texture2D tex4:register(t4);
+    Texture2D tex5:register(t5);
+    Texture2D tex6:register(t6);
+    Texture2D tex7:register(t7);
+    Texture2D tex8:register(t8);
+    Texture2D tex9:register(t9);
+    Texture2D tex10:register(t10);
+    Texture2D tex11:register(t11);
+    Texture2D tex12:register(t12);
+    Texture2D tex13:register(t13);
+    Texture2D tex14:register(t14);
+    Texture2D tex15:register(t15);
+    void swap(inout float a, inout float b) {float c = a; a = b; b = c;}
+    #define GET_LAYER(L) {indices[L] = index##L; layers[L] = linear_sample(tex##L, input.tc, wrap_t##L).x;}
+  """
+  shaderCode:t="""
+    float layers[16]; uint indices[16];
+    GET_LAYER(0);GET_LAYER(1);GET_LAYER(2);GET_LAYER(3);GET_LAYER(4);GET_LAYER(5);GET_LAYER(6);GET_LAYER(7);
+    GET_LAYER(8);GET_LAYER(9);GET_LAYER(10);GET_LAYER(11);GET_LAYER(12);GET_LAYER(13);GET_LAYER(14);GET_LAYER(15);
+
+    uint ret_index0 = index0, ret_index1 = index0;
+    float lastHt = -1, prevHt = -2;
+
+    for (uint l = 0; l < 16; ++l)
+    {
+      float ht = layers[l] > 0 ? layers[l] + layer_delta*l : 0;
+      if (ht > lastHt)
+      {
+        ret_index1 = ret_index0;
+        ret_index0 = indices[l];
+        prevHt = lastHt;
+        lastHt = ht;
+      }
+    }
+
+    result.col0.xy = float2(ret_index0, ret_index1)/255.;
+    result.col0.z = 0;
+    result.col0.w = saturate((lastHt-prevHt)*ht_mask_scale + 0.5);
+  """
+}
+
+
+min
+{
+  inputs:i=2
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  Texture2D tex1:register(t1);
+  SamplerState sampler0:register(s0);
+  SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="result.col0 = input.tc.z*min(linear_sample(tex0, input.tc, wrap_t0), linear_sample(tex1, input.tc, wrap_t1));"
+}
+
+polynomial_smooth_min // from http://www.iquilezles.org/www/articles/smin/smin.htm
+{
+  inputs:i=2
+
+  params
+  {
+    smooth:r = 0.1
+  }
+  shaderPreMain:t="""
+   cbuffer global
+   {
+     float smooth;
+   };
+   Texture2D tex0:register(t0);
+   Texture2D tex1:register(t1);
+   SamplerState sampler0:register(s0);
+   SamplerState sampler1:register(s1);
+  """
+
+  shaderCode:t="""
+  float4 a = linear_sample(tex0, input.tc, wrap_t0);
+  float4 b = linear_sample(tex1, input.tc, wrap_t1);
+  float x = max(smooth, 1e-3);
+  float4 k = float4(x, x, x, x);
+  float4 h = saturate(0.5 + 0.5 * (b - a) / k);
+
+  result.col0 = input.tc.z * (lerp(b, a, h) - k * h * (1.0 - h));
+  """
+}
+
+get_normal
+{
+  inputs:i = 1
+  params
+  {
+    cell_size:r = 128.0
+  }
+  shaderPreMain:t="""
+   cbuffer global
+   {
+     float cell_size;
+   };
+   Texture2D tex0:register(t0);
+   SamplerState sampler0:register(s0);
+  """
+
+  shaderCode:t="""
+  result.col0 = float4(getNormal(tex0, wrap_t0, input.tc, cell_size), 0) * 0.5 + 0.5;
+  """
+}
+
+get_curvature
+{
+  inputs:i = 1
+  params
+  {
+    scale:r = 1.0
+  }
+  shaderPreMain:t="""
+   cbuffer global
+   {
+     float scale;
+   };
+   Texture2D tex0:register(t0);
+   SamplerState sampler0:register(s0);
+  """
+
+  shaderCode:t="""
+  result.col0 = -getCurvature(tex0, wrap_t0, input.tc, scale) * 0.5 + 0.5;
+  """
+}
+
+
+polynomial_smooth_max
+{
+  inputs:i=2
+
+  params
+  {
+    smooth:r = 0.1
+  }
+  shaderPreMain:t="""
+   cbuffer global
+   {
+     float smooth;
+   };
+   Texture2D tex0:register(t0);
+   Texture2D tex1:register(t1);
+   SamplerState sampler0:register(s0);
+   SamplerState sampler1:register(s1);
+  """
+
+  shaderCode:t="""
+  float4 a = -linear_sample(tex0, input.tc, wrap_t0);
+  float4 b = -linear_sample(tex1, input.tc, wrap_t1);
+  float x = max(smooth, 1e-3);
+  float4 k = float4(x, x, x, x);
+  float4 h = saturate(0.5 + 0.5 * (b - a) / k);
+
+  result.col0 = -input.tc.z * (lerp(b, a, h) - k * h * (1.0 - h));
+  """
+}
+
+invert // 1-x
+{
+  inputs:i=1
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="result.col0 = 1.0 - linear_sample(tex0, input.tc, wrap_t0);"
+}
+
+pow2
+{
+  inputs:i=1
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+    float4 v = linear_sample(tex0, input.tc, wrap_t0);
+    result.col0 = v * v;
+  """
+}
+
+pow3
+{
+  inputs:i=1
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+    float4 v = linear_sample(tex0, input.tc, wrap_t0);
+    result.col0 = v * v * v;
+  """
+}
+
+linear_to_srgb
+{
+  inputs:i=1
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+    float4 linearCol = linear_sample(tex0, input.tc, wrap_t0);
+    float3 sRGBLo = linearCol.rgb * 12.92;
+    float3 sRGBHi = ( pow( abs( linearCol.rgb ), 1.0 / 2.4) * 1.055) - 0.055;
+    float3 sRGB = ( linearCol.rgb <= 0.0031308) ? sRGBLo : sRGBHi;
+    result.col0 = float4(sRGB, linearCol.a);
+  """
+}
+
+srgb_to_linear
+{
+  inputs:i=1
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+    float4 sRGBcol = linear_sample(tex0, input.tc, wrap_t0);
+    float3 linearLo = sRGBcol.rgb / 12.92;
+    float3 linearHi = pow((abs(sRGBcol.rgb) + 0.055) / 1.055, 2.4);
+    float3 linearColor = (sRGBcol.rgb <= 0.04045) ? linearLo : linearHi;
+    result.col0 = float4(linearColor, sRGBcol.a);
+  """
+}
+
+
+sqrt
+{
+  inputs:i=1
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+    float4 v = linear_sample(tex0, input.tc, wrap_t0);
+    result.col0 = sqrt(max(v, 0.0));
+  """
+}
+
+abs
+{
+  inputs:i=1
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+    float4 v = linear_sample(tex0, input.tc, wrap_t0);
+    result.col0 = abs(v);
+  """
+}
+
+get_r
+{
+  inputs:i=1
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+    float4 v = linear_sample(tex0, input.tc, wrap_t0);
+    result.col0 = float4(v.x, v.x, v.x, v.x);
+  """
+}
+
+get_g
+{
+  inputs:i=1
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+    float4 v = linear_sample(tex0, input.tc, wrap_t0);
+    result.col0 = float4(v.y, v.y, v.y, v.y);
+  """
+}
+
+get_b
+{
+  inputs:i=1
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+    float4 v = linear_sample(tex0, input.tc, wrap_t0);
+    result.col0 = float4(v.z, v.z, v.z, v.z);
+  """
+}
+
+get_a
+{
+  inputs:i=1
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+    float4 v = linear_sample(tex0, input.tc, wrap_t0);
+    result.col0 = float4(v.w, v.w, v.w, v.w);
+  """
+}
+
+separate_channels
+{
+  inputs:i=1
+  outputs:i=4
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+
+  #define MRTOutput_DEFINED
+  struct MRTOutput {float4 col0:SV_Target0; float4 col1:SV_Target1; float4 col2:SV_Target2; float4 col3:SV_Target3;};
+
+  """
+  shaderCode:t="""
+    float4 v = linear_sample(tex0, input.tc, wrap_t0);
+    result.col0 = v.r;
+    result.col1 = v.g;
+    result.col2 = v.b;
+    result.col3 = v.a;
+  """
+}
+
+makeRGBA
+{
+  inputs:i=4
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  Texture2D tex1:register(t1);
+  Texture2D tex2:register(t2);
+  Texture2D tex3:register(t3);
+  SamplerState sampler0:register(s0);
+  SamplerState sampler1:register(s1);
+  SamplerState sampler2:register(s2);
+  SamplerState sampler3:register(s3);
+  """
+  shaderCode:t="""
+    float r = linear_sample(tex0, input.tc, wrap_t0).x;
+    float g = linear_sample(tex1, input.tc, wrap_t1).x;
+    float b = linear_sample(tex2, input.tc, wrap_t2).x;
+    float a = linear_sample(tex3, input.tc, wrap_t3).x;
+    result.col0 = float4(r, g, b, a);
+  """
+}
+
+alpha
+{
+  inputs:i=2
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  Texture2D tex1:register(t1);
+  SamplerState sampler0:register(s0);
+  SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="""
+    float4 v0 = linear_sample(tex0, input.tc, wrap_t0);
+    result.col0 = input.tc.z * lerp(v0, linear_sample(tex1, input.tc, wrap_t1), 1.0 - v0.a);
+  """
+}
+
+smoothstep
+{
+  inputs:i=1
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+    float4 v = linear_sample(tex0, input.tc, wrap_t0);
+    result.col0 = smoothstep(0.0, 1.0, v);
+  """
+}
+
+saturate
+{
+  inputs:i=1
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+    float4 v = linear_sample(tex0, input.tc, wrap_t0);
+    result.col0 = saturate(v);
+  """
+}
+
+apply_gradient
+{
+  inputs:i=2
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  Texture2D tex1:register(t1);
+  SamplerState sampler0:register(s0);
+  SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="""
+    float2 gradDim;
+    tex1.GetDimensions(gradDim.x, gradDim.y);
+    float v = (saturate(linear_sample(tex0, input.tc, wrap_t0).x) * (gradDim.x - 1.0) + 0.5) / gradDim.x;
+    result.col0 = linear_sample(tex1, float2(v, 0.0), false);
+  """
+}
+
+lerp_tex
+{
+  inputs:i=3
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  Texture2D tex1:register(t1);
+  Texture2D tex2:register(t2);
+  SamplerState sampler0:register(s0);
+  SamplerState sampler1:register(s1);
+  SamplerState sampler2:register(s2);
+  """
+  shaderCode:t="result.col0 = input.tc.z * lerp(linear_sample(tex0, input.tc, wrap_t0), linear_sample(tex1, input.tc, wrap_t1), linear_sample(tex2, input.tc, wrap_t2).r);"
+}
+
+lerp_scalar
+{
+  inputs:i=2
+
+  params
+  {
+    t:r = 0.5
+  }
+
+  shaderPreMain:t="""
+  cbuffer global
+  {
+    float t;
+  };
+  Texture2D tex0:register(t0);
+  Texture2D tex1:register(t1);
+  SamplerState sampler0:register(s0);
+  SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="result.col0 = input.tc.z * lerp(linear_sample(tex0, input.tc, wrap_t0), linear_sample(tex1, input.tc, wrap_t1), t);"
+}
+
+
+binary
+{
+ params
+ {
+   shader_postcode:t = "result.col0 = input.tc.z*input0*input1;"
+ }
+ inputs:i=2
+ shaderPreMain:t="""
+ Texture2D tex0:register(t0);
+ Texture2D tex1:register(t1);
+ SamplerState sampler0:register(s0);
+ SamplerState sampler1:register(s1);
+ """
+ shaderCode:t="float4 input0 = linear_sample(tex0, input.tc, wrap_t0), input1 = linear_sample(tex1, input.tc, wrap_t1); "
+}
+unary
+{
+ params
+ {
+   shader_postcode:t = "result.col0 = input.tc.z*input0;"
+ }
+ inputs:i=1
+ shaderPreMain:t="""
+ Texture2D tex0:register(t0);
+ SamplerState sampler0:register(s0);
+ """
+ shaderCode:t="float4 input0 = linear_sample(tex0, input.tc, wrap_t0);"
+}
+
+resample_nearest_neighbor
+{
+ params
+ {
+   shader_postcode:t = "result.col0 = input0;"
+ }
+ inputs:i=1
+ outputs:i=1
+ shaderPreMain:t="""
+ Texture2D tex0:register(t0);
+ SamplerState sampler0:register(s0);
+ """
+ shaderCode:t="float4 input0 = nearest_heighbor_sample(tex0, input.tc, wrap_t0);"
+}
+
+resample_bicubic
+{
+ params
+ {
+   shader_postcode:t = "result.col0 = input0;"
+ }
+ inputs:i=1
+ outputs:i=1
+ shaderPreMain:t="""
+ Texture2D tex0:register(t0);
+ SamplerState sampler0:register(s0);
+ """
+ shaderCode:t="float4 input0 = bicubic_sample(tex0, input.tc, wrap_t0);"
+}
+
+unary_weights
+{
+ params
+ {
+   shader_postcode:t = "result.col0 = input0;"
+ }
+ inputs:i=1
+ shaderPreMain:t="""
+ Texture2D tex0:register(t0);
+ SamplerState sampler0:register(s0);
+ """
+ shaderCode:t="float4 input0 = linear_sample(tex0, input.tc, wrap_t0);"
+}
+
+
+blur_hq_step
+{
+  outputs:i = 1
+  inputs:i = 2
+  params
+  {
+     wrap:b = true
+     distance:r = 0.05
+     random_angle:r = 0.1
+     start_turn:r = 0.0
+     rays:i = 7
+     step:r = 0
+  }
+
+  shaderPreMain:t="""
+  cbuffer global
+  {
+    int wrap;
+    float distance;
+    float random_angle;
+    float start_turn;
+    int rays;
+    float step;
+  };
+  Texture2D tex0:register(t0);
+  Texture2D tex1:register(t1);
+  SamplerState sampler0:register(s0);
+  SamplerState sampler1:register(s1);
+  """
+
+ shaderCode:t="""
+   int2 dim;
+   tex0.GetDimensions(dim.x, dim.y);
+
+   int2 dimMask;
+   tex1.GetDimensions(dimMask.x, dimMask.y);
+
+   float2 halfPixel = 0.5 / dim;
+
+   float firstAngle = rand2d(input.tc + step + 3.5) * 2.0 * 3.141592;
+   float firstRadius = rand2d(input.tc + step + 5.5) * distance * random_angle * float(rays) / 6.0;
+   float2 firstTc = input.tc.xy + float2(sin(firstAngle), cos(firstAngle)) * firstRadius;
+//   firstTc = wrap ? firstTc : clamp(firstTc, halfPixel, 1-halfPixel);
+
+   float4 accum = linear_sample(tex0, firstTc, wrap_t0);
+   float blurMask = dimMask.x > 1 ? linear_sample(tex1, input.tc, wrap_t1).x : 1.0;
+   float angle = (random_angle * (rand2d(input.tc + step + 1.7) - 0.5) + start_turn);
+   float angleStep = (2.0 * 3.141592) / float(rays);
+
+   for (int i = 0; i < rays; i++)
+   {
+     float2 offs = float2(sin(angle), cos(angle)) * distance * blurMask;
+     offs *= 1.0 + (rand2d(input.tc + step + float(i)) - 0.5) * random_angle;
+     float2 offsTc = offs + input.tc;
+     accum += linear_sample(tex0, offsTc, wrap_t0);
+     angle += angleStep;
+   }
+
+   result.col0 = accum / float(rays + 1);
+ """
+}
+
+   erosion_shader
+  {
+    outputs:i = 6
+    inputs:i = 4
+    params
+    {
+      mapSize:i = 0
+      cellCount:i = 0
+      cellSize:i = 0
+      cellOffsetX:r = 0
+      cellOffsetY:r = 0
+      weightsCount:i = 0
+      erosion_radius:i = 0
+      drop_lifetime:i = 0
+      inertia:r = 0
+      sediment_capacity_factor:r = 0
+      min_sediment_capacity:r = 0
+      deposit_speed:r = 0
+      erosion_speed:r = 0
+
+      evaporate_speed:r = 0
+      gravity:r = 0
+      start_drop_speed:r = 0
+      start_drop_water:r = 0
+      flow_map_inertion:r = 0
+      physical_width:r=1
+      physical_height:r=1
+      gravity_influence_on_flow:r = 0
+      use_unorm_direction_map:b=yes
+      direction_speed:r = 0
+    }
+
+    shaderPreMain:t="""
+    cbuffer global
+    {
+      int mapSize;
+      int cellCount;
+      int cellSize;
+      float cellOffsetX, cellOffsetY;
+      int weightsCount;
+      int erosion_radius, drop_lifetime;
+      float inertia,
+        sediment_capacity_factor,
+        min_sediment_capacity,
+        deposit_speed,
+        erosion_speed,
+        evaporate_speed,
+        gravity,
+        start_drop_speed,
+        start_drop_water,
+        flow_map_inertion,
+        physical_width,
+        physical_height,
+        gravity_influence_on_flow,
+        direction_speed;
+      bool use_unorm_direction_map;
+    };
+    Texture2D inHeightMap:register(t0);
+    Texture2D hardnessMap:register(t1);
+    Texture2D precipitationMap:register(t2);
+    Texture2D<float2> inFlowMap:register(t3);
+
+    RWTexture2D<float> heightMap: register(u7);
+    RWTexture2D<float> sedimentMap: register(u6);
+    RWTexture2D<float> depositMap: register(u5);
+    RWTexture2D<float> flowMapX: register(u4);
+    RWTexture2D<float> flowMapY: register(u3);
+    RWTexture2D<float> waterFlowMap: register(u2);
+    #define VOID_OUTPUT
+
+    uint2 indexc(int x, int y)
+    {
+      x = clamp(x, 0, mapSize - 1);
+      y = clamp(y, 0, mapSize - 1);
+      return uint2(x, y);
+    }
+    uint2 index(int x, int y)
+    {
+      return indexc(x, y);
+    }
+    uint2 index(int2 i)
+    {
+      return indexc(i.x, i.y);
+    }
+    float3 CalculateHeightAndGradient (float2 pos)
+    {
+      float aspect = physical_height / max(physical_width, 1);
+
+      pos -= float2(0.5, 0.5);
+      int coordX = (int) pos.x;
+      int coordY = (int) pos.y;
+
+      float x = pos.x - coordX;
+      float y = pos.y - coordY;
+
+      float heightNW = heightMap[indexc(coordX, coordY)];
+      float heightNE = heightMap[indexc(coordX + 1, coordY)];
+      float heightSW = heightMap[indexc(coordX, coordY + 1)];
+      float heightSE = heightMap[indexc(coordX + 1, coordY + 1)];
+
+      float gradientX = (heightNE - heightNW) * (1 - y) + (heightSE - heightSW) * y;
+      float gradientY = (heightSW - heightNW) * (1 - x) + (heightSE - heightNE) * x;
+      gradientX *= aspect;
+      gradientY *= aspect;
+
+      float height = heightNW * (1 - x) * (1 - y) + heightNE * x * (1 - y) + heightSW * (1 - x) * y + heightSE * x * y;
+
+      return float3(gradientX,gradientY,height);
+    }
+    bool InsideMap(float x, float y)
+    {
+      const float border = 0;
+      return border <= x && x < mapSize - border && border <= y && y < mapSize - border;
+    }
+    void Deposition(float2 pos, float amountToDeposit)
+    {
+      pos -= float2(0.5, 0.5);
+      int coordX = (int) pos.x;
+      int coordY = (int) pos.y;
+      float cellOffsetX = pos.x - coordX;
+      float cellOffsetY = pos.y - coordY;
+      heightMap[index(coordX, coordY)] += amountToDeposit * (1 - cellOffsetX) * (1 - cellOffsetY);
+      heightMap[index(coordX + 1, coordY)] += amountToDeposit * cellOffsetX * (1 - cellOffsetY);
+      heightMap[index(coordX, coordY + 1)] += amountToDeposit * (1 - cellOffsetX) * cellOffsetY;
+      heightMap[index(coordX + 1, coordY + 1)] += amountToDeposit * cellOffsetX * cellOffsetY;
+
+      depositMap[index(coordX, coordY)] += amountToDeposit * (1 - cellOffsetX) * (1 - cellOffsetY);
+      depositMap[index(coordX + 1, coordY)] += amountToDeposit * cellOffsetX * (1 - cellOffsetY);
+      depositMap[index(coordX, coordY + 1)] += amountToDeposit * (1 - cellOffsetX) * cellOffsetY;
+      depositMap[index(coordX + 1, coordY + 1)] += amountToDeposit * cellOffsetX * cellOffsetY;
+    }
+    """
+   shaderCode:t="""
+    float2 cellCenter = float2(cellSize, cellSize) * 0.5;
+    float2 position = input.tc.xy * cellCount * cellSize - float2(cellOffsetX - cellCenter.x, cellOffsetY - cellCenter.y);
+
+    if (!InsideMap(position.x, position.y))
+      return;
+
+    float2 precipitationMapDims = get_dimensions(precipitationMap);
+    bool usePrecipitationMap = max(precipitationMapDims.x, precipitationMapDims.y) > 1;
+    if(usePrecipitationMap)
+    {
+      uint randSeed = int((position.x * precipitationMapDims.x + position.y)*1000);
+      rand_lcg(randSeed);
+      float randChance = rand_lcg_float(randSeed);
+
+      int2 idx = index(int2(position));
+      if(saturate(precipitationMap[idx].x) < randChance)
+        return;
+    }
+
+    float2 inFlowMapDims = get_dimensions(inFlowMap);
+    bool useInFlowMap = max(inFlowMapDims.x, inFlowMapDims.y) > 1;
+
+    float speed = start_drop_speed;
+    float water = start_drop_water;
+    float sediment = 0;
+    float2 dir = float2(0,0);
+    int2 node = int2(0,0);
+
+    [loop][allow_uav_condition]
+    for (int lifetime = 0; lifetime < drop_lifetime; lifetime++)
+    {
+      node = int2(position);
+      float2 cellOffset = position - node;
+      float3 heightAndGradient = CalculateHeightAndGradient (position);
+      float2 grad = heightAndGradient.xy;
+      grad *= lerp(1.0, gravity, gravity_influence_on_flow);
+      dir = (dir * inertia - grad * (1 - inertia));
+
+      if(useInFlowMap && use_unorm_direction_map) {
+        dir += (inFlowMap[node]*2 - 1) * direction_speed;
+      } else {
+        dir += inFlowMap[node] * direction_speed;
+      }      
+      
+      flowMapY[node] = lerp(flowMapY[node], dir.y, flow_map_inertion);
+      flowMapX[node] = lerp(flowMapX[node], dir.x, flow_map_inertion);
+
+      waterFlowMap[node] += water;
+
+      dir /= max(0.01, length(dir));
+      position += dir;
+      if (length(dir) < 0.01f || !InsideMap(position.x, position.y))
+      {
+        break;
+      }
+      float newHeight = CalculateHeightAndGradient (position).z;
+      float deltaHeight = newHeight - heightAndGradient.z;
+      float sedimentCapacity = max(-deltaHeight * speed * water * sediment_capacity_factor, min_sediment_capacity);
+      if (sediment > sedimentCapacity || deltaHeight > 0)
+      {
+        float amountToDeposit = (deltaHeight > 0) ? min(deltaHeight, sediment) : (sediment - sedimentCapacity) * deposit_speed;
+
+        sediment -= amountToDeposit;
+        const float conusVinv = 1.0 / (3.14 * erosion_radius * erosion_radius / 3);
+        for (int x = -erosion_radius; x <= erosion_radius; x++)
+          for (int y = -erosion_radius; y <= erosion_radius; y++)
+          {
+            float r = sqrt(x*x + y*y);
+            if (r <= erosion_radius)
+            {
+              float weight = (1 - r / erosion_radius) * conusVinv;
+              int2 erodeIndex = index(node + int2(x, y));
+              float weightedDepositAmount = amountToDeposit * weight;
+              heightMap[erodeIndex] += weightedDepositAmount;
+              depositMap[erodeIndex] += weightedDepositAmount;
+            }
+          }
+      }
+      else
+      {
+        float amountToErode = min ((sedimentCapacity - sediment) * erosion_speed, -deltaHeight) * (1 - hardnessMap[node]);
+
+        const float conusVinv = 1.0 / (3.14 * erosion_radius * erosion_radius / 3);
+        for (int x = -erosion_radius; x <= erosion_radius; x++)
+          for (int y = -erosion_radius; y <= erosion_radius; y++)
+          {
+            float r = sqrt(x*x + y*y);
+            if (r <= erosion_radius)
+            {
+              float weight = (1 - r / erosion_radius) * conusVinv;
+              int2 erodeIndex = index(node + int2(x, y));
+              float weightedErodeAmount = amountToErode * weight;
+              float deltaSediment = min(heightMap[erodeIndex], weightedErodeAmount) ;
+              heightMap[erodeIndex] -= deltaSediment;
+              sedimentMap[erodeIndex] += deltaSediment;
+              sediment += deltaSediment;
+            }
+          }
+      }
+
+      speed = sqrt(max(0.0, speed * speed + deltaHeight * gravity));
+      water *= (1 - evaporate_speed);
+    }
+   """
+  }
+
+fill_areas_init
+{
+  outputs:i = 1
+  inputs:i = 1
+  params
+  {
+     seed:r = 0.1
+  }
+
+  shaderPreMain:t="""
+  cbuffer global
+  {
+    float seed;
+  };
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+
+ shaderCode:t="""
+   float c00 = get_texel(tex0, input.tc, wrap_t0, int2(0, 0)).r;
+   float c10 = get_texel(tex0, input.tc, wrap_t0, int2(-1, 0)).r;
+   float c01 = get_texel(tex0, input.tc, wrap_t0, int2(0, -1)).r;
+
+   if (c00 >= 0.5 && c01 < 0.5 && c10 < 0.5)
+     c00 = frac(input.tc.x * (0.0017103 + seed * 0.001) + input.tc.y * (0.0032331 + seed * 0.00212) + frac(seed * 1.345)) * 0.8 + 0.1;
+   else
+     c00 = c00 >= 0.5 ? 1.0 : 0.0;
+
+   result.col0 = float4(c00, 0, 0, 0);
+ """
+}
+
+
+fill_areas_postprocess
+{
+  outputs:i = 1
+  inputs:i = 1
+  params
+  {
+     seed:r = 0.1
+     quantization:i = 500000
+  }
+
+  shaderPreMain:t="""
+  cbuffer global
+  {
+    float seed;
+    int quantization;
+  };
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+
+ shaderCode:t="""
+   float v = get_texel(tex0, input.tc, wrap_t0, int2(0, 0)).r;
+   if (v <= 0.0)
+   {
+     result.col0 = float4(0, 0, 0, 0);
+   }
+   else
+   {
+     float r = frac(sin(fmod(v * 939315.1 + seed, 2 * PI)) * 6542.235);
+     float g = frac(sin(fmod(v * 759215.4 + 1.0 - seed, 2 * PI)) * 46742.281);
+     float sx = saturate(floor(r * quantization + 1) / (quantization));
+     float sy = sqrt(saturate(1.0 - sx * sx));
+     float sz = saturate(floor(g * quantization + 1) / (quantization));
+     float sw = sqrt(saturate(1.0 - sz * sz));
+
+     result.col0 = float4(sx, sy, sz, sw);
+   }
+ """
+}
+
+
+fill_areas_step
+{
+  outputs:i = 1
+  inputs:i = 1
+  params
+  {
+     seed:r = 0.1
+     step:i = 0
+  }
+
+  shaderPreMain:t="""
+  cbuffer global
+  {
+    float seed;
+    int step;
+  };
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+
+  shaderCode:t="""
+    int2 dim;
+    tex0.GetDimensions(dim.x, dim.y);
+
+    float c = get_texel(tex0, input.tc, wrap_t0).r;
+    if (c <= 0.0 || dim.x <= 1 || dim.y <= 1)
+    {
+      result.col0 = float4(0, 0, 0, 0);
+    }
+    else
+    {
+      float2 pixelStep = 1.0 / float2(dim);
+
+      int horzFillDist = (step & 1) == 0 ? 512 : 0;
+      int vertFillDist = (step & 1) == 1 ? 512 : 0;
+
+      for (int i = 1; i < horzFillDist; i++)
+      {
+        float p = get_texel(tex0, input.tc + float2(pixelStep.x * i, 0), wrap_t0).r;
+        if (p <= 0.0)
+          break;
+        if (p < c)
+          c = p;               
+      }
+
+      for (int i = 1; i < horzFillDist; i++)
+      {
+        float p = get_texel(tex0, input.tc - float2(pixelStep.x * i, 0), wrap_t0).r;
+        if (p <= 0.0)
+          break;
+        if (p < c)
+          c = p;               
+      }
+
+      for (int i = 1; i < vertFillDist; i++)
+      {
+        float p = get_texel(tex0, input.tc - float2(0, pixelStep.y * i), wrap_t0).r;
+        if (p <= 0.0)
+          break;
+        if (p < c)
+          c = p;               
+      }
+
+      for (int i = 1; i < vertFillDist; i++)
+      {
+        float p = get_texel(tex0, input.tc + float2(0, pixelStep.y * i), wrap_t0).r;
+        if (p <= 0.0)
+          break;
+        if (p < c)
+          c = p;               
+      }
+
+      result.col0 = float4(c, 0, 0, 0);
+    }
+ """
+}
+
+
+
+//===========================
+// distance field
+//===========================
+selectPoints
+{
+ outputs:i=1
+ inputs:i=1
+ params
+ {
+   threshold:r=0.5
+   wrap:b=yes
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     float threshold;
+     int wrap;
+   };
+ Texture2D tex0:register(t0);
+ SamplerState sampler0:register(s0);
+ """
+ shaderCode:t="""
+ int2 dim; tex0.GetDimensions(dim.x, dim.y);
+ bool above = get_texel(tex0, input.tc, wrap_t0).x > threshold;
+ result.col0 = float4(encodeSDF(int2(pos.xy), above, false), 0, 1);
+"""
+}
+
+jumpFlooding
+{
+ outputs:i=1
+ inputs:i=1
+ params
+ {
+   distanceI:i = 1
+   wrap:b = yes
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     int distanceI;
+     int wrap;
+   };
+ Texture2D tex0:register(t0);
+ """
+ shaderCode:t="""
+ int2 dim; tex0.GetDimensions(dim.x, dim.y);
+ int2 tci = dim*input.tc;
+ float distanceWrap = 1e10;
+
+ bool above, valid;
+ int2 res = decodeSDF(tex0[tci].xy, above, valid);
+
+ [unroll]
+ for (int y = -1; y <= 1; ++y)
+ {
+   [unroll]
+   for (int x = -1; x <= 1; ++x)
+   {
+     [flatten]
+     if (x==0 && y ==0)
+       continue;
+     int2 tc1i = tci + distanceI*int2(x,y);
+     tc1i = wrap ? (tc1i + dim)%dim : clamp(tc1i, 0, dim-1);
+     bool above1,valid1;
+     int2 res1 = decodeSDF(tex0[tc1i].xy, above1, valid1);
+
+     if (!valid1 && above == above1)// || (!wrap && any(tc1i<0 || tc1i>=dim))
+       continue;
+     if (!valid1 || (above!=above1))
+       res1 = tc1i;
+     
+     float distance1 = lengthSq(res1 - tci);
+     [flatten]
+     if (wrap)
+       distance1 = wrappedDistanceSqi(res1, tci, dim);
+     if (distance1 < distanceWrap)
+     {
+       distanceWrap = distance1;
+       res = res1;
+       valid = true;
+     }
+   }
+ }
+ result.col0 = float4(encodeSDF(res, above, valid),0,0);
+"""
+}
+
+writeDistance
+{
+ outputs:i=1
+ inputs:i=1
+ params
+ {
+   distance:r = 1//pixels
+   wrap:b = yes
+   signed:b = no
+ }
+ shaderPreMain:t="""
+   cbuffer global:register(b0)
+   {
+     float maxDistance;
+     int wrap;
+     int signed_distance;
+   };
+ Texture2D tex0:register(t0);
+ """
+ shaderCode:t="""
+ int2 dim; tex0.GetDimensions(dim.x, dim.y);
+ bool above, valid;
+ int2 tci = int2(dim*input.tc);
+ int2 res = decodeSDF(tex0[tci].xy, above, valid);
+
+ float distanceNoWrap = lengthSq(res-tci);
+ float distanceWrap = wrappedDistanceSqi(res, tci, dim);
+ float distance = wrap ? distanceWrap : distanceNoWrap;
+
+ float normalizedDistance = saturate(sqrt(max(0, distance))/maxDistance);
+ if (!valid)
+   normalizedDistance = 1;
+ float sdf = (above ? 0.5 : -0.5)*normalizedDistance+0.5;
+ result.col0 = signed_distance ? sdf : (above ? 1 : 1-normalizedDistance);
+ result.col0.g=above;
+ result.col0.b=valid;
+ result.col0.a = 1;
+"""
+}
+
+writeVoronoiColor
+{
+ outputs:i=1
+ inputs:i=2
+ params
+ {
+   distance:r = 1//pixels
+   wrap:b = yes
+   signed:b = no
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     float maxDistance;
+     int wrap;
+     int signed_distance;
+   };
+ Texture2D tex0:register(t0);
+ Texture2D tex1:register(t1);
+ SamplerState sampler1:register(s1);
+ """
+ shaderCode:t="""
+ int2 dim; tex0.GetDimensions(dim.x, dim.y);
+ bool above, valid;
+ int2 tci = int2(dim*input.tc);
+ int2 res = decodeSDF(tex0[tci].xy, above, valid);
+ float2 tc = (res+0.5)/float2(dim);
+ [flatten]
+ if (!valid || (!signed_distance && above))
+   tc = input.tc;
+
+ result.col0 = get_texel(tex1, tc, wrap_t1);
+"""
+}
+
+
+//===========================
+// distance field AA
+//===========================
+selectPoints2
+{
+ outputs:i=2
+ inputs:i=1
+ params
+ {
+   wrap:b=yes
+   gradThres:r=0.01
+ }
+ shaderPreMain:t="""
+  cbuffer global
+  {
+    int wrap;
+    float gradThres;
+  };
+  Texture2D tex0:register(t0);
+
+  #define MRTOutput_DEFINED
+  struct MRTOutput {float4 col0:SV_Target0; float4 col1:SV_Target1;};
+ """
+ shaderCode:t="""
+  // https://github.com/memononen/SDF/blob/master/src/sdf.h
+  // Loosely based on this^^^.
+  // Unfortunately, it's only accurate for pixels directly containing presumed 0.5 threshold isoline.
+  // So in order for it to work, I attempted to use gradient descent method to improve data on incorrect pixels
+  // see gradDescent shader
+
+  float2 tc = input.tc.xy;
+  int2 dim; tex0.GetDimensions(dim.x, dim.y);
+  float2 tci = tc*dim;
+
+  float a = get_texel(tex0, tc, wrap).x;
+
+  // Skip flat areas.
+  int ret = 0;
+  if (a == 1)
+    ret = 1;
+  if (a == 0)
+  {
+    int he = get_texel(tex0, tc, wrap, int2(-1, 0)).x==1 || get_texel(tex0, tc, wrap, int2(1, 0)).x==1;
+    int ve = get_texel(tex0, tc, wrap, int2(0, -1)).x==1 || get_texel(tex0, tc, wrap, int2(0, 1)).x==1;
+    if (!he && !ve) {
+      ret = 1;
+    }
+  }
+
+  float2 g = get2DGradient(tex0, wrap, tc, 0);
+  if( abs(g.x)<gradThres && abs(g.y)<gradThres ) {
+    ret = 1;
+  }
+    
+  float2 tci1 = -1;
+  float dist = 1E6;
+  float error = 0;
+
+  if(!ret) {
+    float glen = lengthSq(g);
+    if (glen > 0.0001) {
+      glen = 1.0f / sqrt(glen);
+      g *= glen;
+    }
+
+    // Find nearest point on contour.
+    float df = getEdgeDistance(g, a);
+    float2 dt = g*df;
+
+    tci1 = tci + dt;
+    tci1 = wrap ? (tci1 + dim)%dim : clamp(tci1, 0, dim-1);
+    dist = lengthSq(dt);
+    error = abs(linear_sample(tex0, tci1/dim, wrap).x - 0.5);
+
+    g = dt;  
+  } else {
+    g = 0;
+  }
+
+  result.col0 = float4(tci1, dist, error);
+  result.col1.xy = g;
+"""
+}
+
+gradDescent
+{
+ outputs:i=1
+ inputs:i=3
+ params
+ {
+   wrap:b=yes
+   iters:i=20
+   errorTol:r=0.01
+ }
+ shaderPreMain:t="""
+  cbuffer global
+  {
+    int wrap;
+    int iters;
+    float errorTol;
+  };
+  Texture2D tex0:register(t0);
+  Texture2D grad:register(t1);
+  Texture2D input0:register(t2);
+ """
+ shaderCode:t="""
+  int2 dim; tex0.GetDimensions(dim.x, dim.y);
+  float2 tc = input.tc.xy;
+  float2 tci = tc*dim;
+
+  float4 res = get_texel(tex0, tc, wrap);
+  float2 pt = res.xy;
+  float dist = res.z;
+  float error = res.w;
+
+  for(int i = 0; i < iters; ++i) {
+    [flatten]
+    if( error < errorTol )
+      break;
+
+    float2 g = linear_sample(grad, pt/dim, wrap).xy;
+    float2 pt1 = pt + g;
+    pt1 = wrap ? (pt1 + dim)%dim : clamp(pt1, 0, dim-1);
+
+    float dist1 = wrap ? wrappedDistanceSqi(pt1, tci, dim) : lengthSq(pt1 - tci);
+
+    float error1 = abs(linear_sample(input0, pt1/dim, wrap).x - 0.5);
+    if(error1 < error) {
+      pt = pt1;
+      dist = dist1;
+      error = error1;
+    }
+  }
+
+  float a = get_texel(input0, tc, wrap).x;
+  result.col0 = float4(pt, dist, a);
+"""
+}
+
+jumpFlooding2
+{
+ outputs:i=1
+ inputs:i=1
+ params
+ {
+  distanceI:i = 1
+  wrap:b=yes
+ }
+ shaderPreMain:t="""
+  cbuffer global
+  {
+    int distanceI;
+    int wrap;
+  };
+  Texture2D tex0:register(t0);
+ """
+ shaderCode:t="""
+  int2 dim; tex0.GetDimensions(dim.x, dim.y);
+  float2 tc = input.tc.xy;
+  float2 tci = tc*dim;
+
+  float4 res = get_texel(tex0, tc, wrap);
+  float a = res.w;
+  float pd = res.z;
+  float2 pt = res.xy;
+
+  [unroll]
+  for(int x=-1; x<=1; ++x) {
+    [unroll]
+    for(int y=-1; y<=1; ++y) {
+      [flatten]
+      if(x==0 && y==0)
+        continue;
+
+      float4 res1 = get_texel(tex0, tc, wrap, int2(x,y)*distanceI);
+      float dist = res1.z;
+
+      if(dist < pd) {
+        float2 tci1 = res1.xy;
+        tci1 = wrap ? (tci1 + dim)%dim : clamp(tci1, 0, dim-1);
+
+        float d = wrap ? wrappedDistanceSqi(tci1, tci, dim) : lengthSq(tci1 - tci);
+        if (d + 0.001 < pd) {
+          pt = tci1;
+          pd = d;
+        }
+      }
+    }
+  }
+
+  result.col0 = float4(pt, pd, a);
+"""
+}
+
+writeDistance2
+{
+ outputs:i=1
+ inputs:i=1
+ params
+ {
+  distance:r = 1//pixels
+  wrap:b = yes
+  signed:b = no
+ }
+ shaderPreMain:t="""
+  cbuffer global:register(b0)
+  {
+    float maxDistance;
+    int wrap;
+    int signed_distance;
+  };
+ Texture2D tex0:register(t0);
+ """
+ shaderCode:t="""
+  int2 dim; tex0.GetDimensions(dim.x, dim.y);
+  float4 res = get_texel(tex0, input.tc.xy, wrap);
+
+  float a = res.w;
+  bool above = a > 0.5;
+  float distance = res.z;
+
+  float normalizedDistance = saturate(sqrt(max(0, distance))/maxDistance);
+  float sdf = (above ? 0.5 : -0.5)*normalizedDistance + 0.5;
+
+  result.col0.r = signed_distance ? sdf : (above ? 1 : 1-normalizedDistance);
+  result.col0.g = above;
+  result.col0.b = 0;
+  result.col0.a = 1;
+"""
+}
+
+writeVoronoiColor2
+{
+ outputs:i=1
+ inputs:i=2
+ params
+ {
+  distance:r = 1//pixels
+  wrap:b = yes
+  signed:b = no
+ }
+ shaderPreMain:t="""
+  cbuffer global
+  {
+    float maxDistance;
+    int wrap;
+    int signed_distance;
+  };
+ Texture2D tex0:register(t0);
+ Texture2D colorInput:register(t1);
+ """
+ shaderCode:t="""
+  float2 dim = get_dimensions(tex0);
+  float4 res = get_texel(tex0, input.tc.xy, wrap);
+
+  float2 tci1 = int2(res.xy);
+  float a = res.w;
+  bool above = a > 0.5;
+
+  float2 tc = (tci1+0.5)/float2(dim);
+ 
+  if (!signed_distance && above)
+    tc = input.tc;
+
+  result.col0 = get_texel(colorInput, tc, wrap_t1);
+"""
+}
+
+
+
+gaussianBlur
+{
+ outputs:i=1
+ inputs:i=2
+ //defMaxSubSize:i=1024
+ params
+ {
+   distance:r = 0.05
+   sigma:r= 0.227761
+   gaussian:b = false
+   wrap:b = yes
+   vertical:b=yes
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     float dist;
+     float sigma;
+     int gaussian;
+     int wrap;
+     int vertical;
+   };
+
+ Texture2D tex0:register(t0);
+ Texture2D tex1:register(t1);
+ SamplerState sampler1:register(s1);
+ """
+ shaderCode:t="""
+ int2 dim1; tex1.GetDimensions(dim1.x, dim1.y);
+ float useDist = dist*(dim1.x>1 ? linear_sample(tex1, input.tc, wrap_t1).x : 1);
+
+ int2 dim; tex0.GetDimensions(dim.x, dim.y);
+ int2 tci = dim*input.tc;
+ float floatDist = max(clamp(useDist, 0, 0.5f) * max(dim.x, dim.y), 0.001);
+ int pixelDistance = int(floatDist + 1.0);
+ 
+ float4 blurred = 0;
+ float totalWeight = 0;
+ float invSqsigma = -0.25/max(1e-6, sigma*sigma);
+ float invPixelDistance = rcp(max(1, float(floatDist)));
+ [loop]
+ for (int i = -pixelDistance; i <= pixelDistance; ++i)
+ {
+   float weight = get_blur_kernel_weight(gaussian, invSqsigma, abs(i)*invPixelDistance);
+   blurred += weight * get_texel(tex0, input.tc, wrap_t0, vertical ? int2(0, i) : int2(i, 0));
+   totalWeight += weight;
+ }
+ result.col0 = blurred/max(totalWeight,1e-6);
+"""
+}
+
+gaussian_max
+{
+ outputs:i=1
+ inputs:i=2
+ //defMaxSubSize:i=1024
+ params
+ {
+   distance:r = 0.05
+   sigma:r= 0.227761
+   gaussian:b = false
+   wrap:b = yes
+   vertical:b=yes
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     float dist;
+     float sigma;
+     int gaussian;
+     int wrap;
+     int vertical;
+   };
+
+
+ Texture2D tex0:register(t0);
+ Texture2D tex1:register(t1);
+ SamplerState sampler1:register(s1);
+ """
+ shaderCode:t="""
+ int2 dim1; tex1.GetDimensions(dim1.x, dim1.y);
+ float useDist = dist*(dim1.x>1 ? linear_sample(tex1, input.tc, wrap_t1).x : 1);
+
+ int2 dim; tex0.GetDimensions(dim.x, dim.y);
+ int2 wrap_dim = wrap ? dim : 0;
+ int2 tci = dim*input.tc;
+ float floatDist = max(clamp(useDist, 0, 0.5f) * max(dim.x, dim.y), 0.001);
+ int pixelDistance = int(ceil(floatDist));
+
+ float4 maxVal = tex0[tci];
+ float invSqsigma = -0.25/max(1e-6, sigma*sigma);
+ float invPixelDistance = rcp(max(1, floatDist));
+ float invWeight0 = 1.0 / (get_blur_kernel_weight(gaussian, invSqsigma, 0) + 1e-6);
+ [loop]
+ for (int i = -pixelDistance; i <= pixelDistance; ++i)
+ {
+   float weight = get_blur_kernel_weight(gaussian, invSqsigma, abs(i) * invPixelDistance) * invWeight0;
+   int2 sampleI = tci + (vertical ?  int2(0, i) : int2(i, 0));
+   sampleI = wrap_dim.x > 0 ? (sampleI + wrap_dim) % wrap_dim : clamp(sampleI, 0, dim-1);
+   maxVal = max(maxVal, weight * tex0[sampleI]);
+ }
+ result.col0 = maxVal;
+"""
+}
+
+gaussian_min
+{
+ outputs:i=1
+ inputs:i=2
+ //defMaxSubSize:i=1024
+ params
+ {
+   distance:r = 0.05
+   sigma:r= 0.227761
+   gaussian:b = false
+   wrap:b = yes
+   vertical:b=yes
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     float dist;
+     float sigma;
+     int gaussian;
+     int wrap;
+     int vertical;
+   };
+
+ Texture2D tex0:register(t0);
+ Texture2D tex1:register(t1);
+ SamplerState sampler1:register(s1);
+ """
+ shaderCode:t="""
+ int2 dim1; tex1.GetDimensions(dim1.x, dim1.y);
+ float useDist = dist*(dim1.x>1 ? linear_sample(tex1, input.tc, wrap_t1).x : 1);
+
+ int2 dim; tex0.GetDimensions(dim.x, dim.y);
+ int2 wrap_dim = wrap ? dim : 0;
+ int2 tci = dim*input.tc;
+ float floatDist = max(clamp(useDist, 0, 0.5f) * max(dim.x, dim.y), 0.001);
+ int pixelDistance = int(ceil(floatDist));
+
+ float4 minVal = tex0[tci];
+ float invSqsigma = -0.25/max(1e-6, sigma*sigma);
+ float invPixelDistance = rcp(max(1, floatDist));
+ float invWeight0 = 1.0 / (get_blur_kernel_weight(gaussian, invSqsigma, 0) + 1e-6);
+ [loop]
+ for (int i = -pixelDistance; i <= pixelDistance; ++i)
+ {
+   float weight = get_blur_kernel_weight(gaussian, invSqsigma, abs(i) * invPixelDistance) * invWeight0;
+   int2 sampleI = tci + (vertical ?  int2(0, i) : int2(i, 0));
+   sampleI = wrap_dim.x > 0 ? (sampleI + wrap_dim) % wrap_dim : clamp(sampleI, 0, dim-1);
+   minVal = min(minVal, lerp(float4(1.0, 1.0, 1.0, 1.0), tex0[sampleI], weight));
+ }
+ result.col0 = minVal;
+"""
+}
+
+gradient_map
+{
+ outputs:i=1
+ inputs:i=1
+ params
+ {
+   multiplier:r = 0.01
+   wrap:b = yes
+   signed:b = false
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     float multiplier;
+     int wrap;
+     int signedResult;
+   };
+
+ Texture2D tex0:register(t0);
+ SamplerState sampler0:register(s0);
+ """
+ shaderCode:t="""
+
+ int2 dim;
+ tex0.GetDimensions(dim.x, dim.y);
+
+ int2 wrap_dim = wrap ? dim : 0;
+ int2 tci = dim * input.tc;
+ int2 sampleI;
+
+ sampleI = wrap_dim.x > 0 ? (tci + wrap_dim + int2(1, 0)) % wrap_dim : clamp(tci + int2(1, 0), 0, dim-1);
+ float vp0 = tex0[sampleI].x;
+ sampleI = wrap_dim.x > 0 ? (tci + wrap_dim + int2(-1, 0)) % wrap_dim : clamp(tci + int2(-1, 0), 0, dim-1);
+ float vm0 = tex0[sampleI].x;
+ sampleI = wrap_dim.x > 0 ? (tci + wrap_dim + int2(0, 1)) % wrap_dim : clamp(tci + int2(0, 1), 0, dim-1);
+ float v0p = tex0[sampleI].x;
+ sampleI = wrap_dim.x > 0 ? (tci + wrap_dim + int2(0, -1)) % wrap_dim : clamp(tci + int2(0, -1), 0, dim-1);
+ float v0m = tex0[sampleI].x;
+
+ float4 grad = float4((vp0 - vm0) * float(dim.x), (v0p - v0m) * float(dim.y), 0.0, 0.0);
+
+ result.col0 = grad * multiplier * (signedResult ? 1.0 : 0.5) + (signedResult ? 0.0 : 0.5);
+"""
+}
+
+gradient_blur
+{
+ outputs:i=1
+ inputs:i=3
+ //defMaxSubSize:i=1024
+ params
+ {
+   distance:r = 0.05
+   wrap:b = yes
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     float dist;
+     int wrap;
+   };
+
+ float get_kernel_weight(float x)
+ {
+   float d = x * x;
+   return max(1.0 - d, 0.0);
+ }
+
+ Texture2D tex0:register(t0); // color
+ Texture2D tex1:register(t1); // distance
+ Texture2D tex2:register(t2); // gradient
+ SamplerState sampler0:register(s0);
+ SamplerState sampler1:register(s1);
+ SamplerState sampler2:register(s2);
+ """
+ shaderCode:t="""
+
+
+ int2 dim1; tex1.GetDimensions(dim1.x, dim1.y);
+ float useDist = dist*(dim1.x>1 ? linear_sample(tex1, input.tc, wrap_t1).x : 1);
+
+ int2 dim; tex0.GetDimensions(dim.x, dim.y);
+ int2 wrap_dim = wrap ? dim : 0;
+ int2 tci = dim * input.tc;
+ float floatDist = max(clamp(useDist, 0, 0.5f) * max(dim.x, dim.y), 0.00001);
+ int pixelDistance = int(ceil(floatDist));
+
+ float invPixelDistance = rcp(max(0.00001, floatDist));
+
+ float invDim = 1.0 / max(max(dim.x, dim.y), 1);
+ float weightSum = 1e-6;
+ float4 accum = float4(0, 0, 0, 0);
+
+ float2 curPos = input.tc;
+ float2 dir = float2(0, 0);
+
+ dir = linear_sample(tex2, curPos, wrap_t2) * invDim;
+
+ [loop]
+ for (int i = 0; i <= pixelDistance; i++)
+ {
+   float weight = get_kernel_weight(i * invPixelDistance);
+   weightSum += weight;
+   accum += linear_sample(tex0, curPos, wrap_t0) * weight;
+   float2 newDir = (linear_sample(tex2, curPos, wrap_t2) - 0.5) * invDim;
+   dir = lerp(dir, newDir, 0.9);
+   curPos = wrap ? (curPos + dir) : saturate(curPos + dir);
+ }
+
+ curPos = input.tc;
+ dir = float2(0, 0);
+
+ dir = -linear_sample(tex2, curPos, wrap_t2) * invDim;
+
+ [loop]
+ for (int i = 1; i <= pixelDistance; i++)
+ {
+   float2 newDir = -(linear_sample(tex2, curPos, wrap_t2) - 0.5) * invDim;
+   dir = lerp(dir, newDir, 0.9);
+   curPos = wrap ? (curPos + dir) : saturate(curPos + dir);
+   float weight = get_kernel_weight(i * invPixelDistance);
+   weightSum += weight;
+   accum += linear_sample(tex0, curPos, wrap_t0) * weight;
+ }
+
+ accum /= weightSum;
+
+ result.col0 = accum;
+"""
+}
+
+
+madd_texture
+{
+  inputs:i=2
+  params
+  {
+    scale:r = 1.0
+  }
+  shaderPreMain:t="""
+  cbuffer global
+  {
+    float scale;
+  }
+  Texture2D tex0:register(t0);
+  Texture2D tex1:register(t1);
+  SamplerState sampler0:register(s0);
+  SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="result.col0 = scale * linear_sample(tex0, input.tc, wrap_t0) + linear_sample(tex1, input.tc, wrap_t1);"
+}
+
+levels_native
+{
+  inputs:i=1
+  params
+  {
+    in_low:r = 0.0
+    in_mid:r = 0.5
+    in_high:r = 1.0
+    out_low:r = 0.0
+    out_high:r = 1.0
+  }
+  shaderPreMain:t="""
+  cbuffer global
+  {
+    float in_low;
+    float in_mid;
+    float in_high;
+    float out_low;
+    float out_high;
+  }
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+    float2 v_3_0 = input.tc.xy;
+    float v_9_0 = -16.0;
+    float v_11_0 = 16.0;
+    float v_12_0 = 0.0;
+    float v_15_0 = 1.0;
+    float v_17_3 = saturate(in_mid) * (v_11_0 - v_9_0) + v_9_0;
+    float4 v_2_2 = linear_sample(tex0, input.tc, wrap_t0);
+    float4 v_4_3 = saturate((v_2_2 - in_low) / (in_high - in_low));
+    float v_13_1 = abs(v_17_3);
+    float v_14_2 = (v_13_1 + v_15_0);
+    float v_16_2 = (v_15_0 / v_14_2);
+    float v_10_4 = ((v_17_3 > v_12_0) ? (v_14_2) : (v_16_2));
+    float4 v_5_2 = pow(v_4_3, float4(v_10_4, v_10_4, v_10_4, v_10_4));
+    float4 v_18_3 = saturate(v_5_2) * (out_high - out_low) + out_low;
+    result.col0 = v_18_3;
+  """
+}
+
+
+warp_native {
+  params {
+    filter_size:r = 0.01
+    gradient_mul:r = 0.5
+  }
+  inputs:i=2
+  shaderPreMain:t="""
+  cbuffer global {
+    float filter_size;
+    float gradient_mul;
+  };
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  Texture2D tex1:register(t1);
+  SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="""
+    float2 v_2_0 = input.tc.xy;
+    float v_6_0 = 0.0;
+    float v_17_0 = 2.0;
+    float v_20_0 = 0.0;
+    float v_29_0 = -1.0;
+    float v_16_2 = (filter_size / v_17_0);
+    float v_28_2 = (gradient_mul * v_29_0);
+    float4 v_5_4 = float4(v_16_2, v_6_0, v_6_0, v_6_0);
+    float4 v_7_4 = float4(v_6_0, v_16_2, v_6_0, v_6_0);
+    float4 v_11_2 = (float4(v_2_0, 0.0, 0.0) + v_5_4);
+    float4 v_12_2 = (float4(v_2_0, 0.0, 0.0) + v_7_4);
+    float4 v_13_2 = linear_sample(tex1, v_12_2.xy, wrap_t1);
+    float4 v_30_2 = (float4(v_2_0, 0.0, 0.0) - v_5_4);
+    float4 v_31_2 = (float4(v_2_0, 0.0, 0.0) - v_7_4);
+    float4 v_32_2 = linear_sample(tex1, v_31_2.xy, wrap_t1);
+    float4 v_4_2 =  linear_sample(tex1, v_30_2.xy, wrap_t1);
+    float4 v_10_2 = linear_sample(tex1, v_11_2.xy, wrap_t1);
+    float4 v_14_2 = (v_4_2 - v_10_2);
+    float4 v_15_2 = (v_32_2 - v_13_2);
+    float v_18_1 = v_14_2.x;
+    float v_19_1 = v_15_2.x;
+    float4 v_21_4 = float4(v_18_1, v_19_1, v_20_0, v_20_0);
+    float4 v_22_3 = (v_21_4 * float4(v_28_2, v_28_2, v_28_2, v_28_2) + float4(v_2_0, 0.0, 0.0));
+    float4 v_24_2 = linear_sample(tex0, v_22_3.xy, wrap_t0);
+    result.col0 = v_24_2;
+  """
+}
+
+
+native_gauss
+{
+ outputs:i=1
+ inputs:i=0
+ params
+ {
+   sigma:r= 20
+ }
+ shaderPreMain:t="""
+   cbuffer global
+   {
+     float sigma;
+   };
+ """
+ shaderCode:t="""
+ float2 uv = (input.tc*2-1);
+ result.col0 = exp(-sigma*dot(uv,uv))/sqrt(PI);
+
+"""
+}
+
+blurParticles
+{
+ inputs:i=2
+ outputs:i=1
+ params
+ {
+   minSize:r=0
+   maxSize:r=0.1
+   scale:r = 1
+ }
+ shaderPreMain:t="""
+  cbuffer global
+  {
+    float minSize;
+    float maxSize;
+    float scale;
+  };
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  Texture2D tex1:register(t1);
+  SamplerState sampler1:register(s1);
+  #define ParticlesOutput_DEFINE u7
+  #define ParticlesOutputCounter_DEFINE u6
+  //#define VOID_OUTPUT
+  #define WRAP 1
+
+ """
+ shaderCode:t="""
+ 
+ float value = linear_sample(tex0, input.tc, wrap_t0).x*scale;
+ float blurDist = linear_sample(tex1, input.tc, wrap_t1).x;
+ float dist = lerp(clamp(minSize,0,0.5), clamp(maxSize,0,0.5), blurDist);
+ ParticleInstance particle;
+ particle.pos = input.tc;
+ particle.scale = dist;
+ particle.angle = 0;
+ particle.brightness = value;
+ particle.depth = frac(input.tc.x/4096.0 + input.tc.y);
+ //ENTITY_PROPERTIES
+ particle.entityWorldPos = float3(0, 0, 0);
+ particle.entityForward = float3(0, 0, 0);
+ particle.entityUp = float3(0, 0, 0);
+ particle.entityNameIndex = 0;
+ particle.entityPlaceType = 0;
+ particle.entitySeed = 0;
+ particle.entityScale = float3(0, 0, 0);
+ particle.reserved0 = 0;
+ particle.reserved1 = 0;
+
+ [branch]
+ if (dist>0.5/8192.)
+ {
+   uint instIdx;
+   InterlockedAdd(instancesCounter[1], 1, instIdx);
+   instances[instIdx] = particle;
+   wrap_particle(particle);
+ }
+"""
+}
+
+median_3x3_5x5
+{
+  inputs:i = 1
+  outputs:i = 1
+  params
+  {
+    size:i = 3
+  }
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  cbuffer global
+  {
+    int size;
+  }
+  """
+  shaderCode:t="""
+    float4 pix[21];
+    #define CMP_SWAP(i, j) if (pix[i].r + pix[i].g + pix[i].b > pix[j].r + pix[j].g + pix[j].b) { float4 t = pix[i]; pix[i] = pix[j]; pix[j] = t; }
+
+    if (size >= 5)
+    {
+      for (int dx = 0; dx < 3; dx++)
+        for (int dy = 0; dy < 5; dy++)
+          pix[dx * 5 + dy] = get_texel(tex0, input.tc, wrap_t0, int2(dx - 1, dy - 2));
+
+      for (int dy = 0; dy < 3; dy++)
+      {
+        pix[20 - dy] = get_texel(tex0, input.tc, wrap_t0, int2(2, dy - 1));
+        pix[17 - dy] = get_texel(tex0, input.tc, wrap_t0, int2(-2, dy - 1));
+      }
+
+      // genereted by Networksort
+      CMP_SWAP(0,16);CMP_SWAP(1,17);CMP_SWAP(2,18);CMP_SWAP(3,19);CMP_SWAP(4,20);CMP_SWAP(5,13);CMP_SWAP(6,14);CMP_SWAP(7,15);
+      CMP_SWAP(0,8);CMP_SWAP(1,9);CMP_SWAP(2,10);CMP_SWAP(3,11);CMP_SWAP(4,12);
+      CMP_SWAP(8,16);CMP_SWAP(9,17);CMP_SWAP(10,18);CMP_SWAP(11,19);CMP_SWAP(12,20);CMP_SWAP(0,4);CMP_SWAP(1,5);CMP_SWAP(2,6);CMP_SWAP(3,7);
+      CMP_SWAP(8,12);CMP_SWAP(9,13);CMP_SWAP(10,14);CMP_SWAP(11,15);CMP_SWAP(16,20);CMP_SWAP(5,17);CMP_SWAP(6,18);CMP_SWAP(7,19);CMP_SWAP(0,2);CMP_SWAP(1,3);
+      CMP_SWAP(4,16);CMP_SWAP(5,9);CMP_SWAP(6,10);CMP_SWAP(7,11);CMP_SWAP(13,17);CMP_SWAP(14,18);CMP_SWAP(15,19);CMP_SWAP(0,1);
+      CMP_SWAP(4,8);CMP_SWAP(12,16);CMP_SWAP(5,7);CMP_SWAP(9,11);CMP_SWAP(13,15);CMP_SWAP(17,19);
+      CMP_SWAP(4,6);CMP_SWAP(8,10);CMP_SWAP(12,14);CMP_SWAP(16,18);CMP_SWAP(3,17);CMP_SWAP(7,13);
+      CMP_SWAP(2,16);CMP_SWAP(6,20);CMP_SWAP(3,9);CMP_SWAP(11,17);
+      CMP_SWAP(2,8);CMP_SWAP(6,12);CMP_SWAP(10,16);CMP_SWAP(14,20);CMP_SWAP(3,5);CMP_SWAP(7,9);CMP_SWAP(11,13);CMP_SWAP(15,17);
+      CMP_SWAP(2,4);CMP_SWAP(6,8);CMP_SWAP(10,12);CMP_SWAP(14,16);CMP_SWAP(18,20);
+      CMP_SWAP(2,3);CMP_SWAP(4,5);CMP_SWAP(6,7);CMP_SWAP(8,9);CMP_SWAP(10,11);CMP_SWAP(12,13);CMP_SWAP(14,15);CMP_SWAP(16,17);CMP_SWAP(18,19);
+      CMP_SWAP(1,16);CMP_SWAP(3,18);CMP_SWAP(5,20);CMP_SWAP(7,14);
+      CMP_SWAP(3,10);CMP_SWAP(5,12);CMP_SWAP(9,16);
+      CMP_SWAP(7,10);CMP_SWAP(9,12);
+      CMP_SWAP(9,10);
+      result.col0 = pix[10];
+    }
+    else
+    {
+      for (int dx = 0; dx < 3; dx++)
+        for (int dy = 0; dy < 3; dy++)
+          pix[dx * 3 + dy] = get_texel(tex0, input.tc, wrap_t0, int2(dx - 1, dy - 1));
+
+      // genereted by Networksort
+      CMP_SWAP(0,1);CMP_SWAP(3,4);CMP_SWAP(6,7);
+      CMP_SWAP(1,2);CMP_SWAP(4,5);CMP_SWAP(7,8);
+      CMP_SWAP(0,1);CMP_SWAP(3,4);CMP_SWAP(6,7);CMP_SWAP(2,5);
+      CMP_SWAP(0,3);CMP_SWAP(1,4);CMP_SWAP(5,8);
+      CMP_SWAP(3,6);CMP_SWAP(4,7);CMP_SWAP(2,5);
+      CMP_SWAP(1,4);CMP_SWAP(2,6);
+      CMP_SWAP(4,6);
+      CMP_SWAP(2,4);
+      result.col0 = pix[4];
+    }
+
+  """
+}
+
+max_square
+{
+  inputs:i = 1
+  outputs:i = 1
+  params
+  {
+    size:i = 3
+  }
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  cbuffer global
+  {
+    int size;
+  }
+  """
+  shaderCode:t="""
+    float4 res = float4(-1e9, -1e9, -1e9, -1e9);
+    for (int dx = -size / 2; dx <= (size - 1) / 2; dx++)
+      for (int dy = -size / 2; dy <= (size - 1) / 2; dy++)
+      {
+        float v = get_texel(tex0, input.tc, wrap_t0, int2(dx, dy));
+        res = max(v, res);
+      }
+    result.col0 = res;
+  """
+}
+
+min_square
+{
+  inputs:i = 1
+  outputs:i = 1
+  params
+  {
+    size:i = 3
+  }
+  shaderPreMain:t="""
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  cbuffer global
+  {
+    int size;
+  }
+  """
+  shaderCode:t="""
+    float4 res = float4(1e9, 1e9, 1e9, 1e9);
+    for (int dx = -size / 2; dx <= (size - 1) / 2; dx++)
+      for (int dy = -size / 2; dy <= (size - 1) / 2; dy++)
+      {
+        float v = get_texel(tex0, input.tc, wrap_t0, int2(dx, dy));
+        res = min(v, res);
+      }
+    result.col0 = res;
+  """
+}
+
+
+img_to_gradient_ps
+{
+  inputs:i=1
+  params
+  {
+    bandwidth:r = 0.05
+    invert:b = false
+    clip_left:r = 0.0
+    clip_right:r = 1.0
+    color_influence:r = 3.0
+    bias:r = 0.5
+    sort_mode:i = 0
+  }
+  shaderPreMain:t="""
+  cbuffer global {
+    float bandwidth;
+    int invert;
+    float clip_left;
+    float clip_right;
+    float color_influence;
+    float bias;
+    int sort_mode;
+  };
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  // For each output pixel, tc.x in [0..1] selects a bucket along the chosen sort axis.
+  // sort_mode: 0=luminance, 1=temperature(warm/cool), 2=hue, 3=saturation
+  float range = max(clip_right - clip_left, 0.001);
+  float t = invert ? (1.0 - input.tc.x) : input.tc.x;
+  float biasGamma = (bias > 0.001 && bias < 0.999) ? (log(0.5) / log(bias)) : 1.0;
+  t = pow(saturate(t), biasGamma);
+  float targetVal = clip_left + t * range;
+  float4 colorSum = float4(0, 0, 0, 0);
+  float weightSum = 0.0;
+  int N = 32;
+  float invN = 1.0 / N;
+  float bw = max(bandwidth * range, 0.001);
+  // Choose mip level so each sample covers exactly (srcSize/N) source pixels,
+  // giving perfect coverage with no gaps or overlaps regardless of source resolution.
+  uint srcW, srcH;
+  tex0.GetDimensions(srcW, srcH);
+  float mipLevel = max(0.0, log2(float(srcW) / float(N)));
+  [loop]
+  for (int gy = 0; gy < N; gy++)
+  {
+    [loop]
+    for (int gx = 0; gx < N; gx++)
+    {
+      float2 srcTC = float2((gx + 0.5) * invN, (gy + 0.5) * invN);
+      float4 c = tex0.SampleLevel(sampler0, srcTC, mipLevel);
+      float lum = dot(c.rgb, float3(0.299, 0.587, 0.114));
+      float cmax = max(c.r, max(c.g, c.b));
+      float cmin = min(c.r, min(c.g, c.b));
+      float delta = cmax - cmin;
+      float axisVal;
+      if (sort_mode == 1) // temperature: warm (red) -> cool (blue)
+        axisVal = saturate((c.r - c.b + 1.0) * 0.5);
+      else if (sort_mode == 2) // hue angle [0..1]
+      {
+        float h = 0.0;
+        if (delta > 0.001)
+        {
+          if (cmax == c.r)      h = (c.g - c.b) / delta + (c.g < c.b ? 6.0 : 0.0);
+          else if (cmax == c.g) h = (c.b - c.r) / delta + 2.0;
+          else                  h = (c.r - c.g) / delta + 4.0;
+          h /= 6.0;
+        }
+        axisVal = h;
+      }
+      else if (sort_mode == 3) // saturation
+        axisVal = (cmax > 0.001) ? (delta / cmax) : 0.0;
+      else // 0 = luminance (default)
+        axisVal = lum;
+      float sat = (lum > 0.001) ? ((cmax - cmin) / (lum * 2.0 + 0.001)) : 0.0;
+      float axisW = max(0.0, 1.0 - abs(axisVal - targetVal) / bw);
+      float w = axisW * (1.0 + sat * color_influence);
+      colorSum += c * w;
+      weightSum += w;
+    }
+  }
+  float3 avg = (weightSum > 0.001) ? colorSum.rgb / weightSum : float3(targetVal, targetVal, targetVal);
+  result.col0 = float4(saturate(avg), 1.0);
+  """
+}
+
+
+heightmap_occlusion_ps
+{
+  inputs:i=1
+  params
+  {
+    strength:r = 2.0
+    octaves:r = 2.0
+  }
+  shaderPreMain:t="""
+  cbuffer global {
+    float strength;
+    float octaves;
+  };
+  Texture2D tex0:register(t0);
+  SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  // Horizon-based AO in UV space.
+  // distances and radius are in UV [0,1]; height is in [0,1].
+  // This keeps the angle computation scale-independent.
+  float2 tc = input.tc.xy;
+  int iOctaves = clamp(int(octaves + 0.5), 1, 8);
+  float hp = tex0.SampleLevel(sampler0, tc, 0).r;
+  float totalOcc = 0.0;
+  float invHalfPi = 1.0 / (PI * 0.5);
+  int iNumRays  = 8;
+  int iNumSteps = 16;
+  float radius = 0.25; // starting radius in UV space
+  [loop]
+  for (int oct = 0; oct < iOctaves; oct++)
+  {
+    float stepDist = radius / iNumSteps;
+    float octOcc = 0.0;
+    [loop]
+    for (int r = 0; r < iNumRays; r++)
+    {
+      float angle = r * (2.0 * PI / iNumRays);
+      float2 dir;
+      sincos(angle, dir.y, dir.x);
+      float maxTan = 0.0;
+      [loop]
+      for (int s = 1; s <= iNumSteps; s++)
+      {
+        float2 sampleTC = tc + dir * (s * stepDist);
+        if (any(sampleTC < 0.0) || any(sampleTC > 1.0))
+          break;
+        float hs = tex0.SampleLevel(sampler0, sampleTC, 0).r;
+        float t = (hs - hp) * strength / (s * stepDist);
+        maxTan = max(maxTan, t);
+      }
+      octOcc += 1.0 - atan(max(0.0, maxTan)) * invHalfPi;
+    }
+    totalOcc += octOcc / iNumRays;
+    radius *= 0.5;
+  }
+  result.col0 = float4(saturate(totalOcc / iOctaves), 0, 0, 1);
+  """
+}

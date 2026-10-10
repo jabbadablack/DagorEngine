@@ -84,7 +84,11 @@ applications. They may have dependencies on `1stPartyLibs` and `3rdPartyLibs`.
 
 ### `tools`
 
-Contains the source code for various [Dagor Tools](../dagor-tools/index.rst).
+Contains the source code for various [Dagor Tools](../dagor-tools/index.rst),
+the `pythonCommon` packages behind `dng.py` in the engine root, and
+`toolsData`: the data the tools load at runtime that is not built (fonts,
+icons, themes, dargbox's UI), which `dng.py build` copies into the engine's
+`tools/` directory.
 
 ### `scripts`
 

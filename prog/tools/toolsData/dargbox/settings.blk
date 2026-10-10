@@ -1,0 +1,104 @@
+initScript:t="init.nut"
+
+script:t="browser/filebrowser.ui.nut"
+//script:t=autolayout.nut
+
+__allow_force_apply_all:b=yes
+
+drawFps:b=yes
+utf8mode:b=yes
+joystickRemap360:b=yes
+//touchEmu:b=no
+//touchScreen:b=yes
+//emuTouchScreenWithMouse:b=yes
+
+guiBufQuads:i = 160000
+
+dumpMemLeaksAfterScene:b=yes
+
+mountPoints {
+  darg{ forSource:t="..\..\prog\scripts\sq\daRg"; forVromfs:t="sq/daRg";}
+  sqstd{ forSource:t="..\..\prog\scripts\sq\std"; forVromfs:t="sq/std";}
+}
+
+addpath:t="../../prog/tools/dargbox/gamebase"
+addpath:t="../../prog/tools/dargbox/shaders/source"
+
+video{
+  //resolution:t="1536 x 768" //set via init.nut
+  //resolution:t="2880 x 1620" //set via init.nut
+  //mode:t="fullscreen" //set via init.nut
+  //mode:t="windowed" //set via init.nut
+  driver:t="dx11" // dx11 doesn't support pure DDS (i.e. not DDSx)
+  threadedWindow:b=false
+}
+
+graphics{
+  limitfps:b=yes
+}
+workcycle{
+  act_rate:i=30
+}
+
+
+gui-settings{
+  //dargdrop-start-len:i=5
+  //double-click-time:i=500
+
+  KeyRepeater{
+    useKeyRepeater:b=yes
+
+    keyRepeaterRepeatKeyboard:b=no
+    keyRepeaterRepeatJoystick:b=yes
+
+    repeatDelay:i=1000
+    repeatFrequency:i=30
+
+    Accelerator{
+      repeatDelay:i=500
+      buildUpTime:i=1000
+
+      repeatFinalFrequency:i=3000
+    }
+  }
+}
+
+//shaders:t=shaders/tools
+-effects {
+  res:t="resPacks.blk"
+  frameBlk:t=""
+  sceneBlk:t=""
+}
+
+
+debug {
+  useAddonVromSrc:b=yes
+  http_server:b=yes
+  vromfsFirstPriority:b=no
+}
+
+
+basevromfs{
+}
+
+
+sound {
+  //loglevel:t="all"
+  //fmodLoglevel:t="log"
+  banksFolder:t="sound"
+  banks {
+    presets {
+      master {
+        master_bank {
+          loadToMemory:b=true
+        }
+        cmn_gen_ui {
+          loadToMemory:b=true
+        }
+        bank:t="cmn_gen_ui.assets"
+        bank:t="master_bank.assets"
+        bank:t="master_bank.strings"
+      }
+    }
+  }
+}

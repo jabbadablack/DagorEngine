@@ -1,0 +1,68 @@
+
+height_blend_mask {
+  params {
+    _threshold_30650:r = 1.0
+  }
+  inputs:i=2
+  shaderPreMain:t="""
+    cbuffer global {
+      float _threshold_30650;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+    Texture2D sampler1_t:register(t1);
+    SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="""
+  InputStruct_height_blend_mask _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  _in._threshold_30650 = _threshold_30650; // 1.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+  _in.sampler1_t = sampler1_t;
+  _in.sampler1_wrap = wrap_t1;
+  _in.sampler1 = sampler1;
+
+
+  OutputStruct_height_blend_mask _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_height_blend_mask(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    shader_function:t="""
+
+  void _function_height_blend_mask(InputStruct_height_blend_mask _in, out OutputStruct_height_blend_mask _out) {
+
+  float2 _v_3_0 = _in.tc;
+  float4 _v_4_2 = linear_sample(_in.sampler1_t, _v_3_0, _in.sampler1_wrap);
+  float _v_9_0 = 0.0;
+  float4 _v_2_2 = linear_sample(_in.sampler0_t, _v_3_0, _in.sampler0_wrap);
+  float4 _v_5_2 = (_v_2_2 - _v_4_2);
+  float4 _v_7_3 = saturate((_v_5_2 - _v_9_0) / (_in._threshold_30650 - _v_9_0));
+  _out.col0 = _v_7_3;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_height_blend_mask {
+  float4 pos;
+  float3 tc;
+  float _threshold_30650;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+  Texture2D sampler1_t;
+  bool sampler1_wrap;
+  SamplerState sampler1;
+};
+struct OutputStruct_height_blend_mask {
+  float4 col0;
+};
+"""
+  }
+}

@@ -1,0 +1,112 @@
+
+rgb_mask_to_index {
+  params {
+    _A__B_29381:i = 0
+    _A_B_48410:i = 0
+    _A__B_29381_10:i = 0
+    _A_B_48410_10:i = 0
+    _A__B_29381_11:i = 0
+    _A_B_48410_11:i = 0
+    _A__B_29381_12:i = 0
+    _A_B_48410_12:i = 0
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    cbuffer global {
+      int _A__B_29381;
+      int _A_B_48410;
+      int _A__B_29381_10;
+      int _A_B_48410_10;
+      int _A__B_29381_11;
+      int _A_B_48410_11;
+      int _A__B_29381_12;
+      int _A_B_48410_12;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_rgb_mask_to_index _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._A__B_29381 = _A__B_29381; // 0
+  _in._A_B_48410 = _A_B_48410; // 0
+  _in._A__B_29381_10 = _A__B_29381_10; // 0
+  _in._A_B_48410_10 = _A_B_48410_10; // 0
+  _in._A__B_29381_11 = _A__B_29381_11; // 0
+  _in._A_B_48410_11 = _A_B_48410_11; // 0
+  _in._A__B_29381_12 = _A__B_29381_12; // 0
+  _in._A_B_48410_12 = _A_B_48410_12; // 0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_rgb_mask_to_index _out;
+  _out._w_46546 = 0.0;
+  _out._res_35681 = 0;
+  _out._res_35681_10 = 0;
+  _out._res_35681_11 = 0;
+  _out._res_35681_12 = 0;
+  _out._value_13390 = 0.0;
+
+  _function_rgb_mask_to_index(_in, _out);
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  """
+    shader_function:t="""
+
+  void _function_rgb_mask_to_index(InputStruct_rgb_mask_to_index _in, out OutputStruct_rgb_mask_to_index _out) {
+
+  float4 _v_0_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float _v_1_1 = _v_0_1.x;
+  float _v_1_2 = _v_0_1.y;
+  float _v_1_3 = _v_0_1.z;
+  _out._w_46546 = _v_0_1.w;
+  float _v_2_2 = max(_v_1_1, _v_1_2);
+  float _v_3_2 = max(_v_2_2, _v_1_3);
+  float _v_4_2 = (_v_1_1 + _v_1_2);
+  float _v_5_2 = (_v_4_2 + _v_1_3);
+  float _v_6_1 = 1.0 - _v_5_2;
+  float _v_7_1 = saturate(_v_6_1);
+  float _v_8_2 = max(_v_3_2, _v_7_1);
+  _out._res_35681 = ((_v_8_2 >= _v_1_1) ? (_in._A__B_29381) : (_in._A_B_48410));
+  _out._res_35681_10 = ((_v_8_2 >= _v_1_2) ? (_in._A__B_29381_10) : (_in._A_B_48410_10));
+  _out._res_35681_11 = ((_v_8_2 >= _v_1_3) ? (_in._A__B_29381_11) : (_in._A_B_48410_11));
+  _out._res_35681_12 = ((_v_8_2 >= _v_7_1) ? (_in._A__B_29381_12) : (_in._A_B_48410_12));
+  _out._value_13390 = 1.0;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_rgb_mask_to_index {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  int _A__B_29381;
+  int _A_B_48410;
+  int _A__B_29381_10;
+  int _A_B_48410_10;
+  int _A__B_29381_11;
+  int _A_B_48410_11;
+  int _A__B_29381_12;
+  int _A_B_48410_12;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_rgb_mask_to_index {
+  float _w_46546;
+  int _res_35681;
+  int _res_35681_10;
+  int _res_35681_11;
+  int _res_35681_12;
+  float _value_13390;
+};
+"""
+  }
+}

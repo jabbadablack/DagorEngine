@@ -1,0 +1,56 @@
+
+scalar_mul {
+  params {
+    _scale_20861:r = 1.0
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    cbuffer global {
+      float _scale_20861;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_scalar_mul _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  _in._scale_20861 = _scale_20861; // 1.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_scalar_mul _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_scalar_mul(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    shader_function:t="""
+
+  void _function_scalar_mul(InputStruct_scalar_mul _in, out OutputStruct_scalar_mul _out) {
+
+  float4 _v_0_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float4 _v_2_2 = (_v_0_1 * float4(_in._scale_20861, _in._scale_20861, _in._scale_20861, _in._scale_20861));
+  _out.col0 = _v_2_2;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_scalar_mul {
+  float4 pos;
+  float3 tc;
+  float _scale_20861;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_scalar_mul {
+  float4 col0;
+};
+"""
+  }
+}

@@ -1,0 +1,83 @@
+
+extract_color {
+  params {
+    _color_1752:p4 = 1.0, 0.0, 0.0, 0.0
+    _channels_mask_4481:p4 = 1.0, 1.0, 1.0, 0.0
+    _sensitivity_16840:r = 1.0
+    _threshold_12274:r = 0.0
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    cbuffer global {
+      float4 _color_1752;
+      float4 _channels_mask_4481;
+      float _sensitivity_16840;
+      float _threshold_12274;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_extract_color _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  _in._color_1752 = _color_1752; // float4(1.0, 0.0, 0.0, 0.0)
+  _in._channels_mask_4481 = _channels_mask_4481; // float4(1.0, 1.0, 1.0, 0.0)
+  _in._sensitivity_16840 = _sensitivity_16840; // 1.0
+  _in._threshold_12274 = _threshold_12274; // 0.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_extract_color _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_extract_color(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    shader_function:t="""
+
+  void _function_extract_color(InputStruct_extract_color _in, out OutputStruct_extract_color _out) {
+
+  float4 _v_1_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float4 _v_4_2 = (_in._color_1752 * _in._channels_mask_4481);
+  float4 _v_6_2 = (_v_1_1 * _in._channels_mask_4481);
+  float4 _v_7_2 = (_v_6_2 - _v_4_2);
+  float _v_8_0 = 1.0;
+  float _v_16_0 = 0.001;
+  float _v_19_2 = (_v_8_0 - _in._threshold_12274);
+  float _v_5_1 = length(_v_7_2);
+  float _v_11_2 = (_v_5_1 + _in._threshold_12274);
+  float _v_15_2 = max(_v_19_2, _v_16_0);
+  float _v_9_2 = (_v_8_0 - _v_11_2);
+  float _v_17_2 = (_v_9_2 / _v_15_2);
+  float _v_22_2 = min(_v_8_0, _v_17_2);
+  float _v_21_2 = (_v_8_0 - _v_22_2);
+  float _v_13_2 = (_v_21_2 * _in._sensitivity_16840);
+  float _v_23_2 = (_v_8_0 - _v_13_2);
+  float _v_14_1 = saturate(_v_23_2);
+  _out.col0 = float4(_v_14_1, _v_14_1, _v_14_1, _v_14_1);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_extract_color {
+  float4 pos;
+  float3 tc;
+  float4 _color_1752;
+  float4 _channels_mask_4481;
+  float _sensitivity_16840;
+  float _threshold_12274;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_extract_color {
+  float4 col0;
+};
+"""
+  }
+}

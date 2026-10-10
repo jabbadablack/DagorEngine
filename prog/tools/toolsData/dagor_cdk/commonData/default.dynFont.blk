@@ -1,0 +1,9 @@
+baseFontData{
+  baseFont:t="fonts/dejaVuSans.ttf"
+}
+
+font{
+  name:t="default"
+  baseFontData:i=0
+  ht:i=14
+}

@@ -1,0 +1,826 @@
+baseFontData{
+  baseFont:t="lato-regular.ttf"
+
+  addFont{
+    addFont:t="NotoSans-Regular.ttf"
+    htScale:r=1
+    optional:b=yes
+    range:ip2=13, 31
+    range:ip2=880, 883
+    range:ip2=886, 889
+    range:ip2=895, 899
+    range:ip2=975, 975
+    range:ip2=1159, 1159
+    range:ip2=1300, 3646
+    range:ip2=4347, 4351
+    range:ip2=6832, 7423
+    range:ip2=7627, 7677
+    range:ip2=7836, 7837
+    range:ip2=7839, 7839
+    range:ip2=7930, 7935
+    range:ip2=8209, 8209
+    range:ip2=8227, 8229
+    range:ip2=8231, 8238
+    range:ip2=8241, 8241
+    range:ip2=8245, 8248
+    range:ip2=8251, 8251
+    range:ip2=8255, 8259
+    range:ip2=8261, 8285
+    range:ip2=8288, 8303
+    range:ip2=8341, 8351
+    range:ip2=8374, 8375
+    range:ip2=8379, 8412
+    range:ip2=8432, 8452
+    range:ip2=8454, 8466
+    range:ip2=8468, 8469
+    range:ip2=8472, 8479
+    range:ip2=8481, 8481
+    range:ip2=8483, 8485
+    range:ip2=8487, 8493
+    range:ip2=8495, 8497
+    range:ip2=8499, 8524
+    range:ip2=8527, 8530
+    range:ip2=8585, 8585
+    range:ip2=11373, 11379
+    range:ip2=11384, 11798
+    range:ip2=11800, 11903
+    range:ip2=42560, 42774
+    range:ip2=42779, 42783
+    range:ip2=42786, 43359
+    range:ip2=43824, 44031
+    range:ip2=64261, 65039
+    range:ip2=65060, 65071
+    range:ip2=65532, 65535
+  }
+
+  addFont{
+    addFont:t="NotoSansCJKjp-Regular.otf"
+    htScale:r=1
+    optional:b=yes
+    range:ip2=4352, 6831
+    range:ip2=8414, 8414
+    range:ip2=8544, 8555
+    range:ip2=8560, 8571
+    range:ip2=8632, 8681
+    range:ip2=8693, 8705
+    range:ip2=8707, 8718
+    range:ip2=8723, 8724
+    range:ip2=8733, 8733
+    range:ip2=8736, 8744
+    range:ip2=8746, 8746
+    range:ip2=8748, 8775
+    range:ip2=8780, 8799
+    range:ip2=8802, 8803
+    range:ip2=8806, 8899
+    range:ip2=8922, 8959
+    range:ip2=8965, 8967
+    range:ip2=8978, 8978
+    range:ip2=8984, 8985
+    range:ip2=9001, 9002
+    range:ip2=9136, 9164
+    range:ip2=9166, 9166
+    range:ip2=9178, 9185
+    range:ip2=9251, 9251
+    range:ip2=9332, 9449
+    range:ip2=9461, 9470
+    range:ip2=9473, 9473
+    range:ip2=9475, 9483
+    range:ip2=9485, 9487
+    range:ip2=9489, 9491
+    range:ip2=9493, 9495
+    range:ip2=9497, 9632
+    range:ip2=9634, 9641
+    range:ip2=9649, 9651
+    range:ip2=9654, 9655
+    range:ip2=9660, 9661
+    range:ip2=9664, 9665
+    range:ip2=9670, 9671
+    range:ip2=9673, 9673
+    range:ip2=9678, 9678
+    range:ip2=9680, 9683
+    range:ip2=9698, 9701
+    range:ip2=9711, 9711
+    range:ip2=9729, 9731
+    range:ip2=9733, 9734
+    range:ip2=9737, 9737
+    range:ip2=9742, 9743
+    range:ip2=9750, 9751
+    range:ip2=9756, 9759
+    range:ip2=9775, 9775
+    range:ip2=9792, 9794
+    range:ip2=9824, 9832
+    range:ip2=9834, 9839
+    range:ip2=9842, 9853
+    range:ip2=9888, 9888
+    range:ip2=9917, 9918
+    range:ip2=9986, 9986
+    range:ip2=10003, 10003
+    range:ip2=10010, 10010
+    range:ip2=10045, 10045
+    range:ip2=10047, 10048
+    range:ip2=10070, 10070
+    range:ip2=10112, 10131
+    range:ip2=10145, 10145
+    range:ip2=10548, 10624
+    range:ip2=10687, 10730
+    range:ip2=10746, 11007
+    range:ip2=11013, 11015
+    range:ip2=11034, 11034
+    range:ip2=11157, 11158
+    range:ip2=11904, 19903
+    range:ip2=19968, 42559
+    range:ip2=43360, 43823
+    range:ip2=44032, 63742
+    range:ip2=63744, 64255
+    range:ip2=65040, 65055
+    range:ip2=65072, 65278
+    range:ip2=65281, 65528
+  }
+
+  addFont{
+    addFont:t="NotoSansSymbols-Regular.ttf"
+    htScale:r=1
+    optional:b=yes
+    range:ip2=8415, 8431
+    range:ip2=8556, 8559
+    range:ip2=8572, 8578
+    range:ip2=8581, 8584
+    range:ip2=8586, 8591
+    range:ip2=8960, 8961
+    range:ip2=8963, 8964
+    range:ip2=8968, 8975
+    range:ip2=8977, 8977
+    range:ip2=8979, 8981
+    range:ip2=8983, 8983
+    range:ip2=8988, 8991
+    range:ip2=8994, 8995
+    range:ip2=9004, 9082
+    range:ip2=9084, 9084
+    range:ip2=9088, 9135
+    range:ip2=9165, 9165
+    range:ip2=9168, 9177
+    range:ip2=9186, 9192
+    range:ip2=9738, 9741
+    range:ip2=9747, 9747
+    range:ip2=9764, 9774
+    range:ip2=9784, 9787
+    range:ip2=9789, 9791
+    range:ip2=9795, 9811
+    range:ip2=9840, 9841
+    range:ip2=9854, 9854
+    range:ip2=9872, 9885
+    range:ip2=9890, 9897
+    range:ip2=9901, 9916
+    range:ip2=9934, 9934
+    range:ip2=9954, 9983
+    range:ip2=10013, 10017
+    range:ip2=10529, 10547
+  }
+
+  addFont{
+    addFont:t="NotoSansSymbols2-Regular.ttf"
+    htScale:r=1
+    optional:b=yes
+    range:ip2=127, 159
+    range:ip2=8623, 8631
+    range:ip2=8682, 8692
+    range:ip2=8728, 8728
+    range:ip2=8900, 8921
+    range:ip2=8982, 8982
+    range:ip2=8986, 8987
+    range:ip2=8996, 9000
+    range:ip2=9003, 9003
+    range:ip2=9083, 9083
+    range:ip2=9085, 9087
+    range:ip2=9167, 9167
+    range:ip2=9193, 9250
+    range:ip2=9252, 9311
+    range:ip2=9644, 9648
+    range:ip2=9652, 9653
+    range:ip2=9656, 9659
+    range:ip2=9662, 9663
+    range:ip2=9666, 9669
+    range:ip2=9672, 9672
+    range:ip2=9677, 9677
+    range:ip2=9684, 9697
+    range:ip2=9703, 9710
+    range:ip2=9712, 9727
+    range:ip2=9732, 9732
+    range:ip2=9735, 9736
+    range:ip2=9744, 9746
+    range:ip2=9748, 9749
+    range:ip2=9752, 9755
+    range:ip2=9760, 9763
+    range:ip2=9776, 9783
+    range:ip2=9812, 9823
+    range:ip2=9855, 9871
+    range:ip2=9886, 9887
+    range:ip2=9889, 9889
+    range:ip2=9898, 9900
+    range:ip2=9919, 9933
+    range:ip2=9935, 9953
+    range:ip2=9984, 9985
+    range:ip2=9987, 10002
+    range:ip2=10004, 10009
+    range:ip2=10011, 10012
+    range:ip2=10018, 10044
+    range:ip2=10046, 10046
+    range:ip2=10049, 10069
+    range:ip2=10071, 10101
+    range:ip2=10132, 10144
+    range:ip2=10146, 10528
+    range:ip2=10625, 10686
+    range:ip2=10731, 10745
+    range:ip2=11008, 11012
+    range:ip2=11016, 11033
+    range:ip2=11035, 11156
+    range:ip2=11159, 11359
+    range:ip2=19904, 19967
+    range:ip2=65529, 65531
+  }
+}
+
+baseFontData{
+  baseFont:t="firasans-medium.ttf"
+
+  addFont{
+    addFont:t="NotoSans-Regular.ttf"
+    htScale:r=1
+    optional:b=yes
+    range:ip2=691, 691
+    range:ip2=693, 694
+    range:ip2=701, 702
+    range:ip2=705, 709
+    range:ip2=713, 713
+    range:ip2=717, 717
+    range:ip2=722, 723
+    range:ip2=725, 725
+    range:ip2=735, 735
+    range:ip2=746, 749
+    range:ip2=751, 767
+    range:ip2=773, 773
+    range:ip2=782, 782
+    range:ip2=784, 784
+    range:ip2=788, 789
+    range:ip2=802, 802
+    range:ip2=814, 814
+    range:ip2=819, 819
+    range:ip2=823, 824
+    range:ip2=830, 833
+    range:ip2=835, 836
+    range:ip2=838, 859
+    range:ip2=861, 864
+    range:ip2=866, 879
+    range:ip2=1146, 1161
+    range:ip2=2304, 3646
+    range:ip2=4347, 4351
+    range:ip2=6832, 7497
+    range:ip2=7499, 7531
+    range:ip2=7543, 7568
+    range:ip2=7570, 7614
+    range:ip2=7616, 7619
+    range:ip2=7626, 7681
+    range:ip2=7686, 7689
+    range:ip2=7696, 7697
+    range:ip2=7700, 7709
+    range:ip2=7712, 7715
+    range:ip2=7718, 7725
+    range:ip2=7728, 7733
+    range:ip2=7736, 7739
+    range:ip2=7746, 7747
+    range:ip2=7752, 7753
+    range:ip2=7758, 7759
+    range:ip2=7768, 7769
+    range:ip2=7772, 7775
+    range:ip2=7780, 7785
+    range:ip2=7794, 7799
+    range:ip2=7802, 7807
+    range:ip2=7814, 7825
+    range:ip2=7828, 7837
+    range:ip2=7839, 7839
+    range:ip2=7930, 7935
+    range:ip2=8192, 8198
+    range:ip2=8201, 8202
+    range:ip2=8208, 8209
+    range:ip2=8215, 8215
+    range:ip2=8219, 8219
+    range:ip2=8223, 8223
+    range:ip2=8227, 8229
+    range:ip2=8231, 8239
+    range:ip2=8241, 8248
+    range:ip2=8251, 8254
+    range:ip2=8256, 8259
+    range:ip2=8261, 8265
+    range:ip2=8267, 8303
+    range:ip2=8305, 8307
+    range:ip2=8336, 8352
+    range:ip2=8354, 8357
+    range:ip2=8359, 8360
+    range:ip2=8365, 8366
+    range:ip2=8368, 8371
+    range:ip2=8373, 8376
+    range:ip2=8379, 8380
+    range:ip2=8382, 8412
+    range:ip2=8432, 8457
+    range:ip2=8459, 8466
+    range:ip2=8468, 8469
+    range:ip2=8471, 8481
+    range:ip2=8483, 8485
+    range:ip2=8487, 8493
+    range:ip2=8495, 8530
+    range:ip2=8579, 8580
+    range:ip2=8585, 8585
+    range:ip2=9676, 9676
+    range:ip2=11360, 11363
+    range:ip2=11367, 11372
+    range:ip2=11374, 11376
+    range:ip2=11380, 11903
+    range:ip2=42560, 42888
+    range:ip2=42894, 42921
+    range:ip2=42923, 42924
+    range:ip2=42927, 42929
+    range:ip2=42936, 43359
+    range:ip2=43824, 43858
+    range:ip2=43860, 44031
+    range:ip2=64256, 64256
+    range:ip2=64259, 65039
+    range:ip2=65056, 65071
+    range:ip2=65532, 65535
+  }
+
+  addFont{
+    addFont:t="NotoSansCJKjp-Regular.otf"
+    htScale:r=1
+    optional:b=yes
+    range:ip2=4352, 6831
+    range:ip2=8413, 8414
+    range:ip2=8544, 8555
+    range:ip2=8560, 8571
+    range:ip2=8596, 8622
+    range:ip2=8632, 8677
+    range:ip2=8693, 8705
+    range:ip2=8707, 8708
+    range:ip2=8711, 8718
+    range:ip2=8723, 8724
+    range:ip2=8733, 8733
+    range:ip2=8735, 8746
+    range:ip2=8748, 8775
+    range:ip2=8780, 8799
+    range:ip2=8801, 8803
+    range:ip2=8806, 8899
+    range:ip2=8922, 8959
+    range:ip2=8965, 8967
+    range:ip2=8978, 8978
+    range:ip2=8984, 8985
+    range:ip2=9001, 9002
+    range:ip2=9136, 9164
+    range:ip2=9178, 9185
+    range:ip2=9251, 9251
+    range:ip2=9312, 9643
+    range:ip2=9649, 9651
+    range:ip2=9654, 9655
+    range:ip2=9660, 9661
+    range:ip2=9664, 9665
+    range:ip2=9670, 9671
+    range:ip2=9673, 9673
+    range:ip2=9675, 9675
+    range:ip2=9678, 9683
+    range:ip2=9698, 9702
+    range:ip2=9711, 9711
+    range:ip2=9728, 9731
+    range:ip2=9733, 9734
+    range:ip2=9737, 9737
+    range:ip2=9742, 9743
+    range:ip2=9750, 9751
+    range:ip2=9756, 9759
+    range:ip2=9775, 9775
+    range:ip2=9792, 9794
+    range:ip2=9824, 9839
+    range:ip2=9842, 9853
+    range:ip2=9888, 9888
+    range:ip2=9917, 9918
+    range:ip2=9986, 9986
+    range:ip2=10003, 10003
+    range:ip2=10010, 10010
+    range:ip2=10045, 10045
+    range:ip2=10047, 10048
+    range:ip2=10070, 10070
+    range:ip2=10102, 10131
+    range:ip2=10145, 10145
+    range:ip2=10548, 10624
+    range:ip2=10687, 10730
+    range:ip2=10746, 11007
+    range:ip2=11013, 11015
+    range:ip2=11034, 11034
+    range:ip2=11157, 11158
+    range:ip2=11904, 19903
+    range:ip2=19968, 42559
+    range:ip2=43360, 43823
+    range:ip2=44032, 64255
+    range:ip2=65040, 65055
+    range:ip2=65072, 65278
+    range:ip2=65281, 65528
+  }
+
+  addFont{
+    addFont:t="NotoSansSymbols-Regular.ttf"
+    htScale:r=1
+    optional:b=yes
+    range:ip2=8415, 8431
+    range:ip2=8556, 8559
+    range:ip2=8572, 8578
+    range:ip2=8581, 8584
+    range:ip2=8586, 8591
+    range:ip2=8960, 8964
+    range:ip2=8968, 8977
+    range:ip2=8979, 8981
+    range:ip2=8983, 8983
+    range:ip2=8988, 8995
+    range:ip2=9004, 9082
+    range:ip2=9084, 9084
+    range:ip2=9088, 9135
+    range:ip2=9165, 9165
+    range:ip2=9168, 9177
+    range:ip2=9186, 9192
+    range:ip2=9738, 9741
+    range:ip2=9747, 9747
+    range:ip2=9764, 9774
+    range:ip2=9784, 9787
+    range:ip2=9789, 9791
+    range:ip2=9795, 9811
+    range:ip2=9840, 9841
+    range:ip2=9854, 9854
+    range:ip2=9872, 9885
+    range:ip2=9890, 9897
+    range:ip2=9901, 9916
+    range:ip2=9934, 9934
+    range:ip2=9954, 9983
+    range:ip2=10013, 10017
+    range:ip2=10529, 10547
+  }
+
+  addFont{
+    addFont:t="NotoSansSymbols2-Regular.ttf"
+    htScale:r=1
+    optional:b=yes
+    range:ip2=127, 159
+    range:ip2=8623, 8631
+    range:ip2=8683, 8692
+    range:ip2=8728, 8728
+    range:ip2=8900, 8900
+    range:ip2=8902, 8921
+    range:ip2=8982, 8982
+    range:ip2=8986, 8987
+    range:ip2=8996, 8997
+    range:ip2=9083, 9083
+    range:ip2=9085, 9087
+    range:ip2=9167, 9167
+    range:ip2=9193, 9250
+    range:ip2=9252, 9311
+    range:ip2=9644, 9646
+    range:ip2=9648, 9648
+    range:ip2=9652, 9653
+    range:ip2=9656, 9659
+    range:ip2=9662, 9663
+    range:ip2=9666, 9669
+    range:ip2=9672, 9672
+    range:ip2=9677, 9677
+    range:ip2=9684, 9697
+    range:ip2=9703, 9710
+    range:ip2=9712, 9727
+    range:ip2=9732, 9732
+    range:ip2=9735, 9736
+    range:ip2=9744, 9746
+    range:ip2=9748, 9749
+    range:ip2=9752, 9755
+    range:ip2=9760, 9763
+    range:ip2=9776, 9783
+    range:ip2=9788, 9788
+    range:ip2=9812, 9823
+    range:ip2=9855, 9871
+    range:ip2=9886, 9887
+    range:ip2=9889, 9889
+    range:ip2=9898, 9900
+    range:ip2=9919, 9933
+    range:ip2=9935, 9953
+    range:ip2=9984, 9985
+    range:ip2=9987, 10002
+    range:ip2=10004, 10009
+    range:ip2=10011, 10012
+    range:ip2=10018, 10044
+    range:ip2=10046, 10046
+    range:ip2=10049, 10069
+    range:ip2=10071, 10101
+    range:ip2=10132, 10144
+    range:ip2=10146, 10528
+    range:ip2=10625, 10686
+    range:ip2=10731, 10745
+    range:ip2=11008, 11012
+    range:ip2=11016, 11033
+    range:ip2=11035, 11156
+    range:ip2=11159, 11359
+    range:ip2=19904, 19967
+    range:ip2=65529, 65531
+  }
+}
+
+baseFontData{
+  baseFont:t="jetbrains-mono-nl-regular.ttf"
+  optional:b=yes
+}
+
+baseFontData{
+  baseFont:t="fontawesome-webfont.ttf"
+  forceAutoHint:b=no
+  optional:b=yes
+}
+
+font{
+  name:t="lato-regular"
+  baseFontData:i=0
+}
+
+font{
+  name:t="firasans-medium"
+  baseFontData:i=1
+}
+
+font{
+  name:t="mono"
+  baseFontData:i=2
+}
+
+font{
+  name:t="fontawesome"
+  baseFontData:i=3
+}
+
+hRes.480{
+  lato-regular{
+    ht:i=10
+  }
+
+  firasans-medium{
+    ht:i=16
+  }
+
+  mono{
+    ht:i=6
+  }
+
+  fontawesome{
+    ht:i=14
+  }
+}
+
+hRes.600{
+  lato-regular{
+    ht:i=12
+  }
+
+  firasans-medium{
+    ht:i=20
+  }
+
+  mono{
+    ht:i=7
+  }
+
+  fontawesome{
+    ht:i=18
+  }
+}
+
+hRes.720{
+  lato-regular{
+    ht:i=15
+  }
+
+  firasans-medium{
+    ht:i=24
+  }
+
+  mono{
+    ht:i=9
+  }
+
+  fontawesome{
+    ht:i=22
+  }
+}
+
+hRes.768{
+  lato-regular{
+    ht:i=16
+  }
+
+  firasans-medium{
+    ht:i=26
+  }
+
+  mono{
+    ht:i=9
+  }
+
+  fontawesome{
+    ht:i=23
+  }
+}
+
+hRes.800{
+  lato-regular{
+    ht:i=17
+  }
+
+  firasans-medium{
+    ht:i=27
+  }
+
+  mono{
+    ht:i=10
+  }
+
+  fontawesome{
+    ht:i=24
+  }
+}
+
+hRes.864{
+  lato-regular{
+    ht:i=18
+  }
+
+  firasans-medium{
+    ht:i=29
+  }
+
+  mono{
+    ht:i=10
+  }
+
+  fontawesome{
+    ht:i=26
+  }
+}
+
+hRes.900{
+  lato-regular{
+    ht:i=19
+  }
+
+  firasans-medium{
+    ht:i=30
+  }
+
+  mono{
+    ht:i=11
+  }
+
+  fontawesome{
+    ht:i=27
+  }
+}
+
+hRes.960{
+  lato-regular{
+    ht:i=20
+  }
+
+  firasans-medium{
+    ht:i=32
+  }
+
+  mono{
+    ht:i=12
+  }
+
+  fontawesome{
+    ht:i=29
+  }
+}
+
+hRes.1024{
+  lato-regular{
+    ht:i=21
+  }
+
+  firasans-medium{
+    ht:i=35
+  }
+
+  mono{
+    ht:i=12
+  }
+
+  fontawesome{
+    ht:i=31
+  }
+}
+
+hRes.1050{
+  lato-regular{
+    ht:i=22
+  }
+
+  firasans-medium{
+    ht:i=36
+  }
+
+  mono{
+    ht:i=13
+  }
+
+  fontawesome{
+    ht:i=32
+  }
+}
+
+hRes.1080{
+  lato-regular{
+    ht:i=22
+  }
+
+  firasans-medium{
+    ht:i=37
+  }
+
+  mono{
+    ht:i=13
+  }
+
+  fontawesome{
+    ht:i=32
+  }
+}
+
+hRes.1200{
+  lato-regular{
+    ht:i=25
+  }
+
+  firasans-medium{
+    ht:i=41
+  }
+
+  mono{
+    ht:i=14
+  }
+
+  fontawesome{
+    ht:i=36
+  }
+}
+
+hRes.1440{
+  lato-regular{
+    ht:i=30
+  }
+
+  firasans-medium{
+    ht:i=49
+  }
+
+  mono{
+    ht:i=17
+  }
+
+  fontawesome{
+    ht:i=43
+  }
+}
+
+hRes.1800{
+  lato-regular{
+    ht:i=37
+  }
+
+  firasans-medium{
+    ht:i=61
+  }
+
+  mono{
+    ht:i=22
+  }
+
+  fontawesome{
+    ht:i=54
+  }
+}
+
+hRes.2160{
+  lato-regular{
+    ht:i=45
+  }
+
+  firasans-medium{
+    ht:i=73
+  }
+
+  mono{
+    ht:i=26
+  }
+
+  fontawesome{
+    ht:i=65
+  }
+}

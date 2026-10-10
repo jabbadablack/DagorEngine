@@ -1,0 +1,24 @@
+video {
+  //resolution:t="1280 x 1024"
+  bits16:b=off
+  mode:t="windowed"
+  force_window_caption_visible:b=true
+
+  texturelod:r=-0.5
+
+  min_target_size:i=2048
+}
+stub3d {
+  bufferSize:i=419430400 // 400M
+}
+
+graphics {
+  glow:b=true
+  texquality:t=high
+  limitfps:b=off
+  max_bindump_shadervars:i=8192
+  //anisotropy:r=16
+  cellsVBcfg {
+    max_size:i=0xC800000  // 2*200M
+  }
+}

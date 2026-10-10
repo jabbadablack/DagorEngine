@@ -1,0 +1,156 @@
+
+heightmap_shadow {
+  params {
+    _direction_29728:r = 90.0
+    _distance_57062:r = 0.05
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    cbuffer global {
+      float _direction_29728;
+      float _distance_57062;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_heightmap_shadow _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._direction_29728 = _direction_29728; // 90.0
+  _in._distance_57062 = _distance_57062; // 0.05
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_heightmap_shadow _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_heightmap_shadow(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  """
+    shader_function:t="""
+
+  void _function_heightmap_shadow(InputStruct_heightmap_shadow _in, out OutputStruct_heightmap_shadow _out) {
+
+  float2 _v_2_0 = _in.tc;
+  float _v_5_0 = 180.0;
+  float _v_6_0 = 3.14159265;
+  float _v_7_2 = (_in._direction_29728 / _v_5_0);
+  float _v_8_2 = (_v_7_2 * _v_6_0);
+  float _v_9_1 = sin(_v_8_2);
+  float _v_10_1 = cos(_v_8_2);
+  float4 _v_13_2 = linear_sample(_in.sampler0_t, _v_2_0, _in.sampler0_wrap);
+  float _v_15_0 = 0.0;
+  float _v_20_0 = 8.0;
+  float _v_22_0 = 5.0;
+  float _v_24_0 = 6.0;
+  float _v_26_0 = 7.0;
+  float _v_39_0 = 1.0;
+  float _v_40_2 = (_v_20_0 / _v_20_0);
+  float _v_41_2 = (_v_26_0 / _v_20_0);
+  float _v_42_2 = (_v_24_0 / _v_20_0);
+  float _v_43_2 = (_v_22_0 / _v_20_0);
+  float _v_49_0 = 8.0;
+  float _v_57_0 = 1.0;
+  float _v_59_0 = 2.0;
+  float _v_61_0 = 3.0;
+  float _v_63_2 = (_v_61_0 / _v_20_0);
+  float _v_64_2 = (_v_59_0 / _v_20_0);
+  float _v_65_2 = (_v_57_0 / _v_20_0);
+  float _v_70_0 = 4.0;
+  float4 _v_11_4 = float4(_v_10_1, _v_9_1, _v_15_0, _v_15_0);
+  float4 _v_17_2 = (_v_11_4 * float4(_in._distance_57062, _in._distance_57062, _in._distance_57062, _in._distance_57062));
+  float _v_19_2 = (_v_39_0 / _v_49_0);
+  float4 _v_21_2 = (_v_17_2 * float4(_v_43_2, _v_43_2, _v_43_2, _v_43_2));
+  float4 _v_23_2 = (_v_17_2 * float4(_v_42_2, _v_42_2, _v_42_2, _v_42_2));
+  float4 _v_25_2 = (_v_17_2 * float4(_v_41_2, _v_41_2, _v_41_2, _v_41_2));
+  float4 _v_27_2 = (float4(_v_2_0, 0.0, 0.0) + _v_25_2);
+  float4 _v_29_2 = (float4(_v_2_0, 0.0, 0.0) + _v_23_2);
+  float4 _v_31_2 = (float4(_v_2_0, 0.0, 0.0) + _v_21_2);
+  float _v_44_2 = (_v_40_2 - _v_19_2);
+  float _v_46_2 = (_v_41_2 - _v_19_2);
+  float _v_47_2 = (_v_42_2 - _v_19_2);
+  float _v_48_2 = (_v_43_2 - _v_19_2);
+  float4 _v_56_2 = (_v_17_2 * float4(_v_65_2, _v_65_2, _v_65_2, _v_65_2));
+  float4 _v_58_2 = (_v_17_2 * float4(_v_64_2, _v_64_2, _v_64_2, _v_64_2));
+  float4 _v_60_2 = (_v_17_2 * float4(_v_63_2, _v_63_2, _v_63_2, _v_63_2));
+  float _v_62_2 = (_v_70_0 / _v_20_0);
+  float _v_66_2 = (_v_62_2 - _v_19_2);
+  float _v_67_2 = (_v_63_2 - _v_19_2);
+  float _v_68_2 = (_v_64_2 - _v_19_2);
+  float _v_69_2 = (_v_65_2 - _v_19_2);
+  float4 _v_71_2 = (_v_17_2 * float4(_v_62_2, _v_62_2, _v_62_2, _v_62_2));
+  float4 _v_73_2 = (float4(_v_2_0, 0.0, 0.0) + _v_71_2);
+  float4 _v_76_2 = (float4(_v_2_0, 0.0, 0.0) + _v_60_2);
+  float4 _v_78_2 = (float4(_v_2_0, 0.0, 0.0) + _v_58_2);
+  float4 _v_80_2 = (float4(_v_2_0, 0.0, 0.0) + _v_56_2);
+  float4 _v_3_2 = (float4(_v_2_0, 0.0, 0.0) + _v_17_2);
+  float4 _v_18_2 = linear_sample(_in.sampler0_t, _v_27_2.xy, _in.sampler0_wrap);
+  float4 _v_28_2 = linear_sample(_in.sampler0_t, _v_29_2.xy, _in.sampler0_wrap);
+  float4 _v_30_2 = linear_sample(_in.sampler0_t, _v_31_2.xy, _in.sampler0_wrap);
+  float4 _v_45_2 = (_v_18_2 - float4(_v_46_2, _v_46_2, _v_46_2, _v_46_2));
+  float4 _v_50_2 = (_v_28_2 - float4(_v_47_2, _v_47_2, _v_47_2, _v_47_2));
+  float4 _v_51_2 = (_v_30_2 - float4(_v_48_2, _v_48_2, _v_48_2, _v_48_2));
+  float4 _v_72_2 = linear_sample(_in.sampler0_t, _v_73_2.xy, _in.sampler0_wrap);
+  float4 _v_75_2 = linear_sample(_in.sampler0_t, _v_76_2.xy, _in.sampler0_wrap);
+  float4 _v_77_2 = linear_sample(_in.sampler0_t, _v_78_2.xy, _in.sampler0_wrap);
+  float4 _v_79_2 = linear_sample(_in.sampler0_t, _v_80_2.xy, _in.sampler0_wrap);
+  float4 _v_87_2 = (_v_75_2 - float4(_v_67_2, _v_67_2, _v_67_2, _v_67_2));
+  float4 _v_89_2 = (_v_77_2 - float4(_v_68_2, _v_68_2, _v_68_2, _v_68_2));
+  float4 _v_90_2 = (_v_79_2 - float4(_v_69_2, _v_69_2, _v_69_2, _v_69_2));
+  float4 _v_93_2 = (_v_72_2 - float4(_v_66_2, _v_66_2, _v_66_2, _v_66_2));
+  float4 _v_1_2 = linear_sample(_in.sampler0_t, _v_3_2.xy, _in.sampler0_wrap);
+  float4 _v_36_2 = (_v_45_2 - _v_13_2);
+  float4 _v_37_2 = (_v_50_2 - _v_13_2);
+  float4 _v_38_2 = (_v_51_2 - _v_13_2);
+  float4 _v_54_2 = (_v_1_2 - float4(_v_44_2, _v_44_2, _v_44_2, _v_44_2));
+  float4 _v_74_2 = (_v_93_2 - _v_13_2);
+  float4 _v_84_2 = (_v_87_2 - _v_13_2);
+  float4 _v_85_2 = (_v_89_2 - _v_13_2);
+  float4 _v_86_2 = (_v_90_2 - _v_13_2);
+  float4 _v_97_1 = saturate(_v_36_2);
+  float4 _v_98_1 = saturate(_v_37_2);
+  float4 _v_99_1 = saturate(_v_38_2);
+  float4 _v_100_1 = saturate(_v_74_2);
+  float4 _v_101_1 = saturate(_v_84_2);
+  float4 _v_102_1 = saturate(_v_85_2);
+  float4 _v_103_1 = saturate(_v_86_2);
+  float4 _v_12_2 = (_v_54_2 - _v_13_2);
+  float4 _v_96_1 = saturate(_v_12_2);
+  float4 _v_32_2 = (_v_96_1 + _v_97_1);
+  float4 _v_33_2 = (_v_32_2 + _v_98_1);
+  float4 _v_34_2 = (_v_33_2 + _v_99_1);
+  float4 _v_81_2 = (_v_34_2 + _v_100_1);
+  float4 _v_82_2 = (_v_81_2 + _v_101_1);
+  float4 _v_83_2 = (_v_82_2 + _v_102_1);
+  float4 _v_95_2 = (_v_83_2 + _v_103_1);
+  float4 _v_35_2 = (_v_95_2 / float4(_v_20_0, _v_20_0, _v_20_0, _v_20_0));
+  _out.col0 = _v_35_2;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_heightmap_shadow {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _direction_29728;
+  float _distance_57062;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_heightmap_shadow {
+  float4 col0;
+};
+"""
+  }
+}

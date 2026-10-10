@@ -1,0 +1,91 @@
+
+slope {
+  params {
+    _dist_65071:r = 0.005
+    _mult_3109:r = 2.0
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _dist_65071;
+      float _mult_3109;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_slope _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._dist_65071 = _dist_65071; // 0.005
+  _in._mult_3109 = _mult_3109; // 2.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_slope _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_slope(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+
+  void _function_slope(InputStruct_slope _in, out OutputStruct_slope _out) {
+
+  float2 _v_0_0 = _in.tc;
+  float2 _v_5_0 = _in.tc;
+  float _v_23_0 = 0.0;
+  float _v_28_0 = -1.0;
+  float _v_29_0 = 0.0;
+  float4 _v_26_4 = float4(_in._dist_65071, _in._dist_65071, _v_29_0, _v_29_0);
+  float _v_27_2 = (_in._dist_65071 * _v_28_0);
+  float4 _v_30_4 = float4(_v_27_2, _v_27_2, _v_29_0, _v_29_0);
+  float4 _v_31_4 = float4(_v_27_2, _in._dist_65071, _v_29_0, _v_29_0);
+  float4 _v_32_4 = float4(_in._dist_65071, _v_27_2, _v_29_0, _v_29_0);
+  float4 _v_3_2 = (float4(_v_0_0, 0.0, 0.0) + _v_26_4);
+  float4 _v_8_2 = (float4(_v_0_0, 0.0, 0.0) + _v_30_4);
+  float4 _v_16_2 = (float4(_v_5_0, 0.0, 0.0) + _v_31_4);
+  float4 _v_19_2 = (float4(_v_5_0, 0.0, 0.0) + _v_32_4);
+  float4 _v_1_2 = linear_sample(_in.sampler0_t, _v_3_2.xy, _in.sampler0_wrap);
+  float4 _v_6_2 = linear_sample(_in.sampler0_t, _v_8_2.xy, _in.sampler0_wrap);
+  float4 _v_10_2 = (_v_1_2 - _v_6_2);
+  float4 _v_14_2 = linear_sample(_in.sampler0_t, _v_16_2.xy, _in.sampler0_wrap);
+  float4 _v_17_2 = linear_sample(_in.sampler0_t, _v_19_2.xy, _in.sampler0_wrap);
+  float4 _v_20_2 = (_v_14_2 - _v_17_2);
+  float _v_21_1 = length(_v_20_2);
+  float _v_9_1 = length(_v_10_2);
+  float4 _v_22_4 = float4(_v_9_1, _v_21_1, _v_23_0, _v_23_0);
+  float _v_24_1 = length(_v_22_4);
+  float _v_12_2 = (_v_24_1 * _in._mult_3109);
+  _out.col0 = float4(_v_12_2, _v_12_2, _v_12_2, _v_12_2);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_slope {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _dist_65071;
+  float _mult_3109;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_slope {
+  float4 col0;
+};
+"""
+  }
+}

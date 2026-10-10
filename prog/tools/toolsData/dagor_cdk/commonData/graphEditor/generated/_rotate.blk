@@ -1,0 +1,86 @@
+
+rotate {
+  params {
+    _degrees_16642:r = 0.0
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    cbuffer global {
+      float _degrees_16642;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_rotate _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._degrees_16642 = _degrees_16642; // 0.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_rotate _out;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_rotate(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  """
+    shader_function:t="""
+
+  void _function_rotate(InputStruct_rotate _in, out OutputStruct_rotate _out) {
+
+  float2 _v_1_0 = float2(0.5, 0.5);
+  float _v_5_0 = 180.0;
+  float _v_7_0 = 3.14159265;
+  float2 _v_22_0 = _in.tc;
+  float _v_32_0 = 0.0;
+  float2 _v_0_2 = (_v_22_0 - _v_1_0);
+  float _v_4_2 = (_in._degrees_16642 / _v_5_0);
+  float _v_6_2 = (_v_4_2 * _v_7_0);
+  float _v_13_1 = cos(_v_6_2);
+  float _v_16_1 = sin(_v_6_2);
+  float _v_23_1 = float4(_v_0_2, 0.0, 0.0).x;
+  float _v_23_2 = float4(_v_0_2, 0.0, 0.0).y;
+  _out._z_46559 = float4(_v_0_2, 0.0, 0.0).z;
+  _out._w_46546 = float4(_v_0_2, 0.0, 0.0).w;
+  float _v_24_2 = (_v_16_1 * _v_23_2);
+  float _v_25_2 = (_v_16_1 * _v_23_1);
+  float _v_26_2 = (_v_13_1 * _v_23_2);
+  float _v_28_2 = (_v_26_2 + _v_25_2);
+  float _v_21_2 = (_v_13_1 * _v_23_1);
+  float _v_27_2 = (_v_21_2 + _v_24_2);
+  float4 _v_30_4 = float4(_v_27_2, _v_28_2, _v_32_0, _v_32_0);
+  float4 _v_2_2 = (_v_30_4 + float4(_v_1_0, 0.0, 0.0));
+  float4 _v_14_2 = linear_sample(_in.sampler0_t, _v_2_2.xy, _in.sampler0_wrap);
+  _out.col0 = _v_14_2;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_rotate {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _degrees_16642;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_rotate {
+  float _z_46559;
+  float _w_46546;
+  float4 col0;
+};
+"""
+  }
+}

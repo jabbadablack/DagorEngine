@@ -1,0 +1,84 @@
+
+levels {
+  params {
+    _in_low_10249:r = 0.0
+    _mid_17061:r = 0.5
+    _in_high_21587:r = 1.0
+    _out_low_37184:r = 0.0
+    _out_high_49978:r = 1.0
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    cbuffer global {
+      float _in_low_10249;
+      float _mid_17061;
+      float _in_high_21587;
+      float _out_low_37184;
+      float _out_high_49978;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_levels _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  _in._in_low_10249 = _in_low_10249; // 0.0
+  _in._mid_17061 = _mid_17061; // 0.5
+  _in._in_high_21587 = _in_high_21587; // 1.0
+  _in._out_low_37184 = _out_low_37184; // 0.0
+  _in._out_high_49978 = _out_high_49978; // 1.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_levels _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_levels(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    shader_function:t="""
+
+  void _function_levels(InputStruct_levels _in, out OutputStruct_levels _out) {
+
+  float2 _v_3_0 = _in.tc;
+  float _v_9_0 = -16.0;
+  float _v_11_0 = 16.0;
+  float _v_12_0 = 0.0;
+  float _v_15_0 = 1.0;
+  float _v_17_3 = saturate(_in._mid_17061) * (_v_11_0 - _v_9_0) + _v_9_0;
+  float4 _v_2_2 = linear_sample(_in.sampler0_t, _v_3_0, _in.sampler0_wrap);
+  float4 _v_4_3 = saturate((_v_2_2 - _in._in_low_10249) / (_in._in_high_21587 - _in._in_low_10249));
+  float _v_13_1 = abs(_v_17_3);
+  float _v_14_2 = (_v_13_1 + _v_15_0);
+  float _v_16_2 = (_v_15_0 / _v_14_2);
+  float _v_10_4 = ((_v_17_3 > _v_12_0) ? (_v_14_2) : (_v_16_2));
+  float4 _v_5_2 = pow(_v_4_3, float4(_v_10_4, _v_10_4, _v_10_4, _v_10_4));
+  float4 _v_18_3 = saturate(_v_5_2) * (_in._out_high_49978 - _in._out_low_37184) + _in._out_low_37184;
+  _out.col0 = _v_18_3;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_levels {
+  float4 pos;
+  float3 tc;
+  float _in_low_10249;
+  float _mid_17061;
+  float _in_high_21587;
+  float _out_low_37184;
+  float _out_high_49978;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_levels {
+  float4 col0;
+};
+"""
+  }
+}

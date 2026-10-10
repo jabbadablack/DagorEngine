@@ -1,0 +1,17 @@
+fontbins{
+  name:t=fonts/fonts
+}
+
+fontSizeByWidthCap:r=0.75
+
+refHRes:i=1080
+inscriptionsTexSz:ip2 = 2048,512
+genSysTexSz:ip2=1024,256
+
+
+
+dynamicGen{
+  texCount:i=2
+  texSz:i=2048
+  prefix:t="fonts"
+}

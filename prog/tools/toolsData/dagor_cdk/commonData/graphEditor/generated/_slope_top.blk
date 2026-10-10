@@ -1,0 +1,114 @@
+
+slope_top {
+  params {
+    _not_mask_threshold_58067:r = 0.1
+    _mask_exist_threshold_29013:r = 1.0
+  }
+  inputs:i=2
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _not_mask_threshold_58067;
+      float _mask_exist_threshold_29013;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+    Texture2D sampler1_t:register(t1);
+    SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="""
+  InputStruct_slope_top _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._not_mask_threshold_58067 = _not_mask_threshold_58067; // 0.1
+  _in._mask_exist_threshold_29013 = _mask_exist_threshold_29013; // 1.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+  _in.sampler1_t = sampler1_t;
+  _in.sampler1_wrap = wrap_t1;
+  _in.sampler1 = sampler1;
+
+
+  OutputStruct_slope_top _out;
+  _out._res_35681 = 0.0;
+  _out._y_46556 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out._y_46556_13 = 0.0;
+  _out._z_46559_13 = 0.0;
+  _out._w_46546_13 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_slope_top(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+  void _function_slope_top(InputStruct_slope_top _in, out OutputStruct_slope_top _out) {
+
+  float2 _v_2_1 = normalize(getNormal(_in.sampler1_t, _in.sampler1_wrap, _in.tc, 1).xy);
+  float2 _v_4_1 = get_dimensions(_in.sampler1_t);
+  float _v_5_0 = 0.0;
+  float _v_7_0 = 1.1;
+  float2 _v_8_1 = normalize(_v_2_1);
+  float2 _v_9_0 = _in.tc;
+  float _v_20_0 = 1.0;
+  float _v_21_0 = 0.0;
+  float _v_23_0 = 0.0;
+  float2 _v_3_2 = (float2(_v_5_0, _v_5_0) - _v_8_1);
+  float2 _v_6_2 = (float2(_v_7_0, _v_7_0) / _v_4_1);
+  float4 _v_11_2 = linear_sample(_in.sampler0_t, _v_9_0, _in.sampler0_wrap);
+  float _v_18_1 = _v_11_2.x;
+  _out._y_46556 = _v_11_2.y;
+  _out._z_46559 = _v_11_2.z;
+  _out._w_46546 = _v_11_2.w;
+  float2 _v_29_2 = (_v_3_2 * _v_6_2);
+  float2 _v_10_2 = (_v_9_0 + _v_29_2);
+  float4 _v_0_2 = linear_sample(_in.sampler0_t, _v_10_2, _in.sampler0_wrap);
+  float _v_13_1 = _v_0_2.x;
+  _out._y_46556_13 = _v_0_2.y;
+  _out._z_46559_13 = _v_0_2.z;
+  _out._w_46546_13 = _v_0_2.w;
+  float _v_16_4 = ((_in._not_mask_threshold_58067 >= _v_13_1) ? (_v_20_0) : (_v_21_0));
+  float _v_17_4 = ((_v_18_1 >= _in._mask_exist_threshold_29013) ? (_v_16_4) : (_v_23_0));
+  float _v_22_2 = (_v_18_1 - _v_13_1);
+  _out._res_35681 = saturate(_v_22_2);
+  _out.col0 = float4(_v_17_4, _v_17_4, _v_17_4, _v_17_4);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_slope_top {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _not_mask_threshold_58067;
+  float _mask_exist_threshold_29013;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+  Texture2D sampler1_t;
+  bool sampler1_wrap;
+  SamplerState sampler1;
+};
+struct OutputStruct_slope_top {
+  float _res_35681;
+  float _y_46556;
+  float _z_46559;
+  float _w_46546;
+  float _y_46556_13;
+  float _z_46559_13;
+  float _w_46546_13;
+  float4 col0;
+};
+"""
+  }
+}

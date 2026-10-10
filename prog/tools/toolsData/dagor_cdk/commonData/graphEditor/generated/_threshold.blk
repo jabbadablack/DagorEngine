@@ -1,0 +1,75 @@
+
+threshold {
+  params {
+    _threshold_12274:r = 0.5
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _threshold_12274;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_threshold _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._threshold_12274 = _threshold_12274; // 0.5
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_threshold _out;
+  _out._y_46556 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_threshold(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+  void _function_threshold(InputStruct_threshold _in, out OutputStruct_threshold _out) {
+
+  float4 _v_0_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float _v_1_1 = _v_0_1.x;
+  _out._y_46556 = _v_0_1.y;
+  _out._z_46559 = _v_0_1.z;
+  _out._w_46546 = _v_0_1.w;
+  float _v_4_0 = 1.0;
+  float _v_5_0 = 0.0;
+  float _v_2_4 = ((_v_1_1 >= _in._threshold_12274) ? (_v_4_0) : (_v_5_0));
+  _out.col0 = float4(_v_2_4, _v_2_4, _v_2_4, _v_2_4);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_threshold {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _threshold_12274;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_threshold {
+  float _y_46556;
+  float _z_46559;
+  float _w_46546;
+  float4 col0;
+};
+"""
+  }
+}

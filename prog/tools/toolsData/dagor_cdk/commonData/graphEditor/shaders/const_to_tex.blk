@@ -1,0 +1,192 @@
+templateUid:t = "d77717f0-ad1b-4cfa-becf-9f4f634c0460"
+hint:t = "/*--------------------*/"
+
+node {
+  id:i = 0
+  x:r = 595.9297939383557
+  y:r = 293.564997630706
+  descName:t = "float to vec"
+  pin {
+    name:t = "x"
+    role:t = "in"
+    types:t = "float"
+    customPinInput:t = "_x_46557"
+  }
+  pin {
+    name:t = "y"
+    role:t = "in"
+    types:t = "float"
+    customPinInput:t = "_y_46556"
+  }
+  pin {
+    name:t = "z"
+    role:t = "in"
+    types:t = "float"
+    customPinInput:t = "_z_46559"
+  }
+  pin {
+    name:t = "w"
+    role:t = "in"
+    types:t = "float"
+    customPinInput:t = "_w_46546"
+  }
+  pin {
+    name:t = "vec"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "float4($x$, $y$, $z$, $w$)"
+    }
+  }
+}
+node {
+  id:i = 1
+  x:r = 739.5230293529252
+  y:r = 292.34413278226316
+  templateUid:t = "e9c40e8f-d682-4021-b803-6701341256af"
+  descName:t = "result"
+  pin {
+    name:t = "color"
+    role:t = "in"
+    types:t = "float4"
+    data {
+      def_val:t = "float4(0.5, 0.5, 0.5, 0.5)"
+      def_val_blk:t = "0.5, 0.5, 0.5, 0.5"
+      code:t = "_out.col%MRT index% = $color$"
+      result_color:b = yes
+    }
+  }
+  pin {
+    name:t = "out"
+    role:t = "out"
+    types:t = "texture2D"
+  }
+  property {
+    name:t = "MRT index"
+    val:t = "0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 2
+  x:r = 740.645039617829
+  y:r = 242.8665108939535
+  templateUid:t = "32fdc2b6-2bbe-4dd7-8cdd-4bffaeeeeeb2"
+  descName:t = "comment"
+  property {
+    name:t = "comment string"
+    val:t = '@"width":90'
+  }
+  property {
+    name:t = "font size"
+    val:t = "15"
+  }
+}
+edge {
+  id:i = 0
+  elemA:i = 0
+  pinA:i = 4
+  elemB:i = 1
+  pinB:i = 0
+}
+
+description {
+  name:t = "[[description-name]]"
+  category:t = "[[description-category]]"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  allowLoop:b = no
+  width:i = 90
+  pin {
+    name:t = "out"
+    types:t = "texture2D"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 292
+    subgraphElem:i = 1
+    subgraphPin:i = 1
+  }
+  pin {
+    name:t = "x"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 293
+    subgraphElem:i = 0
+    subgraphPin:i = 0
+    data {
+      blk_code:t = "%x%"
+      code:t = "%x%"
+    }
+  }
+  pin {
+    name:t = "y"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 293
+    subgraphElem:i = 0
+    subgraphPin:i = 1
+    data {
+      blk_code:t = "%y%"
+      code:t = "%y%"
+    }
+  }
+  pin {
+    name:t = "z"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 293
+    subgraphElem:i = 0
+    subgraphPin:i = 2
+    data {
+      blk_code:t = "%z%"
+      code:t = "%z%"
+    }
+  }
+  pin {
+    name:t = "w"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 293
+    subgraphElem:i = 0
+    subgraphPin:i = 3
+    data {
+      blk_code:t = "%w%"
+      code:t = "%w%"
+    }
+  }
+  property {
+    name:t = "x"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "y"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "z"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "w"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+}

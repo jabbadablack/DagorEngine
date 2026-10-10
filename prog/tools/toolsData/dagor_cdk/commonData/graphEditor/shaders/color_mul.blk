@@ -1,0 +1,207 @@
+templateUid:t = "e7e8e7bd-87d6-4d57-a341-0619112c726e"
+
+node {
+  id:i = 0
+  x:r = 145.59909404624503
+  y:r = 332.36673993183933
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "texture"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler0"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 1
+  x:r = 147.3100616016427
+  y:r = 458.38193018480484
+  templateUid:t = "b46631c8-db5f-485f-af5c-312f4a2fe10b"
+  descName:t = "const float4"
+  externalName:t = "color"
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float4"
+    customVarName:t = "_color_1752"
+    data {
+      code:t = "float4(%x%, %y%, %z%, %w%)"
+      blk_code:t = "%x%, %y%, %z%, %w%"
+    }
+  }
+  property {
+    name:t = "x"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "y"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "z"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "w"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = "color"
+  }
+}
+node {
+  id:i = 2
+  x:r = 360.0713733070256
+  y:r = 384.93347504477566
+  templateUid:t = "5dde9d07-6fff-4012-9d7c-4a5db3f68901"
+  descName:t = "*"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A*B"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "($A$ * $B$)"
+    }
+  }
+}
+node {
+  id:i = 3
+  x:r = 558.7736320339252
+  y:r = 385.9848097470343
+  templateUid:t = "e9c40e8f-d682-4021-b803-6701341256af"
+  descName:t = "result"
+  pin {
+    name:t = "color"
+    role:t = "in"
+    types:t = "float4"
+    data {
+      def_val:t = "float4(0.5, 0.5, 0.5, 0.5)"
+      def_val_blk:t = "0.5, 0.5, 0.5, 0.5"
+      code:t = "_out.col0 = $color$"
+    }
+  }
+  pin {
+    name:t = "out"
+    role:t = "out"
+    types:t = "texture2D"
+  }
+}
+edge {
+  id:i = 0
+  elemA:i = 2
+  pinA:i = 0
+  elemB:i = 0
+  pinB:i = 1
+}
+edge {
+  id:i = 1
+  elemA:i = 1
+  pinA:i = 0
+  elemB:i = 2
+  pinB:i = 1
+}
+edge {
+  id:i = 2
+  elemA:i = 3
+  pinA:i = 0
+  elemB:i = 2
+  pinB:i = 2
+}
+
+description {
+  name:t = "[[description-name]]"
+  category:t = "[[description-category]]"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  allowLoop:b = no
+  width:i = 200
+  pin {
+    name:t = "texture"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    subgraphElem:i = 0
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "color"
+    types:t = "float4"
+    role:t = "in"
+    singleConnect:b = yes
+    data {
+      blk_code:t = "%color.x%, %color.y%, %color.z%, %color.w%"
+      code:t = "float4(%color.x%, %color.y%, %color.z%, %color.w%)"
+    }
+  }
+  pin {
+    name:t = "out"
+    types:t = "texture2D"
+    role:t = "out"
+    singleConnect:b = no
+    subgraphElem:i = 3
+    subgraphPin:i = 1
+  }
+  property {
+    name:t = "color.x"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "color.y"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "color.z"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "color.w"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+}

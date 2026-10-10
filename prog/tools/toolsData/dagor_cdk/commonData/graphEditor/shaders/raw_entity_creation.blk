@@ -1,0 +1,1566 @@
+templateUid:t = "6761ac59-7a77-4622-8234-f3f568fc2e0f"
+hint:t = "/*--------------------*/"
+
+node {
+  id:i = 0
+  x:r = 1141.4552143334822
+  y:r = 561.769870529114
+  descName:t = "vec to float"
+  pinComment {
+    pinIndex:i = 4
+    text:t = "#"
+  }
+  pinComment {
+    pinIndex:i = 0
+    text:t = "pos"
+  }
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+    customPinInput:t = "_pos_29481"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 1
+  x:r = 1142.3931743755434
+  y:r = 714.5311744197555
+  descName:t = "vec to float"
+  pinComment {
+    pinIndex:i = 4
+    text:t = "#"
+  }
+  pinComment {
+    pinIndex:i = 0
+    text:t = "up"
+  }
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+    customPinInput:t = "_up_28576"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 2
+  x:r = 1142.2543731137137
+  y:r = 874.8298074376313
+  descName:t = "vec to float"
+  pinComment {
+    pinIndex:i = 4
+    text:t = "#"
+  }
+  pinComment {
+    pinIndex:i = 0
+    text:t = "forward"
+  }
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+    customPinInput:t = "_forward_16414"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 3
+  x:r = 1089.0674192423953
+  y:r = 311.5654103385743
+  descName:t = "integer pixel pos"
+  pinComment {
+    pinIndex:i = 1
+    text:t = "#"
+  }
+  pin {
+    name:t = "ix"
+    role:t = "out"
+    types:t = "int"
+    data {
+      code:t = "int(_in.tc.x / ddx_fine(_in.tc.x) + 0.125)"
+    }
+  }
+  pin {
+    name:t = "iy"
+    role:t = "out"
+    types:t = "int"
+    data {
+      code:t = "int(_in.tc.y / ddy_fine(_in.tc.y) + 0.125)"
+    }
+  }
+}
+node {
+  id:i = 4
+  x:r = 1414.7851168038046
+  y:r = 661.6283655291156
+  descName:t = "float to vec"
+  pin {
+    name:t = "x"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "y"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "z"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "w"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "vec"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "float4($x$, $y$, $z$, $w$)"
+    }
+  }
+}
+node {
+  id:i = 5
+  x:r = 1020.6958389896029
+  y:r = 1116.8705131633226
+  templateUid:t = "5d1556c3-b704-4007-b9b5-341c9cc9601e"
+  descName:t = "const float3"
+  externalName:t = "scale"
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float3"
+    customVarName:t = "_scale_20861"
+    data {
+      code:t = "float3(%x%, %y%, %z%)"
+      blk_code:t = "%x%, %y%, %z%"
+    }
+  }
+  property {
+    name:t = "x"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "y"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "z"
+    val:t = "1.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = "scale"
+  }
+}
+node {
+  id:i = 6
+  x:r = 3232.6905719030333
+  y:r = 655.1322888809345
+  templateUid:t = "e9c40e8f-d682-4021-b803-6701341256af"
+  descName:t = "result"
+  externalName:t = "raw entities"
+  pin {
+    name:t = "color"
+    role:t = "in"
+    types:t = "float4"
+    data {
+      def_val:t = "float4(0.5, 0.5, 0.5, 0.5)"
+      def_val_blk:t = "0.5, 0.5, 0.5, 0.5"
+      code:t = "_out.col%MRT index% = $color$"
+      result_color:b = yes
+    }
+  }
+  pin {
+    name:t = "out"
+    role:t = "out"
+    types:t = "texture2D"
+  }
+  property {
+    name:t = "MRT index"
+    val:t = "0"
+  }
+  property {
+    name:t = "external name"
+    val:t = "raw entities"
+  }
+}
+node {
+  id:i = 7
+  x:r = 2651.9919467959953
+  y:r = 842.7841730694298
+  templateUid:t = "7906ca75-6ce8-4812-bf64-b2cfc465a9fe"
+  descName:t = "get_entity_index"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  pin {
+    name:t = "entity index"
+    role:t = "out"
+    types:t = "int"
+    data {
+      code:t = "($A$ - $B$)"
+    }
+  }
+}
+node {
+  id:i = 8
+  x:r = 3050.0896697708977
+  y:r = 653.9369732428821
+  descName:t = "if A>B"
+  groupTypes {
+    group1:t = "int"
+    group2:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "int,float"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "int"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A>B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A<=B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+}
+node {
+  id:i = 9
+  x:r = 2069.264283313159
+  y:r = 464.1856925870318
+  templateUid:t = "7906ca75-6ce8-4812-bf64-b2cfc465a9fe"
+  descName:t = "get_entity_index"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  pin {
+    name:t = "entity index"
+    role:t = "out"
+    types:t = "int"
+    data {
+      code:t = "($A$ - $B$)"
+    }
+  }
+}
+node {
+  id:i = 10
+  x:r = 2508.408860427248
+  y:r = 526.0732172192364
+  descName:t = "if A==B"
+  groupTypes {
+    group2:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "int"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "int"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A==B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A!=B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ == $B$) ? ($A==B$) : ($A!=B$))"
+    }
+  }
+}
+node {
+  id:i = 11
+  x:r = 2293.3783264099666
+  y:r = 774.5255175463195
+  descName:t = "float to vec"
+  pin {
+    name:t = "x"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "y"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "z"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "w"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "vec"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "float4($x$, $y$, $z$, $w$)"
+    }
+  }
+}
+node {
+  id:i = 12
+  x:r = 1211.5856196342572
+  y:r = 1116.3017992944797
+  descName:t = "vec to float"
+  pinComment {
+    pinIndex:i = 4
+    text:t = "#"
+  }
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 13
+  x:r = 1165.0356354623816
+  y:r = 1397.663651432144
+  templateUid:t = "0c0e9c86-2d10-4313-8607-fe7fc4185af7"
+  descName:t = "abs"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "entities count"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "int,float,float2,float3,float4"
+    group:t = "group1"
+    customPinInput:t = "_entities_count_64123"
+  }
+  pin {
+    name:t = "abs(A)"
+    role:t = "out"
+    types:t = "int,float,float2,float3,float4"
+    group:t = "group1"
+    data {
+      code:t = "abs($A$)"
+    }
+  }
+}
+node {
+  id:i = 14
+  x:r = 1093.9595764717772
+  y:r = 1298.2746208019946
+  templateUid:t = "32fdc2b6-2bbe-4dd7-8cdd-4bffaeeeeeb2"
+  descName:t = "comment"
+  property {
+    name:t = "comment string"
+    val:t = "reserved"
+  }
+  property {
+    name:t = "font size"
+    val:t = "15"
+  }
+}
+node {
+  id:i = 15
+  x:r = 2742.2583360539165
+  y:r = 925.7203677264426
+  templateUid:t = "b46631c8-db5f-485f-af5c-312f4a2fe10b"
+  descName:t = "const float4"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "float4(%x%, %y%, %z%, %w%)"
+      blk_code:t = "%x%, %y%, %z%, %w%"
+    }
+  }
+  property {
+    name:t = "x"
+    val:t = "0.0"
+  }
+  property {
+    name:t = "y"
+    val:t = "0.0"
+  }
+  property {
+    name:t = "z"
+    val:t = "0.0"
+  }
+  property {
+    name:t = "w"
+    val:t = "0.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 17
+  x:r = 2151.226975974513
+  y:r = 532.5500264427443
+  templateUid:t = "49d2391e-594c-488b-acb8-19aba0c3db5d"
+  descName:t = "const int"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "int"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "-1"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 23
+  x:r = 1417.3005543116476
+  y:r = 808.8936079495554
+  descName:t = "float to vec"
+  pin {
+    name:t = "x"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "y"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "z"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "w"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "vec"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "float4($x$, $y$, $z$, $w$)"
+    }
+  }
+}
+node {
+  id:i = 24
+  x:r = 1413.9078365169357
+  y:r = 962.0670056725501
+  descName:t = "float to vec"
+  pinComment {
+    pinIndex:i = 1
+    text:t = "place type"
+  }
+  pinComment {
+    pinIndex:i = 2
+    text:t = "entity name index"
+  }
+  pinComment {
+    pinIndex:i = 3
+    text:t = "entity seed"
+  }
+  pin {
+    name:t = "x"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "y"
+    role:t = "in"
+    types:t = "float"
+    customPinInput:t = "_place_type_6"
+  }
+  pin {
+    name:t = "z"
+    role:t = "in"
+    types:t = "float"
+    customPinInput:t = "_entity_name_index_47879"
+  }
+  pin {
+    name:t = "w"
+    role:t = "in"
+    types:t = "float"
+    customPinInput:t = "_entity_seed_27081"
+  }
+  pin {
+    name:t = "vec"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "float4($x$, $y$, $z$, $w$)"
+    }
+  }
+}
+node {
+  id:i = 25
+  x:r = 1410.635073009633
+  y:r = 1150.404647102112
+  descName:t = "float to vec"
+  pin {
+    name:t = "x"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "y"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "z"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "w"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "vec"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "float4($x$, $y$, $z$, $w$)"
+    }
+  }
+}
+node {
+  id:i = 26
+  x:r = 1180.9287854460108
+  y:r = 1278.7369408149643
+  templateUid:t = "936f5686-cfd1-413d-91c9-8ad06b0ca79d"
+  descName:t = "const float"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "0.0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 27
+  x:r = 1814.2442012527968
+  y:r = 612.9867063313891
+  descName:t = "if A==B"
+  groupTypes {
+    group1:t = "int"
+    group2:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "int"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "int"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A==B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A!=B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ == $B$) ? ($A==B$) : ($A!=B$))"
+    }
+  }
+}
+node {
+  id:i = 28
+  x:r = 1142.9681786833446
+  y:r = 412.75183076885156
+  templateUid:t = "49d2391e-594c-488b-acb8-19aba0c3db5d"
+  descName:t = "const int"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "int"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "4"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 29
+  x:r = 1327.4245126902808
+  y:r = 346.95173124878113
+  descName:t = "imod"
+  groupTypes {
+    group1:t = "int"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "int"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "int"
+    data {
+      def_1:b = yes
+    }
+  }
+  pin {
+    name:t = "A mod B"
+    role:t = "out"
+    types:t = "int"
+    group:t = "group1"
+    data {
+      code:t = "($A$ % $B$)"
+    }
+  }
+}
+node {
+  id:i = 30
+  x:r = 1640.0745703515443
+  y:r = 632.1250077427744
+  templateUid:t = "49d2391e-594c-488b-acb8-19aba0c3db5d"
+  descName:t = "const int"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "int"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 31
+  x:r = 1638.3770006348122
+  y:r = 797.4661151390275
+  templateUid:t = "49d2391e-594c-488b-acb8-19aba0c3db5d"
+  descName:t = "const int"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "int"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "1"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 34
+  x:r = 1810.2010533218404
+  y:r = 783.8566766611709
+  descName:t = "if A==B"
+  groupTypes {
+    group1:t = "int"
+    group2:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "int"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "int"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A==B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A!=B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ == $B$) ? ($A==B$) : ($A!=B$))"
+    }
+  }
+}
+node {
+  id:i = 35
+  x:r = 1634.333852703856
+  y:r = 956.2731117956547
+  templateUid:t = "49d2391e-594c-488b-acb8-19aba0c3db5d"
+  descName:t = "const int"
+  externalName:t = ""
+  pin {
+    name:t = "value"
+    role:t = "out"
+    types:t = "int"
+    data {
+      code:t = "%value%"
+      blk_code:t = "%value%"
+    }
+  }
+  property {
+    name:t = "value"
+    val:t = "2"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+node {
+  id:i = 36
+  x:r = 1807.6657771000284
+  y:r = 936.632186481221
+  descName:t = "if A==B"
+  groupTypes {
+    group1:t = "int"
+    group2:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "int"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "int"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "A==B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "A!=B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group2"
+  }
+  pin {
+    name:t = "res"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group2"
+    data {
+      code:t = "(($A$ == $B$) ? ($A==B$) : ($A!=B$))"
+    }
+  }
+}
+node {
+  id:i = 37
+  x:r = 1098.858216803103
+  y:r = 92.29338315338089
+  templateUid:t = "32fdc2b6-2bbe-4dd7-8cdd-4bffaeeeeeb2"
+  descName:t = "comment"
+  property {
+    name:t = "comment string"
+    val:t = "Save Entity Pos, Up, Forward to Texture"
+  }
+  property {
+    name:t = "font size"
+    val:t = "50"
+  }
+}
+node {
+  id:i = 38
+  x:r = 2377.144447378085
+  y:r = 347.2958352064167
+  templateUid:t = "32fdc2b6-2bbe-4dd7-8cdd-4bffaeeeeeb2"
+  descName:t = "comment"
+  property {
+    name:t = "comment string"
+    val:t = "Save Entities Count to First Element"
+  }
+  property {
+    name:t = "font size"
+    val:t = "50"
+  }
+}
+edge {
+  id:i = 0
+  elemA:i = 5
+  pinA:i = 0
+  elemB:i = 12
+  pinB:i = 0
+}
+edge {
+  id:i = 1
+  elemA:i = 10
+  pinA:i = 4
+  elemB:i = 8
+  pinB:i = 2
+}
+edge {
+  id:i = 2
+  elemA:i = 10
+  pinA:i = 3
+  elemB:i = 27
+  pinB:i = 4
+}
+edge {
+  id:i = 3
+  elemA:i = 17
+  pinA:i = 0
+  elemB:i = 10
+  pinB:i = 1
+}
+edge {
+  id:i = 4
+  elemA:i = 8
+  pinA:i = 1
+  elemB:i = 7
+  pinB:i = 0
+}
+edge {
+  id:i = 5
+  elemA:i = 8
+  pinA:i = 4
+  elemB:i = 6
+  pinB:i = 0
+}
+edge {
+  id:i = 6
+  elemA:i = 1
+  pinA:i = 2
+  elemB:i = 23
+  pinB:i = 0
+}
+edge {
+  id:i = 7
+  elemA:i = 12
+  pinA:i = 3
+  elemB:i = 25
+  pinB:i = 2
+}
+edge {
+  id:i = 8
+  elemA:i = 13
+  pinA:i = 1
+  elemB:i = 8
+  pinB:i = 0
+}
+edge {
+  id:i = 9
+  elemA:i = 10
+  pinA:i = 0
+  elemB:i = 9
+  pinB:i = 0
+}
+edge {
+  id:i = 10
+  elemA:i = 8
+  pinA:i = 3
+  elemB:i = 15
+  pinB:i = 0
+}
+edge {
+  id:i = 12
+  elemA:i = 1
+  pinA:i = 1
+  elemB:i = 4
+  pinB:i = 3
+}
+edge {
+  id:i = 13
+  elemA:i = 12
+  pinA:i = 2
+  elemB:i = 25
+  pinB:i = 1
+}
+edge {
+  id:i = 14
+  elemA:i = 0
+  pinA:i = 3
+  elemB:i = 4
+  pinB:i = 2
+}
+edge {
+  id:i = 15
+  elemA:i = 0
+  pinA:i = 2
+  elemB:i = 4
+  pinB:i = 1
+}
+edge {
+  id:i = 16
+  elemA:i = 2
+  pinA:i = 1
+  elemB:i = 23
+  pinB:i = 2
+}
+edge {
+  id:i = 17
+  elemA:i = 2
+  pinA:i = 2
+  elemB:i = 23
+  pinB:i = 3
+}
+edge {
+  id:i = 18
+  elemA:i = 2
+  pinA:i = 3
+  elemB:i = 24
+  pinB:i = 0
+}
+edge {
+  id:i = 19
+  elemA:i = 1
+  pinA:i = 3
+  elemB:i = 23
+  pinB:i = 1
+}
+edge {
+  id:i = 20
+  elemA:i = 12
+  pinA:i = 1
+  elemB:i = 25
+  pinB:i = 0
+}
+edge {
+  id:i = 21
+  elemA:i = 11
+  pinA:i = 1
+  elemB:i = 13
+  pinB:i = 1
+}
+edge {
+  id:i = 22
+  elemA:i = 0
+  pinA:i = 1
+  elemB:i = 4
+  pinB:i = 0
+}
+edge {
+  id:i = 23
+  elemA:i = 11
+  pinA:i = 0
+  elemB:i = 13
+  pinB:i = 1
+}
+edge {
+  id:i = 24
+  elemA:i = 11
+  pinA:i = 4
+  elemB:i = 10
+  pinB:i = 2
+}
+edge {
+  id:i = 25
+  elemA:i = 11
+  pinA:i = 2
+  elemB:i = 13
+  pinB:i = 1
+}
+edge {
+  id:i = 26
+  elemA:i = 13
+  pinA:i = 1
+  elemB:i = 11
+  pinB:i = 3
+}
+edge {
+  id:i = 32
+  elemA:i = 26
+  pinA:i = 0
+  elemB:i = 25
+  pinB:i = 3
+}
+edge {
+  id:i = 33
+  elemA:i = 3
+  pinA:i = 0
+  elemB:i = 29
+  pinB:i = 0
+}
+edge {
+  id:i = 34
+  elemA:i = 29
+  pinA:i = 1
+  elemB:i = 28
+  pinB:i = 0
+}
+edge {
+  id:i = 35
+  elemA:i = 4
+  pinA:i = 4
+  elemB:i = 27
+  pinB:i = 2
+}
+edge {
+  id:i = 36
+  elemA:i = 29
+  pinA:i = 2
+  elemB:i = 27
+  pinB:i = 0
+}
+edge {
+  id:i = 37
+  elemA:i = 30
+  pinA:i = 0
+  elemB:i = 27
+  pinB:i = 1
+}
+edge {
+  id:i = 38
+  elemA:i = 31
+  pinA:i = 0
+  elemB:i = 34
+  pinB:i = 1
+}
+edge {
+  id:i = 39
+  elemA:i = 29
+  pinA:i = 2
+  elemB:i = 34
+  pinB:i = 0
+}
+edge {
+  id:i = 40
+  elemA:i = 35
+  pinA:i = 0
+  elemB:i = 36
+  pinB:i = 1
+}
+edge {
+  id:i = 41
+  elemA:i = 23
+  pinA:i = 4
+  elemB:i = 34
+  pinB:i = 2
+}
+edge {
+  id:i = 42
+  elemA:i = 29
+  pinA:i = 2
+  elemB:i = 36
+  pinB:i = 0
+}
+edge {
+  id:i = 43
+  elemA:i = 25
+  pinA:i = 4
+  elemB:i = 36
+  pinB:i = 3
+}
+edge {
+  id:i = 44
+  elemA:i = 24
+  pinA:i = 4
+  elemB:i = 36
+  pinB:i = 2
+}
+edge {
+  id:i = 45
+  elemA:i = 36
+  pinA:i = 4
+  elemB:i = 34
+  pinB:i = 3
+}
+edge {
+  id:i = 46
+  elemA:i = 34
+  pinA:i = 4
+  elemB:i = 27
+  pinB:i = 3
+}
+
+description {
+  name:t = "[[description-name]]"
+  category:t = "[[description-category]]"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  allowLoop:b = no
+  width:i = 200
+  pin {
+    name:t = "pos"
+    types:t = "float4"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 561
+    subgraphElem:i = 0
+    subgraphPin:i = 0
+    data {
+      blk_code:t = "%pos.x%, %pos.y%, %pos.z%, %pos.w%"
+      code:t = "float4(%pos.x%, %pos.y%, %pos.z%, %pos.w%)"
+    }
+  }
+  pin {
+    name:t = "raw entities"
+    types:t = "texture2D"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 655
+    subgraphElem:i = 6
+    subgraphPin:i = 1
+  }
+  pin {
+    name:t = "up"
+    types:t = "float4"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 714
+    subgraphElem:i = 1
+    subgraphPin:i = 0
+    data {
+      blk_code:t = "%up.x%, %up.y%, %up.z%, %up.w%"
+      code:t = "float4(%up.x%, %up.y%, %up.z%, %up.w%)"
+    }
+  }
+  pin {
+    name:t = "forward"
+    types:t = "float4"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 874
+    subgraphElem:i = 2
+    subgraphPin:i = 0
+    data {
+      blk_code:t = "%forward.x%, %forward.y%, %forward.z%, %forward.w%"
+      code:t = "float4(%forward.x%, %forward.y%, %forward.z%, %forward.w%)"
+    }
+  }
+  pin {
+    name:t = "place type"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 962
+    subgraphElem:i = 24
+    subgraphPin:i = 1
+    data {
+      blk_code:t = "%place type%"
+      code:t = "%place type%"
+    }
+  }
+  pin {
+    name:t = "entity name index"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 962
+    subgraphElem:i = 24
+    subgraphPin:i = 2
+    data {
+      blk_code:t = "%entity name index%"
+      code:t = "%entity name index%"
+    }
+  }
+  pin {
+    name:t = "entity seed"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 962
+    subgraphElem:i = 24
+    subgraphPin:i = 3
+    data {
+      blk_code:t = "%entity seed%"
+      code:t = "%entity seed%"
+    }
+  }
+  pin {
+    name:t = "scale"
+    types:t = "float3"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 1116
+    subgraphPin {
+      elem:i = 12
+      pin:i = 0
+    }
+    data {
+      blk_code:t = "%scale.x%, %scale.y%, %scale.z%"
+      code:t = "float3(%scale.x%, %scale.y%, %scale.z%)"
+    }
+  }
+  pin {
+    name:t = "entities count"
+    types:t = "int,float,float2,float3,float4"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 1397
+    subgraphElem:i = 13
+    subgraphPin:i = 0
+    data {
+      blk_code:t = "%entities count%"
+      code:t = "%entities count%"
+    }
+  }
+  property {
+    name:t = "pos.x"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "pos.y"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "pos.z"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "pos.w"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "up.x"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "up.y"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "up.z"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "up.w"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "forward.x"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "forward.y"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "forward.z"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "forward.w"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "place type"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "entity name index"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "entity seed"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "scale.x"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "scale.y"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "scale.z"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "entities count"
+    minVal:i = -65535
+    maxVal:i = 65535
+    step:i = 1
+    val:i = 0
+  }
+}

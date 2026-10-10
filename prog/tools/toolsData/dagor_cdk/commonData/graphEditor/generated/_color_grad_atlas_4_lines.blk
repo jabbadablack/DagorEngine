@@ -1,0 +1,111 @@
+
+color_grad_atlas_4_lines {
+  params {
+  }
+  inputs:i=4
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+    Texture2D sampler1_t:register(t1);
+    SamplerState sampler1:register(s1);
+    Texture2D sampler2_t:register(t2);
+    SamplerState sampler2:register(s2);
+    Texture2D sampler3_t:register(t3);
+    SamplerState sampler3:register(s3);
+  """
+  shaderCode:t="""
+  InputStruct_color_grad_atlas_4_lines _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+  _in.sampler1_t = sampler1_t;
+  _in.sampler1_wrap = wrap_t1;
+  _in.sampler1 = sampler1;
+  _in.sampler2_t = sampler2_t;
+  _in.sampler2_wrap = wrap_t2;
+  _in.sampler2 = sampler2;
+  _in.sampler3_t = sampler3_t;
+  _in.sampler3_wrap = wrap_t3;
+  _in.sampler3 = sampler3;
+
+
+  OutputStruct_color_grad_atlas_4_lines _out;
+  _out._x_46557 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_color_grad_atlas_4_lines(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+
+  void _function_color_grad_atlas_4_lines(InputStruct_color_grad_atlas_4_lines _in, out OutputStruct_color_grad_atlas_4_lines _out) {
+
+  float2 _v_0_0 = _in.tc;
+  float _v_1_0 = 4.0;
+  float _v_2_0 = 1.0;
+  _out._x_46557 = float4(_v_0_0, 0.0, 0.0).x;
+  float _v_7_2 = float4(_v_0_0, 0.0, 0.0).y;
+  _out._z_46559 = float4(_v_0_0, 0.0, 0.0).z;
+  _out._w_46546 = float4(_v_0_0, 0.0, 0.0).w;
+  float _v_9_0 = 0.5;
+  float4 _v_10_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float4 _v_11_1 = linear_sample(_in.sampler1_t, _in.tc, _in.sampler1_wrap);
+  float _v_12_0 = 2.0;
+  float _v_13_0 = 3.0;
+  float4 _v_18_1 = linear_sample(_in.sampler2_t, _in.tc, _in.sampler2_wrap);
+  float4 _v_19_1 = linear_sample(_in.sampler3_t, _in.tc, _in.sampler3_wrap);
+  float _v_4_2 = (_v_7_2 * _v_1_0);
+  float _v_3_2 = (_v_4_2 - _v_9_0);
+  float _v_8_2 = (_v_3_2 - _v_2_0);
+  float _v_17_2 = (_v_3_2 - _v_12_0);
+  float _v_22_2 = (_v_3_2 - _v_13_0);
+  float _v_6_1 = abs(_v_8_2);
+  float _v_16_1 = abs(_v_17_2);
+  float _v_21_1 = abs(_v_22_2);
+  float4 _v_5_4 = ((_v_9_0 >= _v_6_1) ? (_v_11_1) : (_v_10_1));
+  float4 _v_15_4 = ((_v_9_0 >= _v_16_1) ? (_v_18_1) : (_v_5_4));
+  float4 _v_20_4 = ((_v_9_0 >= _v_21_1) ? (_v_19_1) : (_v_15_4));
+  _out.col0 = _v_20_4;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_color_grad_atlas_4_lines {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+  Texture2D sampler1_t;
+  bool sampler1_wrap;
+  SamplerState sampler1;
+  Texture2D sampler2_t;
+  bool sampler2_wrap;
+  SamplerState sampler2;
+  Texture2D sampler3_t;
+  bool sampler3_wrap;
+  SamplerState sampler3;
+};
+struct OutputStruct_color_grad_atlas_4_lines {
+  float _x_46557;
+  float _z_46559;
+  float _w_46546;
+  float4 col0;
+};
+"""
+  }
+}

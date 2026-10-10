@@ -1,0 +1,80 @@
+
+flowmap_from_normals {
+  params {
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_flowmap_from_normals _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_flowmap_from_normals _out;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_flowmap_from_normals(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+
+  void _function_flowmap_from_normals(InputStruct_flowmap_from_normals _in, out OutputStruct_flowmap_from_normals _out) {
+
+  float4 _v_0_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float _v_4_0 = 0.5;
+  float _v_11_0 = 0.000001;
+  float _v_13_0 = 2.0;
+  float _v_14_0 = 1.0;
+  float _v_17_0 = 0.5;
+  float4 _v_3_2 = (_v_0_1 * float4(_v_13_0, _v_13_0, _v_13_0, _v_13_0));
+  float4 _v_5_2 = (_v_3_2 - float4(_v_14_0, _v_14_0, _v_14_0, _v_14_0));
+  float _v_1_1 = _v_5_2.x;
+  float _v_1_2 = _v_5_2.y;
+  _out._z_46559 = _v_5_2.z;
+  _out._w_46546 = _v_5_2.w;
+  float _v_2_2 = (_v_1_2 * _v_1_2);
+  float _v_12_2 = (_v_1_1 * _v_1_1);
+  float _v_6_2 = (_v_12_2 + _v_2_2);
+  float _v_7_2 = pow(_v_6_2, _v_4_0);
+  float _v_10_2 = max(_v_7_2, _v_11_0);
+  float4 _v_9_2 = (_v_5_2 / float4(_v_10_2, _v_10_2, _v_10_2, _v_10_2));
+  float4 _v_15_2 = (_v_9_2 * float4(_v_17_0, _v_17_0, _v_17_0, _v_17_0));
+  float4 _v_16_2 = (_v_15_2 + float4(_v_17_0, _v_17_0, _v_17_0, _v_17_0));
+  _out.col0 = _v_16_2;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_flowmap_from_normals {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_flowmap_from_normals {
+  float _z_46559;
+  float _w_46546;
+  float4 col0;
+};
+"""
+  }
+}

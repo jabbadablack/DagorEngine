@@ -1,0 +1,359 @@
+templateUid:t = "8c53a71f-ec93-4f99-b63e-322886ca96f0"
+hint:t = "/*--------------------*/"
+
+node {
+  id:i = 0
+  x:r = 289.68833849329206
+  y:r = 312.80082559339525
+  templateUid:t = "9e8dd5c1-c04e-4415-bf7a-a65286a39974"
+  descName:t = "get_raw_entity"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  pinComment {
+    pinIndex:i = 3
+    text:t = "#"
+  }
+  pinComment {
+    pinIndex:i = 4
+    text:t = "#"
+  }
+  pinComment {
+    pinIndex:i = 5
+    text:t = "#"
+  }
+  pinComment {
+    pinIndex:i = 6
+    text:t = "#"
+  }
+  pinComment {
+    pinIndex:i = 7
+    text:t = "#"
+  }
+  pinComment {
+    pinIndex:i = 9
+    text:t = "#"
+  }
+  pin {
+    name:t = "exists"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "(($A$ > $B$) ? ($A>B$) : ($A<=B$))"
+    }
+  }
+  pin {
+    name:t = "raw entity index"
+    role:t = "in"
+    types:t = "int"
+    data {
+      blk_code:t = "%raw entity index%"
+      code:t = "%raw entity index%"
+    }
+  }
+  pin {
+    name:t = "pos"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "float4($x$, $y$, $z$, $w$)"
+    }
+  }
+  pin {
+    name:t = "up"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "float4($x$, $y$, $z$, $w$)"
+    }
+  }
+  pin {
+    name:t = "forward"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "float4($x$, $y$, $z$, $w$)"
+    }
+  }
+  pin {
+    name:t = "place type"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "entity name index"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "entity seed"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+  pin {
+    name:t = "raw entities"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler0"
+  }
+  pin {
+    name:t = "scale"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "float4($x$, $y$, $z$, $w$)"
+    }
+  }
+  property {
+    name:t = "raw entity index"
+    val:t = "1"
+  }
+}
+node {
+  id:i = 2
+  x:r = -19.942208462332303
+  y:r = 312.8008255933953
+  descName:t = "integer pixel index"
+  pin {
+    name:t = "pixel index"
+    role:t = "out"
+    types:t = "int"
+    data {
+      code:t = "int(_in.tc.x / ddx_fine(_in.tc.x) + 0.125) + int(_in.tc.y / ddy_fine(_in.tc.y) + 0.125) * int(1.0 / ddx_fine(_in.tc.x) + 0.125)"
+    }
+  }
+}
+node {
+  id:i = 5
+  x:r = 728.9081527347781
+  y:r = 315.5789473684209
+  descName:t = "out particle"
+  pin {
+    name:t = "append"
+    role:t = "in"
+    types:t = "float"
+    data {
+      def_val:t = "1.0"
+      def_val_blk:t = "1.0"
+      code:t = """
+{
+    ParticleInstance tmp_particle
+"""
+    }
+  }
+  pin {
+    name:t = "pos"
+    role:t = "in"
+    types:t = "float2"
+    data {
+      def_val:t = "float2(0.5, 0.5)"
+      def_val_blk:t = "0.5, 0.5"
+      code:t = "  tmp_particle.pos = $pos$"
+    }
+  }
+  pin {
+    name:t = "scale"
+    role:t = "in"
+    types:t = "float2"
+    customPinInput:t = "_scale_20861"
+    data {
+      def_val:t = "float2(1.0, 1.0)"
+      def_val_blk:t = "1.0, 1.0"
+      code:t = "  tmp_particle.scale = $scale$"
+    }
+  }
+  pin {
+    name:t = "angle"
+    role:t = "in"
+    types:t = "float"
+    customPinInput:t = "_angle_11396"
+    data {
+      def_val:t = "0.0"
+      def_val_blk:t = "0.0"
+      code:t = "  tmp_particle.angle = $angle$"
+    }
+  }
+  pin {
+    name:t = "brightness"
+    role:t = "in"
+    types:t = "float"
+    customPinInput:t = "_brightness_50764"
+    data {
+      def_val:t = "1.0"
+      def_val_blk:t = "1.0"
+      code:t = "  tmp_particle.brightness = $brightness$"
+    }
+  }
+  pin {
+    name:t = "depth"
+    role:t = "in"
+    types:t = "float"
+    customPinInput:t = "_depth_31976"
+    data {
+      def_val:t = "0.5"
+      def_val_blk:t = "0.5"
+      code:t = """
+  tmp_particle.depth = $depth$;
+    [branch]
+    if ($append$ > 0.0) { uint instIdx; InterlockedAdd(instancesCounter[1], 1, instIdx);instances[instIdx] = tmp_particle; wrap_particle(tmp_particle); }
+  }
+"""
+    }
+  }
+  pin {
+    name:t = "out"
+    role:t = "out"
+    types:t = "particles"
+  }
+}
+edge {
+  id:i = 0
+  elemA:i = 0
+  pinA:i = 0
+  elemB:i = 5
+  pinB:i = 0
+}
+edge {
+  id:i = 3
+  elemA:i = 2
+  pinA:i = 0
+  elemB:i = 0
+  pinB:i = 1
+}
+edge {
+  id:i = 5
+  elemA:i = 0
+  pinA:i = 2
+  elemB:i = 5
+  pinB:i = 1
+}
+
+description {
+  name:t = "[[description-name]]"
+  category:t = "[[description-category]]"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  allowLoop:b = no
+  width:i = 200
+  pin {
+    name:t = "raw entities"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 312
+    subgraphElem:i = 0
+    subgraphPin:i = 8
+  }
+  pin {
+    name:t = "scale"
+    types:t = "float2"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 315
+    subgraphElem:i = 5
+    subgraphPin:i = 2
+    data {
+      def_val:t = "float2(1.0, 1.0)"
+      def_val_blk:t = "1.0, 1.0"
+      code:t = "float2(%scale.x%, %scale.y%)"
+      blk_code:t = "%scale.x%, %scale.y%"
+    }
+  }
+  pin {
+    name:t = "angle"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 315
+    subgraphElem:i = 5
+    subgraphPin:i = 3
+    data {
+      def_val:t = "0.0"
+      def_val_blk:t = "0.0"
+      code:t = "%angle%"
+      blk_code:t = "%angle%"
+    }
+  }
+  pin {
+    name:t = "brightness"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 315
+    subgraphElem:i = 5
+    subgraphPin:i = 4
+    data {
+      def_val:t = "1.0"
+      def_val_blk:t = "1.0"
+      code:t = "%brightness%"
+      blk_code:t = "%brightness%"
+    }
+  }
+  pin {
+    name:t = "depth"
+    types:t = "float"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 315
+    subgraphElem:i = 5
+    subgraphPin:i = 5
+    data {
+      def_val:t = "0.5"
+      def_val_blk:t = "0.5"
+      code:t = "%depth%"
+      blk_code:t = "%depth%"
+    }
+  }
+  pin {
+    name:t = "out"
+    types:t = "particles"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 315
+    subgraphElem:i = 5
+    subgraphPin:i = 6
+  }
+  property {
+    name:t = "scale.x"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "scale.y"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "angle"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.0
+  }
+  property {
+    name:t = "brightness"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 1.0
+  }
+  property {
+    name:t = "depth"
+    minVal:r = -1000000000.0
+    maxVal:r = 1000000000.0
+    step:r = 0.001
+    val:r = 0.5
+  }
+}

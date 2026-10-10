@@ -21,3 +21,6 @@
 active_matter/prog/gameBase/gamedata/dx12_cache.blk binary
 enlisted/prog/gameBase/gamedata/dx12_cache.blk binary
 skyquake/prog/gameBase/gamebase/gamedata/dx12_cache.blk binary
+
+# tools data copied into tools/ by dng.py build, byte for byte
+prog/tools/toolsData/** -text

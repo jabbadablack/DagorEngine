@@ -1,0 +1,75 @@
+
+stack_texture {
+  params {
+  }
+  inputs:i=2
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+    Texture2D sampler1_t:register(t1);
+    SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="""
+  InputStruct_stack_texture _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+  _in.sampler1_t = sampler1_t;
+  _in.sampler1_wrap = wrap_t1;
+  _in.sampler1 = sampler1;
+
+
+  OutputStruct_stack_texture _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_stack_texture(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+
+  void _function_stack_texture(InputStruct_stack_texture _in, out OutputStruct_stack_texture _out) {
+
+  float2 _v_2_0 = _in.tc;
+  float _v_3_1 = float4(_v_2_0, 0.0, 0.0).x;
+  float _v_3_2 = float4(_v_2_0, 0.0, 0.0).y;
+  float _v_3_3 = float4(_v_2_0, 0.0, 0.0).z;
+  float _v_3_4 = float4(_v_2_0, 0.0, 0.0).w;
+  float _v_5_1 = _v_3_2 * (2.0);
+  float _v_7_0 = 0.5;
+  float4 _v_4_4 = float4(_v_3_1, _v_5_1, _v_3_3, _v_3_4);
+  float4 _v_0_2 = linear_sample(_in.sampler0_t, _v_4_4.xy, _in.sampler0_wrap);
+  float4 _v_1_2 = linear_sample(_in.sampler1_t, _v_4_4.xy, _in.sampler1_wrap);
+  float4 _v_6_4 = ((_v_3_2 > _v_7_0) ? (_v_1_2) : (_v_0_2));
+  _out.col0 = _v_6_4;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_stack_texture {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+  Texture2D sampler1_t;
+  bool sampler1_wrap;
+  SamplerState sampler1;
+};
+struct OutputStruct_stack_texture {
+  float4 col0;
+};
+"""
+  }
+}

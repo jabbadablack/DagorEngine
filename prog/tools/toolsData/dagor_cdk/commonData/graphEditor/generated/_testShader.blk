@@ -1,0 +1,44 @@
+
+testShader {
+  params {
+  }
+  inputs:i=0
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+  """
+  shaderCode:t="""
+  InputStruct_testShader _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+
+
+  OutputStruct_testShader _out;
+
+  _function_testShader(_in, _out);
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  """
+    shader_function:t="""
+
+
+  void _function_testShader(InputStruct_testShader _in, out OutputStruct_testShader _out) {
+
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_testShader {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+};
+struct OutputStruct_testShader {
+};
+"""
+  }
+}

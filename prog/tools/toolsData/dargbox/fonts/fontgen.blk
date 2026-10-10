@@ -1,0 +1,74 @@
+﻿prefix:t="."
+hRes {
+  hRes:i=480
+  hRes:i=600
+  hRes:i=720
+  hRes:i=768
+  hRes:i=800
+  hRes:i=864
+  hRes:i=900
+  hRes:i=960
+  hRes:i=1024
+  hRes:i=1050
+  hRes:i=1080
+  hRes:i=1200
+  hRes:i=1440
+  hRes:i=1800
+  hRes:i=2160
+}
+
+forcePow2:b=true
+atlas:t="fonts"
+
+font{
+  name:t=lato-regular
+  file:t=lato-regular.ttf
+  size_percents:r=2.083
+  fallback_fonts {
+    //first would be first to read
+    font { file:t="NotoSans-Regular.ttf"; optional:b=yes;}
+    font { file:t="NotoSansCJKjp-Regular.otf"; optional:b=yes;}
+    font { file:t="NotoSansSymbols-Regular.ttf"; optional:b=yes;}
+    font { file:t="NotoSansSymbols2-Regular.ttf"; optional:b=yes;}
+  }
+
+  //fontFeatureSettings:t = "lnum"
+  //fontFeatureSettings:t = "tnum"
+
+  //forceAutoHinting:b=no
+}
+
+font{
+  name:t=firasans-medium
+  file:t=firasans-medium.ttf
+  size_percents:r=3.385416
+  fallback_fonts {
+    //first would be first to read
+    font { file:t="NotoSans-Regular.ttf"; optional:b=yes;}
+    font { file:t="NotoSansCJKjp-Regular.otf"; optional:b=yes;}
+    font { file:t="NotoSansSymbols-Regular.ttf"; optional:b=yes;}
+    font { file:t="NotoSansSymbols2-Regular.ttf"; optional:b=yes;}
+  }
+}
+
+font{
+  name:t=mono
+  file:t=jetbrains-mono-nl-regular.ttf
+  size_percents:r=1.2
+  optional:b=yes // .ttf may be absent at runtime; logwarn + skip instead of logerr
+}
+
+font{
+  name:t=fontawesome
+  file:t="fontawesome-webfont.ttf"
+  size_percents:r=3
+  forceAutoHinting:b=no
+  optional:b=yes
+
+  include_ex {
+    range:ip2=0xf000,0xf2e0 // fontawesone (Unicode Private Area)
+    includeCp:b=no
+    size_percents:r=3
+    forceAutoHinting:b=no
+  }
+}

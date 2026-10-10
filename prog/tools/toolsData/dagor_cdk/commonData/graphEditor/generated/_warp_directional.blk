@@ -1,0 +1,97 @@
+
+warp_directional {
+  params {
+    _warp_scale_61078:r = 0.2
+    _direction_29728:r = 1.0
+  }
+  inputs:i=2
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _warp_scale_61078;
+      float _direction_29728;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+    Texture2D sampler1_t:register(t1);
+    SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="""
+  InputStruct_warp_directional _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._warp_scale_61078 = _warp_scale_61078; // 0.2
+  _in._direction_29728 = _direction_29728; // 1.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+  _in.sampler1_t = sampler1_t;
+  _in.sampler1_wrap = wrap_t1;
+  _in.sampler1 = sampler1;
+
+
+  OutputStruct_warp_directional _out;
+  _out._y_46556 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_warp_directional(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+  void _function_warp_directional(InputStruct_warp_directional _in, out OutputStruct_warp_directional _out) {
+
+  float2 _v_2_0 = _in.tc;
+  float4 _v_6_2 = linear_sample(_in.sampler1_t, _v_2_0, _in.sampler1_wrap);
+  float _v_12_0 = 3.14159265;
+  float _v_13_1 = _v_12_0 * (2.0);
+  float _v_14_2 = (_in._direction_29728 * _v_13_1);
+  float _v_15_1 = sin(_v_14_2);
+  float _v_16_1 = cos(_v_14_2);
+  float _v_19_0 = 1.0;
+  float _v_5_1 = _v_6_2.x;
+  _out._y_46556 = _v_6_2.y;
+  _out._z_46559 = _v_6_2.z;
+  _out._w_46546 = _v_6_2.w;
+  float _v_7_2 = (_v_5_1 * _in._warp_scale_61078);
+  float _v_17_2 = (_v_7_2 * _v_16_1);
+  float _v_18_2 = (_v_7_2 * _v_15_1);
+  float4 _v_10_4 = float4(_v_17_2, _v_18_2, _v_19_0, _v_19_0);
+  float4 _v_4_2 = (float4(_v_2_0, 0.0, 0.0) + _v_10_4);
+  float4 _v_8_2 = linear_sample(_in.sampler0_t, _v_4_2.xy, _in.sampler0_wrap);
+  _out.col0 = _v_8_2;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_warp_directional {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _warp_scale_61078;
+  float _direction_29728;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+  Texture2D sampler1_t;
+  bool sampler1_wrap;
+  SamplerState sampler1;
+};
+struct OutputStruct_warp_directional {
+  float _y_46556;
+  float _z_46559;
+  float _w_46546;
+  float4 col0;
+};
+"""
+  }
+}

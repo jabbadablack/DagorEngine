@@ -1,0 +1,95 @@
+
+mask_from_index {
+  params {
+    _index_10363:r = 1.0
+    _index_step_40617:r = 8.0
+    _first_index_25697:r = 1.0
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _index_10363;
+      float _index_step_40617;
+      float _first_index_25697;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_mask_from_index _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._index_10363 = _index_10363; // 1.0
+  _in._index_step_40617 = _index_step_40617; // 8.0
+  _in._first_index_25697 = _first_index_25697; // 1.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_mask_from_index _out;
+  _out._res_35681 = 0.0;
+  _out._y_46556 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_mask_from_index(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+  void _function_mask_from_index(InputStruct_mask_from_index _in, out OutputStruct_mask_from_index _out) {
+
+  float _v_2_0 = 255.0;
+  float4 _v_7_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float _v_11_0 = 1.0;
+  float _v_12_0 = 512.0;
+  float _v_13_2 = (_v_11_0 / _v_12_0);
+  float _v_14_0 = 0.0;
+  float _v_15_0 = 1.0;
+  float _v_4_1 = _v_7_1.x;
+  _out._y_46556 = _v_7_1.y;
+  _out._z_46559 = _v_7_1.z;
+  _out._w_46546 = _v_7_1.w;
+  float _v_17_2 = (_in._index_10363 + _in._first_index_25697);
+  float _v_20_2 = (_v_17_2 * _in._index_step_40617);
+  float _v_1_2 = (_v_20_2 / _v_2_0);
+  _out._res_35681 = _v_17_2 * (8.0);
+  float _v_8_2 = (_v_1_2 - _v_4_1);
+  float _v_9_1 = abs(_v_8_2);
+  float _v_10_4 = ((_v_13_2 > _v_9_1) ? (_v_15_0) : (_v_14_0));
+  _out.col0 = float4(_v_10_4, _v_10_4, _v_10_4, _v_10_4);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_mask_from_index {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _index_10363;
+  float _index_step_40617;
+  float _first_index_25697;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_mask_from_index {
+  float _res_35681;
+  float _y_46556;
+  float _z_46559;
+  float _w_46546;
+  float4 col0;
+};
+"""
+  }
+}

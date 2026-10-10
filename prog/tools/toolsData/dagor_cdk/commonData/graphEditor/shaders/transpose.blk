@@ -1,0 +1,214 @@
+templateUid:t = "8db194d1-b92d-434a-88e4-02dca372ed56"
+
+node {
+  id:i = 0
+  x:r = 128.98113207547166
+  y:r = 493.24750277469474
+  descName:t = "uv"
+  pin {
+    name:t = "tc"
+    role:t = "out"
+    types:t = "float2"
+    data {
+      code:t = "_in.tc"
+    }
+  }
+}
+node {
+  id:i = 1
+  x:r = 323.3251942286348
+  y:r = 490.9744728079911
+  descName:t = "vec to float"
+  pin {
+    name:t = "vec"
+    role:t = "in"
+    types:t = "float4"
+  }
+  pin {
+    name:t = "x"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.x"
+    }
+  }
+  pin {
+    name:t = "y"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.y"
+    }
+  }
+  pin {
+    name:t = "z"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.z"
+    }
+  }
+  pin {
+    name:t = "w"
+    role:t = "out"
+    types:t = "float"
+    data {
+      code:t = "$vec$.w"
+    }
+  }
+}
+node {
+  id:i = 2
+  x:r = 465.3895671476138
+  y:r = 469.3806881243063
+  descName:t = "float to vec"
+  pin {
+    name:t = "x"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "y"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "z"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "w"
+    role:t = "in"
+    types:t = "float"
+  }
+  pin {
+    name:t = "vec"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "float4($x$, $y$, $z$, $w$)"
+    }
+  }
+}
+node {
+  id:i = 3
+  x:r = 642.6859045504995
+  y:r = 392.0976692563818
+  descName:t = "tex2D"
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler0"
+  }
+  pin {
+    name:t = "coord"
+    role:t = "in"
+    types:t = "float2"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, $coord$, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 4
+  x:r = 824.5283018867924
+  y:r = 390.96115427303
+  templateUid:t = "e9c40e8f-d682-4021-b803-6701341256af"
+  descName:t = "result"
+  pin {
+    name:t = "color"
+    role:t = "in"
+    types:t = "float4"
+    data {
+      def_val:t = "float4(0.5, 0.5, 0.5, 0.5)"
+      def_val_blk:t = "0.5, 0.5, 0.5, 0.5"
+      code:t = "_out.col0 = $color$"
+    }
+  }
+  pin {
+    name:t = "out"
+    role:t = "out"
+    types:t = "texture2D"
+  }
+}
+edge {
+  id:i = 0
+  elemA:i = 1
+  pinA:i = 1
+  elemB:i = 2
+  pinB:i = 1
+}
+edge {
+  id:i = 1
+  elemA:i = 2
+  pinA:i = 0
+  elemB:i = 1
+  pinB:i = 2
+}
+edge {
+  id:i = 2
+  elemA:i = 1
+  pinA:i = 3
+  elemB:i = 2
+  pinB:i = 2
+}
+edge {
+  id:i = 3
+  elemA:i = 1
+  pinA:i = 4
+  elemB:i = 2
+  pinB:i = 3
+}
+edge {
+  id:i = 4
+  elemA:i = 1
+  pinA:i = 0
+  elemB:i = 0
+  pinB:i = 0
+}
+edge {
+  id:i = 5
+  elemA:i = 3
+  pinA:i = 1
+  elemB:i = 2
+  pinB:i = 4
+}
+edge {
+  id:i = 6
+  elemA:i = 3
+  pinA:i = 2
+  elemB:i = 4
+  pinB:i = 0
+}
+
+description {
+  name:t = "[[description-name]]"
+  category:t = "[[description-category]]"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  allowLoop:b = no
+  width:i = 200
+  pin {
+    name:t = "texture"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    subgraphElem:i = 3
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "out"
+    types:t = "texture2D"
+    role:t = "out"
+    singleConnect:b = no
+    subgraphElem:i = 4
+    subgraphPin:i = 1
+  }
+}

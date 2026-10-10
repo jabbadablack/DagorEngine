@@ -1,0 +1,68 @@
+
+checker {
+  params {
+    _cells_56752:r = 16.0
+  }
+  inputs:i=0
+  shaderPreMain:t="""
+    cbuffer global {
+      float _cells_56752;
+    };
+  """
+  shaderCode:t="""
+  InputStruct_checker _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._cells_56752 = _cells_56752; // 16.0
+
+
+  OutputStruct_checker _out;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_checker(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  """
+    shader_function:t="""
+
+  void _function_checker(InputStruct_checker _in, out OutputStruct_checker _out) {
+
+  float2 _v_0_0 = _in.tc;
+  float2 _v_4_2 = (_v_0_0 * float2(_in._cells_56752, _in._cells_56752));
+  float _v_6_0 = 0.0;
+  float _v_8_0 = 0.5;
+  float _v_10_0 = 1.0;
+  float2 _v_2_1 = frac(_v_4_2);
+  float2 _v_7_2 = (_v_2_1 - float2(_v_8_0, _v_8_0));
+  float _v_1_1 = float4(_v_7_2, 0.0, 0.0).x;
+  float _v_1_2 = float4(_v_7_2, 0.0, 0.0).y;
+  _out._z_46559 = float4(_v_7_2, 0.0, 0.0).z;
+  _out._w_46546 = float4(_v_7_2, 0.0, 0.0).w;
+  float _v_9_2 = (_v_1_1 * _v_1_2);
+  float _v_5_4 = ((_v_9_2 > _v_6_0) ? (_v_6_0) : (_v_10_0));
+  _out.col0 = float4(_v_5_4, _v_5_4, _v_5_4, _v_5_4);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_checker {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _cells_56752;
+};
+struct OutputStruct_checker {
+  float _z_46559;
+  float _w_46546;
+  float4 col0;
+};
+"""
+  }
+}

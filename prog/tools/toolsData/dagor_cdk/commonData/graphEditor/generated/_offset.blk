@@ -1,0 +1,64 @@
+
+offset {
+  params {
+    _offset_15432:p2 = 0.0, 0.0
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float2 _offset_15432;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_offset _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._offset_15432 = _offset_15432; // float2(0.0, 0.0)
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_offset _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_offset(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+  void _function_offset(InputStruct_offset _in, out OutputStruct_offset _out) {
+
+  float2 _v_1_0 = _in.tc;
+  float2 _v_2_2 = (_v_1_0 + _in._offset_15432);
+  float4 _v_0_2 = linear_sample(_in.sampler0_t, _v_2_2, _in.sampler0_wrap);
+  _out.col0 = _v_0_2;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_offset {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float2 _offset_15432;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_offset {
+  float4 col0;
+};
+"""
+  }
+}

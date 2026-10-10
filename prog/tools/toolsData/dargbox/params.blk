@@ -1,0 +1,4 @@
+oculusGui {
+  depth:r = 5
+  uiVFovScale:r = 0.6
+}

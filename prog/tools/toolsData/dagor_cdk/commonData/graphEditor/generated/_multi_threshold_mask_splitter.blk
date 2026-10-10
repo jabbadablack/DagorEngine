@@ -1,0 +1,158 @@
+
+multi_threshold_mask_splitter {
+  params {
+    _warp_gradient_mul_59459:r = 0.5
+    _warp_filter_size_45972:r = 0.01
+    _splitter_threshold_1_49842:r = 0.4
+    _splitter_threshold_2_49841:r = 0.6
+  }
+  inputs:i=3
+  outputs:i=3
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _warp_gradient_mul_59459;
+      float _warp_filter_size_45972;
+      float _splitter_threshold_1_49842;
+      float _splitter_threshold_2_49841;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+    Texture2D sampler1_t:register(t1);
+    SamplerState sampler1:register(s1);
+    Texture2D sampler2_t:register(t2);
+    SamplerState sampler2:register(s2);
+  """
+  shaderCode:t="""
+  InputStruct_multi_threshold_mask_splitter _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._warp_gradient_mul_59459 = _warp_gradient_mul_59459; // 0.5
+  _in._warp_filter_size_45972 = _warp_filter_size_45972; // 0.01
+  _in._splitter_threshold_1_49842 = _splitter_threshold_1_49842; // 0.4
+  _in._splitter_threshold_2_49841 = _splitter_threshold_2_49841; // 0.6
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+  _in.sampler1_t = sampler1_t;
+  _in.sampler1_wrap = wrap_t1;
+  _in.sampler1 = sampler1;
+  _in.sampler2_t = sampler2_t;
+  _in.sampler2_wrap = wrap_t2;
+  _in.sampler2 = sampler2;
+
+
+  OutputStruct_multi_threshold_mask_splitter _out;
+  _out._y_46556 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out._y_46556_40 = 0.0;
+  _out._z_46559_40 = 0.0;
+  _out._w_46546_40 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+  _out.col1 = float4(0.0, 0.0, 0.0, 0.0);
+  _out.col2 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_multi_threshold_mask_splitter(_in, _out);
+  result.col0 = _out.col0;
+  result.col1 = _out.col1;
+  result.col2 = _out.col2;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  #define MRTOutput_DEFINED
+  struct MRTOutput { float4 col0:SV_Target0; float4 col1:SV_Target1; float4 col2:SV_Target2;};
+  """
+    shader_function:t="""
+
+
+  void _function_multi_threshold_mask_splitter(InputStruct_multi_threshold_mask_splitter _in, out OutputStruct_multi_threshold_mask_splitter _out) {
+
+  float _v_7_0 = 1.0;
+  float _v_8_0 = 0.0;
+  float _v_10_0 = 0.0;
+  float4 _v_18_1 = linear_sample(_in.sampler2_t, _in.tc, _in.sampler2_wrap);
+  float2 _v_25_0 = _in.tc;
+  float _v_29_0 = 0.0;
+  float _v_38_0 = 2.0;
+  float _v_41_0 = 0.0;
+  float _v_47_0 = -1.0;
+  float _v_17_1 = _v_18_1.x;
+  float _v_37_2 = (_in._warp_filter_size_45972 / _v_38_0);
+  float _v_46_2 = (_in._warp_gradient_mul_59459 * _v_47_0);
+  float _v_0_4 = ((_v_17_1 >= _in._splitter_threshold_2_49841) ? (_v_7_0) : (_v_8_0));
+  float _v_5_4 = ((_v_17_1 >= _in._splitter_threshold_1_49842) ? (_v_7_0) : (_v_8_0));
+  float4 _v_28_4 = float4(_v_37_2, _v_29_0, _v_29_0, _v_29_0);
+  float4 _v_30_4 = float4(_v_29_0, _v_37_2, _v_29_0, _v_29_0);
+  float4 _v_32_2 = (float4(_v_25_0, 0.0, 0.0) + _v_28_4);
+  float4 _v_33_2 = (float4(_v_25_0, 0.0, 0.0) + _v_30_4);
+  float4 _v_34_2 = linear_sample(_in.sampler1_t, _v_33_2.xy, _in.sampler1_wrap);
+  float4 _v_48_2 = (float4(_v_25_0, 0.0, 0.0) - _v_28_4);
+  float4 _v_49_2 = (float4(_v_25_0, 0.0, 0.0) - _v_30_4);
+  float4 _v_50_2 = linear_sample(_in.sampler1_t, _v_49_2.xy, _in.sampler1_wrap);
+  float _v_52_1 = 1.0 - _v_5_4;
+  float4 _v_27_2 = linear_sample(_in.sampler1_t, _v_48_2.xy, _in.sampler1_wrap);
+  float4 _v_31_2 = linear_sample(_in.sampler1_t, _v_32_2.xy, _in.sampler1_wrap);
+  float4 _v_35_2 = (_v_27_2 - _v_31_2);
+  float4 _v_36_2 = (_v_50_2 - _v_34_2);
+  float _v_39_1 = _v_35_2.x;
+  _out._y_46556 = _v_35_2.y;
+  _out._z_46559 = _v_35_2.z;
+  _out._w_46546 = _v_35_2.w;
+  float _v_40_1 = _v_36_2.x;
+  _out._y_46556_40 = _v_36_2.y;
+  _out._z_46559_40 = _v_36_2.z;
+  _out._w_46546_40 = _v_36_2.w;
+  float4 _v_42_4 = float4(_v_39_1, _v_40_1, _v_41_0, _v_41_0);
+  float4 _v_43_3 = (_v_42_4 * float4(_v_46_2, _v_46_2, _v_46_2, _v_46_2) + float4(_v_25_0, 0.0, 0.0));
+  float4 _v_45_2 = linear_sample(_in.sampler0_t, _v_43_3.xy, _in.sampler0_wrap);
+  float _v_1_1 = _v_45_2.x;
+  float _v_24_2 = (_v_1_1 * _v_5_4);
+  float _v_51_2 = (_v_1_1 * _v_52_1);
+  float _v_53_2 = (_v_1_1 * _v_0_4);
+  float4 _v_2_4 = float4(_v_24_2, _v_10_0, _v_10_0, _v_10_0);
+  _out.col0 = _v_2_4;
+  float4 _v_19_4 = float4(_v_51_2, _v_10_0, _v_10_0, _v_10_0);
+  float4 _v_20_4 = float4(_v_53_2, _v_10_0, _v_10_0, _v_10_0);
+  _out.col1 = _v_19_4;
+  _out.col2 = _v_20_4;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_multi_threshold_mask_splitter {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _warp_gradient_mul_59459;
+  float _warp_filter_size_45972;
+  float _splitter_threshold_1_49842;
+  float _splitter_threshold_2_49841;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+  Texture2D sampler1_t;
+  bool sampler1_wrap;
+  SamplerState sampler1;
+  Texture2D sampler2_t;
+  bool sampler2_wrap;
+  SamplerState sampler2;
+};
+struct OutputStruct_multi_threshold_mask_splitter {
+  float _y_46556;
+  float _z_46559;
+  float _w_46546;
+  float _y_46556_40;
+  float _z_46559_40;
+  float _w_46546_40;
+  float4 col0;
+  float4 col1;
+  float4 col2;
+};
+"""
+  }
+}

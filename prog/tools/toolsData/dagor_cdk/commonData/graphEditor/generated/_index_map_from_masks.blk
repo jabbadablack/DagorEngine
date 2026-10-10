@@ -1,0 +1,529 @@
+
+index_map_from_masks {
+  params {
+    _layer_delta_15713:r = 0.01
+    _index_step_39126:r = 1.0
+    _layer_0_index_58024:i = 0
+    _layer_1_index_59241:i = 1
+    _layer_2_index_22954:i = 2
+    _layer_3_index_24171:i = 3
+    _layer_4_index_53932:i = 4
+    _layer_5_index_55149:i = 5
+    _layer_6_index_18862:i = 6
+    _layer_7_index_20079:i = 7
+    _layer_8_index_50336:i = 8
+    _layer_9_index_51553:i = 9
+    _layer_10_index_42841:i = 10
+    _layer_11_index_54296:i = 11
+    _layer_12_index_41051:i = 12
+    _layer_13_index_60442:i = 13
+    _layer_14_index_38749:i = 14
+    _layer_15_index_50204:i = 15
+  }
+  inputs:i=16
+  outputs:i=2
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _layer_delta_15713;
+      float _index_step_39126;
+      int _layer_0_index_58024;
+      int _layer_1_index_59241;
+      int _layer_2_index_22954;
+      int _layer_3_index_24171;
+      int _layer_4_index_53932;
+      int _layer_5_index_55149;
+      int _layer_6_index_18862;
+      int _layer_7_index_20079;
+      int _layer_8_index_50336;
+      int _layer_9_index_51553;
+      int _layer_10_index_42841;
+      int _layer_11_index_54296;
+      int _layer_12_index_41051;
+      int _layer_13_index_60442;
+      int _layer_14_index_38749;
+      int _layer_15_index_50204;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+    Texture2D sampler1_t:register(t1);
+    SamplerState sampler1:register(s1);
+    Texture2D sampler2_t:register(t2);
+    SamplerState sampler2:register(s2);
+    Texture2D sampler3_t:register(t3);
+    SamplerState sampler3:register(s3);
+    Texture2D sampler4_t:register(t4);
+    SamplerState sampler4:register(s4);
+    Texture2D sampler5_t:register(t5);
+    SamplerState sampler5:register(s5);
+    Texture2D sampler6_t:register(t6);
+    SamplerState sampler6:register(s6);
+    Texture2D sampler7_t:register(t7);
+    SamplerState sampler7:register(s7);
+    Texture2D sampler8_t:register(t8);
+    SamplerState sampler8:register(s8);
+    Texture2D sampler9_t:register(t9);
+    SamplerState sampler9:register(s9);
+    Texture2D sampler10_t:register(t10);
+    SamplerState sampler10:register(s10);
+    Texture2D sampler11_t:register(t11);
+    SamplerState sampler11:register(s11);
+    Texture2D sampler12_t:register(t12);
+    SamplerState sampler12:register(s12);
+    Texture2D sampler13_t:register(t13);
+    SamplerState sampler13:register(s13);
+    Texture2D sampler14_t:register(t14);
+    SamplerState sampler14:register(s14);
+    Texture2D sampler15_t:register(t15);
+    SamplerState sampler15:register(s15);
+  """
+  shaderCode:t="""
+  InputStruct_index_map_from_masks _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._layer_delta_15713 = _layer_delta_15713; // 0.01
+  _in._index_step_39126 = _index_step_39126; // 1.0
+  _in._layer_0_index_58024 = _layer_0_index_58024; // 0
+  _in._layer_1_index_59241 = _layer_1_index_59241; // 1
+  _in._layer_2_index_22954 = _layer_2_index_22954; // 2
+  _in._layer_3_index_24171 = _layer_3_index_24171; // 3
+  _in._layer_4_index_53932 = _layer_4_index_53932; // 4
+  _in._layer_5_index_55149 = _layer_5_index_55149; // 5
+  _in._layer_6_index_18862 = _layer_6_index_18862; // 6
+  _in._layer_7_index_20079 = _layer_7_index_20079; // 7
+  _in._layer_8_index_50336 = _layer_8_index_50336; // 8
+  _in._layer_9_index_51553 = _layer_9_index_51553; // 9
+  _in._layer_10_index_42841 = _layer_10_index_42841; // 10
+  _in._layer_11_index_54296 = _layer_11_index_54296; // 11
+  _in._layer_12_index_41051 = _layer_12_index_41051; // 12
+  _in._layer_13_index_60442 = _layer_13_index_60442; // 13
+  _in._layer_14_index_38749 = _layer_14_index_38749; // 14
+  _in._layer_15_index_50204 = _layer_15_index_50204; // 15
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+  _in.sampler1_t = sampler1_t;
+  _in.sampler1_wrap = wrap_t1;
+  _in.sampler1 = sampler1;
+  _in.sampler2_t = sampler2_t;
+  _in.sampler2_wrap = wrap_t2;
+  _in.sampler2 = sampler2;
+  _in.sampler3_t = sampler3_t;
+  _in.sampler3_wrap = wrap_t3;
+  _in.sampler3 = sampler3;
+  _in.sampler4_t = sampler4_t;
+  _in.sampler4_wrap = wrap_t4;
+  _in.sampler4 = sampler4;
+  _in.sampler5_t = sampler5_t;
+  _in.sampler5_wrap = wrap_t5;
+  _in.sampler5 = sampler5;
+  _in.sampler6_t = sampler6_t;
+  _in.sampler6_wrap = wrap_t6;
+  _in.sampler6 = sampler6;
+  _in.sampler7_t = sampler7_t;
+  _in.sampler7_wrap = wrap_t7;
+  _in.sampler7 = sampler7;
+  _in.sampler8_t = sampler8_t;
+  _in.sampler8_wrap = wrap_t8;
+  _in.sampler8 = sampler8;
+  _in.sampler9_t = sampler9_t;
+  _in.sampler9_wrap = wrap_t9;
+  _in.sampler9 = sampler9;
+  _in.sampler10_t = sampler10_t;
+  _in.sampler10_wrap = wrap_t10;
+  _in.sampler10 = sampler10;
+  _in.sampler11_t = sampler11_t;
+  _in.sampler11_wrap = wrap_t11;
+  _in.sampler11 = sampler11;
+  _in.sampler12_t = sampler12_t;
+  _in.sampler12_wrap = wrap_t12;
+  _in.sampler12 = sampler12;
+  _in.sampler13_t = sampler13_t;
+  _in.sampler13_wrap = wrap_t13;
+  _in.sampler13 = sampler13;
+  _in.sampler14_t = sampler14_t;
+  _in.sampler14_wrap = wrap_t14;
+  _in.sampler14 = sampler14;
+  _in.sampler15_t = sampler15_t;
+  _in.sampler15_wrap = wrap_t15;
+  _in.sampler15 = sampler15;
+
+
+  OutputStruct_index_map_from_masks _out;
+  _out._y_46556 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out._y_46556_1 = 0.0;
+  _out._z_46559_1 = 0.0;
+  _out._w_46546_1 = 0.0;
+  _out._y_46556_9 = 0.0;
+  _out._z_46559_9 = 0.0;
+  _out._w_46546_9 = 0.0;
+  _out._y_46556_46 = 0.0;
+  _out._z_46559_46 = 0.0;
+  _out._w_46546_46 = 0.0;
+  _out._y_46556_21 = 0.0;
+  _out._z_46559_21 = 0.0;
+  _out._w_46546_21 = 0.0;
+  _out._y_46556_35 = 0.0;
+  _out._z_46559_35 = 0.0;
+  _out._w_46546_35 = 0.0;
+  _out._y_46556_47 = 0.0;
+  _out._z_46559_47 = 0.0;
+  _out._w_46546_47 = 0.0;
+  _out._y_46556_76 = 0.0;
+  _out._z_46559_76 = 0.0;
+  _out._w_46546_76 = 0.0;
+  _out._y_46556_60 = 0.0;
+  _out._z_46559_60 = 0.0;
+  _out._w_46546_60 = 0.0;
+  _out._y_46556_68 = 0.0;
+  _out._z_46559_68 = 0.0;
+  _out._w_46546_68 = 0.0;
+  _out._y_46556_84 = 0.0;
+  _out._z_46559_84 = 0.0;
+  _out._w_46546_84 = 0.0;
+  _out._y_46556_92 = 0.0;
+  _out._z_46559_92 = 0.0;
+  _out._w_46546_92 = 0.0;
+  _out._y_46556_100 = 0.0;
+  _out._z_46559_100 = 0.0;
+  _out._w_46546_100 = 0.0;
+  _out._y_46556_108 = 0.0;
+  _out._z_46559_108 = 0.0;
+  _out._w_46546_108 = 0.0;
+  _out._y_46556_116 = 0.0;
+  _out._z_46559_116 = 0.0;
+  _out._w_46546_116 = 0.0;
+  _out._y_46556_124 = 0.0;
+  _out._z_46559_124 = 0.0;
+  _out._w_46546_124 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+  _out.col1 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_index_map_from_masks(_in, _out);
+  result.col0 = _out.col0;
+  result.col1 = _out.col1;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  #define MRTOutput_DEFINED
+  struct MRTOutput { float4 col0:SV_Target0; float4 col1:SV_Target1;};
+  """
+    shader_function:t="""
+
+
+  void _function_index_map_from_masks(InputStruct_index_map_from_masks _in, out OutputStruct_index_map_from_masks _out) {
+
+  float4 _v_0_1 = linear_sample(_in.sampler1_t, _in.tc, _in.sampler1_wrap);
+  float _v_1_1 = _v_0_1.x;
+  _out._y_46556_1 = _v_0_1.y;
+  _out._z_46559_1 = _v_0_1.z;
+  _out._w_46546_1 = _v_0_1.w;
+  float4 _v_4_1 = linear_sample(_in.sampler4_t, _in.tc, _in.sampler4_wrap);
+  float _v_6_1 = saturate(_v_1_1);
+  float4 _v_8_1 = linear_sample(_in.sampler2_t, _in.tc, _in.sampler2_wrap);
+  float _v_9_1 = _v_8_1.x;
+  _out._y_46556_9 = _v_8_1.y;
+  _out._z_46559_9 = _v_8_1.z;
+  _out._w_46546_9 = _v_8_1.w;
+  float _v_14_1 = saturate(_v_9_1);
+  float4 _v_18_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float _v_19_1 = _v_18_1.x;
+  _out._y_46556 = _v_18_1.y;
+  _out._z_46559 = _v_18_1.z;
+  _out._w_46546 = _v_18_1.w;
+  float _v_21_1 = _v_4_1.x;
+  _out._y_46556_21 = _v_4_1.y;
+  _out._z_46559_21 = _v_4_1.z;
+  _out._w_46546_21 = _v_4_1.w;
+  float _v_25_0 = 255.0;
+  float _v_26_2 = (_in._index_step_39126 / _v_25_0);
+  float _v_31_1 = saturate(_v_21_1);
+  float4 _v_34_1 = linear_sample(_in.sampler5_t, _in.tc, _in.sampler5_wrap);
+  float _v_35_1 = _v_34_1.x;
+  _out._y_46556_35 = _v_34_1.y;
+  _out._z_46559_35 = _v_34_1.z;
+  _out._w_46546_35 = _v_34_1.w;
+  float _v_39_1 = saturate(_v_35_1);
+  float4 _v_43_1 = linear_sample(_in.sampler8_t, _in.tc, _in.sampler8_wrap);
+  float4 _v_44_1 = linear_sample(_in.sampler3_t, _in.tc, _in.sampler3_wrap);
+  float4 _v_45_1 = linear_sample(_in.sampler6_t, _in.tc, _in.sampler6_wrap);
+  float _v_46_1 = _v_44_1.x;
+  _out._y_46556_46 = _v_44_1.y;
+  _out._z_46559_46 = _v_44_1.z;
+  _out._w_46546_46 = _v_44_1.w;
+  float _v_47_1 = _v_45_1.x;
+  _out._y_46556_47 = _v_45_1.y;
+  _out._z_46559_47 = _v_45_1.z;
+  _out._w_46546_47 = _v_45_1.w;
+  float _v_51_1 = saturate(_v_46_1);
+  float _v_57_1 = saturate(_v_47_1);
+  float _v_60_1 = _v_43_1.x;
+  _out._y_46556_60 = _v_43_1.y;
+  _out._z_46559_60 = _v_43_1.z;
+  _out._w_46546_60 = _v_43_1.w;
+  float _v_64_1 = saturate(_v_60_1);
+  float4 _v_67_1 = linear_sample(_in.sampler9_t, _in.tc, _in.sampler9_wrap);
+  float _v_68_1 = _v_67_1.x;
+  _out._y_46556_68 = _v_67_1.y;
+  _out._z_46559_68 = _v_67_1.z;
+  _out._w_46546_68 = _v_67_1.w;
+  float _v_72_1 = saturate(_v_68_1);
+  float4 _v_75_1 = linear_sample(_in.sampler7_t, _in.tc, _in.sampler7_wrap);
+  float _v_76_1 = _v_75_1.x;
+  _out._y_46556_76 = _v_75_1.y;
+  _out._z_46559_76 = _v_75_1.z;
+  _out._w_46546_76 = _v_75_1.w;
+  float _v_80_1 = saturate(_v_76_1);
+  float4 _v_83_1 = linear_sample(_in.sampler10_t, _in.tc, _in.sampler10_wrap);
+  float _v_84_1 = _v_83_1.x;
+  _out._y_46556_84 = _v_83_1.y;
+  _out._z_46559_84 = _v_83_1.z;
+  _out._w_46546_84 = _v_83_1.w;
+  float _v_88_1 = saturate(_v_84_1);
+  float4 _v_91_1 = linear_sample(_in.sampler11_t, _in.tc, _in.sampler11_wrap);
+  float _v_92_1 = _v_91_1.x;
+  _out._y_46556_92 = _v_91_1.y;
+  _out._z_46559_92 = _v_91_1.z;
+  _out._w_46546_92 = _v_91_1.w;
+  float _v_96_1 = saturate(_v_92_1);
+  float4 _v_99_1 = linear_sample(_in.sampler12_t, _in.tc, _in.sampler12_wrap);
+  float _v_100_1 = _v_99_1.x;
+  _out._y_46556_100 = _v_99_1.y;
+  _out._z_46559_100 = _v_99_1.z;
+  _out._w_46546_100 = _v_99_1.w;
+  float _v_104_1 = saturate(_v_100_1);
+  float4 _v_107_1 = linear_sample(_in.sampler13_t, _in.tc, _in.sampler13_wrap);
+  float _v_108_1 = _v_107_1.x;
+  _out._y_46556_108 = _v_107_1.y;
+  _out._z_46559_108 = _v_107_1.z;
+  _out._w_46546_108 = _v_107_1.w;
+  float _v_112_1 = saturate(_v_108_1);
+  float4 _v_115_1 = linear_sample(_in.sampler14_t, _in.tc, _in.sampler14_wrap);
+  float _v_116_1 = _v_115_1.x;
+  _out._y_46556_116 = _v_115_1.y;
+  _out._z_46559_116 = _v_115_1.z;
+  _out._w_46546_116 = _v_115_1.w;
+  float _v_120_1 = saturate(_v_116_1);
+  float4 _v_123_1 = linear_sample(_in.sampler15_t, _in.tc, _in.sampler15_wrap);
+  float _v_124_1 = _v_123_1.x;
+  _out._y_46556_124 = _v_123_1.y;
+  _out._z_46559_124 = _v_123_1.z;
+  _out._w_46546_124 = _v_123_1.w;
+  float _v_127_0 = 0.5;
+  float _v_128_1 = saturate(_v_124_1);
+  float _v_129_0 = 1.0;
+  float _v_130_0 = 0.0;
+  float _v_147_2 = (_v_19_1 - _in._layer_delta_15713);
+  float _v_20_1 = saturate(_v_147_2);
+  float _v_28_2 = max(_v_20_1, _v_6_1);
+  float _v_131_2 = max(_v_20_1, _v_6_1);
+  float _v_132_2 = max(_v_131_2, _v_14_1);
+  float _v_133_2 = max(_v_132_2, _v_51_1);
+  float _v_134_2 = max(_v_133_2, _v_31_1);
+  float _v_135_2 = max(_v_134_2, _v_39_1);
+  float _v_136_2 = max(_v_135_2, _v_57_1);
+  float _v_137_2 = max(_v_136_2, _v_80_1);
+  float _v_138_2 = max(_v_137_2, _v_64_1);
+  float _v_139_2 = max(_v_138_2, _v_72_1);
+  float _v_140_2 = max(_v_139_2, _v_88_1);
+  float _v_141_2 = max(_v_140_2, _v_96_1);
+  float _v_142_2 = max(_v_141_2, _v_104_1);
+  float _v_143_2 = max(_v_142_2, _v_112_1);
+  float _v_144_2 = max(_v_143_2, _v_120_1);
+  float _v_145_2 = max(_v_144_2, _v_128_1);
+  int _v_5_4 = ((_v_20_1 >= _v_6_1) ? (_in._layer_0_index_58024) : (_in._layer_1_index_59241));
+  float _v_12_2 = (_v_28_2 - _in._layer_delta_15713);
+  float _v_16_1 = saturate(_v_12_2);
+  float _v_40_4 = ((_v_145_2 >= _v_127_0) ? (_v_129_0) : (_v_130_0));
+  _out.col1 = float4(_v_40_4, _v_40_4, _v_40_4, _v_40_4);
+  int _v_11_4 = ((_v_16_1 >= _v_14_1) ? (_v_5_4) : (_in._layer_2_index_22954));
+  float _v_13_2 = max(_v_16_1, _v_14_1);
+  float _v_15_2 = (_v_13_2 - _in._layer_delta_15713);
+  float _v_17_1 = saturate(_v_15_2);
+  int _v_49_4 = ((_v_17_1 >= _v_51_1) ? (_v_11_4) : (_in._layer_3_index_24171));
+  float _v_50_2 = max(_v_17_1, _v_51_1);
+  float _v_52_2 = (_v_50_2 - _in._layer_delta_15713);
+  float _v_53_1 = saturate(_v_52_2);
+  int _v_29_4 = ((_v_53_1 >= _v_31_1) ? (_v_49_4) : (_in._layer_4_index_53932));
+  float _v_30_2 = max(_v_53_1, _v_31_1);
+  float _v_32_2 = (_v_30_2 - _in._layer_delta_15713);
+  float _v_33_1 = saturate(_v_32_2);
+  int _v_37_4 = ((_v_33_1 >= _v_39_1) ? (_v_29_4) : (_in._layer_5_index_55149));
+  float _v_38_2 = max(_v_33_1, _v_39_1);
+  float _v_41_2 = (_v_38_2 - _in._layer_delta_15713);
+  float _v_42_1 = saturate(_v_41_2);
+  int _v_55_4 = ((_v_42_1 >= _v_57_1) ? (_v_37_4) : (_in._layer_6_index_18862));
+  float _v_56_2 = max(_v_42_1, _v_57_1);
+  float _v_58_2 = (_v_56_2 - _in._layer_delta_15713);
+  float _v_59_1 = saturate(_v_58_2);
+  int _v_78_4 = ((_v_59_1 >= _v_80_1) ? (_v_55_4) : (_in._layer_7_index_20079));
+  float _v_79_2 = max(_v_59_1, _v_80_1);
+  float _v_81_2 = (_v_79_2 - _in._layer_delta_15713);
+  float _v_82_1 = saturate(_v_81_2);
+  int _v_62_4 = ((_v_82_1 >= _v_64_1) ? (_v_78_4) : (_in._layer_8_index_50336));
+  float _v_63_2 = max(_v_82_1, _v_64_1);
+  float _v_65_2 = (_v_63_2 - _in._layer_delta_15713);
+  float _v_66_1 = saturate(_v_65_2);
+  int _v_70_4 = ((_v_66_1 >= _v_72_1) ? (_v_62_4) : (_in._layer_9_index_51553));
+  float _v_71_2 = max(_v_66_1, _v_72_1);
+  float _v_73_2 = (_v_71_2 - _in._layer_delta_15713);
+  float _v_74_1 = saturate(_v_73_2);
+  int _v_86_4 = ((_v_74_1 >= _v_88_1) ? (_v_70_4) : (_in._layer_10_index_42841));
+  float _v_87_2 = max(_v_74_1, _v_88_1);
+  float _v_89_2 = (_v_87_2 - _in._layer_delta_15713);
+  float _v_90_1 = saturate(_v_89_2);
+  int _v_94_4 = ((_v_90_1 >= _v_96_1) ? (_v_86_4) : (_in._layer_11_index_54296));
+  float _v_95_2 = max(_v_90_1, _v_96_1);
+  float _v_97_2 = (_v_95_2 - _in._layer_delta_15713);
+  float _v_98_1 = saturate(_v_97_2);
+  int _v_102_4 = ((_v_98_1 >= _v_104_1) ? (_v_94_4) : (_in._layer_12_index_41051));
+  float _v_103_2 = max(_v_98_1, _v_104_1);
+  float _v_105_2 = (_v_103_2 - _in._layer_delta_15713);
+  float _v_106_1 = saturate(_v_105_2);
+  int _v_110_4 = ((_v_106_1 >= _v_112_1) ? (_v_102_4) : (_in._layer_13_index_60442));
+  float _v_111_2 = max(_v_106_1, _v_112_1);
+  float _v_113_2 = (_v_111_2 - _in._layer_delta_15713);
+  float _v_114_1 = saturate(_v_113_2);
+  int _v_118_4 = ((_v_114_1 >= _v_120_1) ? (_v_110_4) : (_in._layer_14_index_38749));
+  float _v_119_2 = max(_v_114_1, _v_120_1);
+  float _v_121_2 = (_v_119_2 - _in._layer_delta_15713);
+  float _v_122_1 = saturate(_v_121_2);
+  int _v_126_4 = ((_v_122_1 >= _v_128_1) ? (_v_118_4) : (_in._layer_15_index_50204));
+  float _v_23_2 = (_v_26_2 * float(_v_126_4));
+  _out.col0 = float4(_v_23_2, _v_23_2, _v_23_2, _v_23_2);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_index_map_from_masks {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _layer_delta_15713;
+  float _index_step_39126;
+  int _layer_0_index_58024;
+  int _layer_1_index_59241;
+  int _layer_2_index_22954;
+  int _layer_3_index_24171;
+  int _layer_4_index_53932;
+  int _layer_5_index_55149;
+  int _layer_6_index_18862;
+  int _layer_7_index_20079;
+  int _layer_8_index_50336;
+  int _layer_9_index_51553;
+  int _layer_10_index_42841;
+  int _layer_11_index_54296;
+  int _layer_12_index_41051;
+  int _layer_13_index_60442;
+  int _layer_14_index_38749;
+  int _layer_15_index_50204;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+  Texture2D sampler1_t;
+  bool sampler1_wrap;
+  SamplerState sampler1;
+  Texture2D sampler2_t;
+  bool sampler2_wrap;
+  SamplerState sampler2;
+  Texture2D sampler3_t;
+  bool sampler3_wrap;
+  SamplerState sampler3;
+  Texture2D sampler4_t;
+  bool sampler4_wrap;
+  SamplerState sampler4;
+  Texture2D sampler5_t;
+  bool sampler5_wrap;
+  SamplerState sampler5;
+  Texture2D sampler6_t;
+  bool sampler6_wrap;
+  SamplerState sampler6;
+  Texture2D sampler7_t;
+  bool sampler7_wrap;
+  SamplerState sampler7;
+  Texture2D sampler8_t;
+  bool sampler8_wrap;
+  SamplerState sampler8;
+  Texture2D sampler9_t;
+  bool sampler9_wrap;
+  SamplerState sampler9;
+  Texture2D sampler10_t;
+  bool sampler10_wrap;
+  SamplerState sampler10;
+  Texture2D sampler11_t;
+  bool sampler11_wrap;
+  SamplerState sampler11;
+  Texture2D sampler12_t;
+  bool sampler12_wrap;
+  SamplerState sampler12;
+  Texture2D sampler13_t;
+  bool sampler13_wrap;
+  SamplerState sampler13;
+  Texture2D sampler14_t;
+  bool sampler14_wrap;
+  SamplerState sampler14;
+  Texture2D sampler15_t;
+  bool sampler15_wrap;
+  SamplerState sampler15;
+};
+struct OutputStruct_index_map_from_masks {
+  float _y_46556;
+  float _z_46559;
+  float _w_46546;
+  float _y_46556_1;
+  float _z_46559_1;
+  float _w_46546_1;
+  float _y_46556_9;
+  float _z_46559_9;
+  float _w_46546_9;
+  float _y_46556_46;
+  float _z_46559_46;
+  float _w_46546_46;
+  float _y_46556_21;
+  float _z_46559_21;
+  float _w_46546_21;
+  float _y_46556_35;
+  float _z_46559_35;
+  float _w_46546_35;
+  float _y_46556_47;
+  float _z_46559_47;
+  float _w_46546_47;
+  float _y_46556_76;
+  float _z_46559_76;
+  float _w_46546_76;
+  float _y_46556_60;
+  float _z_46559_60;
+  float _w_46546_60;
+  float _y_46556_68;
+  float _z_46559_68;
+  float _w_46546_68;
+  float _y_46556_84;
+  float _z_46559_84;
+  float _w_46546_84;
+  float _y_46556_92;
+  float _z_46559_92;
+  float _w_46546_92;
+  float _y_46556_100;
+  float _z_46559_100;
+  float _w_46546_100;
+  float _y_46556_108;
+  float _z_46559_108;
+  float _w_46546_108;
+  float _y_46556_116;
+  float _z_46559_116;
+  float _w_46546_116;
+  float _y_46556_124;
+  float _z_46559_124;
+  float _w_46546_124;
+  float4 col0;
+  float4 col1;
+};
+"""
+  }
+}

@@ -1,0 +1,39 @@
+
+normandy {
+  params {
+  }
+  inputs:i=0
+  shaderPreMain:t="""
+  """
+  shaderCode:t="""
+  InputStruct_normandy _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+
+
+  OutputStruct_normandy _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_normandy(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    shader_function:t="""
+
+  void _function_normandy(InputStruct_normandy _in, out OutputStruct_normandy _out) {
+
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_normandy {
+  float4 pos;
+  float3 tc;
+};
+struct OutputStruct_normandy {
+  float4 col0;
+};
+"""
+  }
+}

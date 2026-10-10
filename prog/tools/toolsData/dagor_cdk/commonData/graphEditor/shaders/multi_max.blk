@@ -1,0 +1,639 @@
+templateUid:t = "fe311b8d-6a1d-41c3-9f2b-59133a45d604"
+hint:t = "/*--------------------*/"
+
+node {
+  id:i = 0
+  x:r = 189.4604065428025
+  y:r = 218.0351868649629
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 1
+  x:r = 17.274968686107343
+  y:r = 188.9331937882099
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "input1"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler0"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 2
+  x:r = 17.912689168363727
+  y:r = 273.9351138610034
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "input2"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler1"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 3
+  x:r = 18.55040965062011
+  y:r = 358.9370339337968
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "input3"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler2"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 4
+  x:r = 19.188130132876523
+  y:r = 442.0641940156894
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "input4"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler3"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 5
+  x:r = 19.787449159264554
+  y:r = 530.777232614416
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "input5"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler4"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 6
+  x:r = 20.425169641520938
+  y:r = 615.7791526872095
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "input6"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler5"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 7
+  x:r = 21.062890123777322
+  y:r = 700.7810727600029
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "input7"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler6"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 8
+  x:r = 21.700610606033734
+  y:r = 783.9082328418955
+  descName:t = "texValue"
+  pinComment {
+    pinIndex:i = 0
+    text:t = "input8"
+  }
+  pin {
+    name:t = "texture"
+    role:t = "in"
+    types:t = "texture2D"
+    customPinInput:t = "sampler7"
+  }
+  pin {
+    name:t = "rgba"
+    role:t = "out"
+    types:t = "float4"
+    data {
+      code:t = "linear_sample($texture$_t, _in.tc, $texture$_wrap)"
+    }
+  }
+}
+node {
+  id:i = 9
+  x:r = 362.5760461879346
+  y:r = 323.65946683766543
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 10
+  x:r = 531.942165851265
+  y:r = 384.2895070287481
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 11
+  x:r = 714.4316054509012
+  y:r = 461.7923871379383
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 12
+  x:r = 870.6744051779259
+  y:r = 522.422427329021
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 13
+  x:r = 1023.1676849231494
+  y:r = 607.4243474018144
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 14
+  x:r = 1188.7842846046783
+  y:r = 664.3048676110955
+  templateUid:t = "dfd7bd48-fbd3-4e56-be5d-fb81486a6af5"
+  descName:t = "max"
+  groupTypes {
+    group1:t = "float4"
+  }
+  pin {
+    name:t = "A"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "B"
+    role:t = "in"
+    types:t = "float4"
+    group:t = "group1"
+  }
+  pin {
+    name:t = "max"
+    role:t = "out"
+    types:t = "float4"
+    group:t = "group1"
+    data {
+      code:t = "max($A$, $B$)"
+    }
+  }
+}
+node {
+  id:i = 15
+  x:r = 1385.8497620437079
+  y:r = 665.1222314770189
+  templateUid:t = "e9c40e8f-d682-4021-b803-6701341256af"
+  descName:t = "result"
+  externalName:t = ""
+  pin {
+    name:t = "color"
+    role:t = "in"
+    types:t = "float4"
+    data {
+      def_val:t = "float4(0.5, 0.5, 0.5, 0.5)"
+      def_val_blk:t = "0.5, 0.5, 0.5, 0.5"
+      code:t = "_out.col%MRT index% = $color$"
+      result_color:b = yes
+    }
+  }
+  pin {
+    name:t = "out"
+    role:t = "out"
+    types:t = "texture2D"
+  }
+  property {
+    name:t = "MRT index"
+    val:t = "0"
+  }
+  property {
+    name:t = "external name"
+    val:t = ""
+  }
+}
+edge {
+  id:i = 0
+  elemA:i = 1
+  pinA:i = 1
+  elemB:i = 0
+  pinB:i = 0
+}
+edge {
+  id:i = 1
+  elemA:i = 0
+  pinA:i = 1
+  elemB:i = 2
+  pinB:i = 1
+}
+edge {
+  id:i = 2
+  elemA:i = 9
+  pinA:i = 1
+  elemB:i = 3
+  pinB:i = 1
+}
+edge {
+  id:i = 3
+  elemA:i = 14
+  pinA:i = 2
+  elemB:i = 15
+  pinB:i = 0
+}
+edge {
+  id:i = 4
+  elemA:i = 0
+  pinA:i = 2
+  elemB:i = 9
+  pinB:i = 0
+}
+edge {
+  id:i = 5
+  elemA:i = 10
+  pinA:i = 1
+  elemB:i = 4
+  pinB:i = 1
+}
+edge {
+  id:i = 6
+  elemA:i = 9
+  pinA:i = 2
+  elemB:i = 10
+  pinB:i = 0
+}
+edge {
+  id:i = 7
+  elemA:i = 11
+  pinA:i = 1
+  elemB:i = 5
+  pinB:i = 1
+}
+edge {
+  id:i = 8
+  elemA:i = 10
+  pinA:i = 2
+  elemB:i = 11
+  pinB:i = 0
+}
+edge {
+  id:i = 9
+  elemA:i = 12
+  pinA:i = 1
+  elemB:i = 6
+  pinB:i = 1
+}
+edge {
+  id:i = 10
+  elemA:i = 11
+  pinA:i = 2
+  elemB:i = 12
+  pinB:i = 0
+}
+edge {
+  id:i = 11
+  elemA:i = 13
+  pinA:i = 1
+  elemB:i = 7
+  pinB:i = 1
+}
+edge {
+  id:i = 12
+  elemA:i = 12
+  pinA:i = 2
+  elemB:i = 13
+  pinB:i = 0
+}
+edge {
+  id:i = 13
+  elemA:i = 14
+  pinA:i = 1
+  elemB:i = 8
+  pinB:i = 1
+}
+edge {
+  id:i = 14
+  elemA:i = 13
+  pinA:i = 2
+  elemB:i = 14
+  pinB:i = 0
+}
+
+description {
+  name:t = "[[description-name]]"
+  category:t = "[[description-category]]"
+  plugin:t = "shader_editor"
+  generated:b = yes
+  allowLoop:b = no
+  width:i = 200
+  pin {
+    name:t = "input1"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 188
+    subgraphElem:i = 1
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "input2"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 273
+    subgraphElem:i = 2
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "input3"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 358
+    subgraphElem:i = 3
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "input4"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 442
+    subgraphElem:i = 4
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "input5"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 530
+    subgraphElem:i = 5
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "input6"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 615
+    subgraphElem:i = 6
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "out"
+    types:t = "texture2D"
+    role:t = "out"
+    singleConnect:b = no
+    yPos:i = 665
+    subgraphElem:i = 15
+    subgraphPin:i = 1
+  }
+  pin {
+    name:t = "input7"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 700
+    subgraphElem:i = 7
+    subgraphPin:i = 0
+  }
+  pin {
+    name:t = "input8"
+    types:t = "texture2D"
+    role:t = "in"
+    singleConnect:b = yes
+    yPos:i = 783
+    subgraphElem:i = 8
+    subgraphPin:i = 0
+  }
+}

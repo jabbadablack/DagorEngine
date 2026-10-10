@@ -1,0 +1,97 @@
+
+star {
+  params {
+    _offset_15432:p2 = 0.0, 0.0
+    _radius_4093:r = 1.0
+    _rotation_12273:r = 0.0
+    _rays_2492:r = 5.0
+  }
+  inputs:i=0
+  shaderPreMain:t="""
+    cbuffer global {
+      float2 _offset_15432;
+      float _radius_4093;
+      float _rotation_12273;
+      float _rays_2492;
+    };
+  """
+  shaderCode:t="""
+  InputStruct_star _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._offset_15432 = _offset_15432; // float2(0.0, 0.0)
+  _in._radius_4093 = _radius_4093; // 1.0
+  _in._rotation_12273 = _rotation_12273; // 0.0
+  _in._rays_2492 = _rays_2492; // 5.0
+
+
+  OutputStruct_star _out;
+  _out.___46472 = 0.0;
+  _out.___46472_5 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_star(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+  """
+    shader_function:t="""
+
+  void _function_star(InputStruct_star _in, out OutputStruct_star _out) {
+
+  float2 _v_1_0 = _in.tc;
+  float2 _v_4_0 = float2(0.5, 0.5);
+  float _v_9_0 = 0.50;
+  float _v_24_0 = 3.14159265;
+  float _v_26_0 = 0.5;
+  float2 _v_30_2 = (_v_4_0 + _in._offset_15432);
+  float2 _v_3_2 = (_v_1_0 - _v_30_2);
+  float2 _v_13_2 = (_v_3_2 / float2(_in._radius_4093, _in._radius_4093));
+  float _v_5_1 = float4(_v_13_2, 0.0, 0.0).x;
+  float _v_5_2 = float4(_v_13_2, 0.0, 0.0).y;
+  _out.___46472 = float4(_v_13_2, 0.0, 0.0).z;
+  _out.___46472_5 = float4(_v_13_2, 0.0, 0.0).w;
+  float _v_12_1 = length(_v_13_2);
+  float _v_14_1 = _v_12_1 * (2.0);
+  float _v_2_2 = atan2(_v_5_2, _v_5_1);
+  float _v_11_1 = 1.0 - _v_14_1;
+  float _v_23_2 = (_v_2_2 / _v_24_0);
+  float _v_22_2 = (_v_23_2 + _in._rotation_12273);
+  float _v_25_3 = (_v_22_2 * _v_26_0 + _v_26_0);
+  float _v_27_1 = frac(_v_25_3);
+  float _v_8_2 = (_v_9_0 - _v_27_1);
+  float _v_6_2 = (_v_8_2 * _in._rays_2492);
+  float _v_10_1 = frac(_v_6_2);
+  float _v_15_1 = _v_10_1 * (2.0);
+  float _v_16_1 = 1.0 - _v_15_1;
+  float _v_17_1 = abs(_v_16_1);
+  float _v_19_1 = _v_17_1 * (0.2);
+  float _v_20_1 = sqrt(_v_19_1);
+  float _v_18_2 = (_v_11_1 - _v_20_1);
+  float _v_31_1 = saturate(_v_18_2);
+  _out.col0 = float4(_v_31_1, _v_31_1, _v_31_1, _v_31_1);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_star {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float2 _offset_15432;
+  float _radius_4093;
+  float _rotation_12273;
+  float _rays_2492;
+};
+struct OutputStruct_star {
+  float ___46472;
+  float ___46472_5;
+  float4 col0;
+};
+"""
+  }
+}

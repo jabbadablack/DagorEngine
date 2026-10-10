@@ -1,0 +1,74 @@
+
+angle_to_vector {
+  params {
+    ___46470:r = 0.0
+    ___46470_4:r = 0.0
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float ___46470;
+      float ___46470_4;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_angle_to_vector _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in.___46470 = ___46470; // 0.0
+  _in.___46470_4 = ___46470_4; // 0.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_angle_to_vector _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_angle_to_vector(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+
+  void _function_angle_to_vector(InputStruct_angle_to_vector _in, out OutputStruct_angle_to_vector _out) {
+
+  float4 _v_0_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float _v_1_1 = _v_0_1.x;
+  float _v_7_0 = 3.14159265;
+  float _v_8_1 = _v_7_0 * (2.0);
+  float _v_6_2 = (_v_1_1 * _v_8_1);
+  float _v_2_1 = sin(_v_6_2);
+  float _v_3_1 = cos(_v_6_2);
+  float4 _v_4_4 = float4(_v_2_1, _v_3_1, _in.___46470, _in.___46470_4);
+  _out.col0 = _v_4_4;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_angle_to_vector {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float ___46470;
+  float ___46470_4;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_angle_to_vector {
+  float4 col0;
+};
+"""
+  }
+}

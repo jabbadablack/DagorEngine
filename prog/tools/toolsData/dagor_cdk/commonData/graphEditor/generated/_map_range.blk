@@ -1,0 +1,75 @@
+
+map_range {
+  params {
+    _low_16177:r = 0.0
+    _mid_17061:r = 0.5
+    _high_19499:r = 1.0
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    cbuffer global {
+      float _low_16177;
+      float _mid_17061;
+      float _high_19499;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_map_range _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  _in._low_16177 = _low_16177; // 0.0
+  _in._mid_17061 = _mid_17061; // 0.5
+  _in._high_19499 = _high_19499; // 1.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_map_range _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_map_range(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    shader_function:t="""
+
+  void _function_map_range(InputStruct_map_range _in, out OutputStruct_map_range _out) {
+
+  float2 _v_3_0 = _in.tc;
+  float _v_10_0 = -16.0;
+  float _v_12_0 = 16.0;
+  float _v_13_0 = 0.0;
+  float _v_16_0 = 1.0;
+  float _v_18_3 = saturate(_in._mid_17061) * (_v_12_0 - _v_10_0) + _v_10_0;
+  float4 _v_2_2 = linear_sample(_in.sampler0_t, _v_3_0, _in.sampler0_wrap);
+  float4 _v_4_3 = saturate((_v_2_2 - _in._low_16177) / (_in._high_19499 - _in._low_16177));
+  float _v_14_1 = abs(_v_18_3);
+  float _v_15_2 = (_v_14_1 + _v_16_0);
+  float _v_17_2 = (_v_16_0 / _v_15_2);
+  float _v_11_4 = ((_v_18_3 > _v_13_0) ? (_v_15_2) : (_v_17_2));
+  float4 _v_5_2 = pow(_v_4_3, float4(_v_11_4, _v_11_4, _v_11_4, _v_11_4));
+  _out.col0 = _v_5_2;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_map_range {
+  float4 pos;
+  float3 tc;
+  float _low_16177;
+  float _mid_17061;
+  float _high_19499;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_map_range {
+  float4 col0;
+};
+"""
+  }
+}

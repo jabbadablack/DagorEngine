@@ -1,0 +1,90 @@
+
+test_white_noise {
+  params {
+    _seed_30098:i = 0
+    _pos_x_58865:r = 1.0
+    _pos_y_58864:r = 1.0
+    _seed_30098_3:i = 1
+  }
+  inputs:i=0
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      int _seed_30098;
+      float _pos_x_58865;
+      float _pos_y_58864;
+      int _seed_30098_3;
+    };
+  """
+  shaderCode:t="""
+  InputStruct_test_white_noise _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._seed_30098 = _seed_30098; // 0
+  _in._pos_x_58865 = _pos_x_58865; // 1.0
+  _in._pos_y_58864 = _pos_y_58864; // 1.0
+  _in._seed_30098_3 = _seed_30098_3; // 1
+
+
+  OutputStruct_test_white_noise _out;
+  _out._x_46557 = 0.0;
+  _out._y_46556 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out._value_13390 = 0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_test_white_noise(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+  void _function_test_white_noise(InputStruct_test_white_noise _in, out OutputStruct_test_white_noise _out) {
+
+  _out._value_13390 = 1;
+  int _v_8_0 = 524288;
+  float _v_9_1 = _in._pos_x_58865 * (524288.0);
+  float _v_10_1 = _in._pos_y_58864 * (524288.0);
+  float2 _v_11_0 = _in.tc;
+  _out._x_46557 = float4(_v_11_0, 0.0, 0.0).x;
+  _out._y_46556 = float4(_v_11_0, 0.0, 0.0).y;
+  _out._z_46559 = float4(_v_11_0, 0.0, 0.0).z;
+  _out._w_46546 = float4(_v_11_0, 0.0, 0.0).w;
+  float _v_14_0 = 1.0;
+  float _v_2_2 = (_v_14_0 / float(_v_8_0));
+  int _v_7_3 = uint_noise2D(int(_v_9_1), int(_v_10_1), _in._seed_30098);
+  int _v_0_2 = (_v_7_3 % _v_8_0);
+  float _v_1_2 = (float(_v_0_2) * _v_2_2);
+  float _v_15_1 = frac(_v_1_2);
+  _out.col0 = float4(_v_15_1, _v_15_1, _v_15_1, _v_15_1);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_test_white_noise {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  int _seed_30098;
+  float _pos_x_58865;
+  float _pos_y_58864;
+  int _seed_30098_3;
+};
+struct OutputStruct_test_white_noise {
+  float _x_46557;
+  float _y_46556;
+  float _z_46559;
+  float _w_46546;
+  int _value_13390;
+  float4 col0;
+};
+"""
+  }
+}

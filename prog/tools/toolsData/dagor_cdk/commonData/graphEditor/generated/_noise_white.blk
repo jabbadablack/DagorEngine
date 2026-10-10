@@ -1,0 +1,68 @@
+
+noise_white {
+  params {
+    _random_seed_8886:r = 1.0
+    _threshold_12274:r = 0.0
+  }
+  inputs:i=0
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _random_seed_8886;
+      float _threshold_12274;
+    };
+  """
+  shaderCode:t="""
+  InputStruct_noise_white _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._random_seed_8886 = _random_seed_8886; // 1.0
+  _in._threshold_12274 = _threshold_12274; // 0.0
+
+
+  OutputStruct_noise_white _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_noise_white(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+  void _function_noise_white(InputStruct_noise_white _in, out OutputStruct_noise_white _out) {
+
+  float _v_3_0 = rand(_in._random_seed_8886 + 1.9214 + _in.tc.x + _in.tc.y * 231.321);
+  float _v_4_0 = rand(_in._random_seed_8886 + 5.6177 + _in.tc.x + _in.tc.y * 231.321);
+  float _v_10_0 = 1.0;
+  float _v_11_2 = (_v_10_0 - _in._threshold_12274);
+  float _v_13_0 = 0.0001;
+  float _v_0_0 = rand(_in._random_seed_8886 + 0.6893 + _in.tc.x + _in.tc.y * 231.321);
+  float _v_1_0 = rand(_in._random_seed_8886 + 0.0 + _in.tc.x + _in.tc.y * 231.321);
+  float4 _v_5_4 = float4(_v_1_0, _v_0_0, _v_3_0, _v_4_0);
+  float4 _v_7_2 = (_v_5_4 - float4(_in._threshold_12274, _in._threshold_12274, _in._threshold_12274, _in._threshold_12274));
+  float _v_12_2 = max(_v_11_2, _v_13_0);
+  float4 _v_9_2 = (_v_7_2 / float4(_v_12_2, _v_12_2, _v_12_2, _v_12_2));
+  _out.col0 = _v_9_2;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_noise_white {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _random_seed_8886;
+  float _threshold_12274;
+};
+struct OutputStruct_noise_white {
+  float4 col0;
+};
+"""
+  }
+}

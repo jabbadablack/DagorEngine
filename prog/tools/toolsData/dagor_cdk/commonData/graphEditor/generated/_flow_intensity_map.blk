@@ -1,0 +1,72 @@
+
+flow_intensity_map {
+  params {
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_flow_intensity_map _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_flow_intensity_map _out;
+  _out._z_46559 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_flow_intensity_map(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+
+  void _function_flow_intensity_map(InputStruct_flow_intensity_map _in, out OutputStruct_flow_intensity_map _out) {
+
+  float2 _v_3_1 = get2DGradient(_in.sampler0_t, _in.sampler0_wrap, _in.tc);
+  float _v_4_1 = float4(_v_3_1, 0.0, 0.0).x;
+  float _v_4_2 = float4(_v_3_1, 0.0, 0.0).y;
+  _out._z_46559 = float4(_v_3_1, 0.0, 0.0).z;
+  float _v_4_4 = float4(_v_3_1, 0.0, 0.0).w;
+  int _v_6_0 = 2;
+  float _v_11_0 = 0.0;
+  float _v_1_2 = pow(_v_4_2, float(_v_6_0));
+  float _v_5_2 = pow(_v_4_1, float(_v_6_0));
+  float _v_8_1 = sqrt(_v_5_2);
+  float _v_10_1 = sqrt(_v_1_2);
+  float _v_14_2 = (_v_8_1 * _v_10_1);
+  float _v_2_1 = smoothstep(0.0, 1.0, _v_14_2);
+  float4 _v_13_4 = float4(_v_2_1, _v_11_0, _v_11_0, _v_4_4);
+  _out.col0 = _v_13_4;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_flow_intensity_map {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_flow_intensity_map {
+  float _z_46559;
+  float4 col0;
+};
+"""
+  }
+}

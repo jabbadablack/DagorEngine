@@ -3,7 +3,7 @@ import argparse
 import os
 import sys
 
-from . import COMPONENTS, ENGINE_ROOT, HOST, Build
+from . import COMPONENTS, ENGINE_ROOT, HOST, Build, sync_tools_data
 
 # id: (dir with its build.py, content dir that is not in git, archive with that content, built by default)
 PROJECTS = {
@@ -70,6 +70,7 @@ def main(argv):
   named = {s for p in args.projects for s in (SAMPLES if p == 'samples' else [p])}
   projects = [p for p in PROJECTS if (p in named if named else PROJECTS[p][3])]
 
+  sync_tools_data(args.dry_run)  # data of the engine tools that is not built
   b = Build(components, args.arch, args.dry_run)
   runner = Build(None)  # a project's build.py does its own dry run
   failed = []

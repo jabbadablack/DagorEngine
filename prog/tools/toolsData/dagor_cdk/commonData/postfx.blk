@@ -1,0 +1,282 @@
+
+DemonPostFx
+{
+  caption:t = "use DemonPostFx"
+  use:b=no
+
+  hdrGlowPower:r     = 1.0
+  glowRadius:r=0.04
+  hdrDarkThreshold:r = 1.5
+  hdrStarThreshold:r = 3.5
+  hdrStarPowerMul:r  = 2.0
+
+/* removed not used in HDR  (only in fake HDR)
+  showAlpha:b=no
+  caption:t = "show alpha"
+   glowPower:r=1.0
+
+  darkThreshold:r=0.5
+  darkMultiplier:r=0.5
+*/
+
+  glowFadeK:r=1
+  glowEdgeK:r=0.1
+  glowAngleU:r= 45
+  glowAngleV:r=135
+
+//  useRawSkyMask:b=yes
+
+  volfogFade:r=0.05
+  volfogRange:r=7.0
+  volfogMul:r=1.5
+  volfogColor:c=255, 255, 255
+  volfogMaxAngle:r=60
+
+  sunAzimuth:r=0
+  sunZenith:r=45
+
+  caption:t="Automatic sync with Light plugin"
+  autosyncWithLightPlugin:b=true
+
+  colorMatrix
+  {
+    brightness:r=100
+    brightnessColor:c=255, 255, 255
+
+    contrast:r=100
+    contrastColor:c=255, 255, 255
+    contrastPivot:r=50
+    contrastPivotColor:c=255, 255, 255
+
+    saturation:r=100
+    saturationColor:c=255, 255, 255
+    grayColor:c=255, 255, 255
+
+    hue:r=0
+
+    view_levels:b = 1
+  }
+
+  starGlow
+  {
+    numRays:i=0
+//    alphaThreshold:r=0.9 - not used in HDR nor in in fake for now
+
+    defaultRayParams
+    {
+      radius:r=0.1
+      power:r=4
+      fadeK:p3=2,2,1
+      color:c=255,255,255
+    }
+
+    ray01
+    {
+      angle:r=90
+      caption:t="use custom params:"
+      useCustom:b=no
+      radius:r=0.1
+      power:r=4
+      fadeK:p3=2,2,1
+      color:c=255,255,255
+    }
+
+    ray02
+    {
+      angle:r=30
+      caption:t="use custom params:"
+      useCustom:b=no
+      radius:r=0.1
+      power:r=4
+      fadeK:p3=2,2,1
+      color:c=255,255,255
+    }
+
+    ray03
+    {
+      angle:r=-30
+      caption:t="use custom params:"
+      useCustom:b=no
+      radius:r=0.1
+      power:r=4
+      fadeK:p3=2,2,1
+      color:c=255,255,255
+    }
+
+    ray04
+    {
+      angle:r=0
+      caption:t="use custom params:"
+      useCustom:b=yes
+      radius:r=0.15
+      power:r=6
+      fadeK:p3=2,2,1
+      color:c=255,255,255
+    }
+  }
+}
+
+
+hdr
+{
+  /*
+  caption:t = "RGBE Texture adaptation:"
+  textureTonemapAdaptation:r = 1.0  ;// Для перевода HDR текстур в LDR.
+
+  caption:t = "RGBE Texture gamma:"
+  textureTonemapGamma:r = 1  ;// Для перевода HDR текстур в LDR.
+
+  bloom:b=1
+
+  track_step:r = 0.1
+  track_min:r = 0.2
+  track_max:r = 5
+  caption:t = "Bright pass threshold:"
+  brightPassThreshold:r = 0.9       ;// Минимальная яркость источников, у которых есть bloom.
+                                      // Зависит от adaptation, поэтому один и тот же источник в разном
+                                      // окружении может иметь или не иметь bloom.
+                                      // Разумные значения: от 0.5 до 5.
+
+  track_step:r = 0.1
+  track_min:r = 0.01
+  track_max:r = 4
+  caption:t = "Bloom multiplier:"
+  bloomMultiplier:r = 0.7          ;// Во сколько раз bloom ярче источника, который его вызвал.
+                                      // Так как bloom и источник складываются, то чем больше значение,
+                                      // тем меньше заметна граница между источником и bloom'ом.
+                                      // Разумные значения: от 1 до 3.
+
+  caption:t = "Bloom source max:"
+  bloomSourceMax:r = 1            ;// Сильные источники обрезаются до этого значения перед размытием. Уменьшает квадратистость.
+
+  caption:t = "Bloom scale:"
+  bloomScale:i = 16                ;// Размер bloomа. Только 4, 8 или 16. 8 (не 4) - самый быстрый, 16 - самый медленный.
+  */
+
+  caption:t = "use adaptation"
+  useAdaptation:b=yes
+
+  caption:t = "Target brightness:"
+  adaptationMultiplier:r = 0.6       ;// Яркость адаптированной картинки. (То, к чему стремится адаптация).
+
+  //
+  // Скорость адаптации.
+  //
+  caption:t = "Adapt to darkness time:"
+  adaptationTimeHighToNorm:r = 1   ;// Период полуадаптации в секундах. От яркого к нормальному.
+  //caption:t = "Norm->Low (no preview):"
+  //adaptationTimeNormToLow:r = 5    ;// От нормального к темному.
+  //caption:t = "Low->Norm (no preview):"
+  //adaptationTimeLowToNorm:r = 0.2   ;// От темного к нормальному.
+  caption:t = "Adapt to light time:"
+  adaptationTimeNormToHigh:r = 0.2  ;// От нормального к яркому.
+  //caption:t = "Lum. Norm (no preview):"
+  //luminosityNorm:r = 0.05           ;// Что считать номальным. Если первые 2 скорости равны между собой
+                                    // и вторые 2 скорости равны между собой, то ненужен.
+
+  fake
+  {
+    //
+    // Степень адаптации.
+    //
+    caption:t = "Adapt. max (look at darkness):"
+    adaptationMax:r = 2              ;// Насколько хорошо видим в темноте. Если слишком задрать, то можно увидеть много лишнего.
+    caption:t = "Adapt. min (look at light):"
+    adaptationMin:r = 0.3
+    caption:t = "lumMin"
+    lumMin:r = 0.01
+    caption:t = "lumMax"
+    lumMax:r = 0.99
+    caption:t = "lumAvg"
+    lumAvg:r = 0.95
+    caption:t = "lowBrightScale"
+    lowBrightScale:r = 0.9
+  }
+
+  /*
+  real
+  {
+    //
+    // Степень адаптации.
+    //
+    caption:t = "Adaptation max:"
+    adaptationMax:r = 3               ;// Насколько хорошо видим в темноте. Если слишком задрать, то можно увидеть много лишнего.
+    caption:t = "Adaptation min:"
+    adaptationMin:r = 0.4
+
+    track_step:r = 0.01
+    track_min:r = 0.5
+    track_max:r = 2
+    caption:t = "Gamma:"
+    gamma:r = 1           ;// Гамма.
+  }
+  */
+
+
+  //
+  // Reflections.
+  //
+
+  /*
+  caption:t = "Dyn. refl. multiplier:"
+  dynamicReflectionMultiplier:p3 = 1.0, 1.0, 1.0  ;// Яркость отражений на dynamic_car_paint в HDR.
+  caption:t = "Dyn. refl. threshold:"
+  dynamicReflectionThreshold:r = 0.2        ;// Вычитается из текстуры отражения делая места с меньшей яркостью черными.
+  caption:t = "Dyn. refl. saturation:"
+  dynamicReflectionSaturation:r = 1.0       ;// Можно сделать отражения черно-белыми.
+
+  caption:t = "Glass refl. multiplier:"
+  glassReflectionMultiplier:p3 = 3.0, 3.0, 3.0  ;//  dynamic_glass_chrome.
+  caption:t = "Glass refl. threshold:"
+  glassReflectionThreshold:r = 0.3
+  caption:t = "Glass refl. saturation:"
+  glassReflectionSaturation:r = 0.4
+  */
+}
+
+
+
+/*
+postfx
+{
+  enabled:b = 0
+  caption:t = "Fade speed (no preview):"
+  fade_speed:r=10
+
+  normal
+  {
+    gray_color:p3=255,255,255
+    saturation:p3=0,0,0
+    contrast:p3  =300,300,300
+    contrast_center:r=64
+  }
+}
+
+
+
+ldr_glow
+{
+  enabled:b = 0
+  glow_bright:r = 0.5
+  glow_radius:r = 1.5
+}
+
+
+
+motionBlur
+{
+  enabled:b             = 0
+  blur_tex_size:ip2             = 512, 256
+  blur_mask:t                   = tex/blurmask.dds
+  regen_color:p4                = 255, 160, 160, 255
+  color_blend_k:r               = 1
+  mblurk:r                              = 50
+  plane_z:r                             = 20
+  blur_dt:p2                    = 0, 0.05
+  blur_side:p2                  = 0, 100
+  max_blur_vel:r                = 200
+  blur_samples:ip2              = 4, 4
+  blur_rad:r                    = 2
+  blur_sample_range:r   = 2
+}
+*/

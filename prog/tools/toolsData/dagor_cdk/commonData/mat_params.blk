@@ -1,0 +1,264 @@
+diffuse_tex
+{
+  type:t="texture"
+  caption:t="Diffuse texture:"
+  slot:i=0
+}
+
+diffuse_tex2
+{
+  type:t="texture"
+  caption:t="Diffuse texture 2:"
+  slot:i=7
+}
+
+bump_tex
+{
+  type:t="texture"
+  caption:t="Normalmap texture:"
+  slot:i=2
+}
+
+chrome_tex
+{
+  type:t="texture"
+  caption:t="Reflect\refract cubemap texture:"
+  slot:i=1
+}
+gloss_tex
+{
+  type:t="texture"
+  caption:t="Gloss and shinneness tex:"
+  slot:i=4
+}
+
+water_normal_tex_0
+{
+  type:t="texture"
+  caption:t="Water texture #1:"
+  texture:t="de_water_shape.dds"
+  slot:i=0
+}
+
+water_normal_tex_1
+{
+  type:t="texture"
+  caption:t="Water texture #2:"
+  texture:t="de_water_shape.dds"
+  slot:i=1
+}
+
+water_normal_tex_2
+{
+  type:t="texture"
+  caption:t="Water texture #3:"
+  texture:t="de_water_shape.dds"
+  slot:i=2
+}
+
+water_amp_tex
+{
+  type:t="texture"
+  caption:t="Water texture #4:"
+  texture:t="de_water_amp.dds"
+  slot:i=3
+}
+
+water_foam_tex
+{
+  type:t="texture"
+  caption:t="Water texture #5:"
+  texture:t="de_water_foam.dds"
+  slot:i=4
+}
+
+water_cube_tex
+{
+  type:t="texture"
+  caption:t="Water texture #6:"
+  texture:t="de_water_cube.dds"
+  slot:i=5
+}
+
+atest
+{
+  type:t="triple_int"
+  caption:t="Alpha test:"
+  constrains_int:ip2=1,255
+}
+
+lighting
+{
+  type:t="combo"
+  caption:t="Lighting:"
+  values
+  {
+    val:t="none"
+    val:t="lightmap"
+    val:t="vltmap"
+  }
+  def:t="vltmap"
+}
+
+specularScale
+{
+  type:t="triple_real"
+  caption:t="Specular scale:"
+  constrains_real:p2=0.001,0
+  use_real_min:b=true
+  use_real_max:b=false
+}
+
+shininess
+{
+  type:t="triple_real"
+  caption:t="Shininess:"
+  constrains_real:p2=0,0
+  use_real_min:b=true
+}
+
+min_fresnel
+{
+  type:t="triple_real"
+  caption:t="Min fresnel value:"
+  constrains_real:p2=0,0
+  use_real_min:b=true
+}
+
+max_fresnel
+{
+  type:t="triple_real"
+  caption:t="Max fresnel value:"
+  constrains_real:p2=1,1
+  use_real_min:b=true
+}
+
+fresnel_power
+{
+  type:t="triple_real"
+  caption:t="Fresnel power:"
+  constrains_real:p2=0,0
+  use_real_min:b=true
+}
+
+two_sided
+{
+  //do not change custom parameters names because there are hardcoded in tool code
+  type:t="custom"
+}
+
+mat_diff
+{
+  type:t="e3dcolor"
+  caption:t="Diffuse color"
+}
+
+mat_amb
+{
+  type:t="e3dcolor"
+  caption:t="Ambient color"
+}
+
+mat_spec
+{
+  type:t="e3dcolor"
+  caption:t="Specular color"
+}
+
+mat_emis
+{
+  type:t="e3dcolor"
+  caption:t="Emission color"
+}
+
+specularStr {
+  type:t="triple_real"
+  caption:t="specularStr:"
+  constrains_int:ip2=1,10
+  use_real_min:b=true
+}
+
+bump_multiplier{
+  type:t="triple_real"
+  caption:t="Bump multiplier value:"
+  constrains_real:p2=0,0
+  use_real_min:b=true
+}
+bump_texcoord_multiplier{
+  type:t="triple_real"
+  caption:t="Bump TC multiplier value:"
+  constrains_real:p2=0,0
+  use_real_min:b=true
+}
+center_or_border
+{
+  type:t="int"
+  caption:t="Water center/border"
+}
+water_type
+{
+  type:t="int"
+  caption:t="Water type"
+}
+
+water_color_tex
+{
+  type:t="texture"
+  caption:t="Water color texture"
+  slot:i=6
+}
+normal_map_tex
+{
+  type:t="texture"
+  caption:t="Normal map"
+  slot:i=2
+}
+far_normal_map_tex
+{
+  type:t="texture"
+  caption:t="Far normal map"
+  slot:i=2
+}
+cube_reflection_tex
+{
+  type:t="texture"
+  caption:t="Cube reflection texture"
+  slot:i=1
+}
+
+base_d_tex 
+{
+  type:t="texture"
+  caption:t="Base diffuse texture:"
+  slot:i=0
+}
+base_n_tex
+{
+  type:t="texture"
+  caption:t="Base normal texture:"
+  slot:i=2
+}
+tile1_d_tex
+{
+  type:t="texture"
+  caption:t="Tile1 diffuse texture:"
+  slot:i=3
+}
+tile1_n_tex
+{
+  type:t="texture"
+  caption:t="Tile1 normal texture:"
+  slot:i=4
+}
+tile2_d_tex
+{
+  type:t="texture"
+  caption:t="Tile2 diffuse texture:"
+  slot:i=5
+}
+tile2_n_tex
+{
+  type:t="texture"
+  caption:t="Tile2 normal texture:"
+  slot:i=6
+}

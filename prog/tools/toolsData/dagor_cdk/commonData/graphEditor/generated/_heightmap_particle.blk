@@ -1,0 +1,154 @@
+
+heightmap_particle {
+  params {
+  }
+  inputs:i=2
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+    Texture2D sampler1_t:register(t1);
+    SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="""
+  InputStruct_heightmap_particle _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+  _in.sampler1_t = sampler1_t;
+  _in.sampler1_wrap = wrap_t1;
+  _in.sampler1 = sampler1;
+
+
+  OutputStruct_heightmap_particle _out;
+  _out._y_46556 = 0.0;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out._index_10363 = 0.0;
+  _out._angle_11396 = 0.0;
+  _out._depth_31976 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_heightmap_particle(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+
+  void _function_heightmap_particle(InputStruct_heightmap_particle _in, out OutputStruct_heightmap_particle _out) {
+
+  _out._index_10363 = _in.index;
+  float2 _v_0_2 = _in.particlePos;
+  float2 _v_0_3 = _in.scale;
+  _out._angle_11396 = _in.angle;
+  float _v_0_5 = _in.brightness;
+  _out._depth_31976 = _in.pos.z;
+  float4 _v_1_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float _v_5_0 = 0.999;
+  float _v_7_0 = 0.0;
+  float4 _v_8_1 = saturate(_v_1_1);
+  float2 _v_11_0 = float2(1.4, 0.0);
+  float2 _v_15_0 = float2(-1.4, 0.0);
+  float2 _v_18_0 = float2(0.0, 1.4);
+  float2 _v_22_0 = float2(0.0, -1.4);
+  float2 _v_25_2 = (_v_11_0 * _v_0_3);
+  float2 _v_26_2 = (_v_15_0 * _v_0_3);
+  float2 _v_27_2 = (_v_18_0 * _v_0_3);
+  float2 _v_28_2 = (_v_22_0 * _v_0_3);
+  float _v_6_1 = _v_8_1.x;
+  _out._y_46556 = _v_8_1.y;
+  _out._z_46559 = _v_8_1.z;
+  _out._w_46546 = _v_8_1.w;
+  float2 _v_12_2 = (_v_25_2 + _v_0_2);
+  float2 _v_16_2 = (_v_26_2 + _v_0_2);
+  float2 _v_19_2 = (_v_27_2 + _v_0_2);
+  float2 _v_23_2 = (_v_28_2 + _v_0_2);
+  float _v_29_3 = saturate((_v_6_1 - _v_7_0) / (_v_5_0 - _v_7_0));
+  float _v_31_1 = smoothstep(0.0, 1.0, _v_29_3);
+  float4 _v_3_2 = linear_sample(_in.sampler1_t, _v_12_2, _in.sampler1_wrap);
+  float4 _v_14_2 = linear_sample(_in.sampler1_t, _v_16_2, _in.sampler1_wrap);
+  float4 _v_17_2 = linear_sample(_in.sampler1_t, _v_19_2, _in.sampler1_wrap);
+  float4 _v_21_2 = linear_sample(_in.sampler1_t, _v_23_2, _in.sampler1_wrap);
+  float4 _v_13_2 = min(_v_3_2, _v_14_2);
+  float4 _v_20_2 = min(_v_17_2, _v_21_2);
+  float4 _v_24_2 = min(_v_13_2, _v_20_2);
+  float4 _v_10_3 = (float4(_v_6_1, _v_6_1, _v_6_1, _v_6_1) * float4(_v_0_5, _v_0_5, _v_0_5, _v_0_5) + _v_24_2);
+  float4 _v_30_2 = (_v_10_3 * float4(_v_31_1, _v_31_1, _v_31_1, _v_31_1));
+  float4 _v_4_4 = ((_v_6_1 > _v_5_0) ? (_v_10_3) : (_v_30_2));
+  _out.col0 = _v_4_4;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_heightmap_particle {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+  Texture2D sampler1_t;
+  bool sampler1_wrap;
+  SamplerState sampler1;
+};
+struct OutputStruct_heightmap_particle {
+  float _y_46556;
+  float _z_46559;
+  float _w_46546;
+  float _index_10363;
+  float _angle_11396;
+  float _depth_31976;
+  float4 col0;
+};
+"""
+    particle_fields:t="""
+
+  float angle;
+  float brightness;
+  float index;
+  float2 particlePos;
+  float2 scale;
+  """
+    particle_fields_with_semantics:t="""
+
+  float angle:TEXCOORD1;
+  float brightness:TEXCOORD2;
+  float index:TEXCOORD3;
+  float2 particlePos:TEXCOORD4;
+  float2 scale:TEXCOORD5;
+  """
+    particle_fields_vs_initialization:t="""
+
+  output.angle = instances[instance].angle;
+  output.brightness = instances[instance].brightness;
+  output.index = float(instance);
+  output.particlePos = instances[instance].pos;
+  output.scale = instances[instance].scale;
+  """
+    particle_fields_ps_copy:t="""
+
+  input.angle = input_.angle;
+  input.brightness = input_.brightness;
+  input.index = input_.index;
+  input.particlePos = input_.particlePos;
+  input.scale = input_.scale;
+  """
+    particle_fields_initialization:t="""
+
+  _in.angle = input.angle;
+  _in.brightness = input.brightness;
+  _in.index = input.index;
+  _in.particlePos = input.particlePos;
+  _in.scale = input.scale;
+  """
+  }
+}

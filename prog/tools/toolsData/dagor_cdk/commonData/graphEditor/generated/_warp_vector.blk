@@ -1,0 +1,80 @@
+
+warp_vector {
+  params {
+    _power_60890:r = 1.0
+  }
+  inputs:i=2
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _power_60890;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+    Texture2D sampler1_t:register(t1);
+    SamplerState sampler1:register(s1);
+  """
+  shaderCode:t="""
+  InputStruct_warp_vector _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._power_60890 = _power_60890; // 1.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+  _in.sampler1_t = sampler1_t;
+  _in.sampler1_wrap = wrap_t1;
+  _in.sampler1 = sampler1;
+
+
+  OutputStruct_warp_vector _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_warp_vector(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+
+  void _function_warp_vector(InputStruct_warp_vector _in, out OutputStruct_warp_vector _out) {
+
+  float2 _v_2_0 = _in.tc;
+  float2 _v_7_1 = get_dimensions(_in.sampler0_t);
+  float _v_8_0 = -1.0;
+  float2 _v_9_2 = (float2(_v_8_0, _v_8_0) / _v_7_1);
+  float2 _v_16_0 = _in.tc;
+  float4 _v_15_2 = linear_sample(_in.sampler1_t, _v_16_0, _in.sampler1_wrap);
+  float4 _v_4_2 = (float4(_in._power_60890, _in._power_60890, _in._power_60890, _in._power_60890) * _v_15_2);
+  float4 _v_11_2 = (float4(_v_9_2, 0.0, 0.0) * _v_4_2);
+  float4 _v_10_2 = (_v_11_2 + float4(_v_2_0, 0.0, 0.0));
+  float4 _v_12_2 = linear_sample(_in.sampler0_t, _v_10_2.xy, _in.sampler0_wrap);
+  _out.col0 = _v_12_2;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_warp_vector {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _power_60890;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+  Texture2D sampler1_t;
+  bool sampler1_wrap;
+  SamplerState sampler1;
+};
+struct OutputStruct_warp_vector {
+  float4 col0;
+};
+"""
+  }
+}

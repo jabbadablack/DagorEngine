@@ -1,0 +1,95 @@
+
+hue_saturation {
+  params {
+    _hue_21117:r = 0.0
+    _saturation_26713:r = 1.0
+    _value_13390:r = 1.0
+  }
+  inputs:i=1
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _hue_21117;
+      float _saturation_26713;
+      float _value_13390;
+    };
+    Texture2D sampler0_t:register(t0);
+    SamplerState sampler0:register(s0);
+  """
+  shaderCode:t="""
+  InputStruct_hue_saturation _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._hue_21117 = _hue_21117; // 0.0
+  _in._saturation_26713 = _saturation_26713; // 1.0
+  _in._value_13390 = _value_13390; // 1.0
+  _in.sampler0_t = sampler0_t;
+  _in.sampler0_wrap = wrap_t0;
+  _in.sampler0 = sampler0;
+
+
+  OutputStruct_hue_saturation _out;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_hue_saturation(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+
+  void _function_hue_saturation(InputStruct_hue_saturation _in, out OutputStruct_hue_saturation _out) {
+
+  float4 _v_7_1 = linear_sample(_in.sampler0_t, _in.tc, _in.sampler0_wrap);
+  float _v_8_1 = _v_7_1.x;
+  float _v_8_2 = _v_7_1.y;
+  float _v_8_3 = _v_7_1.z;
+  float _v_8_4 = _v_7_1.w;
+  float _v_13_0 = 0.0;
+  float _v_4_2 = (_v_8_1 + _v_8_2);
+  float4 _v_9_4 = float4(_v_8_1, _v_8_2, _v_8_3, _v_13_0);
+  float _v_17_2 = (_v_4_2 + _v_8_3);
+  float _v_18_1 = _v_17_2 * (0.3333333);
+  float4 _v_19_3 = lerp(float4(_v_18_1, _v_18_1, _v_18_1, _v_18_1), _v_9_4, _in._saturation_26713);
+  float3 _v_0_1 = RGBtoHSV(_v_19_3.xyz);
+  float _v_14_1 = float4(_v_0_1, 0.0).x;
+  float _v_14_2 = float4(_v_0_1, 0.0).y;
+  float _v_14_3 = float4(_v_0_1, 0.0).z;
+  float _v_14_4 = float4(_v_0_1, 0.0).w;
+  float _v_5_2 = (_v_14_1 + _in._hue_21117);
+  float _v_16_1 = frac(_v_5_2);
+  float4 _v_15_4 = float4(_v_16_1, _v_14_2, _v_14_3, _v_14_4);
+  float3 _v_10_1 = HSVtoRGB(_v_15_4.xyz);
+  float3 _v_20_2 = (_v_10_1 * float3(_in._value_13390, _in._value_13390, _in._value_13390));
+  float _v_11_1 = float4(_v_20_2, 0.0).x;
+  float _v_11_2 = float4(_v_20_2, 0.0).y;
+  float _v_11_3 = float4(_v_20_2, 0.0).z;
+  float4 _v_12_4 = float4(_v_11_1, _v_11_2, _v_11_3, _v_8_4);
+  _out.col0 = _v_12_4;
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_hue_saturation {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _hue_21117;
+  float _saturation_26713;
+  float _value_13390;
+  Texture2D sampler0_t;
+  bool sampler0_wrap;
+  SamplerState sampler0;
+};
+struct OutputStruct_hue_saturation {
+  float4 col0;
+};
+"""
+  }
+}

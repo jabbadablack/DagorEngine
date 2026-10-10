@@ -1,0 +1,82 @@
+
+rectangle {
+  params {
+    _softness_size_29434:r = 0.001
+    _x_size_26119:r = 1.0
+    _y_size_32550:r = 1.0
+  }
+  inputs:i=0
+  shaderPreMain:t="""
+    // [[mrt_outputs_decl]]
+
+    cbuffer global {
+      float _softness_size_29434;
+      float _x_size_26119;
+      float _y_size_32550;
+    };
+  """
+  shaderCode:t="""
+  InputStruct_rectangle _in;
+  _in.pos = input.pos;
+  _in.tc = input.tc;
+  // [[particle_fields_initialization]]
+  _in._softness_size_29434 = _softness_size_29434; // 0.001
+  _in._x_size_26119 = _x_size_26119; // 1.0
+  _in._y_size_32550 = _y_size_32550; // 1.0
+
+
+  OutputStruct_rectangle _out;
+  _out._z_46559 = 0.0;
+  _out._w_46546 = 0.0;
+  _out.col0 = float4(0.0, 0.0, 0.0, 0.0);
+
+  _function_rectangle(_in, _out);
+  result.col0 = _out.col0;
+
+  """
+  substitutions {
+    mrt_outputs_decl:t="""
+
+ float4 col0:SV_Target0;  """
+    shader_function:t="""
+
+  void _function_rectangle(InputStruct_rectangle _in, out OutputStruct_rectangle _out) {
+
+  float _v_1_0 = 1.0;
+  float2 _v_2_0 = _in.tc;
+  float _v_6_0 = 0.0;
+  float _v_7_1 = float4(_v_2_0, 0.0, 0.0).x;
+  float _v_7_2 = float4(_v_2_0, 0.0, 0.0).y;
+  _out._z_46559 = float4(_v_2_0, 0.0, 0.0).z;
+  _out._w_46546 = float4(_v_2_0, 0.0, 0.0).w;
+  float _v_11_0 = 0.5;
+  float _v_13_2 = (_v_7_2 - _v_11_0);
+  float _v_14_1 = abs(_v_13_2);
+  float _v_8_2 = (_v_14_1 * _in._y_size_32550);
+  float _v_10_2 = (_v_7_1 - _v_11_0);
+  float _v_12_1 = abs(_v_10_2);
+  float _v_5_2 = (_v_12_1 * _in._x_size_26119);
+  float _v_15_2 = max(_v_5_2, _v_8_2);
+  float _v_9_2 = (_v_1_0 - _v_15_2);
+  float _v_16_3 = saturate((_v_9_2 - _v_6_0) / (_in._softness_size_29434 - _v_6_0));
+  _out.col0 = float4(_v_16_3, _v_16_3, _v_16_3, _v_16_3);
+
+  }"""
+    structures_decl:t="""
+
+struct InputStruct_rectangle {
+  float4 pos;
+  float3 tc;
+  // [[particle_fields]]
+  float _softness_size_29434;
+  float _x_size_26119;
+  float _y_size_32550;
+};
+struct OutputStruct_rectangle {
+  float _z_46559;
+  float _w_46546;
+  float4 col0;
+};
+"""
+  }
+}

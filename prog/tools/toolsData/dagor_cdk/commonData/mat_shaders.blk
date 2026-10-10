@@ -1,0 +1,32 @@
+simple_aces{
+  diffuse_tex {}
+  bump_tex {}
+}
+
+land_mesh_height_decal{
+  diffuse_tex {}
+}
+
+land_mesh_combined_detailed_decal{
+  diffuse_tex {}
+}
+
+land_mesh_combined{
+  diffuse_tex {}
+}
+land_mesh_combined{
+  diffuse_tex {}
+}
+
+water_3d{}
+
+water_aces{}
+
+layered_static {
+  base_d_tex {}
+  base_n_tex {}
+  tile1_d_tex {}
+  tile1_n_tex {}
+  tile2_d_tex {}
+  tile2_n_tex {}
+}
