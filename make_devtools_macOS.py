@@ -147,7 +147,7 @@ dxc_dest_folder = dest_dir+'/DXC-1.8.2505.1'
 if pathlib.Path(dxc_dest_folder).exists():
   print('=== DXC May 2025 - Patch 1 -- 1.8.2505.1 found at {0}, skipping setup'.format(dxc_dest_folder))
 else:
-  download_url('https://github.com/GaijinEntertainment/DXC-prebuilt/releases/download/dxc-1.8.2505.1/DXC-1.8.2505.1.tar.gz')
+  download_url('https://github.com/Prose-Studio/DagorEngine/releases/download/dxc-1.8.2505.1/DXC-1.8.2505.1.tar.gz')
   with tarfile.open(os.path.normpath(dest_dir+'/.packages/DXC-1.8.2505.1.tar.gz'), 'r:gz') as tar_file:
     tar_file.extractall(dest_dir)
     tar_file.close()
@@ -185,7 +185,7 @@ try:
 except FileNotFoundError:
   print("jam not found, installing jam...")
   jam_zip = 'jam-macOS-11.0-arm64.tar.gz' if mac_proc_arm else 'jam-macOS-10.9-x64_86.tar.gz'
-  download_url('https://github.com/GaijinEntertainment/jam-G8/releases/download/2.5-G8-1.3-2024%2F04%2F01/'+jam_zip)
+  download_url('https://github.com/Prose-Studio/DagorEngine/releases/download/2.5-G8-1.3-2024%2F04%2F01/'+jam_zip)
   with tarfile.open(os.path.normpath(dest_dir+'/.packages/'+jam_zip), 'r:gz') as tar_file:
     tar_file.extractall(dest_dir)
     run('chmod 755 '+dest_dir+'/jam')

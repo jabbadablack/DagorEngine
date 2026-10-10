@@ -257,7 +257,7 @@ except FileNotFoundError:
     elif is_elbrus_linux:
       jam_zip = 'jam-ElbrusLinux-8-e2k-v3.tar.gz'
 
-  download_url('https://github.com/GaijinEntertainment/jam-G8/releases/download/2.5-G8-1.3-2024%2F04%2F01/'+jam_zip)
+  download_url('https://github.com/Prose-Studio/DagorEngine/releases/download/2.5-G8-1.3-2024%2F04%2F01/'+jam_zip)
   with tarfile.open(os.path.normpath(dest_dir+'/.packages/'+jam_zip), 'r:gz') as tar_file:
     tar_file.extractall(dest_dir)
     print('--- will copy jam to /usr/local/bin using sudo:')
