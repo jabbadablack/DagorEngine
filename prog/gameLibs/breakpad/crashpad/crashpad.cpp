@@ -164,8 +164,9 @@ void init(Product &&prod, Configuration &&cfg_)
   if (dgs_get_argv("crashpad-no-upload-gzip"))
     aargs.emplace_back("--no-upload-gzip");
   crashpad_client.demandInit();
+  // empty url keeps reports in the local db
   if (!crashpad_client->StartHandler(base::FilePath(exeDir + L"crashpad_handler.exe"), dumpDbPath, {},
-        "http://palvella.gaijin.net/submit", annotations, aargs, true, false, attachments))
+        cfg.urls.empty() ? "" : cfg.urls.front().c_str(), annotations, aargs, true, false, attachments))
   {
     logerr("Failed to init crashpad. Missing crashpad_handler.exe?");
     return;
@@ -236,8 +237,6 @@ void configure(const Product &p)
     simple_annotations_dict.SetKeyValue("ProductName", p.name.c_str());
   }
 }
-
-void set_environment(const char *) {}
 
 void add_file_to_report(const char *path)
 {

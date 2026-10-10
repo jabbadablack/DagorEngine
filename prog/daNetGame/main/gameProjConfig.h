@@ -29,6 +29,8 @@ static inline const char *es_order_fpath() { return "config/es_order.blk"; }
 
 //! [mandatory] default statsd URL to be used when stats_url:t= not set
 extern const char *default_statsd_url();
+//! [mandatory] crash report upload URL (UseGameCrashReportURL jam var), nullptr keeps crash dumps local
+extern const char *crash_report_url();
 //! [mandatory] statsd key
 extern const char *statsd_key();
 //! [mandatory] default eventlog project name to be used when eventLog{project:t= not set

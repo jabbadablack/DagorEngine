@@ -28,6 +28,10 @@ local statsd_url_str = \"$(UseGameStatsdURL)\" ;
 statsd_url_str ?= nullptr ;
 DefVars_$(Game) += const char* default_statsd_url(){ return $(statsd_url_str);} ;
 
+local crash_report_url_str = \"$(UseGameCrashReportURL)\" ;
+crash_report_url_str ?= nullptr ;
+DefVars_$(Game) += const char* crash_report_url(){ return $(crash_report_url_str);} ;
+
 local statsd_key_str = \"$(UseGameStatsdKey)\" ;
 statsd_key_str ?= \"$(Game)\" ;
 DefVars_$(Game) += const char* statsd_key(){ return $(statsd_key_str);} ;

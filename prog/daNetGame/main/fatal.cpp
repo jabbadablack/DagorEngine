@@ -123,6 +123,8 @@ static void enable_breakpad()
 
   breakpad::Configuration cfg;
   cfg.userAgent = gameproj::game_telemetry_name();
+  if (const char *url = gameproj::crash_report_url())
+    cfg.urls.push_back(url);
   cfg.notify = notify_user;
   cfg.preprocess = [](breakpad::CrashInfo &ci) { ci.name = !ci.isManual ? "Exception" : classify_fatal_type(ci.expression, ci.file); };
   // This is called right after spawn of bpreport process (which is stalled in user message box asking about submission)

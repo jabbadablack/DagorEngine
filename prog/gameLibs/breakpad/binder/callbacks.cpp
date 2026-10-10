@@ -124,8 +124,6 @@ static void run_uploader(const Context *ctx, const char *dump_path, const char *
     PUSH_CLI_ARG(i, "--crashtype", ct)
     if (!ctx->configuration.systemId.empty())
       PUSH_CLI_ARG(i, "--systemid", ctx->configuration.systemId.c_str())
-    if (!ctx->configuration.environment.empty())
-      PUSH_CLI_ARG(i, "--env", ctx->configuration.environment.c_str())
     snprintf(user_id, sizeof(user_id), "%llu", (unsigned long long)ctx->configuration.userId);
     PUSH_CLI_ARG(i, "--uid", user_id)
     for (const auto &f : ctx->configuration.files)
@@ -275,8 +273,6 @@ wchar_t *prepare_args(const Context *ctx, const wchar_t *path, const wchar_t *id
   CONVWRITE("silent", ctx->configuration.silent ? "1" : "0");
   if (!ctx->configuration.systemId.empty())
     CONVWRITE("systemid", ctx->configuration.systemId.c_str());
-  if (!ctx->configuration.environment.empty())
-    CONVWRITE("env", ctx->configuration.environment.c_str());
   FMTWRITE("%llu", "uid", ctx->configuration.userId);
   if (ctx->crash.name || !ctx->product.commandLine.empty())
     CONVWRITE("crashtype", ctx->crash.getName(ctx->configuration));

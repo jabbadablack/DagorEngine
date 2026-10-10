@@ -147,6 +147,8 @@ void init(Product &&prod, Configuration &&cfg_)
 
   context = new Context(eastl::move(prod), eastl::move(cfg_));
   context->crash.reset();
+  if (context->configuration.urls.empty()) // nowhere to submit, keep dumps local
+    context->configuration.senderCmd.clear();
   const Configuration &cfg = context->configuration;
   int iterator = 0;
   while (const char *path = ::dgs_get_argv("add_file_to_report", iterator))
@@ -283,15 +285,6 @@ void configure(const Product &p)
     oldProd.comment = p.comment;
 
   reload_args();
-}
-
-void set_environment(const char *env)
-{
-  if (context)
-  {
-    context->configuration.environment = env;
-    reload_args();
-  }
 }
 
 void add_file_to_report(const char *path)

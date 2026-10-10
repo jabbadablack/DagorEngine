@@ -86,8 +86,6 @@ void Configuration::update(int argc, char **argv)
           userId = argv[++i];
         else if (ARGMATCH("crashtype"))
           crashType = argv[++i];
-        else if (ARGMATCH("env"))
-          stats.env = argv[++i];
         else if (ARGMATCH(product_name))
         {
           ++i;
@@ -196,8 +194,7 @@ std::ostream &operator<<(std::ostream &os, const Configuration &c)
 
   os << "\n---- crash ------"
      << "\nproduct title: " << c.productTitle << "\nproduct: " << c.product << "\ntimestamp: " << c.timestamp
-     << "\nsystemId: " << c.systemId << "\nuser Id: " << c.userId << "\ntype: " << c.crashType << "\n---- stats ------"
-     << "\nhost: " << c.stats.host << ":" << c.stats.port << "\nenv: " << c.stats.env;
+     << "\nsystemId: " << c.systemId << "\nuser Id: " << c.userId << "\ntype: " << c.crashType;
 
   os.flags(flags);
 

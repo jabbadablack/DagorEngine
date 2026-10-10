@@ -96,7 +96,6 @@ struct Configuration
   uint64_t userId = 0;
   eastl::string defaultCrashName = "Exception";
   eastl::string locale = "en-US";
-  eastl::string environment;
   eastl::string productTitle;
   eastl::string d3dDriver = "<Unknown>";
   eastl::string gpuVendor = "<Unknown>";
@@ -128,7 +127,6 @@ void remove_file_from_report(const char *path);
 void set_user_id(uint64_t uid);
 void set_locale(const char *locale_code);
 void set_product_title(const char *product_name);
-void set_environment(const char *env);
 void set_d3d_driver_data(const char *driver, const char *vendor);
 
 bool is_enabled();

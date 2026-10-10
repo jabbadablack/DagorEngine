@@ -274,6 +274,7 @@ if $(Config) != rel && $(Config) != irel && $(Platform) in windows macOS linux {
 }
 
 
+if $(UseGameCrashReportURL) { EnableBreakpadSubmission ?= yes ; } # set UseGameCrashReportURL before including setup.jam
 EnableBreakpadSubmission ?= no ;
 if $(Dedicated) = no && $(Platform) in windows linux && $(Config) = rel {
   ForceLogs = yes ;

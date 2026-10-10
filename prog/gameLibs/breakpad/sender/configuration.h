@@ -45,7 +45,7 @@ struct Configuration
   std::map<std::string, std::string> files;
   bool silent = false;
   bool haveDump = false;
-  std::vector<std::string> urls = {"http://palvella.gaijin.net/submit"};
+  std::vector<std::string> urls;
 
   std::string userAgent = "Breakpad 1.0";
   std::string product;
@@ -58,13 +58,6 @@ struct Configuration
   bool allowEmail = false;
   bool restartParent = false;
   std::vector<std::string> parent;
-
-  struct Stats
-  {
-    std::string host = "client-stats.gaijin.net";
-    uint16_t port = 20011;
-    std::string env = "production";
-  } stats;
 }; // struct Configuration
 
 std::ostream &operator<<(std::ostream &, const Configuration &);

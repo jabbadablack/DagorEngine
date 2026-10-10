@@ -50,7 +50,6 @@ Sources =
   ui.cpp
   sender.cpp
   dagorStubs.cpp
-  stats.cpp
   log.cpp
 ;
 

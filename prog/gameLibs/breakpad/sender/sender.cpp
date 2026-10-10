@@ -5,7 +5,6 @@
 #include "configuration.h"
 #include "files.h"
 #include "log.h"
-#include "stats.h"
 #include "ui.h"
 #include "upload.h"
 
@@ -34,13 +33,11 @@ int spawn(const std::vector<std::string> &parent)
     cmd += a + " ";
 
   log << "Restarting parent: " << cmd << std::endl;
-  stats::count("spawn", "start");
   wchar_t buf[2048] = {L'\0'};
   std::wstring wcmd = utf8_to_wcs(cmd.c_str(), buf, 2048);
   if (wcmd.empty())
   {
     log << "Could not spawn process: error in commandline" << std::endl;
-    stats::count("spawn", "fail");
     return 1;
   }
 
@@ -55,13 +52,11 @@ int spawn(const std::vector<std::string> &parent)
   ZeroMemory(&pi, sizeof(pi));
 
   bool spawned = ::CreateProcessW(wexe.c_str(), (wchar_t *)wcmd.c_str(), NULL, NULL, FALSE, 0, NULL, wcwd.c_str(), &si, &pi);
-  stats::count("spawn", spawned ? "success" : "fail");
   return spawned ? 0 : 1;
 #else
   if (pid_t pid = fork())
   {
     bool spawned = waitpid(pid, NULL, WNOHANG) >= 0;
-    stats::count("spawn", spawned ? "success" : "fail");
     return spawned ? 0 : 1;
   }
   else
@@ -95,13 +90,9 @@ int process_report(int argc, char **argv)
   if (!cfg.isValid())
     return 1;
 
-  stats::init(cfg);
-  stats::count("report", "start");
-
   ui::Response r = cfg.silent ? ui::Response::Send : ui::query(cfg);
   if (r != ui::Response::Send)
   {
-    stats::count("report", "decline");
     log << "User refused to submit report" << std::endl;
     return (r == ui::Response::Restart) ? spawn(cfg.parent) : 0;
   }
@@ -132,8 +123,6 @@ int process_report(int argc, char **argv)
         finalResponse += response.substr(0, response.find('\n'));
     }
   }
-
-  stats::count("report", success ? "success" : "fail");
 
   if (success)
     files::postprocess(cfg, finalResponse.substr(0, finalResponse.find(',')));
