@@ -18,10 +18,13 @@ ENGINE = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)
 CONSOLES = {'ps4', 'ps5', 'xboxOne', 'scarlett', 'nswitch'}
 PLATFORMS = {'windows', 'linux', 'macOS', 'iOS', 'tvOS', 'android'}
 ARCHS = {'x86_64': 'x86_64', 'arm64': 'arm64', 'arm64-v8a': 'arm64', 'e2k': 'e2k'}
+# jam switches whose value is fixed in CMake builds: the vendored OpenSSL and libcurl, NEON on Android arm64
+CONSTANT_VARS = {'UseSystemOpenSSL': 'no', 'UseSystemLibcurl': 'no', 'AndroidHasNeon': 'yes'}
 CONDITION_VARS = {'Platform': 'DAGOR_PLATFORM', 'PlatformArch': 'DAGOR_ARCH', 'KernelLinkage': 'DAGOR_KERNEL_LINKAGE',
                   'SSEVersion': 'DAGOR_SSE', 'Sanitize': 'DAGOR_SANITIZE', 'PlatformSpec': 'DAGOR_CC'}
 LIST_VARS = {'Sources': 'sources', 'AddIncludes': 'includes', 'UseProgLibs': 'deps', 'CPPopt': 'cpp_opt',
-             'Copt': 'c_opt', 'AddLibs': 'libs', 'LINKopt': 'link_options'}
+             'Copt': 'c_opt', 'AddLibs': 'libs', 'LINKopt': 'link_options', 'ExplicitLicenseUsed': 'license_files'}
+IGNORED_VARS = {'TargetLib'}  # jam bookkeeping without a CMake counterpart
 SCALAR_VARS = {'Location', 'Target', 'TargetType', 'StrictCompile', 'ConsoleExe', 'OutDir', 'Exceptions', 'Rtti',
                'Root'}
 KNOWN_INCLUDES = {'defaults.jam', 'build.jam', 'unitTest.jam'}
@@ -190,6 +193,10 @@ def value(word, kind):
     raise Untranslatable(word)
   if kind == 'deps' and w.startswith('${DAGOR_PROG_DIR}/'):
     w = w[len('${DAGOR_PROG_DIR}/'):]
+  if kind == 'libs':  # Ws2_32.lib and -lX11 are the libraries Ws2_32 and X11
+    w = re.sub(r'(?i)\.lib$', '', w) if '/' not in w else w
+    w = re.sub(r'^-l', '', w)
+    w = re.sub(r'^"?-framework\s+(\w+)"?$', r'-Wl,-framework,\1', w)  # one argument for the linker driver
   return w
 
 
@@ -219,6 +226,8 @@ def condition(words):
 
   def operand(w):
     m = re.fullmatch(r'\$\((\w+)\)', w)
+    if m and m.group(1) in CONSTANT_VARS:
+      return ('lit', CONSTANT_VARS[m.group(1)])
     if m:
       var = m.group(1)
       if var not in CONDITION_VARS:
@@ -286,7 +295,11 @@ def condition(words):
     else:
       a = operand(w)
       op = words[i + 1] if i + 1 < len(words) else None
-      if op in ('=', '!='):
+      if op in ('=', '!=') and a[0] == 'lit':
+        equal = a[1] == operand(words[i + 2])[1]
+        expr.append('TRUE' if equal == (op == '=') else 'FALSE')
+        i += 3
+      elif op in ('=', '!='):
         expr.append(term(a, op, [words[i + 2]]))
         i += 3
       elif op == 'in':
@@ -306,6 +319,10 @@ def condition(words):
           raise Untranslatable(w)
         i += 1
   text = ' '.join(expr)
+  # conditions that only depended on consoles fold to constants
+  if re.fullmatch(r'(TRUE|FALSE|NOT|AND|OR|\(|\)|\s)+', text):
+    py = text.replace('TRUE', 'True').replace('FALSE', 'False').replace('NOT', 'not').replace('AND', 'and')
+    return 'TRUE' if eval(py.replace('OR', 'or')) else 'FALSE'
   return text
 
 
@@ -326,7 +343,7 @@ class Converter:
     for v in values:
       m = re.fullmatch(r'\$\((\w+)(?::D=([^)]*))?\)', v)
       if m and m.group(1) in self.user_vars:
-        if m.group(2) is None:
+        if not m.group(2):
           out.append('${' + m.group(1) + '}')
         else:
           self.derived += 1
@@ -391,9 +408,21 @@ class Converter:
           self.emit(depth, 'set({})'.format(name))
         self.used.add(name)
       return
+    if var in IGNORED_VARS:
+      return
     if var in SCALAR_VARS and depth == 0 and op in ('=', '?='):
       self.scalars[var] = values
       return
+    # <list> = [ GLOB $(Root)/$(Location)[/<dir>] : <patterns> ] ; names relative to <dir>, as :D= makes them
+    if len(values) >= 5 and values[0] == '[' and values[1] == 'GLOB' and values[-1] == ']' and values[3] == ':':
+      d = values[2]
+      sub = re.fullmatch(r'\$\(Root\)/\$\(Location\)(?:/(.*))?', d)
+      if sub:
+        base = '${CMAKE_CURRENT_SOURCE_DIR}' + ('/' + sub.group(1) if sub.group(1) else '')
+        patterns = ' '.join('"{}/{}"'.format(base, p) for p in values[4:-1])
+        self.emit(depth, 'file(GLOB {} RELATIVE "{}" CONFIGURE_DEPENDS {})'.format(var, base, patterns))
+        self.user_vars.add(var)
+        return
     # the jamfile's own lists of sources and dirs
     if re.search(r'(?i)(sources|src|folder|dirs?|files)', var) and op in ('=', '+=', '?='):
       try:
@@ -492,6 +521,31 @@ class Converter:
       parts.append('else {{ {} }}'.format(text(else_block)))
     return ' '.join(parts)
 
+  def test_manifest(self, exe):
+    """the dagor_add_catch2_test options of the test.blk target of <exe>"""
+    path = os.path.join(os.path.dirname(self.jamfile), 'test.blk')
+    if not os.path.exists(path):
+      return []
+    text = open(path, encoding='utf-8', errors='replace').read()
+    for block in re.findall(r'target\s*\{(.*?)\}', text, re.S):
+      values = re.findall(r'(\w+):[a-z]+=("[^"]*"|\S+)', block)
+      get = lambda key: [v.strip('"') for k, v in values if k == key]
+      if get('exe') != [exe]:
+        continue
+      out = []
+      for key, kw in (('tag', 'TAGS'), ('requires', 'REQUIRES'), ('platform', 'PLATFORMS')):
+        if get(key):
+          out.append('{} {}'.format(kw, ' '.join(get(key))))
+      for key, kw in (('timeout', 'TIMEOUT'), ('caseTimeout', 'CASE_TIMEOUT'), ('dataDir', 'DATA_DIR')):
+        if get(key):
+          out.append('{} {}'.format(kw, get(key)[0]))
+      if get('serial') and get('serial')[0] in ('yes', 'true', '1'):
+        out.append('SERIAL')
+      if get('args'):
+        out.append('ARGS ' + get('args')[0])
+      return out
+    return []
+
   def call(self):
     s = self.scalars
     type_ = (s.get('TargetType') or ['lib'])[0]
@@ -500,8 +554,10 @@ class Converter:
     args = []
     if s.get('StrictCompile') == ['yes']:
       args.append('STRICT')
-    if s.get('ConsoleExe') == ['yes'] or s.get('unitTest'):
+    if s.get('ConsoleExe') == ['yes'] and not s.get('unitTest'):
       args.append('CONSOLE')
+    if s.get('unitTest'):
+      args += self.test_manifest(name)
     for var, prop in (('Exceptions', 'EXCEPTIONS'), ('Rtti', 'RTTI')):
       if s.get(var) in (['yes'], ['no']):
         args.append('{} {}'.format(prop, 'ON' if s[var] == ['yes'] else 'OFF'))
@@ -513,7 +569,7 @@ class Converter:
     for var, kw in (('sources', 'SOURCES'), ('force_includes', 'FORCE_INCLUDES'), ('includes', 'PRIVATE_INCLUDES'),
                     ('defines', 'PRIVATE_DEFINES'), ('options', 'COMPILE_OPTIONS'), ('c_options', 'C_OPTIONS'),
                     ('source_options', 'SOURCE_OPTIONS'), ('deps', 'DEPS'), ('libs', 'SYSTEM_LIBS'),
-                    ('link_options', 'LINK_OPTIONS')):
+                    ('link_options', 'LINK_OPTIONS'), ('license_files', 'LICENSE_FILES')):
       if var in self.used:
         args.append('{} ${{{}}}'.format(kw, var))
     if s.get('unitTest'):
@@ -524,10 +580,6 @@ class Converter:
       head = 'dagor_add_shared_library({}'.format(name)
     else:
       head = 'dagor_add_library('
-      lib_name = os.path.splitext(target)[0]
-      location = (s.get('Location') or [''])[0]
-      if lib_name and location and '$(' not in lib_name and lib_name != location[len('prog/'):]:
-        self.emit(0, '# jam named the library {}; dependents use the directory name'.format(target))
     sep = '' if head.endswith('(') else ' '
     if len(head) + 1 + sum(len(a) + 1 for a in args) <= 118:
       self.emit(0, head + sep + ' '.join(args) + ')')

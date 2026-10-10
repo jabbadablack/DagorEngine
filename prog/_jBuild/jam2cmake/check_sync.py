@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """While jam and CMake coexist: the jamfiles changed since <base> whose directory has a CMakeLists.txt that did not
-change too, and the ported directories that still have TODO(jam) lines (deleted together with jam).
+change too, and the ported directories that still have TODO(jam) lines or the skeleton's header (deleted together with
+jam).
 
 python check_sync.py [<base git revision, default origin/main>]  -- exit code 1 when either list is not empty
 """
@@ -25,7 +26,8 @@ def main(argv):
       lists = d + '/CMakeLists.txt'
       if os.path.exists(os.path.join(ENGINE, lists)) and lists not in changed:
         problems.append('{} changed, {} did not'.format(path, lists))
-  for line in git('grep', '-n', 'TODO(jam)', '--', '*CMakeLists.txt', '*.cmake'):
+  # TODO(jam) lines, and skeleton headers not yet replaced by a description of the directory
+  for line in git('grep', '-n', '-e', 'TODO(jam)', '-e', 'jam2cmake/skeleton.py', '--', '*CMakeLists.txt', '*.cmake'):
     if line:
       problems.append('unported: ' + line)
   for p in problems:
