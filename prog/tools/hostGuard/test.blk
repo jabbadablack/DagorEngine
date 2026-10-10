@@ -1,0 +1,8 @@
+// the fork contacts no Gaijin hosts: see host_guard.py
+target{
+  name:t="tools.hostGuard"
+  layer:t="exec"
+  tag:t="tools"
+  timeout:r=600
+  command:t="{python} -m unittest -v test_host_guard"
+}
