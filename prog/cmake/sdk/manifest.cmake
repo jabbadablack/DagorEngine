@@ -56,3 +56,21 @@ dagor_sdk(nasm 2.16
     URL https://www.nasm.us/pub/nasm/releasebuilds/2.16/macosx/nasm-2.16-macosx.zip
     SHA256 fa0aca18ac11baefa9090f22fe372903a36beecf73dc998f2fdb90632eec2b1e
 )
+
+# NVIDIA NVAPI R610 (pinned to the commit of the release: the repository's main branch moves on)
+dagor_sdk(nvapi R610
+  any
+    URL https://github.com/NVIDIA/nvapi/archive/cd6918f60b3c9a0476fdfe7e89bb32330602049d.zip
+    SHA256 e9832432139331aef90356c78f92a0ad7d238fc527128ad9f51350614d3c598a
+    FILE nvapi-R610.zip
+    EXTRACT */*.h */amd64/* */x86/* */License.txt
+)
+
+# Microsoft DirectX 12 Agility SDK (headers, d3dx12 and the redistributable D3D12Core/SDKLayers)
+dagor_sdk(agility 1.619.3
+  any
+    URL https://www.nuget.org/api/v2/package/Microsoft.Direct3D.D3D12/1.619.3
+    SHA256 43a7d5a3973812eb4b42623fae5275c790a005b8e48b8d7f5bb43cef39e073c5
+    FILE Microsoft.Direct3D.D3D12.1.619.3.zip
+    EXTRACT build/native/* LICENSE.txt LICENSE-CODE.txt
+)

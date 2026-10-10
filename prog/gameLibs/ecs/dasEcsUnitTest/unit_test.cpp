@@ -444,15 +444,19 @@ extern "C" int main(int argc, char **argv)
 #endif
   start_classic_debug_system(debugFile ? "debug" : nullptr, false);
   dd_get_fname(""); //== pull in directoryService.obj
+#ifdef DAS_ECS_TEST_ENGINE_ROOT
+  eastl::string engineRoot = DAS_ECS_TEST_ENGINE_ROOT "/"; // the CMake build passes the engine checkout
+#else
   char buf[512];
-  eastl::string loc;
+  eastl::string engineRoot; // jam builds the program into <engine>/tools/util
   if (strstr(dgs_argv[0], "/") || strstr(dgs_argv[0], "\\"))
-    loc = eastl::string(dd_get_fname_location(buf, dgs_argv[0]));
+    engineRoot = eastl::string(dd_get_fname_location(buf, dgs_argv[0])) + "../../";
   else
-    loc = "../../";
-  dd_set_named_mount_path("daslibEcs", (loc + "../../prog/gameLibs/das/ecs").c_str());
-  dd_set_named_mount_path("daslib", (loc + "../../prog/1stPartyLibs/daScript/daslib").c_str());
-  bind_dascript::set_das_root((loc + "../../prog/1stPartyLibs/daScript").c_str()); // use exe dir as root path
+    engineRoot = "../../../../";
+#endif
+  dd_set_named_mount_path("daslibEcs", (engineRoot + "prog/gameLibs/das/ecs").c_str());
+  dd_set_named_mount_path("daslib", (engineRoot + "prog/1stPartyLibs/daScript/daslib").c_str());
+  bind_dascript::set_das_root((engineRoot + "prog/1stPartyLibs/daScript").c_str());
   printf("daScript+daECS unit test\n");
   debug_flush(true);
   dd_add_base_path("");

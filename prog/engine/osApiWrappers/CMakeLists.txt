@@ -2,7 +2,8 @@
 #
 # On Linux the window title and clipboard come from engine/osApiWrappers/linuxGUI in programs with a GUI and from
 # stubs otherwise. A program chooses with the DAGOR_LINUX_GUI target property (dagor_add_executable(... PROPERTIES
-# DAGOR_LINUX_GUI ON)), or gets ON from a library that sets INTERFACE_DAGOR_LINUX_GUI (the Vulkan driver).
+# DAGOR_LINUX_GUI ON)), or gets ON from a library that sets INTERFACE_DAGOR_LINUX_GUI (the Vulkan driver); see
+# dagor_add_link_choice().
 set(sources
   critsec.cpp
   timedCritsec.cpp
@@ -94,12 +95,13 @@ elseif(DAGOR_PLATFORM MATCHES "^(linux|android)$")
     list(APPEND sources ${posix_async_read})
     # the GUI or the stubs, by the DAGOR_LINUX_GUI property of the program this ends up in
     dagor_use(engine/osApiWrappers/linuxGUI)
-    list(APPEND deps
-      "$<IF:$<BOOL:$<TARGET_PROPERTY:DAGOR_LINUX_GUI>>,engine.osApiWrappers.linuxGUI,engine.osApiWrappers.noGUI>")
     dagor_add_library(engine.osApiWrappers.noGUI STRICT
       SOURCES linux/linuxSetTitleStub.cpp linux/linuxClipboardStub.cpp
       PRIVATE_INCLUDES ${includes}
       PRIVATE_DEFINES __B_KERNEL_LIB)
+    dagor_add_link_choice(engine.osApiWrappers.linuxShell PROPERTY DAGOR_LINUX_GUI
+      ON engine.osApiWrappers.linuxGUI OFF engine.osApiWrappers.noGUI)
+    list(APPEND deps engine.osApiWrappers.linuxShell)
   endif()
 endif()
 
@@ -110,5 +112,4 @@ dagor_add_library(STRICT
   COMPILE_OPTIONS ${options}
   DEPS ${deps}
   SYSTEM_LIBS ${libs}
-  PROPERTIES COMPATIBLE_INTERFACE_BOOL DAGOR_LINUX_GUI
 )

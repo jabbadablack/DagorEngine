@@ -1,19 +1,10 @@
-set(SQMODULES_SRC 
-  sqmodules.cpp
-  helpers.cpp
-  path.cpp
-  deffileaccess.cpp
-)
-
-
-add_library(sqmodules STATIC ${SQMODULES_SRC})
-add_library(squirrel::sqmodules ALIAS sqmodules)
-
-target_link_libraries(sqmodules sqstdlib squirrel)
-target_include_directories(sqmodules PUBLIC
-  "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>"
-  "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sqmodules>"
-  "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
-  PRIVATE
-  "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/sqrat/include>"
-  )
+# Quirrel's module system (require(), file access); the engine's build replaces upstream's CMakeLists.txt
+set(sources sqmodules.cpp path.cpp helpers.cpp)
+if(DAGOR_PLATFORM MATCHES "^(windows|linux|macOS)$")
+  list(APPEND sources deffileaccess.cpp)
+endif()
+set(options)
+if(DAGOR_CC STREQUAL "msvc")
+  list(APPEND options -wd4267)
+endif()
+dagor_add_library(QUIRREL_HEADERS SOURCES ${sources} COMPILE_OPTIONS ${options})

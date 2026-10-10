@@ -12,6 +12,14 @@
 # DAGOR_TEST_UPDATE_REFERENCES=1 in the environment makes image tests replace their reference images.
 include_guard(GLOBAL)
 
+set(_dagor_tests_default OFF)
+if(DAGOR_VARIANT MATCHES "^(tests|all)$")
+  set(_dagor_tests_default ON)
+endif()
+option(DAGOR_BUILD_TESTS "Build and register the tests (the tests and all trees); off, dagor_add_*_test() do nothing"
+  ${_dagor_tests_default})
+unset(_dagor_tests_default)
+
 set(DAGOR_TEST_REQUIREMENTS gpu display network http_server)
 set(DAGOR_TEST_DEFAULT_TIMEOUT 600)
 set(_DAGOR_TEST_ONE_VALUE TIMEOUT CASE_TIMEOUT DATA_DIR WORKING_DIRECTORY PROJECT)
@@ -65,7 +73,7 @@ endfunction()
 
 # whether a test for <platforms> belongs to this tree (empty: every platform)
 function(_dagor_test_platform_ok out)
-  if(ARGN AND NOT DAGOR_PLATFORM IN_LIST ARGN)
+  if(NOT DAGOR_BUILD_TESTS OR (ARGN AND NOT DAGOR_PLATFORM IN_LIST ARGN))
     set(${out} OFF PARENT_SCOPE)
   else()
     set(${out} ON PARENT_SCOPE)
@@ -98,20 +106,42 @@ function(dagor_add_catch2_test name)
   _dagor_link(${name} PRIVATE 3rdPartyLibs/catch2 engine/unitTest)
   target_compile_definitions(${name} PRIVATE "UNITTEST_DEFAULT_DATA_DIR=\"${data_dir}\"")
 
+  _dagor_catch2_register(${name} ${name} "${data_dir}" ${test_args})
+endfunction()
+
+# dagor_add_catch2_run(<target> <name> [DATA_DIR <dir>] [ARGS ...] <common options>): another run of the cases of a
+# dagor_add_catch2_test program, with other arguments and requirements (e.g. on the stub 3d driver); its tests are
+# named <name>:<case>
+function(dagor_add_catch2_run target name)
+  cmake_parse_arguments(PARSE_ARGV 2 arg "${_DAGOR_TEST_OPTIONS}" "${_DAGOR_TEST_ONE_VALUE}" "${_DAGOR_TEST_MULTI_VALUE}")
+  _dagor_test_platform_ok(ok ${arg_PLATFORMS})
+  if(NOT ok OR NOT TARGET ${target})
+    return()
+  endif()
+  set(data_dir "${CMAKE_CURRENT_SOURCE_DIR}")
+  if(arg_DATA_DIR)
+    _dagor_abs_paths(data_dir "${arg_DATA_DIR}")
+  endif()
+  _dagor_catch2_register(${target} ${name} "${data_dir}" ${ARGN})
+endfunction()
+
+# CTest tests <name>:<case> for the cases of the Catch2 program <target>
+function(_dagor_catch2_register target name data_dir)
+  cmake_parse_arguments(PARSE_ARGV 3 arg "${_DAGOR_TEST_OPTIONS}" "${_DAGOR_TEST_ONE_VALUE}" "${_DAGOR_TEST_MULTI_VALUE}")
   if(DAGOR_CROSS_COMPILING)
     return()
   endif()
-  _dagor_test_properties(props cpp ${test_args})
+  _dagor_test_properties(props cpp ${ARGN})
   set(extra --data-dir "${data_dir}" --artifact-dir "${CMAKE_BINARY_DIR}/test-artifacts/${name}" ${arg_ARGS})
   if(arg_CASE_TIMEOUT)
     list(APPEND extra --case-timeout ${arg_CASE_TIMEOUT})
   endif()
   if("http_server" IN_LIST arg_REQUIRES)
     # Catch2's discovery runs the program and its cases through this launcher (its 'emulator')
-    set_property(TARGET ${name} PROPERTY CROSSCOMPILING_EMULATOR
+    set_property(TARGET ${target} PROPERTY CROSSCOMPILING_EMULATOR
       "${Python3_EXECUTABLE};${DAGOR_CMAKE_DIR}/scripts/run_with_http_server.py;${CMAKE_BINARY_DIR}/test-artifacts/${name}/http")
   endif()
-  catch_discover_tests(${name}
+  catch_discover_tests(${target}
     TEST_PREFIX "${name}:"
     EXTRA_ARGS ${extra}
     WORKING_DIRECTORY "${data_dir}"

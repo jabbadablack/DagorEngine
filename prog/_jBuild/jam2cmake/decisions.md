@@ -41,3 +41,8 @@ jam settings that are global per root become per-tree options set by presets:
 
 The `~zng` (zlib-ng), `-1.4.5` (zstd) and `-3.x` (OpenSSL) suffixes are not variants: jam allowed other versions, and
 CMake builds only these.
+
+jam's `if $(X) in a b` is true when `X` is unset, so a few conditions did the opposite of what they read like. The
+CMake build keeps what jam built: `CppStcode` defaults to `both` (the shader stcode compiled in and validated), and
+quirrelHost's `ENABLE_RE_USE=0` applies only under the sanitizers other than ASan. The tests tree on every platform
+uses the multi-driver interface, which jam's test driver lists (stub with DX12 or Vulkan) gave it on Windows and Linux.

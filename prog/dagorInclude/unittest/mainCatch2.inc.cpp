@@ -434,16 +434,24 @@ int main(int argc, char *argv[])
   opt.artifactDir = artifactDir.c_str();
   opt.imageVariant = imageVariant.c_str();
   opt.caseTimeoutSec = float(caseTimeout);
-  opt.updateReferences = updateReferences;
+  // DAGOR_TEST_UPDATE_REFERENCES=1: the same as --update-references, for runs whose arguments are fixed (CTest)
+  const char *updateReferencesEnv = getenv("DAGOR_TEST_UPDATE_REFERENCES");
+  opt.updateReferences = updateReferences || (updateReferencesEnv && strcmp(updateReferencesEnv, "1") == 0);
   unittest::set_options(opt);
+
+  // listing the cases (test discovery) needs no environment, and its output must be the list alone
+  const Catch::ConfigData &catchConfig = session.configData();
+  const bool listing = catchConfig.listTests || catchConfig.listTags || catchConfig.listReporters || catchConfig.listListeners;
 
   // engine file APIs resolve relative names through base paths; register the current dir as applications do
   dd_add_base_path("");
   unittest_prev_log_callback = debug_set_log_callback(&unittest_log_callback);
 #if UNITTEST_ENV != 0
-  unittest_env_startup(argc, argv, gpuDriver.c_str());
+  if (!listing)
+    unittest_env_startup(argc, argv, gpuDriver.c_str());
 #else
   G_UNUSED(gpuDriver);
+  G_UNUSED(listing);
 #endif
   unittest_flush_unexpected_logerrs();
 
@@ -453,7 +461,8 @@ int main(int argc, char *argv[])
   unittest::stop_watchdog();
 
 #if UNITTEST_ENV != 0
-  unittest_env_shutdown();
+  if (!listing)
+    unittest_env_shutdown();
 #endif
 
 #ifdef CUSTOM_UNITTEST_SHUTDOWN_CODE

@@ -97,10 +97,16 @@ function(_dagor_request_flavor ref flavor)
   endif()
 endfunction()
 
-# dagor_use(<engine-dir>...): the directories (relative to prog/) are added to the tree by dagor_finalize()
+# dagor_use(<engine-dir>[:<flavor>]...): the directories (relative to prog/) are added to the tree by dagor_finalize(),
+# and the flavors declared; for targets that link them through a generator expression, e.g. one flavor per config
 function(dagor_use)
   foreach(ref IN LISTS ARGN)
-    _dagor_queue_dir("${ref}" "${CMAKE_CURRENT_SOURCE_DIR}")
+    if(ref MATCHES "^([^:]+):(.+)$")
+      _dagor_queue_dir("${CMAKE_MATCH_1}" "${CMAKE_CURRENT_SOURCE_DIR}")
+      _dagor_request_flavor("${CMAKE_MATCH_1}" "${CMAKE_MATCH_2}")
+    else()
+      _dagor_queue_dir("${ref}" "${CMAKE_CURRENT_SOURCE_DIR}")
+    endif()
   endforeach()
 endfunction()
 
@@ -124,6 +130,53 @@ function(_dagor_dir_ref dir out)
   else()
     set(${out} "" PARENT_SCOPE)
   endif()
+endfunction()
+
+# dagor_add_link_choice(<name> PROPERTY <property> ON <target> OFF <target>): an interface library that links <ON>
+# into the programs whose <property> is true and <OFF> into the others. A program sets the property (PROPERTIES of
+# dagor_add_executable), or gets it from a library it links that sets INTERFACE_<property> ON. This is how a choice
+# jam made with a global variable is made per program when libraries in between depend on the chosen one; both
+# implementations are built only for the programs that use them.
+function(dagor_add_link_choice name)
+  cmake_parse_arguments(PARSE_ARGV 1 arg "" "PROPERTY;ON;OFF" "")
+  add_library(${name} INTERFACE)
+  target_link_libraries(${name} INTERFACE "$<IF:$<BOOL:$<TARGET_PROPERTY:${arg_PROPERTY}>>,${arg_ON},${arg_OFF}>")
+  set_property(TARGET ${name} APPEND PROPERTY COMPATIBLE_INTERFACE_BOOL ${arg_PROPERTY})
+  foreach(impl ${arg_ON} ${arg_OFF})
+    if(TARGET ${impl})
+      set_property(TARGET ${impl} PROPERTY EXCLUDE_FROM_ALL ON)
+    endif()
+  endforeach()
+endfunction()
+
+# dagor_add_link_select(<name> PROPERTY <property> DEFAULT <target> [<value> <target>]...): like dagor_add_link_choice,
+# for a string property: the programs whose <property> is <value> get that <target>, the others (and those without
+# the property) get the DEFAULT one
+function(dagor_add_link_select name)
+  cmake_parse_arguments(PARSE_ARGV 1 arg "" "PROPERTY;DEFAULT" "")
+  set(pairs ${arg_UNPARSED_ARGUMENTS})
+  set(expr "${arg_DEFAULT}")
+  set(targets ${arg_DEFAULT})
+  set(property "$<TARGET_PROPERTY:${arg_PROPERTY}>")
+  list(LENGTH pairs count)
+  while(count GREATER 1)
+    math(EXPR last "${count} - 1")
+    math(EXPR value_index "${count} - 2")
+    list(GET pairs ${value_index} value)
+    list(GET pairs ${last} target)
+    set(expr "$<IF:$<STREQUAL:${property},${value}>,${target},${expr}>")
+    list(APPEND targets ${target})
+    list(REMOVE_AT pairs ${value_index} ${last})
+    list(LENGTH pairs count)
+  endwhile()
+  add_library(${name} INTERFACE)
+  target_link_libraries(${name} INTERFACE "${expr}")
+  set_property(TARGET ${name} APPEND PROPERTY COMPATIBLE_INTERFACE_STRING ${arg_PROPERTY})
+  foreach(impl IN LISTS targets)
+    if(TARGET ${impl})
+      set_property(TARGET ${impl} PROPERTY EXCLUDE_FROM_ALL ON)
+    endif()
+  endforeach()
 endfunction()
 
 # links <target> to library references, queueing the engine directories they name
@@ -162,11 +215,23 @@ function(_dagor_abs_paths out)
   set(${out} "${result}" PARENT_SCOPE)
 endfunction()
 
-set(_DAGOR_TARGET_OPTIONS STRICT THIRD_PARTY NO_UNITY CONSOLE NO_CONFIG_POSTFIX)
+# Quirrel's headers and settings (jam's add_quirrel.jam), for QUIRREL and QUIRREL_HEADERS of dagor_add_*
+add_library(DagorQuirrel INTERFACE)
+add_library(Dagor::Quirrel ALIAS DagorQuirrel)
+target_include_directories(DagorQuirrel INTERFACE
+  "${DAGOR_PROG_DIR}/1stPartyLibs/quirrel/quirrel/include"
+  "${DAGOR_PROG_DIR}/1stPartyLibs/quirrel/quirrel/sqrat/include"
+  "${DAGOR_PROG_DIR}/1stPartyLibs/quirrel/quirrel"
+  "${DAGOR_PROG_DIR}/gameLibs/publicInclude/quirrel/quirrelHost")
+target_compile_definitions(DagorQuirrel INTERFACE QUIRREL_HOST_HEADER=dagor_quirrel_host.h USE_SQRAT_CONFIG
+  "$<$<CONFIG:Rel,IRel>:SQ_STORE_DOC_OBJECTS=0>")
+set(DAGOR_QUIRREL_LIBS 1stPartyLibs/quirrel/quirrel 1stPartyLibs/quirrel/quirrel/sqmodules gameLibs/quirrel/quirrelHost)
+
+set(_DAGOR_TARGET_OPTIONS STRICT THIRD_PARTY NO_UNITY CONSOLE NO_CONFIG_POSTFIX QUIRREL QUIRREL_HEADERS)
 set(_DAGOR_TARGET_ONE_VALUE PCH FOLDER OUTPUT_NAME OUTPUT_DIR EXCEPTIONS RTTI)
 set(_DAGOR_TARGET_MULTI_VALUE SOURCES SOURCE_DIRS GLOB EXCLUDE FORCE_INCLUDES PUBLIC_INCLUDES PRIVATE_INCLUDES PUBLIC_DEFINES
   PRIVATE_DEFINES COMPILE_OPTIONS C_OPTIONS PUBLIC_COMPILE_OPTIONS SOURCE_OPTIONS DEPS PUBLIC_DEPS SYSTEM_LIBS LINK_OPTIONS
-  LICENSE_FILES PROPERTIES)
+  LICENSE_FILES PROPERTIES STRINGIFY STRINGIFY_ARRAY)
 
 # dagor_glob_sources(<out-var> DIRS <dir>... [GLOB <pattern>...] [EXCLUDE <regex>...]): appends to <out-var> the files
 # of the dirs (relative to the calling dir, not recursive) that match the patterns (default *.cpp *.c), sorted;
@@ -224,6 +289,7 @@ function(_dagor_setup_target target type)
       endif()
     endforeach()
     target_link_libraries(${target} PRIVATE Dagor::BuildSettings)
+    target_include_directories(${target} BEFORE PRIVATE ${DAGOR_BASE_INCLUDES})
     _dagor_base_dir(base)
     string(FIND "${base}/" "/3rdPartyLibs/" third_party_dir)
     if(arg_STRICT AND NOT arg_THIRD_PARTY AND third_party_dir EQUAL -1)
@@ -273,10 +339,22 @@ function(_dagor_setup_target target type)
     target_link_libraries(${target} ${public} ${arg_SYSTEM_LIBS})
     _dagor_record_system_libs(${arg_SYSTEM_LIBS})
   endif()
+  if(arg_QUIRREL OR arg_QUIRREL_HEADERS)
+    target_link_libraries(${target} ${private} Dagor::Quirrel)
+  endif()
+  if(arg_QUIRREL)
+    _dagor_link(${target} ${private} ${DAGOR_QUIRREL_LIBS})
+  endif()
   _dagor_link(${target} ${private} ${arg_DEPS})
   _dagor_link(${target} ${public} ${arg_PUBLIC_DEPS})
   if(arg_PROPERTIES)
     set_target_properties(${target} PROPERTIES ${arg_PROPERTIES})
+  endif()
+  if(arg_STRINGIFY)
+    _dagor_stringify(${target} "" ${arg_STRINGIFY})
+  endif()
+  if(arg_STRINGIFY_ARRAY)
+    _dagor_stringify(${target} --array ${arg_STRINGIFY_ARRAY})
   endif()
 
   # SOURCE_OPTIONS <file> <option>... [<file> <option>...]: options of single files (jam's 'opt on')
@@ -381,6 +459,7 @@ function(_dagor_build_stamp out)
     "const char *dagor_exe_build_date = \"${date}\";\nconst char *dagor_exe_build_time = \"${time}\";\n")
   add_library(dagor.buildStamp OBJECT "${file}")
   target_link_libraries(dagor.buildStamp PRIVATE Dagor::BuildSettings)
+  target_include_directories(dagor.buildStamp BEFORE PRIVATE ${DAGOR_BASE_INCLUDES})
 endfunction()
 
 # the default name of a target declared in an engine directory: its path under prog/ with '/' as '.'
@@ -405,8 +484,9 @@ endfunction()
 #   [EXCLUDE <regex>...]] [PUBLIC_INCLUDES ...] [PRIVATE_INCLUDES ...] [PUBLIC_DEFINES ...] [PRIVATE_DEFINES ...]
 #   [COMPILE_OPTIONS ...] [C_OPTIONS <options of the C sources>...] [PUBLIC_COMPILE_OPTIONS ...] [SOURCE_OPTIONS <file> <option>...] [DEPS <ref>...]
 #   [PUBLIC_DEPS <ref>...] [SYSTEM_LIBS ...] [LINK_OPTIONS ...] [STRICT] [THIRD_PARTY] [EXCEPTIONS ON|OFF]
+#   [QUIRREL] (Quirrel's headers and libraries) [QUIRREL_HEADERS] (its headers only)
 #   [RTTI ON|OFF] [FORCE_INCLUDES <header>...] [PCH <header>] [NO_UNITY] [FOLDER <folder>] [LICENSE_FILES ...]
-#   [PROPERTIES <property> <value>...])
+#   [PROPERTIES <property> <value>...] [STRINGIFY <file>...] [STRINGIFY_ARRAY <file>...] (see DagorCodegen.cmake)
 # <name> defaults to the directory's path under prog/ with '/' as '.' (see dagor_ref_target).
 function(dagor_add_library)
   _dagor_target_name(name "${ARGV0}")

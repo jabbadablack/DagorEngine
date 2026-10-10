@@ -5,7 +5,7 @@ For each jam target of the chosen roots (from inventory.json), it finds the CMak
 the tree's compile_commands.json and reports:
   - sources jam compiles that the CMake tree does not (and, per matched target dir, the other way round)
   - preprocessor definitions and include dirs that differ for a source
-Compiler-specific flags are not compared: the trees may use another compiler than jam did for that root. Intended
+Include dirs that do not exist are not compared (jam passed several). Compiler-specific flags are not compared: the trees may use another compiler than jam did for that root. Intended
 differences go into parity_allowlist.txt, one regex per line matched against the report line, with the reason after it.
 
 python parity.py <build dir> [--config Dev] [--root <substring of a root id>...] [--inventory <inventory.json>]
@@ -21,7 +21,8 @@ import sys
 ENGINE = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..'))
 HERE = os.path.dirname(os.path.abspath(__file__))
 # the toolchain's own include dirs, which jam and CMake spell differently
-SYSTEM_DIRS = re.compile(r'(devtools|windows kits|microsoft visual studio|/llvm|/usr/include|xcode)', re.IGNORECASE)
+SYSTEM_DIRS = re.compile(r'(devtools|/dagor/sdk/|windows kits|microsoft visual studio|/llvm|/usr/include|xcode)',
+                         re.IGNORECASE)
 # definitions of the toolchain or of the build system itself
 IGNORED_DEFINES = re.compile(r'^(CMAKE_INTDIR|_TARGET_SIMD_SSE|_SECURE_SCL|WIN32)$')
 
@@ -57,14 +58,22 @@ def flags(args, base):
         if a.startswith(prefix):
           d = a[len(prefix):] or next(it, '')
           path = norm_path(d, base)
-          if not SYSTEM_DIRS.search(path):
+          if not SYSTEM_DIRS.search(path) and (os.path.isdir(path) or path.startswith(GENERATED)):
             includes.add(path)
           break
   return defines, includes
 
 
+# include dirs of generated files, which exist only once the tree is built
+GENERATED = os.path.normcase(os.path.join(ENGINE, 'build')).replace(os.sep, '/') + '/'
+# sources the inventory has no commands for: jam's dry run lists compilers only, not assemblers
+ASSEMBLY = ('.asm', '.masm', '.nasm', '.nas', '.s')
+TARGET_DIR = re.compile(r'CMakeFiles[\\/]([^\\/]+)\.dir[\\/]')
+
+
 def cmake_compiles(build_dir, config):
-  """{normalized source path: (defines, includes)} of the tree's compile_commands.json, for one configuration."""
+  """{normalized source path: [(target, defines, includes)]} of the tree's compile_commands.json for one configuration;
+  a source of several targets (flavors) has an entry for each."""
   with open(os.path.join(build_dir, 'compile_commands.json')) as f:
     entries = json.load(f)
   marker = '/{}/'.format(config).lower()
@@ -73,12 +82,14 @@ def cmake_compiles(build_dir, config):
     return '/' + e.get('output', '').replace('\\', '/').lower()
 
   multi_config = any(marker in output(e) for e in entries)  # Ninja Multi-Config lists every configuration
-  result = {}
+  result = collections.defaultdict(list)
   for e in entries:
     if multi_config and marker not in output(e):
       continue
     args = e['arguments'] if 'arguments' in e else split(e['command'])
-    result[norm_path(e['file'], e['directory'])] = flags(args, e['directory'])
+    m = TARGET_DIR.search(e.get('output', ''))
+    target = m.group(1) if m else '?'
+    result[norm_path(e['file'], e['directory'])].append((target,) + flags(args, e['directory']))
   return result
 
 
@@ -117,17 +128,20 @@ def main(argv):
         continue
       seen.add(key)
       t = inventory['targets'][key]
-      jam_dirs = set()
+      # the CMake target of the same name (engine/perfMon/stub.lib -> engine.perfMon.stub) when it compiles the source
+      own = os.path.splitext(t['name'])[0].replace('/', '.')
+      cmake_targets = collections.Counter()
       for src, cmd in sorted(t['sources'].items()):
         path = norm_path(src, ENGINE)
-        jam_dirs.add(os.path.dirname(path))
-        base = os.path.join(ENGINE, root['cwd'])
         if path not in cmake:
           report.append('{}: {}: not compiled by CMake'.format(t['name'], src))
           continue
         compared += 1
-        jd, ji = flags(cmd, base)
-        cd, ci = cmake[path]
+        jd, ji = flags(cmd, ENGINE)  # inventory.py made the include dirs relative to the engine root
+        # the CMake compile of this source in the target of the same name, else the one closest to jam's (a source of
+        # several targets or flavors is compiled several times)
+        target, cd, ci = min(cmake[path], key=lambda c: (c[0] != own, len(jd ^ c[1]) + len(ji ^ c[2])))
+        cmake_targets[target] += 1
         for d in sorted(jd - cd):
           report.append('{}: {}: define only in jam: {}'.format(t['name'], src, d))
         for d in sorted(cd - jd):
@@ -136,9 +150,11 @@ def main(argv):
           report.append('{}: {}: include only in jam: {}'.format(t['name'], src, rel(i)))
         for i in sorted(ci - ji):
           report.append('{}: {}: include only in CMake: {}'.format(t['name'], src, rel(i)))
+      # sources the CMake target compiles that jam's target did not (the CMake target compiling most of its sources)
       jam_sources = {norm_path(s, ENGINE) for s in t['sources']}
-      for path in sorted(cmake):
-        if os.path.dirname(path) in jam_dirs and path not in jam_sources and path not in seen:
+      cmake_targets = {cmake_targets.most_common(1)[0][0]} if cmake_targets else set()
+      for path, compiles in sorted(cmake.items()):
+        if path not in jam_sources and path not in seen and not path.endswith(ASSEMBLY) and any(c[0] in cmake_targets for c in compiles):
           seen.add(path)
           report.append('{}: {}: compiled only by CMake'.format(t['name'], rel(path)))
 

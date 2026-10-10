@@ -20,12 +20,16 @@ PLATFORMS = {'windows', 'linux', 'macOS', 'iOS', 'tvOS', 'android'}
 ARCHS = {'x86_64': 'x86_64', 'arm64': 'arm64', 'arm64-v8a': 'arm64', 'e2k': 'e2k'}
 # jam switches whose value is fixed in CMake builds: the vendored OpenSSL and libcurl, NEON on Android arm64
 CONSTANT_VARS = {'UseSystemOpenSSL': 'no', 'UseSystemLibcurl': 'no', 'AndroidHasNeon': 'yes'}
+# jam yes/no switches that are CMake tree options
+BOOL_VARS = {'NeedDasAotCompile': 'DAGOR_DAS_AOT', 'NeedDasLLVMAotCompile': 'DAGOR_DAS_LLVM_AOT',
+             'Dedicated': 'DAGOR_DEDICATED', 'ForceLogs': 'DAGOR_FORCE_LOGS', 'BreakpadEnabled': 'DAGOR_BREAKPAD',
+             'SqVarTrace': 'DAGOR_SQ_VAR_TRACE'}
 CONDITION_VARS = {'Platform': 'DAGOR_PLATFORM', 'PlatformArch': 'DAGOR_ARCH', 'KernelLinkage': 'DAGOR_KERNEL_LINKAGE',
                   'SSEVersion': 'DAGOR_SSE', 'Sanitize': 'DAGOR_SANITIZE', 'PlatformSpec': 'DAGOR_CC'}
 LIST_VARS = {'Sources': 'sources', 'AddIncludes': 'includes', 'UseProgLibs': 'deps', 'CPPopt': 'cpp_opt',
              'Copt': 'c_opt', 'AddLibs': 'libs', 'LINKopt': 'link_options', 'ExplicitLicenseUsed': 'license_files'}
-IGNORED_VARS = {'TargetLib'}  # jam bookkeeping without a CMake counterpart
-SCALAR_VARS = {'Location', 'Target', 'TargetType', 'StrictCompile', 'ConsoleExe', 'OutDir', 'Exceptions', 'Rtti',
+IGNORED_VARS = {'TargetLib', 'LibPath'}  # jam bookkeeping without a CMake counterpart
+SCALAR_VARS = {'Location', 'Target', 'TargetType', 'StrictCompile', 'ConsoleExe', 'OutDir', 'Exceptions', 'Rtti', 'UseQuirrel',
                'Root'}
 KNOWN_INCLUDES = {'defaults.jam', 'build.jam', 'unitTest.jam'}
 # jam variables that only ever had their defaults.jam value; CMake builds have just that version
@@ -60,7 +64,11 @@ def tokens(text):
         if text[i] == '\n':
           line += 1
         i += 1
-      out.append((text[start:i], start_line))
+      word = text[start:i]
+      if word == '{}':  # an empty block written without a space
+        out += [('{', start_line), ('}', start_line)]
+      else:
+        out.append((word, start_line))
   return out
 
 
@@ -230,7 +238,7 @@ def condition(words):
       return ('lit', CONSTANT_VARS[m.group(1)])
     if m:
       var = m.group(1)
-      if var not in CONDITION_VARS:
+      if var not in CONDITION_VARS and var not in BOOL_VARS:
         raise Untranslatable(w)
       return ('var', var)
     if '$(' in w:
@@ -242,7 +250,7 @@ def condition(words):
   def cvar(var):
     if var == 'Platform-PlatformArch':
       return '"${DAGOR_PLATFORM}-${DAGOR_ARCH}"'
-    return CONDITION_VARS[var]
+    return CONDITION_VARS.get(var) or BOOL_VARS[var]
 
   def norm(var, lit):
     """the CMake value of a jam value, None when no supported target has it"""
@@ -263,6 +271,8 @@ def condition(words):
     kind, var = a
     if kind != 'var':
       raise Untranslatable(a[1])
+    if var in BOOL_VARS and len(rest) == 1 and rest[0] in ('yes', 'no'):
+      return BOOL_VARS[var] if (op in ('=', 'in')) == (rest[0] == 'yes') else 'NOT ' + BOOL_VARS[var]
     lits = [norm(var, lit) for lit in rest]
     if var == 'PlatformSpec' and 'clang' in lits:
       lits += ['clang-cl']
@@ -283,7 +293,10 @@ def condition(words):
 
   while i < len(words):
     w = words[i]
-    if w in ('&&', '||'):
+    if w == '[' and words[i + 1:i + 2] == ['GLOB'] and words[i + 3:i + 6] == [':', '*', ']']:
+      expr.append('IS_DIRECTORY "{}"'.format(value(words[i + 2], 'dirs')))  # [ GLOB <dir> : * ]: the dir exists
+      i += 6
+    elif w in ('&&', '||'):
       expr.append('AND' if w == '&&' else 'OR')
       i += 1
     elif w == '!':
@@ -355,6 +368,23 @@ class Converter:
         out.append(v)
     return out
 
+  def stringify(self, depth, src):
+    """StringifySourceFile <f> : <f>.inl : <user> [: --array] ; alone or in a for loop over a list; True if done"""
+    m = re.fullmatch(r'for (\w+) in \$\((\w+)\) \{ StringifySourceFile \$\(\1\) : \$\(\1\)\.inl : \S+ ;'
+                     r'(?: : (--array|--full-string) ;)? \}', src.strip())
+    if m and m.group(2) in self.user_vars and m.group(3) != '--full-string':
+      var = 'stringify_array' if m.group(3) else 'stringify'
+      self.emit(depth, 'list(APPEND {} ${{{}}})'.format(var, m.group(2)))
+      self.used.add(var)
+      return True
+    m = re.fullmatch(r'StringifySourceFile (\S+) : \1\.inl : \S+(?: : (--array))? ;', src.strip())
+    if m and '$(' not in m.group(1):
+      var = 'stringify_array' if m.group(2) else 'stringify'
+      self.emit(depth, 'list(APPEND {} {})'.format(var, m.group(1)))
+      self.used.add(var)
+      return True
+    return False
+
   def autoscan(self, depth, src):
     """AutoscanBuildLists <dirs> : <pattern> : Sources [: <exclude regex>] ;"""
     groups = [g.split() for g in src.rstrip(' ;').split(' : ')]
@@ -424,7 +454,7 @@ class Converter:
         self.user_vars.add(var)
         return
     # the jamfile's own lists of sources and dirs
-    if re.search(r'(?i)(sources|src|folder|dirs?|files)', var) and op in ('=', '+=', '?='):
+    if re.search(r'(?i)(source|src|folder|dirs?|files)', var) and op in ('=', '+=', '?='):
       try:
         vals = [value(v, 'dirs') for v in values]
       except Untranslatable:
@@ -458,6 +488,8 @@ class Converter:
             self.scalars['unitTest'] = True
           if base == 'build.jam':
             self.after_build = True
+        elif base == 'add_quirrel.jam':
+          self.scalars['quirrelHeaders'] = True
         elif base == 'add_null_include.jam':
           self.emit(depth, 'list(APPEND force_includes supp/dag_null.h)')
           self.used.add('force_includes')
@@ -466,6 +498,7 @@ class Converter:
       elif kind == 'if':
         _, branches, else_block = s
         emitted = False
+        start = len(self.lines)
         try:
           conds = [condition(c) for c, _ in branches]
         except Untranslatable:
@@ -492,11 +525,17 @@ class Converter:
             self.statements(else_block, depth)
         if emitted:
           self.emit(depth, 'endif()')
+          # an if whose branches all came out empty (jam bookkeeping only) is dropped
+          construct = self.lines[start:]
+          if all(re.fullmatch(r'\s*(if|elseif|else|endif)\(.*\)', l) for l in construct):
+            del self.lines[start:]
       elif s[1].startswith('AutoscanBuildLists '):
         try:
           self.autoscan(depth, s[1])
         except Untranslatable:
           self.todo_line(depth, s[1])
+      elif self.stringify(depth, s[1]):
+        pass
       else:
         self.todo_line(depth, s[1])
 
@@ -554,6 +593,10 @@ class Converter:
     args = []
     if s.get('StrictCompile') == ['yes']:
       args.append('STRICT')
+    if s.get('UseQuirrel') == ['yes']:
+      args.append('QUIRREL')
+    elif s.get('quirrelHeaders'):
+      args.append('QUIRREL_HEADERS')
     if s.get('ConsoleExe') == ['yes'] and not s.get('unitTest'):
       args.append('CONSOLE')
     if s.get('unitTest'):
@@ -569,7 +612,8 @@ class Converter:
     for var, kw in (('sources', 'SOURCES'), ('force_includes', 'FORCE_INCLUDES'), ('includes', 'PRIVATE_INCLUDES'),
                     ('defines', 'PRIVATE_DEFINES'), ('options', 'COMPILE_OPTIONS'), ('c_options', 'C_OPTIONS'),
                     ('source_options', 'SOURCE_OPTIONS'), ('deps', 'DEPS'), ('libs', 'SYSTEM_LIBS'),
-                    ('link_options', 'LINK_OPTIONS'), ('license_files', 'LICENSE_FILES')):
+                    ('link_options', 'LINK_OPTIONS'), ('license_files', 'LICENSE_FILES'), ('stringify', 'STRINGIFY'),
+                    ('stringify_array', 'STRINGIFY_ARRAY')):
       if var in self.used:
         args.append('{} ${{{}}}'.format(kw, var))
     if s.get('unitTest'):

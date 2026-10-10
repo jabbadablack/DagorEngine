@@ -143,6 +143,9 @@ endif()
 if(DAGOR_FORCE_LOGS)
   _dagor_settings(DEFINE "${_release}" DAGOR_FORCE_LOGS)
 endif()
+if(DAGOR_D3D_MULTI)
+  _dagor_settings(DEFINE 1 _TARGET_D3D_MULTI)
+endif()
 if(DAGOR_ARCH MATCHES "^(x86_64|e2k)$" AND NOT DAGOR_PLATFORM STREQUAL "macOS")
   _dagor_settings(DEFINE 1 _TARGET_SIMD_SSE=${DAGOR_SSE})
 endif()
@@ -187,7 +190,9 @@ elseif(DAGOR_PLATFORM STREQUAL "macOS")
 endif()
 
 # --- include dirs and the forced includes ---------------------------------------------------------------------------
-target_include_directories(DagorBuildSettings INTERFACE
+# the base include dirs come before a target's own, as in jam: headers like daScript/das_config.h resolve to the
+# engine's (prog/1stPartyLibs/daScript) rather than to a library's include dir; dagor_add_* adds them with BEFORE
+set(DAGOR_BASE_INCLUDES
   "${DAGOR_ENGINE_ROOT}/prog/dagorInclude"
   "${DAGOR_ENGINE_ROOT}/prog/1stPartyLibs"
   "${DAGOR_ENGINE_ROOT}/prog/3rdPartyLibs"
@@ -241,8 +246,12 @@ if(DAGOR_CC STREQUAL "clang-cl")
     _dagor_settings(COMPILE "${_c_cxx}" /clang:-fstrict-aliasing)
   endif()
 elseif(DAGOR_CC STREQUAL "msvc")
-  # /X: only the toolchain's include dirs, never those of an INCLUDE environment variable
-  _dagor_settings(COMPILE "${_c_cxx}" /X /bigobj)
+  # /X: only the toolchain's include dirs, never those of an INCLUDE environment variable (except under MSBuild,
+  # which passes the toolset's and SDK's dirs that way)
+  if(NOT CMAKE_GENERATOR MATCHES "^Visual Studio")
+    _dagor_settings(COMPILE "${_c_cxx}" /X)
+  endif()
+  _dagor_settings(COMPILE "${_c_cxx}" /bigobj)
   _dagor_settings(COMPILE "${_opt_cond}" /Ox /GF /Gy /Gw /Oi /Ot /Oy-)
   if(DAGOR_ARCH STREQUAL "arm64")
     _dagor_settings(COMPILE "${_c_cxx}" /wd4746)
@@ -313,6 +322,11 @@ if(DAGOR_MSVC_LIKE)
   _dagor_settings(LINK "${_linked}" /DEBUG /INCREMENTAL:NO /NODEFAULTLIB:LIBMMT /NODEFAULTLIB:LIBIRC /NODEFAULTLIB:LIBC
     /NODEFAULTLIB:MSVCRT /NODEFAULTLIB:MSVCPRT /NODEFAULTLIB:UCRT /NODEFAULTLIB:VCRUNTIME)
   _dagor_settings(LINK "$<AND:${_linked},$<NOT:${_dbg}>>" /OPT:REF /NODEFAULTLIB:LIBCMTD /NODEFAULTLIB:LIBCPMTD)
+  if(DAGOR_CC STREQUAL "clang-cl")
+    # lld-link's /OPT:REF folds identical data too, so distinct objects whose addresses are compared (daFrameGraph's
+    # type tags) would share one address: safe ICF keeps those, by clang's address-significance tables
+    _dagor_settings(LINK "$<AND:${_linked},$<NOT:${_dbg}>>" /OPT:SAFEICF)
+  endif()
   _dagor_settings(LINK "$<AND:${_linked},${_dbg}>" /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT)
   _dagor_settings(LINK "${_exe}" /FILEALIGN:512)
   _dagor_settings(LIBS "${_linked}" kernel32 user32 gdi32 ole32 winmm dbghelp)

@@ -1,0 +1,17 @@
+# BLAKE3 hashing with the SIMD implementations of the target (MASM on Windows x64, GNU assembly elsewhere)
+set(sources blake3.c blake3_dispatch.c blake3_portable.c)
+set(defines)
+if(DAGOR_ARCH STREQUAL "e2k")
+  set(defines BLAKE3_NO_SSE2 BLAKE3_NO_SSE41 BLAKE3_NO_AVX2 BLAKE3_NO_AVX512)
+elseif(DAGOR_ARCH STREQUAL "x86_64" AND DAGOR_PLATFORM STREQUAL "windows")
+  list(APPEND sources blake3_sse2_x86-64_windows_msvc.masm blake3_sse41_x86-64_windows_msvc.masm
+    blake3_avx2_x86-64_windows_msvc.masm)
+  set(defines BLAKE3_NO_AVX512)
+elseif(DAGOR_ARCH STREQUAL "x86_64")
+  list(APPEND sources blake3_avx2_x86-64_unix.S blake3_avx512_x86-64_unix.S blake3_sse2_x86-64_unix.S
+    blake3_sse41_x86-64_unix.S)
+elseif(DAGOR_ARCH STREQUAL "arm64")
+  list(APPEND sources blake3_neon.c)
+  set(defines BLAKE3_USE_NEON)
+endif()
+dagor_add_library(SOURCES ${sources} PRIVATE_INCLUDES . PRIVATE_DEFINES ${defines})

@@ -42,6 +42,15 @@ set(DAGOR_TOOLCHAIN_LINKER_FLAGS
 set(DAGOR_TOOLCHAIN_RC_FLAGS
   "/nologo /x /i\"${_dagor_sdk_inc}/um\" /i\"${_dagor_sdk_inc}/shared\" /i\"${DAGOR_MSVC_DIR}/include\"")
 
+if(CMAKE_GENERATOR MATCHES "^Visual Studio")
+  # MSBuild's ClangCL toolset with the pinned LLVM and lld-link; it passes the toolset and SDK dirs itself
+  dagor_vs_generator(ClangCL "LLVMInstallDir=${DAGOR_LLVM_DIR}" "LLVMToolsVersion=${_dagor_clang_major}"
+    "UseLldLink=true")
+  set(DAGOR_TOOLCHAIN_C_FLAGS "")
+  set(DAGOR_TOOLCHAIN_CXX_FLAGS "")
+  set(DAGOR_TOOLCHAIN_LINKER_FLAGS "/libpath:\"${DAGOR_LLVM_DIR}/lib/clang/${_dagor_clang_major}/lib/windows\"")
+endif()
+
 unset(_dagor_triple)
 unset(_dagor_sdk_inc)
 unset(_dagor_clang_major)

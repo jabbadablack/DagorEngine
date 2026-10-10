@@ -1,67 +1,48 @@
-cmake_minimum_required(VERSION 3.5)
-project(squirrel VERSION 4.0 LANGUAGES C CXX)
-
-option(ENABLE_VAR_TRACE "Enable variable change tracing feature.")
-
-if (NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE "Release")
-endif ()
-
-include(GNUInstallDirs)
-
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}")
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}")
-set(CMAKE_CXX_STANDARD 17)
-
-if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  add_compile_options(
-    "$<$<COMPILE_LANGUAGE:CXX>:-fno-rtti;-fno-exceptions>"
-    -fno-strict-aliasing
-    -Wall
-    -Wextra
-    -pedantic
-    -Wcast-qual
-    -Wno-unused-parameter
-    -Wno-missing-field-initializers
-    "$<$<CONFIG:Release>:-O3>"
-    "$<$<CONFIG:RelWithDebInfo>:-O3;-g>"
-    "$<$<CONFIG:MinSizeRel>:-Os>"
-  )
-  # Debug flags
-  if(CMAKE_COMPILER_IS_GNUCXX)
-    add_compile_options("$<$<CONFIG:Debug>:-g3;-Og>")
-  else()
-    # Clang debug flags
-    add_compile_options("$<$<CONFIG:Debug>:-g;-Og>")
-  endif()
-elseif(MSVC)
-  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-  add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-  add_compile_options(/wd4244 /wd4018 /wd4267) # disable type conversion warnings
+# Quirrel: the VM and its standard library (the engine's build replaces upstream's CMakeLists.txt; the compiler is
+# squirrel/compiler, the module system sqmodules)
+set(sources
+  squirrel/sqapi.cpp
+  squirrel/sqbaselib.cpp
+  squirrel/sqclass.cpp
+  squirrel/sqdebug.cpp
+  squirrel/sqobject.cpp
+  squirrel/sqstate.cpp
+  squirrel/sqtable.cpp
+  squirrel/sqvm.cpp
+  squirrel/sqdedupshrinker.cpp
+  squirrel/sqstringlib.cpp
+  squirrel/sqext.cpp
+  squirrel/sqasync.cpp
+  squirrel/sqmem.cpp
+  sqstdlib/sqstdrex.cpp
+  sqstdlib/sqstdaux.cpp
+  sqstdlib/sqstdmath.cpp
+  sqstdlib/sqstdstring.cpp
+  sqstdlib/sqstdblob.cpp
+  sqstdlib/sqstddebug.cpp
+  sqstdlib/sqstdhash.cpp
+  sqstdlib/sqstdio.cpp
+  sqstdlib/sqstdstream.cpp
+  sqstdlib/sqstdsystem.cpp
+  sqstdlib/sqstddatetime.cpp
+  sqstdlib/sqstdserialization.cpp
+)
+set(defines SQ_EXCLUDE_DEFAULT_MEMFUNCTIONS
+  "$<IF:$<CONFIG:Rel,IRel>,SQ_RUNTIME_TYPE_CHECK=0;SQ_STACK_DUMP_SECRET_PREFIX=no_dump_,SQ_CHECK_THREAD;SQ_RANDOMIZE_FOREACH=1>")
+if(DAGOR_SQ_VAR_TRACE)
+  list(APPEND sources squirrel/vartrace.cpp)
+  list(APPEND defines SQ_VAR_TRACE_ENABLED)
+else()
+  list(APPEND sources squirrel/vartracestub.cpp)
+endif()
+if(NOT DAGOR_PLATFORM MATCHES "^(windows|linux|macOS)$")
+  list(APPEND defines SQ_SYSTEM_STUBS=1)
 endif()
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-  add_compile_definitions(_SQ64)
-endif()
-
-add_subdirectory(squirrel)
-add_subdirectory(squirrel/compiler)
-add_subdirectory(sqstdlib)
-add_subdirectory(sqmodules)
-add_subdirectory(sq)
-
-
-include(CMakePackageConfigHelpers)
-
-write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/cmake/squirrel/squirrel-config-version.cmake"
-  VERSION "${squirrel_VERSION}"
-  COMPATIBILITY AnyNewerVersion
-  )
-
-configure_package_config_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/squirrel-config.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/cmake/squirrel/squirrel-config.cmake"
-  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/squirrel"
-  )
+dagor_add_library(QUIRREL_HEADERS
+  SOURCES ${sources}
+  PRIVATE_INCLUDES squirrel internal helpers
+  PRIVATE_DEFINES ${defines}
+  DEPS 3rdPartyLibs/eastl 1stPartyLibs/quirrel/quirrel/squirrel/compiler
+  LICENSE_FILES COPYRIGHT
+)

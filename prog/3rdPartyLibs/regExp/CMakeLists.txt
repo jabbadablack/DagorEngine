@@ -1,0 +1,13 @@
+# Regular expressions (Henry Spencer's)
+set(sources regExp.cpp)
+if(DAGOR_PLATFORM MATCHES "^(iOS|macOS)$")
+  set(options -Wno-unused)
+endif()
+if(DAGOR_CC MATCHES "^(clang|clang\-cl)$" AND FALSE)
+  set(options -Wno-unused)
+endif()
+if(DAGOR_PLATFORM STREQUAL "windows" AND DAGOR_CC MATCHES "^(clang|clang\-cl)$")
+  list(APPEND options -Wno-unused-value)
+endif()
+
+dagor_add_library(SOURCES ${sources} COMPILE_OPTIONS ${options})

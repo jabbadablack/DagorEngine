@@ -64,6 +64,31 @@ def run_root(root, jam, common):
   return root, cmd, proc.returncode, proc.stdout + proc.stderr
 
 
+INCLUDE_FLAGS = ('-I', '/I', '-imsvc', '-isystem')
+
+
+def engine_relative(args, cwd):
+  """The compiler arguments with relative include dirs relative to the engine root instead of to the root's dir: one
+  library's command is kept for every root that builds it."""
+  result = []
+  it = iter(args)
+  for a in it:
+    flag = next((f for f in INCLUDE_FLAGS if a.startswith(f)), None)
+    if flag is None:
+      result.append(a)
+      continue
+    d = a[len(flag):]
+    if d:
+      prefix = flag
+    else:  # the dir is the next argument
+      result.append(a)
+      d, prefix = next(it, ''), ''
+    if d and not os.path.isabs(d):
+      d = os.path.relpath(os.path.normpath(os.path.join(ENGINE, cwd, d)), ENGINE).replace(os.sep, '/')
+    result.append(prefix + d)
+  return result
+
+
 def parse(dump, cwd):
   """{<output dir>/<target>: target} of one dump."""
   targets = {}
@@ -101,7 +126,7 @@ def parse(dump, cwd):
         src = os.path.normpath(os.path.join(ENGINE, cwd, rest[-1])).replace(os.sep, '/')
         t = target(os.path.dirname(obj))
         if t is not None:
-          t['sources'][os.path.relpath(src, ENGINE).replace(os.sep, '/')] = m.group(2).split()
+          t['sources'][os.path.relpath(src, ENGINE).replace(os.sep, '/')] = engine_relative(m.group(2).split(), cwd)
   return targets
 
 

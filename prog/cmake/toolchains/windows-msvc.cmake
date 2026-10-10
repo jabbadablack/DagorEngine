@@ -46,6 +46,19 @@ endforeach()
 set(DAGOR_TOOLCHAIN_RC_FLAGS
   "/nologo /x /i\"${_dagor_sdk_inc}/um\" /i\"${_dagor_sdk_inc}/shared\" /i\"${DAGOR_MSVC_DIR}/include\"")
 
+if(CMAKE_GENERATOR MATCHES "^Visual Studio")
+  # MSBuild's toolset of that version (v142 for 14.2x, v143 for 14.3x and 14.4x); it passes the dirs itself
+  if(DAGOR_MSVC_VERSION VERSION_LESS 14.30)
+    dagor_vs_generator(v142)
+  else()
+    dagor_vs_generator(v143)
+  endif()
+  foreach(_dagor_lang C CXX)
+    unset(CMAKE_${_dagor_lang}_STANDARD_INCLUDE_DIRECTORIES)
+  endforeach()
+  set(DAGOR_TOOLCHAIN_LINKER_FLAGS "")
+endif()
+
 unset(_dagor_lang)
 unset(_dagor_dir)
 unset(_dagor_host)

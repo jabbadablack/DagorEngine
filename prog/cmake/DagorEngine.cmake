@@ -58,6 +58,7 @@ endif()
 
 include(DagorCompilerFlags)
 include(DagorTargets)
+include(DagorCodegen)
 include(DagorPython)
 include(DagorTesting)
 

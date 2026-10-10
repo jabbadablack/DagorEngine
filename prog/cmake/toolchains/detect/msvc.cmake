@@ -116,3 +116,39 @@ function(dagor_detect_winsdk)
   endif()
   set(DAGOR_WINSDK_BIN "${bin}" CACHE INTERNAL "")
 endfunction()
+
+# dagor_vs_generator(<toolset> [<key>=<value>...]): for the Visual Studio generators, which build with MSBuild's own
+# tools instead of CMAKE_<LANG>_COMPILER: selects the Visual Studio instance, the toolset (v143, v142, ClangCL) at
+# DAGOR_MSVC_VERSION, the Windows SDK and the architecture of the detected ones. MSBuild then passes the toolset's and
+# SDK's include and library dirs itself. The key=value pairs become MSBuild properties of every project.
+function(dagor_vs_generator toolset)
+  cmake_path(GET DAGOR_MSVC_DIR PARENT_PATH instance) # <VS>/VC/Tools/MSVC/<version>
+  foreach(i RANGE 2)
+    cmake_path(GET instance PARENT_PATH instance)
+  endforeach()
+  if(toolset STREQUAL "ClangCL" AND NOT EXISTS "${instance}/MSBuild/Microsoft/VC/v170/Platforms/x64/PlatformToolsets/ClangCL")
+    message(FATAL_ERROR "The Visual Studio generator with clang-cl needs MSBuild's ClangCL toolset, which '${instance}' "
+      "does not have. Install it with the Visual Studio Installer (component "
+      "Microsoft.VisualStudio.Component.VC.Llvm.ClangToolset; the build still uses the pinned LLVM), or use the "
+      "windows-msvc-* presets or the default Ninja generator.")
+  endif()
+  set(host x64)
+  if(DAGOR_HOST_ARCH STREQUAL "arm64")
+    set(host ARM64)
+  endif()
+  set(platform x64)
+  if(DAGOR_ARCH STREQUAL "arm64")
+    set(platform ARM64)
+  endif()
+  # -T and -A on the command line win (CMake caches them before the toolchain file runs)
+  if(NOT CMAKE_GENERATOR_INSTANCE)
+    set(CMAKE_GENERATOR_INSTANCE "${instance}" CACHE INTERNAL "")
+  endif()
+  if(NOT CMAKE_GENERATOR_TOOLSET)
+    set(CMAKE_GENERATOR_TOOLSET "${toolset},version=${DAGOR_MSVC_VERSION},host=${host}" CACHE INTERNAL "")
+  endif()
+  if(NOT CMAKE_GENERATOR_PLATFORM)
+    set(CMAKE_GENERATOR_PLATFORM "${platform},version=${DAGOR_WINSDK_RESOLVED_VERSION}" CACHE INTERNAL "")
+  endif()
+  set(CMAKE_VS_GLOBALS ${ARGN} PARENT_SCOPE)
+endfunction()

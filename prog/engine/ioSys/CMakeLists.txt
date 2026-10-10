@@ -42,13 +42,12 @@ set(deps
 if(NOT DAGOR_KERNEL_LINKAGE STREQUAL "dynamic")
   list(APPEND deps 3rdPartyLibs/eastl)
 endif()
-set(libs)
 
 dagor_require_sdk(oodle OPTIONAL)
 if(DAGOR_SDK_OODLE_FOUND)
   list(APPEND sources oodleIo.cpp oodleIoFatal.cpp)
   list(APPEND includes ${DAGOR_SDK_OODLE_ROOT}/include)
-  list(APPEND libs sdk::oodle)
+  list(APPEND deps sdk::oodle)
 else()
   list(APPEND sources oodleIoStub.cpp)
 endif()
@@ -58,5 +57,4 @@ dagor_add_library(STRICT
   PRIVATE_INCLUDES ${includes}
   PRIVATE_DEFINES __B_KERNEL_LIB USE_ZLIB_VER=0xFF0000
   DEPS ${deps}
-  SYSTEM_LIBS ${libs}
 )
