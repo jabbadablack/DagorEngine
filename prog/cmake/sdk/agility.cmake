@@ -13,7 +13,9 @@ if(DAGOR_PLATFORM STREQUAL "windows")
   else()
     set(_dagor_agility_bin "${DAGOR_SDK_AGILITY_ROOT}/bin/arm64")
   endif()
-  set(DAGOR_SDK_AGILITY_RUNTIME "${_dagor_agility_bin}/D3D12Core.dll" "${_dagor_agility_bin}/d3d12SDKLayers.dll")
+  # cached: the module runs once per configure, the variable is read in other scopes
+  set(DAGOR_SDK_AGILITY_RUNTIME "${_dagor_agility_bin}/D3D12Core.dll" "${_dagor_agility_bin}/d3d12SDKLayers.dll"
+    CACHE INTERNAL "")
   unset(_dagor_agility_dir)
   unset(_dagor_agility_bin)
 endif()

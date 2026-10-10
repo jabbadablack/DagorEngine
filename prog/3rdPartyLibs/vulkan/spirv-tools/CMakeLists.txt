@@ -1,394 +1,249 @@
-# Copyright (c) 2015-2016 The Khronos Group Inc.
-#
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-cmake_minimum_required(VERSION 2.8.12)
-if (POLICY CMP0048)
-  cmake_policy(SET CMP0048 NEW)
+# SPIRV-Tools (Khronos): the SPIR-V assembler, disassembler, validator and optimizer; replaces its upstream CMakeLists
+set(includes
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  include
+  source
+  source/opt
+  source/util
+  source/val
+  external/spirv-headers/include
+  external/spirv-headers/include/spirv/unified1
+)
+set(sources
+  source/assembly_grammar.cpp
+  source/binary.cpp
+  source/diagnostic.cpp
+  source/disassemble.cpp
+  source/enum_string_mapping.cpp
+  source/extensions.cpp
+  source/ext_inst.cpp
+  source/libspirv.cpp
+  source/link/linker.cpp
+  source/name_mapper.cpp
+  source/opcode.cpp
+  source/operand.cpp
+  source/opt/aggressive_dead_code_elim_pass.cpp
+  source/opt/analyze_live_input_pass.cpp
+  source/opt/amd_ext_to_khr.cpp
+  source/opt/basic_block.cpp
+  source/opt/block_merge_pass.cpp
+  source/opt/block_merge_util.cpp
+  source/opt/build_module.cpp
+  source/opt/ccp_pass.cpp
+  source/opt/cfg.cpp
+  source/opt/cfg_cleanup_pass.cpp
+  source/opt/code_sink.cpp
+  source/opt/combine_access_chains.cpp
+  source/opt/compact_ids_pass.cpp
+  source/opt/composite.cpp
+  source/opt/constants.cpp
+  source/opt/const_folding_rules.cpp
+  source/opt/control_dependence.cpp
+  source/opt/convert_to_half_pass.cpp
+  source/opt/convert_to_sampled_image_pass.cpp
+  source/opt/copy_prop_arrays.cpp
+  source/opt/dataflow.cpp
+  source/opt/dead_branch_elim_pass.cpp
+  source/opt/dead_insert_elim_pass.cpp
+  source/opt/dead_variable_elimination.cpp
+  source/opt/debug_info_manager.cpp
+  source/opt/decoration_manager.cpp
+  source/opt/def_use_manager.cpp
+  source/opt/desc_sroa.cpp
+  source/opt/desc_sroa_util.cpp
+  source/opt/dominator_analysis.cpp
+  source/opt/dominator_tree.cpp
+  source/opt/eliminate_dead_constant_pass.cpp
+  source/opt/eliminate_dead_functions_pass.cpp
+  source/opt/eliminate_dead_functions_util.cpp
+  source/opt/eliminate_dead_io_components_pass.cpp
+  source/opt/eliminate_dead_members_pass.cpp
+  source/opt/eliminate_dead_output_stores_pass.cpp
+  source/opt/feature_manager.cpp
+  source/opt/fix_func_call_arguments.cpp
+  source/opt/fix_storage_class.cpp
+  source/opt/flatten_decoration_pass.cpp
+  source/opt/fold.cpp
+  source/opt/folding_rules.cpp
+  source/opt/fold_spec_constant_op_and_composite_pass.cpp
+  source/opt/freeze_spec_constant_value_pass.cpp
+  source/opt/function.cpp
+  source/opt/graphics_robust_access_pass.cpp
+  source/opt/if_conversion.cpp
+  source/opt/inline_exhaustive_pass.cpp
+  source/opt/inline_opaque_pass.cpp
+  source/opt/inline_pass.cpp
+  source/opt/instruction.cpp
+  source/opt/instruction_list.cpp
+  source/opt/instrument_pass.cpp
+  source/opt/interface_var_sroa.cpp
+  source/opt/inst_bindless_check_pass.cpp
+  source/opt/inst_buff_addr_check_pass.cpp
+  source/opt/inst_debug_printf_pass.cpp
+  source/opt/interp_fixup_pass.cpp
+  source/opt/invocation_interlock_placement_pass.cpp
+  source/opt/ir_context.cpp
+  source/opt/ir_loader.cpp
+  source/opt/licm_pass.cpp
+  source/opt/liveness.cpp
+  source/opt/local_access_chain_convert_pass.cpp
+  source/opt/local_redundancy_elimination.cpp
+  source/opt/local_single_block_elim_pass.cpp
+  source/opt/local_single_store_elim_pass.cpp
+  source/opt/loop_dependence.cpp
+  source/opt/loop_dependence_helpers.cpp
+  source/opt/loop_descriptor.cpp
+  source/opt/loop_fission.cpp
+  source/opt/loop_fusion.cpp
+  source/opt/loop_fusion_pass.cpp
+  source/opt/loop_peeling.cpp
+  source/opt/loop_unroller.cpp
+  source/opt/loop_unswitch_pass.cpp
+  source/opt/loop_utils.cpp
+  source/opt/mem_pass.cpp
+  source/opt/merge_return_pass.cpp
+  source/opt/modify_maximal_reconvergence.cpp
+  source/opt/module.cpp
+  source/opt/optimizer.cpp
+  source/opt/pass.cpp
+  source/opt/pass_manager.cpp
+  source/opt/pch_source_opt.cpp
+  source/opt/private_to_local_pass.cpp
+  source/opt/propagator.cpp
+  source/opt/reduce_load_size.cpp
+  source/opt/redundancy_elimination.cpp
+  source/opt/register_pressure.cpp
+  source/opt/relax_float_ops_pass.cpp
+  source/opt/remove_dontinline_pass.cpp
+  source/opt/remove_duplicates_pass.cpp
+  source/opt/remove_unused_interface_variables_pass.cpp
+  source/opt/replace_desc_array_access_using_var_index.cpp
+  source/opt/replace_invalid_opc.cpp
+  source/opt/scalar_analysis.cpp
+  source/opt/scalar_analysis_simplification.cpp
+  source/opt/scalar_replacement_pass.cpp
+  source/opt/set_spec_constant_default_value_pass.cpp
+  source/opt/simplification_pass.cpp
+  source/opt/spread_volatile_semantics.cpp
+  source/opt/ssa_rewrite_pass.cpp
+  source/opt/strength_reduction_pass.cpp
+  source/opt/strip_debug_info_pass.cpp
+  source/opt/strip_nonsemantic_info_pass.cpp
+  source/opt/struct_cfg_analysis.cpp
+  source/opt/switch_descriptorset_pass.cpp
+  source/opt/types.cpp
+  source/opt/type_manager.cpp
+  source/opt/trim_capabilities_pass.cpp
+  source/opt/unify_const_pass.cpp
+  source/opt/upgrade_memory_model.cpp
+  source/opt/value_number_table.cpp
+  source/opt/vector_dce.cpp
+  source/opt/workaround1209.cpp
+  source/opt/wrap_opkill.cpp
+  source/parsed_operand.cpp
+  source/pch_source.cpp
+  source/print.cpp
+  source/reduce/change_operand_reduction_opportunity.cpp
+  source/reduce/change_operand_to_undef_reduction_opportunity.cpp
+  source/reduce/conditional_branch_to_simple_conditional_branch_opportunity_finder.cpp
+  source/reduce/conditional_branch_to_simple_conditional_branch_reduction_opportunity.cpp
+  source/reduce/merge_blocks_reduction_opportunity.cpp
+  source/reduce/merge_blocks_reduction_opportunity_finder.cpp
+  source/reduce/operand_to_const_reduction_opportunity_finder.cpp
+  source/reduce/operand_to_dominating_id_reduction_opportunity_finder.cpp
+  source/reduce/operand_to_undef_reduction_opportunity_finder.cpp
+  source/reduce/pch_source_reduce.cpp
+  source/reduce/reducer.cpp
+  source/reduce/reduction_opportunity.cpp
+  source/reduce/reduction_opportunity_finder.cpp
+  source/reduce/reduction_pass.cpp
+  source/reduce/reduction_util.cpp
+  source/reduce/remove_block_reduction_opportunity.cpp
+  source/reduce/remove_block_reduction_opportunity_finder.cpp
+  source/reduce/remove_function_reduction_opportunity.cpp
+  source/reduce/remove_function_reduction_opportunity_finder.cpp
+  source/reduce/remove_instruction_reduction_opportunity.cpp
+  source/reduce/remove_selection_reduction_opportunity.cpp
+  source/reduce/remove_selection_reduction_opportunity_finder.cpp
+  source/reduce/remove_struct_member_reduction_opportunity.cpp
+  source/reduce/remove_unused_instruction_reduction_opportunity_finder.cpp
+  source/reduce/remove_unused_struct_member_reduction_opportunity_finder.cpp
+  source/reduce/simple_conditional_branch_to_branch_opportunity_finder.cpp
+  source/reduce/simple_conditional_branch_to_branch_reduction_opportunity.cpp
+  source/reduce/structured_construct_to_block_reduction_opportunity.cpp
+  source/reduce/structured_construct_to_block_reduction_opportunity_finder.cpp
+  source/reduce/structured_loop_to_selection_reduction_opportunity.cpp
+  source/reduce/structured_loop_to_selection_reduction_opportunity_finder.cpp
+  source/software_version.cpp
+  source/spirv_endian.cpp
+  source/spirv_fuzzer_options.cpp
+  source/spirv_optimizer_options.cpp
+  source/spirv_reducer_options.cpp
+  source/spirv_target_env.cpp
+  source/spirv_validator_options.cpp
+  source/table.cpp
+  source/text.cpp
+  source/text_handler.cpp
+  source/util/bit_vector.cpp
+  source/util/parse_number.cpp
+  source/util/string_utils.cpp
+  source/util/timer.cpp
+  source/val/basic_block.cpp
+  source/val/construct.cpp
+  source/val/function.cpp
+  source/val/instruction.cpp
+  source/val/validate.cpp
+  source/val/validate_adjacency.cpp
+  source/val/validate_annotation.cpp
+  source/val/validate_arithmetics.cpp
+  source/val/validate_atomics.cpp
+  source/val/validate_barriers.cpp
+  source/val/validate_bitwise.cpp
+  source/val/validate_builtins.cpp
+  source/val/validate_capability.cpp
+  source/val/validate_cfg.cpp
+  source/val/validate_composites.cpp
+  source/val/validate_constants.cpp
+  source/val/validate_conversion.cpp
+  source/val/validate_debug.cpp
+  source/val/validate_decorations.cpp
+  source/val/validate_derivatives.cpp
+  source/val/validate_execution_limitations.cpp
+  source/val/validate_extensions.cpp
+  source/val/validate_function.cpp
+  source/val/validate_id.cpp
+  source/val/validate_image.cpp
+  source/val/validate_instruction.cpp
+  source/val/validate_interfaces.cpp
+  source/val/validate_layout.cpp
+  source/val/validate_literals.cpp
+  source/val/validate_logicals.cpp
+  source/val/validate_memory.cpp
+  source/val/validate_memory_semantics.cpp
+  source/val/validate_mesh_shading.cpp
+  source/val/validate_misc.cpp
+  source/val/validate_mode_setting.cpp
+  source/val/validate_non_uniform.cpp
+  source/val/validate_primitives.cpp
+  source/val/validate_ray_query.cpp
+  source/val/validate_ray_tracing.cpp
+  source/val/validate_ray_tracing_reorder.cpp
+  source/val/validate_scopes.cpp
+  source/val/validate_small_type_uses.cpp
+  source/val/validate_type.cpp
+  source/val/validation_state.cpp
+)
+set(defines NDEBUG _CONSOLE GENERIC_COMPILER YYDEBUG=0)
+if(DAGOR_PLATFORM STREQUAL "windows")
+  list(APPEND defines WIN32)
+  list(APPEND options /d2Zi+)
 endif()
-if (POLICY CMP0054)
-  # Avoid dereferencing variables or interpret keywords that have been
-  # quoted or bracketed.
-  # https://cmake.org/cmake/help/v3.1/policy/CMP0054.html
-  cmake_policy(SET CMP0054 NEW)
-endif()
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-project(spirv-tools)
-enable_testing()
-set(SPIRV_TOOLS "SPIRV-Tools")
-
-include(GNUInstallDirs)
-
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-set(CMAKE_CXX_STANDARD 11)
-
-option(ENABLE_RTTI "Enables RTTI" OFF)
-option(SPIRV_ALLOW_TIMERS "Allow timers via clock_gettime on supported platforms" ON)
-
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-  add_definitions(-DSPIRV_LINUX)
-  set(SPIRV_TIMER_ENABLED ${SPIRV_ALLOW_TIMERS})
-elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Emscripten")
-    add_definitions(-DSPIRV_EMSCRIPTEN)
-elseif("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
-  add_definitions(-DSPIRV_WINDOWS)
-elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "CYGWIN")
-  add_definitions(-DSPIRV_WINDOWS)
-elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
-  add_definitions(-DSPIRV_MAC)
-elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS")
-  add_definitions(-DSPIRV_IOS)
-elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "tvOS")
-  add_definitions(-DSPIRV_TVOS)
-elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Android")
-  add_definitions(-DSPIRV_ANDROID)
-  set(SPIRV_TIMER_ENABLED ${SPIRV_ALLOW_TIMERS})
-elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "FreeBSD")
-  add_definitions(-DSPIRV_FREEBSD)
-elseif("${CMAKE_SYSTEM_NAME}" STREQUAL "Fuchsia")
-  add_definitions(-DSPIRV_FUCHSIA)
-else()
-  message(FATAL_ERROR "Your platform '${CMAKE_SYSTEM_NAME}' is not supported!")
-endif()
-
-if (${SPIRV_TIMER_ENABLED})
-  add_definitions(-DSPIRV_TIMER_ENABLED)
-endif()
-
-if ("${CMAKE_BUILD_TYPE}" STREQUAL "")
-  message(STATUS "No build type selected, default to Debug")
-  set(CMAKE_BUILD_TYPE "Debug")
-endif()
-
-option(SKIP_SPIRV_TOOLS_INSTALL "Skip installation" ${SKIP_SPIRV_TOOLS_INSTALL})
-if(NOT ${SKIP_SPIRV_TOOLS_INSTALL})
-  set(ENABLE_SPIRV_TOOLS_INSTALL ON)
-endif()
-
-option(SPIRV_BUILD_COMPRESSION "Build SPIR-V compressing codec" OFF)
-if(SPIRV_BUILD_COMPRESSION)
-  message(FATAL_ERROR "SPIR-V compression codec has been removed from SPIR-V tools. "
-          "Please remove SPIRV_BUILD_COMPRESSION from your build options.")
-endif(SPIRV_BUILD_COMPRESSION)
-
-option(SPIRV_BUILD_FUZZER "Build spirv-fuzz" OFF)
-
-set(SPIRV_LIB_FUZZING_ENGINE_LINK_OPTIONS "" CACHE STRING "Used by OSS-Fuzz to control, via link options, which fuzzing engine should be used")
-
-option(SPIRV_BUILD_LIBFUZZER_TARGETS "Build libFuzzer targets" OFF)
-
-option(SPIRV_WERROR "Enable error on warning" ON)
-if(("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU") OR (("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang") AND (NOT CMAKE_CXX_SIMULATE_ID STREQUAL "MSVC")))
-  set(COMPILER_IS_LIKE_GNU TRUE)
-endif()
-if(${COMPILER_IS_LIKE_GNU})
-  set(SPIRV_WARNINGS -Wall -Wextra -Wnon-virtual-dtor -Wno-missing-field-initializers)
-
-  if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-    set(SPIRV_WARNINGS ${SPIRV_WARNINGS} -Wno-self-assign)
-  endif()
-
-  option(SPIRV_WARN_EVERYTHING "Enable -Weverything" ${SPIRV_WARN_EVERYTHING})
-  if(${SPIRV_WARN_EVERYTHING})
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-      set(SPIRV_WARNINGS ${SPIRV_WARNINGS}
-        -Weverything -Wno-c++98-compat -Wno-c++98-compat-pedantic -Wno-padded)
-    elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-      set(SPIRV_WARNINGS ${SPIRV_WARNINGS} -Wpedantic -pedantic-errors)
-    else()
-      message(STATUS "Unknown compiler ${CMAKE_CXX_COMPILER_ID}, "
-                     "so SPIRV_WARN_EVERYTHING has no effect")
-    endif()
-  endif()
-
-  if(${SPIRV_WERROR})
-    set(SPIRV_WARNINGS ${SPIRV_WARNINGS} -Werror)
-  endif()
-elseif(MSVC)
-  set(SPIRV_WARNINGS -D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS /wd4800 /wd4819)
-
-  if(${SPIRV_WERROR})
-    set(SPIRV_WARNINGS ${SPIRV_WARNINGS} /WX)
-  endif()
-endif()
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/)
-
-option(SPIRV_COLOR_TERMINAL "Enable color terminal output" ON)
-if(${SPIRV_COLOR_TERMINAL})
-  add_definitions(-DSPIRV_COLOR_TERMINAL)
-endif()
-
-option(SPIRV_LOG_DEBUG "Enable excessive debug output" OFF)
-if(${SPIRV_LOG_DEBUG})
-  add_definitions(-DSPIRV_LOG_DEBUG)
-endif()
-
-if (DEFINED SPIRV_TOOLS_EXTRA_DEFINITIONS)
-  add_definitions(${SPIRV_TOOLS_EXTRA_DEFINITIONS})
-endif()
-
-# Library build setting definitions:
-#
-# * SPIRV_TOOLS_BUILD_STATIC - ON or OFF - Defaults to ON.
-#   If enabled the following targets will be created:
-#     ${SPIRV_TOOLS}-static - STATIC library.
-#                             Has full public symbol visibility.
-#     ${SPIRV_TOOLS}-shared - SHARED library.
-#                             Has default-hidden symbol visibility.
-#     ${SPIRV_TOOLS}        - will alias to one of above, based on BUILD_SHARED_LIBS.
-#   If disabled the following targets will be created:
-#     ${SPIRV_TOOLS}        - either STATIC or SHARED based on SPIRV_TOOLS_LIBRARY_TYPE.
-#                             Has full public symbol visibility.
-#     ${SPIRV_TOOLS}-shared - SHARED library.
-#                             Has default-hidden symbol visibility.
-#
-# * SPIRV_TOOLS_LIBRARY_TYPE - SHARED or STATIC.
-#   Specifies the library type used for building SPIRV-Tools libraries.
-#   Defaults to SHARED when BUILD_SHARED_LIBS=1, otherwise STATIC.
-#
-# * SPIRV_TOOLS_FULL_VISIBILITY - "${SPIRV_TOOLS}-static" or "${SPIRV_TOOLS}"
-#   Evaluates to the SPIRV_TOOLS target library name that has no hidden symbols.
-#   This is used by internal targets for accessing symbols that are non-public.
-#   Note this target provides no API stability guarantees.
-#
-# Ideally, all of these will go away - see https://github.com/KhronosGroup/SPIRV-Tools/issues/3909.
-option(ENABLE_EXCEPTIONS_ON_MSVC "Build SPIRV-TOOLS with c++ exceptions enabled in MSVC" ON)
-option(SPIRV_TOOLS_BUILD_STATIC "Build ${SPIRV_TOOLS}-static target. ${SPIRV_TOOLS} will alias to ${SPIRV_TOOLS}-static or ${SPIRV_TOOLS}-shared based on BUILD_SHARED_LIBS" ON)
-if(SPIRV_TOOLS_BUILD_STATIC)
-  set(SPIRV_TOOLS_FULL_VISIBILITY ${SPIRV_TOOLS}-static)
-  set(SPIRV_TOOLS_LIBRARY_TYPE "STATIC")
-else(SPIRV_TOOLS_BUILD_STATIC)
-  set(SPIRV_TOOLS_FULL_VISIBILITY ${SPIRV_TOOLS})
-  if (NOT DEFINED SPIRV_TOOLS_LIBRARY_TYPE)
-      if(BUILD_SHARED_LIBS)
-        set(SPIRV_TOOLS_LIBRARY_TYPE "SHARED")
-      else()
-        set(SPIRV_TOOLS_LIBRARY_TYPE "STATIC")
-      endif()
-  endif()
-endif(SPIRV_TOOLS_BUILD_STATIC)
-
-function(spvtools_default_compile_options TARGET)
-  target_compile_options(${TARGET} PRIVATE ${SPIRV_WARNINGS})
-
-  if (${COMPILER_IS_LIKE_GNU})
-    target_compile_options(${TARGET} PRIVATE -std=c++11 -fno-exceptions)
-    target_compile_options(${TARGET} PRIVATE
-      -Wall -Wextra -Wno-long-long -Wshadow -Wundef -Wconversion
-      -Wno-sign-conversion)
-
-    if(NOT ENABLE_RTTI)
-        add_compile_options(-fno-rtti)
-    endif()
-    # For good call stacks in profiles, keep the frame pointers.
-    if(NOT "${SPIRV_PERF}" STREQUAL "")
-      target_compile_options(${TARGET} PRIVATE -fno-omit-frame-pointer)
-    endif()
-    if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-      set(SPIRV_USE_SANITIZER "" CACHE STRING
-        "Use the clang sanitizer [address|memory|thread|...]")
-      if(NOT "${SPIRV_USE_SANITIZER}" STREQUAL "")
-        target_compile_options(${TARGET} PRIVATE
-          -fsanitize=${SPIRV_USE_SANITIZER})
-        set_target_properties(${TARGET} PROPERTIES
-          LINK_FLAGS -fsanitize=${SPIRV_USE_SANITIZER})
-      endif()
-      target_compile_options(${TARGET} PRIVATE
-         -ftemplate-depth=1024)
-    else()
-      target_compile_options(${TARGET} PRIVATE
-         -Wno-missing-field-initializers)
-    endif()
-  endif()
-
-  if (MSVC)
-    # Specify /EHs for exception handling. This makes using SPIRV-Tools as
-    # dependencies in other projects easier.
-    if(ENABLE_EXCEPTIONS_ON_MSVC)
-      target_compile_options(${TARGET} PRIVATE /EHs)
-    endif()
-  endif()
-
-  # For MinGW cross compile, statically link to the C++ runtime.
-  # But it still depends on MSVCRT.dll.
-  if (${CMAKE_SYSTEM_NAME} MATCHES "Windows")
-    if (${CMAKE_CXX_COMPILER_ID} MATCHES "GNU")
-      set_target_properties(${TARGET} PROPERTIES
-        LINK_FLAGS -static -static-libgcc -static-libstdc++)
-    endif()
-  endif()
-endfunction()
-
-if(NOT COMMAND find_host_package)
-  macro(find_host_package)
-    find_package(${ARGN})
-  endmacro()
-endif()
-if(NOT COMMAND find_host_program)
-  macro(find_host_program)
-    find_program(${ARGN})
-  endmacro()
-endif()
-
-# Tests require Python3
-find_host_package(PythonInterp 3 REQUIRED)
-
-# Check for symbol exports on Linux.
-# At the moment, this check will fail on the OSX build machines for the Android NDK.
-# It appears they don't have objdump.
-if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
-  macro(spvtools_check_symbol_exports TARGET)
-    if (NOT "${SPIRV_SKIP_TESTS}")
-      add_test(NAME spirv-tools-symbol-exports-${TARGET}
-               COMMAND ${PYTHON_EXECUTABLE}
-               ${spirv-tools_SOURCE_DIR}/utils/check_symbol_exports.py "$<TARGET_FILE:${TARGET}>")
-    endif()
-  endmacro()
-else()
-  macro(spvtools_check_symbol_exports TARGET)
-    if (NOT "${SPIRV_SKIP_TESTS}")
-      message("Skipping symbol exports test for ${TARGET}")
-    endif()
-  endmacro()
+if(DAGOR_PLATFORM STREQUAL "macOS")
+  list(APPEND options -Wno-deprecated-declarations)
 endif()
 
-if(ENABLE_SPIRV_TOOLS_INSTALL)
-  if(WIN32)
-    macro(spvtools_config_package_dir TARGET PATH)
-      set(${PATH} ${TARGET}/cmake)
-    endmacro()
-  else()
-    macro(spvtools_config_package_dir TARGET PATH)
-      set(${PATH} ${CMAKE_INSTALL_LIBDIR}/cmake/${TARGET})
-    endmacro()
-  endif()
-
-  macro(spvtools_generate_config_file TARGET)
-    file(WRITE ${CMAKE_BINARY_DIR}/${TARGET}Config.cmake
-      "include(CMakeFindDependencyMacro)\n"
-      "find_dependency(${SPIRV_TOOLS})\n"
-      "include(\${CMAKE_CURRENT_LIST_DIR}/${TARGET}Targets.cmake)\n"
-      "set(${TARGET}_LIBRARIES ${TARGET})\n"
-      "get_target_property(${TARGET}_INCLUDE_DIRS ${TARGET} INTERFACE_INCLUDE_DIRECTORIES)\n")
-  endmacro()
-endif()
-
-# Defaults to OFF if the user didn't set it.
-option(SPIRV_SKIP_EXECUTABLES
-  "Skip building the executable and tests along with the library"
-  ${SPIRV_SKIP_EXECUTABLES})
-option(SPIRV_SKIP_TESTS
-  "Skip building tests along with the library" ${SPIRV_SKIP_TESTS})
-if ("${SPIRV_SKIP_EXECUTABLES}")
-  set(SPIRV_SKIP_TESTS ON)
-endif()
-
-# Defaults to ON.  The checks can be time consuming.
-# Turn off if they take too long.
-option(SPIRV_CHECK_CONTEXT "In a debug build, check if the IR context is in a valid state." ON)
-if (${SPIRV_CHECK_CONTEXT})
-  add_compile_options($<$<CONFIG:Debug>:-DSPIRV_CHECK_CONTEXT>)
-endif()
-
-# Precompiled header macro. Parameters are source file list and filename for pch cpp file.
-macro(spvtools_pch SRCS PCHPREFIX)
-  if(MSVC AND CMAKE_GENERATOR MATCHES "^Visual Studio" AND NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-    set(PCH_NAME "$(IntDir)\\${PCHPREFIX}.pch")
-    # make source files use/depend on PCH_NAME
-    set_source_files_properties(${${SRCS}} PROPERTIES COMPILE_FLAGS "/Yu${PCHPREFIX}.h /FI${PCHPREFIX}.h /Fp${PCH_NAME} /Zm300" OBJECT_DEPENDS "${PCH_NAME}")
-    # make PCHPREFIX.cpp file compile and generate PCH_NAME
-    set_source_files_properties("${PCHPREFIX}.cpp" PROPERTIES COMPILE_FLAGS "/Yc${PCHPREFIX}.h /Fp${PCH_NAME} /Zm300" OBJECT_OUTPUTS "${PCH_NAME}")
-    list(APPEND ${SRCS} "${PCHPREFIX}.cpp")
-  endif()
-endmacro(spvtools_pch)
-
-add_subdirectory(external)
-
-# Warning about extra semi-colons.
-#
-# This is not supported on all compilers/versions. so enabling only
-# for clang, since that works for all versions that our bots run.
-#
-# This is intentionally done after adding the external subdirectory,
-# so we don't enforce this flag on our dependencies, some of which do
-# not pass it.
-#
-# If the minimum version of CMake supported is updated to 3.0 or
-# later, then check_cxx_compiler_flag could be used instead.
-if("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
-    add_compile_options("-Wextra-semi")
-endif()
-
-add_subdirectory(source)
-add_subdirectory(tools)
-
-add_subdirectory(test)
-add_subdirectory(examples)
-
-if(ENABLE_SPIRV_TOOLS_INSTALL)
-  install(
-    FILES
-      ${CMAKE_CURRENT_SOURCE_DIR}/include/spirv-tools/libspirv.h
-      ${CMAKE_CURRENT_SOURCE_DIR}/include/spirv-tools/libspirv.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/include/spirv-tools/optimizer.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/include/spirv-tools/linker.hpp
-      ${CMAKE_CURRENT_SOURCE_DIR}/include/spirv-tools/instrument.hpp
-    DESTINATION
-      ${CMAKE_INSTALL_INCLUDEDIR}/spirv-tools/)
-endif(ENABLE_SPIRV_TOOLS_INSTALL)
-
-if (NOT "${SPIRV_SKIP_TESTS}")
-  add_test(NAME spirv-tools-copyrights
-           COMMAND ${PYTHON_EXECUTABLE} utils/check_copyright.py
-           WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-endif()
-
-set(SPIRV_LIBRARIES "-lSPIRV-Tools-opt -lSPIRV-Tools -lSPIRV-Tools-link")
-set(SPIRV_SHARED_LIBRARIES "-lSPIRV-Tools-shared")
-
-# Build pkg-config file
-# Use a first-class target so it's regenerated when relevant files are updated.
-add_custom_target(spirv-tools-pkg-config ALL
-        COMMAND ${CMAKE_COMMAND}
-                      -DCHANGES_FILE=${CMAKE_CURRENT_SOURCE_DIR}/CHANGES
-                      -DTEMPLATE_FILE=${CMAKE_CURRENT_SOURCE_DIR}/cmake/SPIRV-Tools.pc.in
-                      -DOUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/SPIRV-Tools.pc
-                      -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-                      -DCMAKE_INSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR}
-                      -DCMAKE_INSTALL_INCLUDEDIR=${CMAKE_INSTALL_INCLUDEDIR}
-                      -DSPIRV_LIBRARIES=${SPIRV_LIBRARIES}
-                      -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/write_pkg_config.cmake
-        DEPENDS "CHANGES" "cmake/SPIRV-Tools.pc.in" "cmake/write_pkg_config.cmake")
-add_custom_target(spirv-tools-shared-pkg-config ALL
-        COMMAND ${CMAKE_COMMAND}
-                      -DCHANGES_FILE=${CMAKE_CURRENT_SOURCE_DIR}/CHANGES
-                      -DTEMPLATE_FILE=${CMAKE_CURRENT_SOURCE_DIR}/cmake/SPIRV-Tools-shared.pc.in
-                      -DOUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/SPIRV-Tools-shared.pc
-                      -DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}
-                      -DCMAKE_INSTALL_LIBDIR=${CMAKE_INSTALL_LIBDIR}
-                      -DCMAKE_INSTALL_INCLUDEDIR=${CMAKE_INSTALL_INCLUDEDIR}
-                      -DSPIRV_SHARED_LIBRARIES=${SPIRV_SHARED_LIBRARIES}
-                      -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/write_pkg_config.cmake
-        DEPENDS "CHANGES" "cmake/SPIRV-Tools-shared.pc.in" "cmake/write_pkg_config.cmake")
-
-# Install pkg-config file
-if (ENABLE_SPIRV_TOOLS_INSTALL)
-  install(
-    FILES
-      ${CMAKE_CURRENT_BINARY_DIR}/SPIRV-Tools.pc
-      ${CMAKE_CURRENT_BINARY_DIR}/SPIRV-Tools-shared.pc
-    DESTINATION
-      ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
-endif()
+dagor_add_library(SOURCES ${sources}
+  PRIVATE_INCLUDES ${includes}
+  PRIVATE_DEFINES ${defines}
+  COMPILE_OPTIONS ${options}
+)

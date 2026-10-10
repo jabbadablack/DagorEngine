@@ -3,7 +3,7 @@
 # rule to the trees whose build dir name matches.
 @tests define only in CMake: _TARGET_D3D_MULTI$  # the tests tree has the multi-driver interface for the render tests (decisions.md)
 @tests define only in CMake: (_DEBUG_TAB_|EASTL_DEBUG|EASTL_DEBUGPARAMS_LEVEL=0|EASTL_NAME_ENABLED=0)$  # tests: checked containers in Dev
-\.c: define only in jam: DAGOR_EXCEPTIONS_ENABLED$  # jam passed the C++ exception setting to C sources too
+\.c: define only in jam: (DAGOR_EXCEPTIONS_ENABLED|_HAS_EXCEPTIONS=0)$  # jam passed the C++ exception settings to C sources too
 include only in CMake: build/  # generated files (stringified .das and the like) go into the build tree, not the sources
 das_ecs_test\.exe: .*define only in CMake: DAS_ECS_TEST_ENGINE_ROOT=  # the test finds daScript from the engine root, not the working dir
 # jam's tests built some libraries in two variants in rel: with exceptions for Catch2 and without logs for the unit
@@ -11,7 +11,9 @@ das_ecs_test\.exe: .*define only in CMake: DAS_ECS_TEST_ENGINE_ROOT=  # the test
 @tests (define only in CMake: DAGOR_FORCE_LOGS|kernel/def_logcryptkey\.cpp: compiled only by CMake)$  # the tests keep their logs in Rel
 @tests (define only in jam: _HAS_EXCEPTIONS=0|define only in CMake: DAGOR_EXCEPTIONS_ENABLED)$  # exceptions in every config
 # the tests tree builds only the stub driver until the DX12 and Vulkan drivers are ported (remove these then)
-drv3d_commonCode\.lib: .*(define only in jam: HAS_NVAPI|include only in jam: prog/3rdpartylibs/antilag2|define only in CMake: D3D_STUB_DRIVER_ONLY|(amdfsr_stub|amdlowlatencystub)\.cpp: compiled only by CMake)$
+drv3d_commonCode(~[^.]*)?\.lib: .*(define only in jam: HAS_NVAPI|include only in jam: prog/3rdpartylibs/antilag2|define only in CMake: D3D_STUB_DRIVER_ONLY|(amdfsr_stub|amdlowlatencystub)\.cpp: compiled only by CMake)$
 drv3d_pc_multi~.*: .*(define only in jam: USE_MULTI_D3D_(vulkan|DX12)|hlsl_stub\.cpp: compiled only by CMake)$
 ^(engine/drv/(drv3d_(DX12|vulkan)|shadersMetaData/(dxil|spirv))|1stPartyLibs/jsoncpp|3rdPartyLibs/vulkan/smol-v|engine/imgui/stub)\.lib: .*: not compiled by CMake$
-(drv3d_commonCode\.lib: .*/(amdFsr|amdLowLatency)|drv3d_pc_multi~.*/hlsl_dx)\.cpp: not compiled by CMake$
+(drv3d_commonCode(~[^.]*)?\.lib: .*/(amdFsr|amdLowLatency)|drv3d_pc_multi~.*/hlsl_dx)\.cpp: not compiled by CMake$
+^(dolphin|whale)\.exe: .*(define only in jam: (NDEBUG|DAGOR_DBGLEVEL=0)|define only in CMake: DAGOR_DBGLEVEL=1)$  # jam built them rel only; CMake in the tree's config (decisions.md)
+(/ShaderCompiler2/(shlex|shsyn)\.cpp: not compiled by CMake|/parsers/(shlex|shsyn)\.cpp: compiled only by CMake)$  # dolphin/whale output goes into the build dir

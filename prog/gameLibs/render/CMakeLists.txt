@@ -1,0 +1,124 @@
+# The shared rendering code of games and tools: post effects, shadows, sky, clouds, decals, texture utilities and more.
+# Outside Rel it also has the ImGui GPU profiler and the debug mesh rendering.
+set(includes
+  ${DAGOR_PROG_DIR}/gameLibs/publicInclude
+  ${DAGOR_PROG_DIR}/3rdPartyLibs/binPack2D/include
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  shaders
+  ${DAGOR_PROG_DIR}/commonFx/commonFxGame
+)
+set(sources
+  giVerifierCapture.cpp
+  giVerifierEnvExr.cpp
+  cameraPositions.cpp
+  bigLightsShadows.cpp
+  tdrGpu.cpp
+  toroidalStaticShadows/toroidalStaticShadowCascade.cpp
+  toroidalStaticShadows/shadowDepthScroller.cpp
+  toroidalStaticShadows/toroidalStaticShadows.cpp
+  load_texture_array.cpp
+  preIntegratedGF.cpp
+  noiseTex.cpp
+  noiseTexData.cpp
+  gpuGrass.cpp
+  fast_grass.cpp
+  ssao_common.cpp
+  ssao.cpp
+  gtao.cpp
+  mobile_ssao.cpp
+  tireTracks.cpp
+  clipmapDecals.cpp
+  burningDecals.cpp
+  clouds.cpp
+  deferredRenderer.cpp
+  deferredRT.cpp
+  psm.cpp
+  rain.cpp
+  waterObjects.cpp
+  xcsm.cpp
+  variance.cpp
+  iesTextureManager.cpp
+  distortion.cpp
+  fxaa.cpp
+  partialDxtRender.cpp
+  dynamicLightProbe.cpp
+  randomGrass.cpp
+  landMask.cpp
+  editorGrass.cpp
+  waterProjFx.cpp
+  sphHarmCalc.cpp
+  cascadeShadows.cpp
+  lightCube.cpp
+  downsampleDepth.cpp
+  screenSpaceReflection/screenSpaceReflections.cpp
+  screenSpaceReflection/screenSpaceReflectionNodes.cpp
+  grassTranslucency.cpp
+  globTMVars.cpp
+  viewVecs.cpp
+  set_reprojection.cpp
+  reprojectionTm.cpp
+  priorityManagedShadervar.cpp
+  debugTexOverlay.cpp
+  debugTonemapOverlay.cpp
+  debugMultiTextOverlay.cpp
+  heroWetness.cpp
+  motionBlur.cpp
+  globe.cpp
+  waterFoamTrail.cpp
+  commonMeshManager.cpp
+  smokeTracers.cpp
+  temporalAA.cpp
+  smaa.cpp
+  toroidalHeightmap.cpp
+  toroidalPuddleMap.cpp
+  mipRenderer.cpp
+  depthAOAboveRenderer.cpp
+  whiteTex.cpp
+  lightProbe.cpp
+  debugLightProbeSpheres.cpp
+  lightProbeSpecularCubesContainer.cpp
+  debugBoxRenderer.cpp
+  debugLightProbeShapeRenderer.cpp
+  debugCollisionDensityRenderer.cpp
+  debugGbuffer.cpp
+  screenDroplets.cpp
+  atlasTexManager.cpp
+  coherentNoise.cpp
+  backBufferHolder.cpp
+  gpuVisibilityTest.cpp
+  voltexRenderer.cpp
+  emissionColorMaps.cpp
+  esmShadows.cpp
+  esmAo.cpp
+  dynamicQuality.cpp
+  dynamicResolution.cpp
+  gpuWatchMs.cpp
+  graphicsAutodetect.cpp
+  vertexDensityOverlay.cpp
+  grassify.cpp
+  driverNetworkManager.cpp
+  motionVectorAccess.cpp
+  sphereRenderer.cpp
+  lightShadowParams.cpp
+  toroidalVoxelGrid.cpp
+  voxelShadows.cpp
+)
+list(APPEND deps
+  engine/lib3d
+  gameLibs/render/lights
+  gameLibs/render/texcompressors
+  gameLibs/render/primitiveObjects
+  gameLibs/render/fx
+  gameLibs/frustumCulling
+  gameLibs/render/dynmodelRenderer
+  gameLibs/resourcePool
+)
+dagor_use(gameLibs/render/imGuiProfiler gameLibs/render/imGuiProfiler/stub gameLibs/render/debugMesh
+  gameLibs/render/debugMesh/stub)
+list(APPEND deps "$<IF:$<CONFIG:Rel>,gameLibs.render.imGuiProfiler.stub,gameLibs.render.imGuiProfiler>"
+  "$<IF:$<CONFIG:Rel>,gameLibs.render.debugMesh.stub,gameLibs.render.debugMesh>")
+if(DAGOR_PLATFORM STREQUAL "windows")
+  list(APPEND libs OleAut32)
+endif()
+
+dagor_add_library(STRICT SOURCES ${sources} PRIVATE_INCLUDES ${includes} DEPS ${deps} SYSTEM_LIBS ${libs})

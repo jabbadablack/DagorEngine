@@ -74,3 +74,28 @@ dagor_sdk(agility 1.619.3
     FILE Microsoft.Direct3D.D3D12.1.619.3.zip
     EXTRACT build/native/* LICENSE.txt LICENSE-CODE.txt
 )
+
+# Microsoft DirectX Shader Compiler 1.8.2505.1 (May 2025, patch 1), loaded at run time by the shader compilers. macOS
+# has no Microsoft build: the fork's release holds the one dng.py devtools used (DXC-1.8.2505.1, every platform).
+dagor_sdk(dxc 1.8.2505.1
+  windows-x86_64
+    URL https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.8.2505.1/dxc_2025_07_14.zip
+    SHA256 9ad895a6b039e3a8f8c22a1009f866800b840a74b50db9218d13319e215ea8a4
+    EXTRACT inc/* bin/x64/dxcompiler.dll bin/x64/dxil.dll bin/arm64/dxcompiler.dll bin/arm64/dxil.dll LICENSE-*.txt
+  windows-arm64
+    URL https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.8.2505.1/dxc_2025_07_14.zip
+    SHA256 9ad895a6b039e3a8f8c22a1009f866800b840a74b50db9218d13319e215ea8a4
+    EXTRACT inc/* bin/x64/dxcompiler.dll bin/x64/dxil.dll bin/arm64/dxcompiler.dll bin/arm64/dxil.dll LICENSE-*.txt
+  linux-x86_64
+    URL https://github.com/microsoft/DirectXShaderCompiler/releases/download/v1.8.2505.1/linux_dxc_2025_07_14.x86_64.tar.gz
+    SHA256 f2213da1fc99dc8778c8823078e16ba97c7f80f86a1d4520ab1adf4b462bc48c
+    EXTRACT ./include/* ./lib/* ./LICENSE-*.txt
+  macOS-x86_64
+    URL https://github.com/Prose-Studio/DagorEngine/releases/download/dxc-1.8.2505.1/DXC-1.8.2505.1.tar.gz
+    SHA256 6d2ea8579c29b87c759ddc1300f9901ad413c483b2bfa1f799cb376f6d0789b3
+    EXTRACT */include/dxc/*.h */lib/macosx/* */LICENSE.TXT
+  macOS-arm64
+    URL https://github.com/Prose-Studio/DagorEngine/releases/download/dxc-1.8.2505.1/DXC-1.8.2505.1.tar.gz
+    SHA256 6d2ea8579c29b87c759ddc1300f9901ad413c483b2bfa1f799cb376f6d0789b3
+    EXTRACT */include/dxc/*.h */lib/macosx/* */LICENSE.TXT
+)

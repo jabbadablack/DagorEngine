@@ -227,11 +227,11 @@ target_compile_definitions(DagorQuirrel INTERFACE QUIRREL_HOST_HEADER=dagor_quir
   "$<$<CONFIG:Rel,IRel>:SQ_STORE_DOC_OBJECTS=0>")
 set(DAGOR_QUIRREL_LIBS 1stPartyLibs/quirrel/quirrel 1stPartyLibs/quirrel/quirrel/sqmodules gameLibs/quirrel/quirrelHost)
 
-set(_DAGOR_TARGET_OPTIONS STRICT THIRD_PARTY NO_UNITY CONSOLE NO_CONFIG_POSTFIX QUIRREL QUIRREL_HEADERS)
+set(_DAGOR_TARGET_OPTIONS STRICT THIRD_PARTY NO_UNITY CONSOLE NO_CONFIG_POSTFIX QUIRREL QUIRREL_HEADERS CDK)
 set(_DAGOR_TARGET_ONE_VALUE PCH FOLDER OUTPUT_NAME OUTPUT_DIR EXCEPTIONS RTTI)
 set(_DAGOR_TARGET_MULTI_VALUE SOURCES SOURCE_DIRS GLOB EXCLUDE FORCE_INCLUDES PUBLIC_INCLUDES PRIVATE_INCLUDES PUBLIC_DEFINES
   PRIVATE_DEFINES COMPILE_OPTIONS C_OPTIONS PUBLIC_COMPILE_OPTIONS SOURCE_OPTIONS DEPS PUBLIC_DEPS SYSTEM_LIBS LINK_OPTIONS
-  LICENSE_FILES PROPERTIES STRINGIFY STRINGIFY_ARRAY)
+  LICENSE_FILES PROPERTIES STRINGIFY STRINGIFY_ARRAY ES_SOURCES)
 
 # dagor_glob_sources(<out-var> DIRS <dir>... [GLOB <pattern>...] [EXCLUDE <regex>...]): appends to <out-var> the files
 # of the dirs (relative to the calling dir, not recursive) that match the patterns (default *.cpp *.c), sorted;
@@ -314,6 +314,16 @@ function(_dagor_setup_target target type)
   if(arg_SOURCE_DIRS)
     dagor_glob_sources(sources DIRS ${arg_SOURCE_DIRS} GLOB ${arg_GLOB} EXCLUDE ${arg_EXCLUDE})
   endif()
+  # ES_SOURCES: the entity systems (<name>ES.cpp.inl) whose registration code the ES codegen makes; until it runs in
+  # the build, the generated <name>ES.cpp.gen.es.cpp committed next to them are compiled
+  _dagor_abs_paths(es_sources ${arg_ES_SOURCES})
+  foreach(es IN LISTS es_sources)
+    string(REGEX REPLACE "\\.inl$" ".gen.es.cpp" generated "${es}")
+    if(NOT EXISTS "${generated}")
+      message(FATAL_ERROR "${target}: ${es} has no generated ${generated}")
+    endif()
+    list(APPEND sources "${generated}")
+  endforeach()
 
   if(type STREQUAL "INTERFACE_LIBRARY")
     set(public INTERFACE)
@@ -419,12 +429,14 @@ function(_dagor_setup_target target type)
   if(type STREQUAL "INTERFACE_LIBRARY")
     return()
   endif()
-  foreach(prop EXCEPTIONS RTTI)
-    if(DEFINED arg_${prop})
-      dagor_check_choice("${target} ${prop}" "${arg_${prop}}" ON OFF)
-      set_property(TARGET ${target} PROPERTY DAGOR_${prop} "${arg_${prop}}")
-    endif()
-  endforeach()
+  if(DEFINED arg_EXCEPTIONS)
+    dagor_check_choice("${target} EXCEPTIONS" "${arg_EXCEPTIONS}" ON OFF SEH)
+    set_property(TARGET ${target} PROPERTY DAGOR_EXCEPTIONS "${arg_EXCEPTIONS}")
+  endif()
+  if(DEFINED arg_RTTI)
+    dagor_check_choice("${target} RTTI" "${arg_RTTI}" ON OFF)
+    set_property(TARGET ${target} PROPERTY DAGOR_RTTI "${arg_RTTI}")
+  endif()
   if(arg_PCH)
     _dagor_abs_paths(pch "${arg_PCH}")
     target_precompile_headers(${target} PRIVATE "${pch}")
@@ -444,6 +456,8 @@ function(_dagor_setup_target target type)
   endif()
   _dagor_abs_paths(licenses ${arg_LICENSE_FILES})
   set_property(TARGET ${target} PROPERTY DAGOR_LICENSE_FILES "${licenses}")
+  _dagor_base_dir(base)
+  set_property(TARGET ${target} PROPERTY DAGOR_SOURCE_DIR "${base}") # its license files (see DagorLicenses.cmake)
 
   if(type MATCHES "^(EXECUTABLE|SHARED_LIBRARY|MODULE_LIBRARY)$")
     # <name>[-asan|-ubsan|...][-cov]-<config>, as jam names programs; rel builds have no config suffix
@@ -484,8 +498,46 @@ function(_dagor_setup_target target type)
   if(type STREQUAL "EXECUTABLE" AND DAGOR_PLATFORM STREQUAL "windows" AND NOT arg_CONSOLE)
     set_property(TARGET ${target} PROPERTY WIN32_EXECUTABLE ON)
   endif()
+  if(arg_CDK)
+    if(NOT type MATCHES "^(EXECUTABLE|SHARED_LIBRARY|MODULE_LIBRARY)$")
+      message(FATAL_ERROR "${target}: CDK is for programs and shared libraries")
+    endif()
+    # a tool of the engine's CDK: cmake --install <tree> --component cdk puts it, its LICENSE file and its debug info
+    # into tools/dagor_cdk/<platform>-<arch> (of the engine root by default, see DagorOptions.cmake)
+    set(dest "tools/dagor_cdk/${DAGOR_PLATFORM}-${DAGOR_ARCH}")
+    install(PROGRAMS "$<TARGET_FILE:${target}>" DESTINATION "${dest}" COMPONENT cdk)
+    install(FILES "$<TARGET_FILE_DIR:${target}>/LICENSE-$<TARGET_FILE_BASE_NAME:${target}>" DESTINATION "${dest}"
+      COMPONENT cdk OPTIONAL)
+    if(DAGOR_MSVC_LIKE)
+      install(FILES "$<TARGET_PDB_FILE:${target}>" DESTINATION "${dest}" COMPONENT cdk OPTIONAL)
+    endif()
+    set_property(TARGET ${target} PROPERTY DAGOR_INSTALL_DIR "${dest}")
+    set_property(GLOBAL APPEND PROPERTY DAGOR_CDK_TARGETS "${target}")
+  endif()
 
   set_property(GLOBAL APPEND PROPERTY DAGOR_TARGETS "${target}")
+endfunction()
+
+# dagor_runtime_files(<target> [SUBDIR <dir>] FILES <file>...): files a program loads at run time (SDK libraries, say),
+# copied next to it when it is built (into <dir> there) and installed with it if it is a CDK tool. Called in the
+# directory that declares <target>.
+function(dagor_runtime_files target)
+  cmake_parse_arguments(PARSE_ARGV 1 arg "" "SUBDIR" "FILES")
+  set(dir "$<TARGET_FILE_DIR:${target}>")
+  if(arg_SUBDIR)
+    string(APPEND dir "/${arg_SUBDIR}")
+  endif()
+  add_custom_command(TARGET ${target} POST_BUILD
+    COMMAND "${CMAKE_COMMAND}" -E make_directory "${dir}"
+    COMMAND "${CMAKE_COMMAND}" -E copy_if_different ${arg_FILES} "${dir}"
+    VERBATIM)
+  get_property(install_dir TARGET ${target} PROPERTY DAGOR_INSTALL_DIR)
+  if(install_dir)
+    if(arg_SUBDIR)
+      string(APPEND install_dir "/${arg_SUBDIR}")
+    endif()
+    install(FILES ${arg_FILES} DESTINATION "${install_dir}" COMPONENT cdk)
+  endif()
 endfunction()
 
 # the object library with dagor_exe_build_date/_time (dagor_get_build_stamp_str), linked into every program
@@ -530,9 +582,11 @@ endfunction()
 # dagor_add_library([<name>] [STATIC|OBJECT|INTERFACE] [SOURCES ...] [SOURCE_DIRS <dir>... [GLOB <pattern>...]
 #   [EXCLUDE <regex>...]] [PUBLIC_INCLUDES ...] [PRIVATE_INCLUDES ...] [PUBLIC_DEFINES ...] [PRIVATE_DEFINES ...]
 #   [COMPILE_OPTIONS ...] [C_OPTIONS <options of the C sources>...] [PUBLIC_COMPILE_OPTIONS ...] [SOURCE_OPTIONS <file> <option>...] [DEPS <ref>...]
-#   [PUBLIC_DEPS <ref>...] [SYSTEM_LIBS ...] [LINK_OPTIONS ...] [STRICT] [THIRD_PARTY] [EXCEPTIONS ON|OFF]
+#   [PUBLIC_DEPS <ref>...] [SYSTEM_LIBS ...] [LINK_OPTIONS ...] [STRICT] [THIRD_PARTY] [EXCEPTIONS ON|OFF|SEH]
 #   [QUIRREL] (Quirrel's headers and libraries) [QUIRREL_HEADERS] (its headers only)
 #   [RTTI ON|OFF] [FORCE_INCLUDES <header>...] [PCH <header>] [NO_UNITY] [FOLDER <folder>] [LICENSE_FILES ...]
+#   [CDK] (programs: installed into tools/dagor_cdk/<platform>-<arch> by the cdk install component)
+#   [ES_SOURCES <name>ES.cpp.inl...] (entity systems, compiled through the ES codegen's output)
 #   [PROPERTIES <property> <value>...] [STRINGIFY <file>...] [STRINGIFY_ARRAY <file>...] (see DagorCodegen.cmake)
 # <name> defaults to the directory's path under prog/ with '/' as '.' (see dagor_ref_target).
 function(dagor_add_library)
@@ -618,4 +672,5 @@ function(dagor_finalize)
     message(FATAL_ERROR "Library references to directories that declare no target of that name:\n${missing}")
   endif()
   dagor_check_system_libs()
+  _dagor_licenses()
 endfunction()

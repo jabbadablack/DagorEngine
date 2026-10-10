@@ -28,3 +28,48 @@ function(_dagor_stringify target mode)
   target_sources(${target} PRIVATE ${outputs})
   target_include_directories(${target} PRIVATE "${gen_dir}")
 endfunction()
+
+# dagor_legacy_parsers(<target> [LEX <file>.dlp...] [SYN <file>.whl...]): the shader compilers' lexers (dolphin:
+# <file>.cpp, <file>.h) and LR parsers (whale: <file>.cpp, <file>.h, <file>tok.h), generated into the build dir by the
+# tree's dolphin and whale (prog/3rdPartyLibs/legacy_parser) and compiled into <target>
+function(dagor_legacy_parsers target)
+  cmake_parse_arguments(PARSE_ARGV 1 arg "" "" "LEX;SYN")
+  dagor_use(3rdPartyLibs/legacy_parser/dolphin 3rdPartyLibs/legacy_parser/whale)
+  _dagor_base_dir(base)
+  set(gen_dir "${CMAKE_CURRENT_BINARY_DIR}/gen/${target}/parsers")
+  set(sources)
+  foreach(kind LEX SYN)
+    foreach(file IN LISTS arg_${kind})
+      _dagor_abs_paths(src "${file}")
+      cmake_path(GET src STEM stem)
+      cmake_path(GET src FILENAME name)
+      if(kind STREQUAL "LEX")
+        set(tool dolphin)
+        set(suffixes .cpp .h)
+      else()
+        set(tool whale)
+        set(suffixes .cpp .h tok.h)
+      endif()
+      set(outputs)
+      set(stale)
+      foreach(suffix IN LISTS suffixes)
+        list(APPEND outputs "${gen_dir}/${stem}${suffix}")
+        cmake_path(GET src PARENT_PATH src_dir)
+        list(APPEND stale "${src_dir}/${stem}${suffix}")
+      endforeach()
+      add_custom_command(OUTPUT ${outputs}
+        COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${src}" "${gen_dir}/${name}"
+        COMMAND "$<TARGET_FILE:${tool}>" "${name}"
+        # jam wrote them next to the grammar, where a quoted #include would find a stale one first
+        COMMAND "${CMAKE_COMMAND}" -E rm -f ${stale}
+        WORKING_DIRECTORY "${gen_dir}"
+        DEPENDS "${src}" ${tool}
+        COMMENT "Generating ${name} (${tool})"
+        VERBATIM)
+      list(APPEND sources ${outputs})
+    endforeach()
+  endforeach()
+  file(MAKE_DIRECTORY "${gen_dir}")
+  target_sources(${target} PRIVATE ${sources})
+  target_include_directories(${target} PRIVATE "${gen_dir}")
+endfunction()

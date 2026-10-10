@@ -35,6 +35,11 @@ set(_dagor_tools_tree OFF)
 if(DAGOR_VARIANT MATCHES "^(cdk|editor|maxplug|dargbox)$")
   set(_dagor_tools_tree ON)
 endif()
+# the tool trees install their programs (CDK) into the engine's tools/ unless another prefix is given
+if(_dagor_tools_tree AND CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX "${DAGOR_ENGINE_ROOT}" CACHE PATH "Install prefix (the CDK goes to <prefix>/tools/dagor_cdk)"
+    FORCE)
+endif()
 set(_dagor_sse_default 2)
 if(DAGOR_PLATFORM STREQUAL "macOS" OR DAGOR_ARCH STREQUAL "e2k"
    OR (DAGOR_PLATFORM STREQUAL "windows" AND NOT _dagor_tools_tree) OR (DAGOR_PLATFORM STREQUAL "linux" AND _dagor_tools_tree))

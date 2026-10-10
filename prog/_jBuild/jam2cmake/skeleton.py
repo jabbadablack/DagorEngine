@@ -28,8 +28,12 @@ CONDITION_VARS = {'Platform': 'DAGOR_PLATFORM', 'PlatformArch': 'DAGOR_ARCH', 'K
                   'SSEVersion': 'DAGOR_SSE', 'Sanitize': 'DAGOR_SANITIZE', 'PlatformSpec': 'DAGOR_CC'}
 LIST_VARS = {'Sources': 'sources', 'AddIncludes': 'includes', 'UseProgLibs': 'deps', 'CPPopt': 'cpp_opt',
              'Copt': 'c_opt', 'AddLibs': 'libs', 'LINKopt': 'link_options', 'ExplicitLicenseUsed': 'license_files'}
-IGNORED_VARS = {'TargetLib', 'LibPath'}  # jam bookkeeping without a CMake counterpart
+IGNORED_VARS = {'TargetLib', 'LibPath',  # jam bookkeeping without a CMake counterpart
+                'ProjectAllowsOodle',  # Oodle is in every program of a tree given DAGOR_SDK_OODLE_DIR
+                'PlatformSpec_windows', 'PlatformArch_windows',  # the trees choose the compiler and architecture
+                'ForcePdb', 'ReproducibleExeBuild', 'UseLLDLink'}  # always so in CMake builds
 SCALAR_VARS = {'Location', 'Target', 'TargetType', 'StrictCompile', 'ConsoleExe', 'OutDir', 'Exceptions', 'Rtti', 'UseQuirrel',
+               'Config',
                'Root'}
 KNOWN_INCLUDES = {'defaults.jam', 'build.jam', 'unitTest.jam'}
 # jam variables that only ever had their defaults.jam value; CMake builds have just that version
@@ -438,7 +442,12 @@ class Converter:
           self.emit(depth, 'set({})'.format(name))
         self.used.add(name)
       return
-    if var in IGNORED_VARS:
+    if var in IGNORED_VARS or (var in FIXED_VERSIONS and values == [FIXED_VERSIONS[var]]):
+      return
+    if var == 'FullOOPEnabled' and depth == 0 and values == ['yes']:
+      # jam's exceptions with SEH and RTTI for the whole build; in CMake for the program's own code
+      self.scalars['Exceptions'] = ['SEH']
+      self.scalars['Rtti'] = ['yes']
       return
     if var in SCALAR_VARS and depth == 0 and op in ('=', '?='):
       self.scalars[var] = values
@@ -488,6 +497,12 @@ class Converter:
             self.scalars['unitTest'] = True
           if base == 'build.jam':
             self.after_build = True
+        elif base == 'defPlatform.jam':
+          pass  # the platform comes from the tree
+        elif base == 'tools_setup.jam':
+          pass  # the tool trees' settings (SSE2, precise floats on Windows) are DagorOptions defaults
+        elif base in ('tools_setup_outdir_util.jam', 'tools_setup_outdir_bin.jam'):
+          self.scalars['cdk'] = True
         elif base == 'add_quirrel.jam':
           self.scalars['quirrelHeaders'] = True
         elif base == 'add_null_include.jam':
@@ -536,6 +551,11 @@ class Converter:
           self.todo_line(depth, s[1])
       elif self.stringify(depth, s[1]):
         pass
+      elif re.fullmatch(r'for (\w+) in \$\((\w+)\) \{ GenESSourceFile \$\(\1\) ; \}', s[1]):
+        # the ES codegen of a list of <name>ES.cpp.inl (ES_SOURCES of dagor_add_*)
+        var = re.fullmatch(r'for (\w+) in \$\((\w+)\).*', s[1]).group(2)
+        self.emit(depth, 'list(APPEND es_sources ${{{}}})'.format(var))
+        self.used.add('es_sources')
       else:
         self.todo_line(depth, s[1])
 
@@ -601,9 +621,15 @@ class Converter:
       args.append('CONSOLE')
     if s.get('unitTest'):
       args += self.test_manifest(name)
+    if s.get('cdk'):
+      args.append('CDK')
+    if s.get('Config') == ['rel']:
+      args.append('NO_CONFIG_POSTFIX')  # jam built it in rel only, so without a config suffix (decisions.md)
     for var, prop in (('Exceptions', 'EXCEPTIONS'), ('Rtti', 'RTTI')):
       if s.get(var) in (['yes'], ['no']):
         args.append('{} {}'.format(prop, 'ON' if s[var] == ['yes'] else 'OFF'))
+      elif s.get(var) == ['SEH']:
+        args.append('{} SEH'.format(prop))
     if 'OutDir' in s:
       try:
         args.append('OUTPUT_DIR ' + value(s['OutDir'][0], 'dirs'))
@@ -613,7 +639,7 @@ class Converter:
                     ('defines', 'PRIVATE_DEFINES'), ('options', 'COMPILE_OPTIONS'), ('c_options', 'C_OPTIONS'),
                     ('source_options', 'SOURCE_OPTIONS'), ('deps', 'DEPS'), ('libs', 'SYSTEM_LIBS'),
                     ('link_options', 'LINK_OPTIONS'), ('license_files', 'LICENSE_FILES'), ('stringify', 'STRINGIFY'),
-                    ('stringify_array', 'STRINGIFY_ARRAY')):
+                    ('stringify_array', 'STRINGIFY_ARRAY'), ('es_sources', 'ES_SOURCES')):
       if var in self.used:
         args.append('{} ${{{}}}'.format(kw, var))
     if s.get('unitTest'):
