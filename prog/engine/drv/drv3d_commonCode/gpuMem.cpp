@@ -387,6 +387,9 @@ unsigned d3d::get_free_dedicated_gpu_memory_size_kb()
 
 #elif _TARGET_APPLE
 unsigned d3d::get_free_dedicated_gpu_memory_size_kb() { return 0; }
+#if _TARGET_PC_MACOSX && defined(D3D_STUB_DRIVER_ONLY)
+unsigned d3d::get_dedicated_gpu_memory_size_kb() { return 0; } // drv3d_Metal defines it otherwise
+#endif
 #elif _TARGET_XBOX
 unsigned d3d::get_free_dedicated_gpu_memory_size_kb() { return 0; }
 #if _TARGET_XBOXONE
