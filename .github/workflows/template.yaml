@@ -48,8 +48,8 @@ jobs:
       - name: Cache devtools
         uses: actions/cache@v4
         with:
-          path: ${{ matrix.devtools }}
-          key: devtools-${{ matrix.os }}-${{ hashFiles('make_devtools*.py') }}
+          path: ${{ matrix.devtools }}/.packages # downloads only: the rest links to software of the runner machine (Visual Studio, SDKs, Xcode)
+          key: devtools-packages-${{ matrix.os }}-${{ hashFiles('make_devtools*.py') }}
 
       - name: Set up devtools
         shell: bash

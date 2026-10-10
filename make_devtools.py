@@ -142,6 +142,20 @@ else:
 
 microsoft_retry = []
 
+def find_msvc_tools(ver, editions):
+  """MSVC tools dir <ver>.* of an installed Visual Studio edition ('2022/Community', ...), or ''.
+  Visual Studio 2022 installs to Program Files, its BuildTools and 2019 to Program Files (x86)."""
+  for root in [os.environ.get('ProgramFiles(x86)', ''), os.environ.get('ProgramFiles', '')]:
+    for edition in editions:
+      versions_folder = '{0}/Microsoft Visual Studio/{1}/VC/Tools/MSVC'.format(root, edition)
+      if not root or not pathlib.Path(versions_folder).exists():
+        continue
+      for item in pathlib.Path(versions_folder).glob(ver + ".*"):
+        tools = os.path.normpath(item)
+        if item.is_dir() and pathlib.Path(tools+'/bin/HostX64/x64/1033').exists() and pathlib.Path(tools+'/bin/HostX86/x86/1033').exists():
+          return tools
+  return ''
+
 # vs140
 def setup_vs140(check_again_after_download):
   vc2015_dest_folder = dest_dir+'/vc2015.3'
@@ -192,28 +206,16 @@ def setup_vs142(check_again_after_download):
   if pathlib.Path(vc2019_dest_folder).exists():
     print('=== VC2019 symlink found at {0}, skipping setup'.format(vc2019_dest_folder))
   else:
-    ok = False
-    vc2019_src_folder = '{0}/Microsoft Visual Studio'.format(os.environ['ProgramFiles(x86)'])
-    if vc2019_src_folder and pathlib.Path(vc2019_src_folder).exists():
-      for nm in ['/2022/BuildTools', '/2022/Community', '/2022/Enterprise', '/2022/Professional',
-                 '/2019/BuildTools', '/2019/Community', '/2019/Enterprise', '/2019/Professional']:
-        if pathlib.Path(vc2019_src_folder + nm + '/VC/Tools/MSVC').exists():
-          versions_folder = vc2019_src_folder + nm + '/VC/Tools/MSVC'
-          for item in pathlib.Path(versions_folder).glob(vs142_ver + ".*"):
-            if item.is_dir():
-              if pathlib.Path(os.path.normpath(item)+'/bin/HostX64/x64/1033').exists():
-                if pathlib.Path(os.path.normpath(item)+'/bin/HostX86/x86/1033').exists():
-                  vc2019_src_folder = os.path.normpath(item)
-                  ok = True
-                  break
-
+    vc2019_src_folder = find_msvc_tools(vs142_ver, ['2022/BuildTools', '2022/Community', '2022/Enterprise', '2022/Professional',
+                                                    '2019/BuildTools', '2019/Community', '2019/Enterprise', '2019/Professional'])
+    ok = vc2019_src_folder != ''
     if ok:
       print('+++ VC2019 found at {0}'.format(vc2019_src_folder))
       make_directory_symlink(vc2019_src_folder, vc2019_dest_folder)
     else:
       print('--- VC2019 not found, install VisualStudio 2019 16.11.34+ and re-run setup')
       if not check_again_after_download:
-        error("Visual Studio 2019 is required but not found at '{0}'".format(vc2019_src_folder))
+        error("Visual Studio 2019 is required but MSVC {0} is not found in any Visual Studio installation".format(vs142_ver))
       microsoft_retry.append(setup_vs142)
 
 
@@ -244,27 +246,15 @@ def setup_vs143(check_again_after_download):
   if pathlib.Path(vc2022_dest_folder).exists():
     print('=== VC2022 symlink found at {0}, skipping setup'.format(vc2022_dest_folder))
   else:
-    ok = False
-    vc2022_src_folder = '{0}/Microsoft Visual Studio'.format(os.environ['ProgramFiles(x86)'])
-    if vc2022_src_folder and pathlib.Path(vc2022_src_folder).exists():
-      for nm in ['/2022/BuildTools', '/2022/Community', '/2022/Enterprise', '/2022/Professional']:
-        if pathlib.Path(vc2022_src_folder + nm + '/VC/Tools/MSVC').exists():
-          versions_folder = vc2022_src_folder + nm + '/VC/Tools/MSVC'
-          for item in pathlib.Path(versions_folder).glob(vs143_ver + ".*"):
-            if item.is_dir():
-              if pathlib.Path(os.path.normpath(item)+'/bin/HostX64/x64/1033').exists():
-                if pathlib.Path(os.path.normpath(item)+'/bin/HostX86/x86/1033').exists():
-                  vc2022_src_folder = os.path.normpath(item)
-                  ok = True
-                  break
-
+    vc2022_src_folder = find_msvc_tools(vs143_ver, ['2022/BuildTools', '2022/Community', '2022/Enterprise', '2022/Professional'])
+    ok = vc2022_src_folder != ''
     if ok:
       print('+++ VC2022 found at {0}'.format(vc2022_src_folder))
       make_directory_symlink(vc2022_src_folder, vc2022_dest_folder)
     else:
       print('--- VC2022 not found, install VisualStudio 2022 17.14.4+ and re-run setup')
       if not check_again_after_download:
-        error("Visual Studio 2022 is required but not found at '{0}'".format(vc2022_src_folder))
+        error("Visual Studio 2022 is required but MSVC {0} is not found in any Visual Studio installation".format(vs143_ver))
       microsoft_retry.append(setup_vs143)
 
 
