@@ -15,7 +15,7 @@ if(DAGOR_CC MATCHES "^(clang|clang-cl)$")
   endif()
 endif()
 
-dagor_add_executable(whale CONSOLE NO_CONFIG_POSTFIX
+dagor_add_executable(whale CONSOLE CDK NO_CONFIG_POSTFIX
   EXCEPTIONS SEH
   RTTI ON
   SOURCES nstl/stl.cpp ${sources}

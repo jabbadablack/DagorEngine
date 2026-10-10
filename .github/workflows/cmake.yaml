@@ -23,7 +23,7 @@ permissions:
 
 jobs:
   tests:
-    name: tests (${{ matrix.preset }})
+    name: ${{ matrix.preset }}
     strategy:
       fail-fast: false
       matrix:
@@ -39,6 +39,16 @@ jobs:
             deps: /home/runner/dagor-deps
           - os: macos-15 # Xcode 16: the Metal driver needs the macOS 15 SDK (MTLResidencySet)
             preset: macos-tests
+            deps: /Users/runner/dagor-deps
+          # the CDK (shader compilers, packers, converters) and the GUI shaders they compile
+          - os: windows-2022
+            preset: windows-cdk
+            deps: D:/dagor-deps
+          - os: ubuntu-22.04
+            preset: linux-cdk
+            deps: /home/runner/dagor-deps
+          - os: macos-15
+            preset: macos-cdk
             deps: /Users/runner/dagor-deps
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120

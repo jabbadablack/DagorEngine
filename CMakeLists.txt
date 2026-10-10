@@ -27,11 +27,15 @@ if(DAGOR_VARIANT MATCHES "^(cdk|all)$")
     tools/sceneTools/resClean
     tools/sceneTools/resDiff
     tools/sceneTools/resUpdate
+    tools/sceneTools/utils
     tools/sceneTools/vromfsPacker
     tools/shaderInfo
     tools/ShaderCompiler2
     tools/ShaderCompiler2/nodeBased
+    tools/sceneTools/guiShaders_commonData
   )
+  # the data the tools load that is not built (prog/tools/toolsData/README.md), with the cdk-data component
+  install(DIRECTORY prog/tools/toolsData/ DESTINATION tools COMPONENT cdk-data PATTERN README.md EXCLUDE)
 endif()
 
 dagor_finalize()

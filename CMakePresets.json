@@ -715,6 +715,45 @@
           "name": "ci-windows-msvc-tests"
         }
       ]
+    },
+    {
+      "name": "ci-windows-cdk",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "windows-cdk"
+        },
+        {
+          "type": "build",
+          "name": "windows-cdk"
+        }
+      ]
+    },
+    {
+      "name": "ci-linux-cdk",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "linux-cdk"
+        },
+        {
+          "type": "build",
+          "name": "linux-cdk"
+        }
+      ]
+    },
+    {
+      "name": "ci-macos-cdk",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "macos-cdk"
+        },
+        {
+          "type": "build",
+          "name": "macos-cdk"
+        }
+      ]
     }
   ]
 }

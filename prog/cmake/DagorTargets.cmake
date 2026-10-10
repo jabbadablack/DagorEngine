@@ -505,7 +505,8 @@ function(_dagor_setup_target target type)
     # a tool of the engine's CDK: cmake --install <tree> --component cdk puts it, its LICENSE file and its debug info
     # into tools/dagor_cdk/<platform>-<arch> (of the engine root by default, see DagorOptions.cmake)
     set(dest "tools/dagor_cdk/${DAGOR_PLATFORM}-${DAGOR_ARCH}")
-    install(PROGRAMS "$<TARGET_FILE:${target}>" DESTINATION "${dest}" COMPONENT cdk)
+    # OPTIONAL: a build of some of the tools (the host tools of another tree) installs those
+    install(PROGRAMS "$<TARGET_FILE:${target}>" DESTINATION "${dest}" COMPONENT cdk OPTIONAL)
     install(FILES "$<TARGET_FILE_DIR:${target}>/LICENSE-$<TARGET_FILE_BASE_NAME:${target}>" DESTINATION "${dest}"
       COMPONENT cdk OPTIONAL)
     if(DAGOR_MSVC_LIKE)
@@ -673,4 +674,6 @@ function(dagor_finalize)
   endif()
   dagor_check_system_libs()
   _dagor_licenses()
+  _dagor_host_tools_target()
+  _dagor_check_cdk_names()
 endfunction()

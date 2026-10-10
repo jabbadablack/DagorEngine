@@ -60,6 +60,8 @@ include(DagorCompilerFlags)
 include(DagorTargets)
 include(DagorLicenses)
 include(DagorCodegen)
+include(DagorContent)
+include(DagorHostTools)
 include(DagorPython)
 include(DagorTesting)
 

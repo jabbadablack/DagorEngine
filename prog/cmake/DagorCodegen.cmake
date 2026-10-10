@@ -30,11 +30,11 @@ function(_dagor_stringify target mode)
 endfunction()
 
 # dagor_legacy_parsers(<target> [LEX <file>.dlp...] [SYN <file>.whl...]): the shader compilers' lexers (dolphin:
-# <file>.cpp, <file>.h) and LR parsers (whale: <file>.cpp, <file>.h, <file>tok.h), generated into the build dir by the
-# tree's dolphin and whale (prog/3rdPartyLibs/legacy_parser) and compiled into <target>
+# <file>.cpp, <file>.h) and LR parsers (whale: <file>.cpp, <file>.h, <file>tok.h), generated into the build dir by
+# dolphin and whale (prog/3rdPartyLibs/legacy_parser; the tree's own, the host's when cross-compiling) and compiled
+# into <target>
 function(dagor_legacy_parsers target)
   cmake_parse_arguments(PARSE_ARGV 1 arg "" "" "LEX;SYN")
-  dagor_use(3rdPartyLibs/legacy_parser/dolphin 3rdPartyLibs/legacy_parser/whale)
   _dagor_base_dir(base)
   set(gen_dir "${CMAKE_CURRENT_BINARY_DIR}/gen/${target}/parsers")
   set(sources)
@@ -50,6 +50,7 @@ function(dagor_legacy_parsers target)
         set(tool whale)
         set(suffixes .cpp .h tok.h)
       endif()
+      dagor_host_tool(${tool} tool_path DIR 3rdPartyLibs/legacy_parser/${tool})
       set(outputs)
       set(stale)
       foreach(suffix IN LISTS suffixes)
@@ -59,11 +60,11 @@ function(dagor_legacy_parsers target)
       endforeach()
       add_custom_command(OUTPUT ${outputs}
         COMMAND "${CMAKE_COMMAND}" -E copy_if_different "${src}" "${gen_dir}/${name}"
-        COMMAND "$<TARGET_FILE:${tool}>" "${name}"
+        COMMAND "${tool_path}" "${name}"
         # jam wrote them next to the grammar, where a quoted #include would find a stale one first
         COMMAND "${CMAKE_COMMAND}" -E rm -f ${stale}
         WORKING_DIRECTORY "${gen_dir}"
-        DEPENDS "${src}" ${tool}
+        DEPENDS "${src}" ${tool_path_DEPENDS}
         COMMENT "Generating ${name} (${tool})"
         VERBATIM)
       list(APPEND sources ${outputs})
