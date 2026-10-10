@@ -1,0 +1,60 @@
+name: cmake
+
+# The CMake build, which replaces jam step by step (see prog/cmake). It runs next to the jam-based tests.yaml until the
+# port is complete. The deps cache (SDKs, LLVM, the codegen venv) is keyed on the pinned manifest.
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+concurrency:
+  group: cmake-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  configure:
+    name: configure (${{ matrix.preset }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2022
+            preset: windows-tests
+            deps: D:/dagor-deps
+          - os: windows-2022
+            preset: windows-msvc-tests
+            deps: D:/dagor-deps
+          - os: ubuntu-22.04
+            preset: linux-tests
+            deps: /home/runner/dagor-deps
+          - os: macos-15
+            preset: macos-tests
+            deps: /Users/runner/dagor-deps
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    env:
+      DAGOR_DEPS_DIR: ${{ matrix.deps }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install CMake and Ninja
+        run: python -m pip install "cmake>=4.0,<5" "ninja>=1.11"
+
+      - name: Cache deps
+        uses: actions/cache@v4
+        with:
+          path: ${{ matrix.deps }}/sdk
+          key: dagor-deps-${{ matrix.os }}-${{ hashFiles('prog/cmake/sdk/manifest.cmake') }}
+
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }}

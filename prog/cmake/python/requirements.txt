@@ -1,0 +1,6 @@
+# The Python packages of the build's code generators (ES codegen: prog/_jBuild/_scripts/gen_es.py), installed by
+# DagorPython.cmake into a venv in the deps cache with pip --require-hashes.
+clang==14.0.6 \
+    --hash=sha256:1bb534a031473d6250fb6af7a2a7d545ca6d3e72781b4c688ee5c0782ce2e851
+cymbal==1.0.0 \
+    --hash=sha256:5ff334e1be271ba895c9f4ed8c0bf6e4aff4f011cf6cbc61a5d9edf3319a4e86

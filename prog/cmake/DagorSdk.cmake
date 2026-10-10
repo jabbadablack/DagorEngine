@@ -1,0 +1,37 @@
+# SDKs as imported targets. dagor_require_sdk(<name>) fetches the SDK (see DagorFetch.cmake) and includes
+# prog/cmake/sdk/<name>.cmake, which declares its targets (sdk::<name>, ...) and variables from DAGOR_SDK_<NAME>_ROOT.
+include_guard(GLOBAL)
+
+include(DagorFetch)
+
+# dagor_require_sdk(<name> [OPTIONAL]): with OPTIONAL a missing SDK (no archive for the host, or a user-provided one
+# that is not set up) leaves DAGOR_SDK_<NAME>_FOUND off instead of failing
+macro(dagor_require_sdk name)
+  cmake_parse_arguments(_dagor_sdk "OPTIONAL" "" "" ${ARGN})
+  string(TOUPPER "${name}" _dagor_sdk_upper)
+  string(REPLACE "-" "_" _dagor_sdk_upper "${_dagor_sdk_upper}")
+  get_property(_dagor_sdk_done GLOBAL PROPERTY DAGOR_SDK_${name}_LOADED)
+  if(NOT _dagor_sdk_done)
+    set_property(GLOBAL PROPERTY DAGOR_SDK_${name}_LOADED ON)
+    if(EXISTS "${DAGOR_CMAKE_DIR}/sdk/${name}.cmake")
+      # the module fetches or locates the SDK itself (user-provided SDKs, ones made of several archives)
+      set(DAGOR_SDK_OPTIONAL ${_dagor_sdk_OPTIONAL})
+      include("${DAGOR_CMAKE_DIR}/sdk/${name}.cmake")
+    else()
+      if(_dagor_sdk_OPTIONAL)
+        dagor_fetch_sdk(${name} DAGOR_SDK_${_dagor_sdk_upper}_ROOT OPTIONAL)
+      else()
+        dagor_fetch_sdk(${name} DAGOR_SDK_${_dagor_sdk_upper}_ROOT)
+      endif()
+    endif()
+    if(DAGOR_SDK_${_dagor_sdk_upper}_ROOT)
+      set(DAGOR_SDK_${_dagor_sdk_upper}_FOUND ON CACHE INTERNAL "")
+    else()
+      set(DAGOR_SDK_${_dagor_sdk_upper}_FOUND OFF CACHE INTERNAL "")
+    endif()
+    set(DAGOR_SDK_${_dagor_sdk_upper}_ROOT "${DAGOR_SDK_${_dagor_sdk_upper}_ROOT}" CACHE INTERNAL "")
+  endif()
+  if(NOT DAGOR_SDK_${_dagor_sdk_upper}_FOUND AND NOT _dagor_sdk_OPTIONAL)
+    message(FATAL_ERROR "SDK '${name}' is required but not available")
+  endif()
+endmacro()

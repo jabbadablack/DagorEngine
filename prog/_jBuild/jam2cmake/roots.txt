@@ -1,0 +1,49 @@
+# The jam builds the CMake port has to cover: <tree> <dir relative to the engine root> [jam arguments...]
+# <tree> is the CMake build tree (variant) the targets will share, so libraries built differently by the roots of one
+# tree show up in the variant matrix. The unit tests (tree 'tests') are found from the test.blk manifests.
+
+# DAGOR_VARIANT=cdk: prog/tools/build_dagor_cdk_mini.cmd
+cdk prog/tools -sRoot=../.. -f sceneTools/assetExp/jamfile
+cdk prog/tools -sRoot=../.. -f converters/ddsxCvt2/jamfile
+cdk prog/tools -sRoot=../.. -f sceneTools/assetExp/ddsxConv/jamfile
+cdk prog/tools -sRoot=../.. -siOS_exp=yes -f sceneTools/assetExp/ddsxConv/jamfile
+cdk prog/tools -sRoot=../.. -sTegra_exp=yes -f sceneTools/assetExp/ddsxConv/jamfile
+cdk prog/tools -sRoot=../.. -f ../3rdPartyLibs/legacy_parser/dolphin/jamfile
+cdk prog/tools -sRoot=../.. -f ../3rdPartyLibs/legacy_parser/whale/jamfile
+cdk prog/tools -sRoot=../.. -f ShaderCompiler2/jamfile-hlsl11
+cdk prog/tools -sRoot=../.. -f ShaderCompiler2/jamfile-hlsl2spirv
+cdk prog/tools -sRoot=../.. -f ShaderCompiler2/jamfile-hlsl2metal
+cdk prog/tools -sRoot=../.. -f ShaderCompiler2/jamfile-dx12
+cdk prog/tools -sRoot=../.. -f ShaderCompiler2/jamfile-stub
+cdk prog/tools -sRoot=../.. -f ShaderCompiler2/nodeBased/jamfile
+cdk prog/tools -sRoot=../.. -f shaderInfo/jamfile
+cdk prog/tools -sRoot=../.. -f ../3rdPartyLibs/scripts/duktape/jamfile
+cdk prog/tools -sRoot=../.. -f sceneTools/vromfsPacker/jamfile
+cdk prog/tools -sRoot=../.. -f sceneTools/csvUtil/jamfile
+cdk prog/tools -sRoot=../.. -f converters/ddsxCvt/jamfile
+cdk prog/tools -sRoot=../.. -f converters/ddsx2dds/jamfile
+cdk prog/tools -sRoot=../.. -f converters/ddsConverter/jamfile
+cdk prog/tools -sRoot=../.. -f FontGenerator/jamfile
+cdk prog/tools -sRoot=../.. -f converters/GuiTex/jamfile
+cdk prog/tools -sRoot=../.. -f sceneTools/utils/jamfile-binBlk
+cdk prog/tools -sRoot=../.. -f sceneTools/dumpGrp/jamfile
+cdk prog/tools -sRoot=../.. -f sceneTools/dbldUtil/jamfile
+cdk prog/tools -sRoot=../.. -f sceneTools/resDiff/jamfile
+cdk prog/tools -sRoot=../.. -f sceneTools/resUpdate/jamfile
+cdk prog/tools -sRoot=../.. -f sceneTools/resClean/jamfile
+cdk prog/tools -sRoot=../.. -sConfig=dev -f consoleSq/jamfile
+
+# DAGOR_VARIANT=editor: the tools on the dynamic kernel (daKernel)
+editor prog/tools -sRoot=../.. -f sceneTools/daEditorX/jamfile-editor
+editor prog/tools -sRoot=../.. -f sceneTools/daEditorX/jamfile
+editor prog/tools -sRoot=../.. -f AssetViewer/jamfile
+editor prog/tools -sRoot=../.. -f sceneTools/findUnusedTex/jamfile
+editor prog/tools -sRoot=../.. -f blkEditor/jamfile
+editor prog/tools -sRoot=../.. -f sceneTools/impostorBaker/tool/jamfile
+
+# DAGOR_VARIANT=maxplug
+maxplug prog/tools -sRoot=../.. -sMaxVer=Max2026 -f maxplug/jamfile
+maxplug prog/tools -sRoot=../.. -sMaxVer=Max2024 -f maxplug/jamfile
+
+# DAGOR_VARIANT=dargbox
+dargbox prog/tools -sRoot=../.. -f dargbox/jamfile

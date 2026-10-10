@@ -1,0 +1,686 @@
+{
+  "version": 10,
+  "$comment": "The engine's presets: <platform>[-<compiler>][-<instrumentation>]-<variant>. Build and test presets build Dev; pass --config Rel|IRel|Dbg (ctest: -C) for another configuration. ci-* presets are what CI runs. Local presets go into CMakeUserPresets.json (ignored by git).",
+  "cmakeMinimumRequired": {
+    "major": 4,
+    "minor": 0,
+    "patch": 0
+  },
+  "include": [
+    "prog/cmake/presets/base.json"
+  ],
+  "configurePresets": [
+    {
+      "name": "windows-tests",
+      "displayName": "Engine unit tests: Windows x64, clang-cl",
+      "inherits": [
+        "windows",
+        "v-tests"
+      ]
+    },
+    {
+      "name": "windows-cdk",
+      "displayName": "Tools (shader compilers, packers, converters): Windows x64, clang-cl",
+      "inherits": [
+        "windows",
+        "v-cdk"
+      ]
+    },
+    {
+      "name": "windows-editor",
+      "displayName": "Editor tools (dynamic kernel): Windows x64, clang-cl",
+      "inherits": [
+        "windows",
+        "v-editor"
+      ]
+    },
+    {
+      "name": "windows-dargbox",
+      "displayName": "dargbox: Windows x64, clang-cl",
+      "inherits": [
+        "windows",
+        "v-dargbox"
+      ]
+    },
+    {
+      "name": "windows-all",
+      "displayName": "Every engine target: Windows x64, clang-cl",
+      "inherits": [
+        "windows",
+        "v-all"
+      ]
+    },
+    {
+      "name": "linux-tests",
+      "displayName": "Engine unit tests: Linux x64, gcc",
+      "inherits": [
+        "linux",
+        "v-tests"
+      ]
+    },
+    {
+      "name": "linux-cdk",
+      "displayName": "Tools (shader compilers, packers, converters): Linux x64, gcc",
+      "inherits": [
+        "linux",
+        "v-cdk"
+      ]
+    },
+    {
+      "name": "linux-editor",
+      "displayName": "Editor tools (dynamic kernel): Linux x64, gcc",
+      "inherits": [
+        "linux",
+        "v-editor"
+      ]
+    },
+    {
+      "name": "linux-dargbox",
+      "displayName": "dargbox: Linux x64, gcc",
+      "inherits": [
+        "linux",
+        "v-dargbox"
+      ]
+    },
+    {
+      "name": "linux-all",
+      "displayName": "Every engine target: Linux x64, gcc",
+      "inherits": [
+        "linux",
+        "v-all"
+      ]
+    },
+    {
+      "name": "macos-tests",
+      "displayName": "Engine unit tests: macOS (host arch), Xcode clang",
+      "inherits": [
+        "macos",
+        "v-tests"
+      ]
+    },
+    {
+      "name": "macos-cdk",
+      "displayName": "Tools (shader compilers, packers, converters): macOS (host arch), Xcode clang",
+      "inherits": [
+        "macos",
+        "v-cdk"
+      ]
+    },
+    {
+      "name": "macos-editor",
+      "displayName": "Editor tools (dynamic kernel): macOS (host arch), Xcode clang",
+      "inherits": [
+        "macos",
+        "v-editor"
+      ]
+    },
+    {
+      "name": "macos-dargbox",
+      "displayName": "dargbox: macOS (host arch), Xcode clang",
+      "inherits": [
+        "macos",
+        "v-dargbox"
+      ]
+    },
+    {
+      "name": "macos-all",
+      "displayName": "Every engine target: macOS (host arch), Xcode clang",
+      "inherits": [
+        "macos",
+        "v-all"
+      ]
+    },
+    {
+      "name": "windows-arm64-tests",
+      "displayName": "Engine unit tests: Windows arm64, clang-cl",
+      "inherits": [
+        "windows-arm64",
+        "v-tests"
+      ]
+    },
+    {
+      "name": "windows-arm64-cdk",
+      "displayName": "Tools: Windows arm64, clang-cl",
+      "inherits": [
+        "windows-arm64",
+        "v-cdk"
+      ]
+    },
+    {
+      "name": "windows-msvc-tests",
+      "displayName": "Engine unit tests: Windows x64, MSVC",
+      "inherits": [
+        "windows-msvc",
+        "v-tests"
+      ]
+    },
+    {
+      "name": "windows-msvc-maxplug",
+      "displayName": "3ds Max 2025+ plugins: MSVC 14.44",
+      "inherits": [
+        "windows-msvc",
+        "v-maxplug"
+      ]
+    },
+    {
+      "name": "windows-vc16-maxplug",
+      "displayName": "3ds Max 2023/2024 plugins: MSVC 14.29",
+      "inherits": [
+        "windows-vc16",
+        "v-maxplug"
+      ]
+    },
+    {
+      "name": "linux-clang-tests",
+      "displayName": "Engine unit tests: Linux x64, clang",
+      "inherits": [
+        "linux-clang",
+        "v-tests"
+      ]
+    },
+    {
+      "name": "linux-e2k-tests",
+      "displayName": "Engine unit tests: Linux Elbrus, lcc",
+      "inherits": [
+        "linux-e2k",
+        "v-tests"
+      ]
+    },
+    {
+      "name": "linux-e2k-cdk",
+      "displayName": "Tools: Linux Elbrus, lcc",
+      "inherits": [
+        "linux-e2k",
+        "v-cdk"
+      ]
+    },
+    {
+      "name": "macos-universal-cdk",
+      "displayName": "Tools: macOS universal binaries",
+      "inherits": [
+        "macos-universal",
+        "v-cdk"
+      ]
+    },
+    {
+      "name": "windows-asan-tests",
+      "displayName": "Unit tests with AddressSanitizer: windows",
+      "inherits": [
+        "windows",
+        "v-tests",
+        "asan"
+      ]
+    },
+    {
+      "name": "windows-coverage-tests",
+      "displayName": "Unit tests with code coverage: windows",
+      "inherits": [
+        "windows",
+        "v-tests",
+        "coverage"
+      ]
+    },
+    {
+      "name": "linux-asan-tests",
+      "displayName": "Unit tests with AddressSanitizer: linux",
+      "inherits": [
+        "linux",
+        "v-tests",
+        "asan"
+      ]
+    },
+    {
+      "name": "linux-coverage-tests",
+      "displayName": "Unit tests with code coverage: linux",
+      "inherits": [
+        "linux-clang",
+        "v-tests",
+        "coverage"
+      ]
+    },
+    {
+      "name": "linux-ubsan-tests",
+      "displayName": "Unit tests with UndefinedBehaviorSanitizer: Linux clang",
+      "inherits": [
+        "linux-clang",
+        "v-tests",
+        "ubsan"
+      ]
+    },
+    {
+      "name": "linux-tsan-tests",
+      "displayName": "Unit tests with ThreadSanitizer: Linux clang",
+      "inherits": [
+        "linux-clang",
+        "v-tests",
+        "tsan"
+      ]
+    },
+    {
+      "name": "macos-asan-tests",
+      "displayName": "Unit tests with AddressSanitizer: macOS",
+      "inherits": [
+        "macos",
+        "v-tests",
+        "asan"
+      ]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "windows-tests",
+      "configurePreset": "windows-tests",
+      "configuration": "Dev"
+    },
+    {
+      "name": "windows-cdk",
+      "configurePreset": "windows-cdk",
+      "configuration": "Dev"
+    },
+    {
+      "name": "windows-editor",
+      "configurePreset": "windows-editor",
+      "configuration": "Dev"
+    },
+    {
+      "name": "windows-dargbox",
+      "configurePreset": "windows-dargbox",
+      "configuration": "Dev"
+    },
+    {
+      "name": "windows-all",
+      "configurePreset": "windows-all",
+      "configuration": "Dev"
+    },
+    {
+      "name": "linux-tests",
+      "configurePreset": "linux-tests",
+      "configuration": "Dev"
+    },
+    {
+      "name": "linux-cdk",
+      "configurePreset": "linux-cdk",
+      "configuration": "Dev"
+    },
+    {
+      "name": "linux-editor",
+      "configurePreset": "linux-editor",
+      "configuration": "Dev"
+    },
+    {
+      "name": "linux-dargbox",
+      "configurePreset": "linux-dargbox",
+      "configuration": "Dev"
+    },
+    {
+      "name": "linux-all",
+      "configurePreset": "linux-all",
+      "configuration": "Dev"
+    },
+    {
+      "name": "macos-tests",
+      "configurePreset": "macos-tests",
+      "configuration": "Dev"
+    },
+    {
+      "name": "macos-cdk",
+      "configurePreset": "macos-cdk",
+      "configuration": "Dev"
+    },
+    {
+      "name": "macos-editor",
+      "configurePreset": "macos-editor",
+      "configuration": "Dev"
+    },
+    {
+      "name": "macos-dargbox",
+      "configurePreset": "macos-dargbox",
+      "configuration": "Dev"
+    },
+    {
+      "name": "macos-all",
+      "configurePreset": "macos-all",
+      "configuration": "Dev"
+    },
+    {
+      "name": "windows-arm64-tests",
+      "configurePreset": "windows-arm64-tests",
+      "configuration": "Dev"
+    },
+    {
+      "name": "windows-arm64-cdk",
+      "configurePreset": "windows-arm64-cdk",
+      "configuration": "Dev"
+    },
+    {
+      "name": "windows-msvc-tests",
+      "configurePreset": "windows-msvc-tests",
+      "configuration": "Dev"
+    },
+    {
+      "name": "windows-msvc-maxplug",
+      "configurePreset": "windows-msvc-maxplug",
+      "configuration": "Dev"
+    },
+    {
+      "name": "windows-vc16-maxplug",
+      "configurePreset": "windows-vc16-maxplug",
+      "configuration": "Dev"
+    },
+    {
+      "name": "linux-clang-tests",
+      "configurePreset": "linux-clang-tests",
+      "configuration": "Dev"
+    },
+    {
+      "name": "linux-e2k-tests",
+      "configurePreset": "linux-e2k-tests",
+      "configuration": "Dev"
+    },
+    {
+      "name": "linux-e2k-cdk",
+      "configurePreset": "linux-e2k-cdk",
+      "configuration": "Dev"
+    },
+    {
+      "name": "macos-universal-cdk",
+      "configurePreset": "macos-universal-cdk",
+      "configuration": "Dev"
+    },
+    {
+      "name": "windows-asan-tests",
+      "configurePreset": "windows-asan-tests",
+      "configuration": "Dev"
+    },
+    {
+      "name": "windows-coverage-tests",
+      "configurePreset": "windows-coverage-tests",
+      "configuration": "Dev"
+    },
+    {
+      "name": "linux-asan-tests",
+      "configurePreset": "linux-asan-tests",
+      "configuration": "Dev"
+    },
+    {
+      "name": "linux-coverage-tests",
+      "configurePreset": "linux-coverage-tests",
+      "configuration": "Dev"
+    },
+    {
+      "name": "linux-ubsan-tests",
+      "configurePreset": "linux-ubsan-tests",
+      "configuration": "Dev"
+    },
+    {
+      "name": "linux-tsan-tests",
+      "configurePreset": "linux-tsan-tests",
+      "configuration": "Dev"
+    },
+    {
+      "name": "macos-asan-tests",
+      "configurePreset": "macos-asan-tests",
+      "configuration": "Dev"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "windows-tests",
+      "configurePreset": "windows-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "ci-windows-tests",
+      "configurePreset": "windows-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "jobs": 4
+      },
+      "filter": {
+        "exclude": {
+          "label": "requires-gpu|requires-display"
+        }
+      }
+    },
+    {
+      "name": "linux-tests",
+      "configurePreset": "linux-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "ci-linux-tests",
+      "configurePreset": "linux-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "jobs": 4
+      },
+      "filter": {
+        "exclude": {
+          "label": "requires-gpu|requires-display"
+        }
+      }
+    },
+    {
+      "name": "macos-tests",
+      "configurePreset": "macos-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "ci-macos-tests",
+      "configurePreset": "macos-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "jobs": 4
+      },
+      "filter": {
+        "exclude": {
+          "label": "requires-gpu|requires-display"
+        }
+      }
+    },
+    {
+      "name": "windows-arm64-tests",
+      "configurePreset": "windows-arm64-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "windows-msvc-tests",
+      "configurePreset": "windows-msvc-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "linux-clang-tests",
+      "configurePreset": "linux-clang-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "linux-e2k-tests",
+      "configurePreset": "linux-e2k-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "windows-asan-tests",
+      "configurePreset": "windows-asan-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "windows-coverage-tests",
+      "configurePreset": "windows-coverage-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "linux-asan-tests",
+      "configurePreset": "linux-asan-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "linux-coverage-tests",
+      "configurePreset": "linux-coverage-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "linux-ubsan-tests",
+      "configurePreset": "linux-ubsan-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "linux-tsan-tests",
+      "configurePreset": "linux-tsan-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    },
+    {
+      "name": "macos-asan-tests",
+      "configurePreset": "macos-asan-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error"
+      }
+    }
+  ],
+  "workflowPresets": [
+    {
+      "name": "ci-windows-tests",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "windows-tests"
+        },
+        {
+          "type": "build",
+          "name": "windows-tests"
+        },
+        {
+          "type": "test",
+          "name": "ci-windows-tests"
+        }
+      ]
+    },
+    {
+      "name": "ci-linux-tests",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "linux-tests"
+        },
+        {
+          "type": "build",
+          "name": "linux-tests"
+        },
+        {
+          "type": "test",
+          "name": "ci-linux-tests"
+        }
+      ]
+    },
+    {
+      "name": "ci-macos-tests",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "macos-tests"
+        },
+        {
+          "type": "build",
+          "name": "macos-tests"
+        },
+        {
+          "type": "test",
+          "name": "ci-macos-tests"
+        }
+      ]
+    }
+  ]
+}

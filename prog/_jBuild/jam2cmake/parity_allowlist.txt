@@ -1,0 +1,2 @@
+# Differences between the jam and CMake builds that are intended (see parity.py). One Python regex per line, matched
+# against a report line ('<target>: <source>: <difference>'), then '  # ' and the reason.

@@ -1,0 +1,62 @@
+{
+  "version": 10,
+  "$comment": "Hidden bases of the engine's presets (CMakePresets.json): the generator and output dir, one base per target platform and compiler, one per variant of the tree.",
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build/${presetName}"
+    },
+    {
+      "name": "on-windows",
+      "hidden": true,
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" }
+    },
+    {
+      "name": "on-linux",
+      "hidden": true,
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" }
+    },
+    {
+      "name": "on-macos",
+      "hidden": true,
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin" }
+    },
+
+    { "name": "windows", "hidden": true, "inherits": ["base", "on-windows"],
+      "cacheVariables": { "DAGOR_PLATFORM": "windows", "DAGOR_ARCH": "x86_64", "DAGOR_COMPILER": "clang" } },
+    { "name": "windows-arm64", "hidden": true, "inherits": ["base", "on-windows"],
+      "cacheVariables": { "DAGOR_PLATFORM": "windows", "DAGOR_ARCH": "arm64", "DAGOR_COMPILER": "clang" } },
+    { "name": "windows-msvc", "hidden": true, "inherits": ["base", "on-windows"],
+      "cacheVariables": { "DAGOR_PLATFORM": "windows", "DAGOR_ARCH": "x86_64", "DAGOR_COMPILER": "msvc" } },
+    { "name": "windows-vc16", "hidden": true, "inherits": ["base", "on-windows"],
+      "cacheVariables": { "DAGOR_PLATFORM": "windows", "DAGOR_ARCH": "x86_64", "DAGOR_COMPILER": "msvc",
+                          "DAGOR_MSVC_TOOLSET": "14.29" } },
+    { "name": "linux", "hidden": true, "inherits": ["base", "on-linux"],
+      "cacheVariables": { "DAGOR_PLATFORM": "linux", "DAGOR_ARCH": "x86_64", "DAGOR_COMPILER": "gcc" } },
+    { "name": "linux-clang", "hidden": true, "inherits": ["base", "on-linux"],
+      "cacheVariables": { "DAGOR_PLATFORM": "linux", "DAGOR_ARCH": "x86_64", "DAGOR_COMPILER": "clang" } },
+    { "name": "linux-e2k", "hidden": true, "inherits": ["base", "on-linux"],
+      "cacheVariables": { "DAGOR_PLATFORM": "linux", "DAGOR_ARCH": "e2k", "DAGOR_COMPILER": "lcc",
+                          "DAGOR_WARNINGS_AS_ERRORS": "OFF" } },
+    { "name": "macos", "hidden": true, "inherits": ["base", "on-macos"],
+      "cacheVariables": { "DAGOR_PLATFORM": "macOS", "DAGOR_COMPILER": "clang" } },
+    { "name": "macos-universal", "hidden": true, "inherits": ["base", "on-macos"],
+      "cacheVariables": { "DAGOR_PLATFORM": "macOS", "DAGOR_ARCH": "universal", "DAGOR_COMPILER": "clang" } },
+
+    { "name": "v-tests",   "hidden": true, "cacheVariables": { "DAGOR_VARIANT": "tests" } },
+    { "name": "v-cdk",     "hidden": true, "cacheVariables": { "DAGOR_VARIANT": "cdk" } },
+    { "name": "v-editor",  "hidden": true, "cacheVariables": { "DAGOR_VARIANT": "editor", "DAGOR_KERNEL_LINKAGE": "dynamic" } },
+    { "name": "v-maxplug", "hidden": true,
+      "cacheVariables": { "DAGOR_VARIANT": "maxplug", "DAGOR_EXCEPTIONS_CONFIGS": "Dev;Rel;IRel;Dbg", "DAGOR_RTTI": "ON" } },
+    { "name": "v-dargbox", "hidden": true, "cacheVariables": { "DAGOR_VARIANT": "dargbox" } },
+    { "name": "v-all",     "hidden": true, "cacheVariables": { "DAGOR_VARIANT": "all" } },
+
+    { "name": "asan",     "hidden": true, "cacheVariables": { "DAGOR_SANITIZE": "address" } },
+    { "name": "ubsan",    "hidden": true, "cacheVariables": { "DAGOR_SANITIZE": "undefined" } },
+    { "name": "tsan",     "hidden": true, "cacheVariables": { "DAGOR_SANITIZE": "thread" } },
+    { "name": "coverage", "hidden": true, "cacheVariables": { "DAGOR_COVERAGE": "ON" } },
+    { "name": "lto",      "hidden": true, "cacheVariables": { "DAGOR_LTO": "thin" } }
+  ]
+}

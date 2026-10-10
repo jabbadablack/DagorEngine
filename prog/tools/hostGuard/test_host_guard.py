@@ -36,6 +36,21 @@ class ScannerTest(unittest.TestCase):
     self.assertEqual(hosts(url, '.github/workflows/tests.yaml'), [(1, 'github.com/GaijinEntertainment')])
     self.assertEqual(hosts(url, 'prog/engine/a.py'), [])
 
+  def test_cmake_files_have_hash_comments(self):
+    self.assertEqual(hosts('# gaijin.net\nset(u "https://gaijin.net")', 'prog/cmake/sdk/x.cmake'), [(2, 'gaijin.net')])
+    self.assertEqual(hosts('# gaijin.lan\nadd_library(a)', 'prog/engine/a/CMakeLists.txt'), [])
+    url = 'set(u https://github.com/GaijinEntertainment/x/releases)'
+    self.assertEqual(hosts(url, 'prog/cmake/sdk/manifest.cmake'), [(1, 'github.com/GaijinEntertainment')])
+    self.assertEqual(hosts(url, 'prog/engine/a/CMakeLists.txt'), [])
+
+  def test_cmake_downloads_only_in_the_fetcher(self):
+    def downloads(text, rel):
+      return [(f.line, f.host) for f in host_guard.scan_downloads(text, rel)]
+    code = '# file(DOWNLOAD in a comment)\nfile(DOWNLOAD https://x/a.zip a.zip)\nFetchContent_Declare(x URL y)'
+    self.assertEqual(downloads(code, 'prog/engine/a/CMakeLists.txt'), [(2, 'file(DOWNLOAD'), (3, 'FetchContent_Declare')])
+    self.assertEqual(downloads(code, 'prog/cmake/DagorFetch.cmake'), [])
+    self.assertEqual(downloads(code, 'prog/engine/a/a.py'), [])
+
   def test_unknown_file_types_are_skipped(self):
     self.assertEqual(hosts('gaijin.net', 'prog/engine/a.png'), [])
 
