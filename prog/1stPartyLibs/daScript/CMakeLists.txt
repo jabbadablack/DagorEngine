@@ -59,6 +59,9 @@ foreach(build standard console)
     SOURCE_OPTIONS ${source_options}
     DEPS 3rdPartyLibs/eastl 3rdPartyLibs/uriparser 3rdPartyLibs/fmt
     LICENSE_FILES LICENSE
+    # the language's floats are IEEE: its comparisons and isnan/isinf see NaN and infinity (-ffinite-math-only would let
+    # the compiler assume them away, and arm64 code then answers wrongly)
+    PROPERTIES DAGOR_IEEE_MATH ON
   )
 endforeach()
 dagor_add_link_choice(1stPartyLibs.daScript PROPERTY DAGOR_DAS_CONSOLE
