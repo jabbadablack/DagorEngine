@@ -322,10 +322,13 @@ if(DAGOR_MSVC_LIKE)
   _dagor_settings(LINK "${_linked}" /DEBUG /INCREMENTAL:NO /NODEFAULTLIB:LIBMMT /NODEFAULTLIB:LIBIRC /NODEFAULTLIB:LIBC
     /NODEFAULTLIB:MSVCRT /NODEFAULTLIB:MSVCPRT /NODEFAULTLIB:UCRT /NODEFAULTLIB:VCRUNTIME)
   _dagor_settings(LINK "$<AND:${_linked},$<NOT:${_dbg}>>" /OPT:REF /NODEFAULTLIB:LIBCMTD /NODEFAULTLIB:LIBCPMTD)
+  # /OPT:REF also folds identical code and data into one address, which breaks code comparing the addresses of
+  # distinct functions or objects (daFrameGraph's blob projectors and type tags): lld-link's safe ICF keeps those, by
+  # clang's address-significance tables; link.exe cannot tell them apart and does not fold at all
   if(DAGOR_CC STREQUAL "clang-cl")
-    # lld-link's /OPT:REF folds identical data too, so distinct objects whose addresses are compared (daFrameGraph's
-    # type tags) would share one address: safe ICF keeps those, by clang's address-significance tables
     _dagor_settings(LINK "$<AND:${_linked},$<NOT:${_dbg}>>" /OPT:SAFEICF)
+  else()
+    _dagor_settings(LINK "$<AND:${_linked},$<NOT:${_dbg}>>" /OPT:NOICF)
   endif()
   _dagor_settings(LINK "$<AND:${_linked},${_dbg}>" /NODEFAULTLIB:LIBCMT /NODEFAULTLIB:LIBCPMT)
   _dagor_settings(LINK "${_exe}" /FILEALIGN:512)
@@ -416,7 +419,7 @@ elseif(DAGOR_CC STREQUAL "msvc")
   set(wd 4514 4061 4820 4668 4619 4365 4127 4302 4242 4244 4265 4101 4201 4625 4626 4800 4018 4710 4245 4291 4389
     4200 4255 4711 4062 4355 4640 4305 4324 4511 4512 4738 4996 4005 4740 4702 4826 4503 4748 4987 4574 4554 4471
     4350 4370 4371 4316 4388 4091 5026 5027 4774 4312 4334 5220 5219 4464 4463 4589 4595 4435 4319 4311 4267 4477
-    4777 4548 5039 5045 4623 5038 4768 4456 5052 5204 4577 4643 4866 5245 5246 5264)
+    4777 4548 5039 5045 4623 5038 4768 4456 5052 5204 4577 4643 4866 4868 5245 5246 5264)
   list(TRANSFORM wd PREPEND /wd)
   _dagor_flags(DagorStrict COMPILE "${_c_cxx}" -Wall -WX ${wd} /permissive-)
   set(wd 4244 4101 4800 4018 4291 4200 4355 4305 4996 4005 4740 4748 4324 4503 4574 4554 4316 4388 4091 5026 5027

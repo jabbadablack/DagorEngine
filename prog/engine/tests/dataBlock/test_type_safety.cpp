@@ -57,6 +57,9 @@ TEST_CASE("DataBlock type mismatch on set with fatal flag off reports non-seriou
 
 TEST_CASE("DataBlock get wrong type with strongTypeChecking triggers error", "[datablock][type_safety]")
 {
+#if DAGOR_DBGLEVEL < 1
+  SKIP("the getters check types only with DAGOR_DBGLEVEL > 0");
+#endif
   FatalFlagsGuard guard;
   guard.setAllNonFatal();
   DataBlock::strongTypeChecking = true;

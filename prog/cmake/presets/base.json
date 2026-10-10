@@ -46,7 +46,8 @@
       "cacheVariables": { "DAGOR_PLATFORM": "macOS", "DAGOR_ARCH": "universal", "DAGOR_COMPILER": "clang" } },
 
     { "name": "v-tests",   "hidden": true,
-      "cacheVariables": { "DAGOR_VARIANT": "tests", "DAGOR_CHECKED_CONTAINERS_CONFIGS": "Dev;Dbg" } },
+      "cacheVariables": { "DAGOR_VARIANT": "tests", "DAGOR_CHECKED_CONTAINERS_CONFIGS": "Dev;Dbg",
+        "DAGOR_EXCEPTIONS_CONFIGS": "Dev;Rel;IRel;Dbg", "DAGOR_FORCE_LOGS": "ON" } },
     { "name": "v-cdk",     "hidden": true, "cacheVariables": { "DAGOR_VARIANT": "cdk" } },
     { "name": "v-editor",  "hidden": true, "cacheVariables": { "DAGOR_VARIANT": "editor", "DAGOR_KERNEL_LINKAGE": "dynamic" } },
     { "name": "v-maxplug", "hidden": true,

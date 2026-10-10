@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Compares what a CMake tree compiles with what jam compiles for the same roots (deleted together with jam).
 
-For each jam target of the chosen roots (from inventory.json), it finds the CMake compiles of the same source files in
-the tree's compile_commands.json and reports:
+For each jam target of the chosen roots (from inventory.json; of a target jam built in several variants there, the
+closest variant), it finds the CMake compiles of the same source files in the tree's compile_commands.json and reports:
   - sources jam compiles that the CMake tree does not (and, per matched target dir, the other way round)
   - preprocessor definitions and include dirs that differ for a source
-Include dirs that do not exist are not compared (jam passed several). Compiler-specific flags are not compared: the trees may use another compiler than jam did for that root. Intended
-differences go into parity_allowlist.txt, one regex per line matched against the report line, with the reason after it.
+Include dirs that do not exist are not compared (jam passed several). Compiler-specific flags are not compared: the
+trees may use another compiler than jam did for that root. Intended differences go into parity_allowlist.txt, one regex
+per line matched against the report line, with the reason after it.
 
 python parity.py <build dir> [--config Dev] [--root <substring of a root id>...] [--inventory <inventory.json>]
 """
@@ -93,16 +94,53 @@ def cmake_compiles(build_dir, config):
   return result
 
 
-def load_allowlist():
+def load_allowlist(build_dir):
+  """The allowlist's rules for this tree: a rule starting with '@<regex> ' applies only to trees whose build dir name
+  matches the regex (@tests: the tests trees)."""
   path = os.path.join(HERE, 'parity_allowlist.txt')
+  tree = os.path.basename(os.path.normpath(build_dir))
   rules = []
   if os.path.exists(path):
     with open(path) as f:
       for line in f:
         line = line.split('  #', 1)[0].strip()
-        if line and not line.startswith('#'):
-          rules.append(re.compile(line))
+        if not line or line.startswith('#'):
+          continue
+        if line.startswith('@'):
+          scope, line = line[1:].split(None, 1)
+          if not re.search(scope, tree):
+            continue
+        rules.append(re.compile(line))
   return rules
+
+
+def compare(t, cmake):
+  """(report lines, sources compared, the CMake target compiling most of them) of one jam target."""
+  report = []
+  compared = 0
+  # the CMake target of the same name (engine/perfMon/stub.lib -> engine.perfMon.stub) when it compiles the source
+  own = os.path.splitext(t['name'])[0].replace('/', '.')
+  cmake_targets = collections.Counter()
+  for src, cmd in sorted(t['sources'].items()):
+    path = norm_path(src, ENGINE)
+    if path not in cmake:
+      report.append('{}: {}: not compiled by CMake'.format(t['name'], src))
+      continue
+    compared += 1
+    jd, ji = flags(cmd, ENGINE)  # inventory.py made the include dirs relative to the engine root
+    # the CMake compile of this source in the target of the same name, else the one closest to jam's (a source of
+    # several targets or flavors is compiled several times)
+    target, cd, ci = min(cmake[path], key=lambda c: (c[0] != own, len(jd ^ c[1]) + len(ji ^ c[2])))
+    cmake_targets[target] += 1
+    for d in sorted(jd - cd):
+      report.append('{}: {}: define only in jam: {}'.format(t['name'], src, d))
+    for d in sorted(cd - jd):
+      report.append('{}: {}: define only in CMake: {}'.format(t['name'], src, d))
+    for i in sorted(ji - ci):
+      report.append('{}: {}: include only in jam: {}'.format(t['name'], src, rel(i)))
+    for i in sorted(ci - ji):
+      report.append('{}: {}: include only in CMake: {}'.format(t['name'], src, rel(i)))
+  return report, compared, cmake_targets.most_common(1)[0][0] if cmake_targets else None
 
 
 def main(argv):
@@ -116,47 +154,35 @@ def main(argv):
   with open(args.inventory) as f:
     inventory = json.load(f)
   cmake = cmake_compiles(args.build_dir, args.config)
-  allow = load_allowlist()
-  report = []
-  compared = 0
-  seen = set()
+  allow = load_allowlist(args.build_dir)
+
+  # the jam variants of each target the roots build (a library can be built with and without exceptions, say)
+  variants = collections.defaultdict(list)
   for root in inventory['roots']:
     if args.root and not any(r in root['id'] for r in args.root):
       continue
     for key in root['targets']:
-      if key in seen:
-        continue
-      seen.add(key)
       t = inventory['targets'][key]
-      # the CMake target of the same name (engine/perfMon/stub.lib -> engine.perfMon.stub) when it compiles the source
-      own = os.path.splitext(t['name'])[0].replace('/', '.')
-      cmake_targets = collections.Counter()
-      for src, cmd in sorted(t['sources'].items()):
-        path = norm_path(src, ENGINE)
-        if path not in cmake:
-          report.append('{}: {}: not compiled by CMake'.format(t['name'], src))
-          continue
-        compared += 1
-        jd, ji = flags(cmd, ENGINE)  # inventory.py made the include dirs relative to the engine root
-        # the CMake compile of this source in the target of the same name, else the one closest to jam's (a source of
-        # several targets or flavors is compiled several times)
-        target, cd, ci = min(cmake[path], key=lambda c: (c[0] != own, len(jd ^ c[1]) + len(ji ^ c[2])))
-        cmake_targets[target] += 1
-        for d in sorted(jd - cd):
-          report.append('{}: {}: define only in jam: {}'.format(t['name'], src, d))
-        for d in sorted(cd - jd):
-          report.append('{}: {}: define only in CMake: {}'.format(t['name'], src, d))
-        for i in sorted(ji - ci):
-          report.append('{}: {}: include only in jam: {}'.format(t['name'], src, rel(i)))
-        for i in sorted(ci - ji):
-          report.append('{}: {}: include only in CMake: {}'.format(t['name'], src, rel(i)))
-      # sources the CMake target compiles that jam's target did not (the CMake target compiling most of its sources)
-      jam_sources = {norm_path(s, ENGINE) for s in t['sources']}
-      cmake_targets = {cmake_targets.most_common(1)[0][0]} if cmake_targets else set()
-      for path, compiles in sorted(cmake.items()):
-        if path not in jam_sources and path not in seen and not path.endswith(ASSEMBLY) and any(c[0] in cmake_targets for c in compiles):
-          seen.add(path)
-          report.append('{}: {}: compiled only by CMake'.format(t['name'], rel(path)))
+      if key not in variants[t['name']]:
+        variants[t['name']].append(key)
+
+  report = []
+  compared = 0
+  seen = set()
+  for name, keys in sorted(variants.items()):
+    # a CMake tree builds a target one way: it is compared with the closest of jam's variants
+    best = min((compare(inventory['targets'][k], cmake) + (k,) for k in keys),
+               key=lambda r: sum(1 for line in r[0] if not any(a.search(line) for a in allow)))
+    lines, count, target, key = best
+    report += lines
+    compared += count
+    # sources that CMake target compiles and jam's did not
+    jam_sources = {norm_path(s, ENGINE) for s in inventory['targets'][key]['sources']}
+    for path, compiles in sorted(cmake.items()):
+      if (path not in jam_sources and path not in seen and not path.endswith(ASSEMBLY)
+          and any(c[0] == target for c in compiles)):
+        seen.add(path)
+        report.append('{}: {}: compiled only by CMake'.format(name, rel(path)))
 
   shown = [line for line in report if not any(r.search(line) for r in allow)]
   for line in shown:

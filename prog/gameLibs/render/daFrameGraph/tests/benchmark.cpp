@@ -31,7 +31,7 @@ struct GraphHandles
 static const auto COLOR_TEX = dafg::Texture2dCreateInfo{.creationFlags = TEXFMT_R8G8B8A8, .resolution = IPoint2{4, 4}};
 static const auto DEPTH_TEX = dafg::Texture2dCreateInfo{.creationFlags = TEXFMT_DEPTH32, .resolution = IPoint2{4, 4}};
 
-static void reg_create(GraphHandles &gh, const char *name, const char *tex_name, const dafg::Texture2dCreateInfo &info)
+[[maybe_unused]] static void reg_create(GraphHandles &gh, const char *name, const char *tex_name, const dafg::Texture2dCreateInfo &info)
 {
   gh.handles.push_back(dafg::register_node(name, DAFG_PP_NODE_SRC, [tex_name, info](dafg::Registry registry) {
     registry.executionHas(dafg::SideEffects::External);

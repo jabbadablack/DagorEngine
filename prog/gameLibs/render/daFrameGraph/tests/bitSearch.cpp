@@ -24,7 +24,7 @@ struct AlignedBits
     wordCount = ((bits + WORD_BITS - 1) / WORD_BITS + WORDS_PER_VEC4 - 1) & ~(WORDS_PER_VEC4 - 1);
     if (wordCount == 0)
       wordCount = WORDS_PER_VEC4; // minimum allocation
-    data = static_cast<uint32_t *>(_mm_malloc(wordCount * sizeof(uint32_t), alignof(vec4f)));
+    data = static_cast<uint32_t *>(defaultmem->allocAligned(wordCount * sizeof(uint32_t), alignof(vec4f)));
     if (fill && bits > 0)
     {
       memset(data, 0xFF, wordCount * sizeof(uint32_t));
@@ -44,7 +44,7 @@ struct AlignedBits
   ~AlignedBits()
   {
     if (data)
-      _mm_free(data);
+      memfree_aligned(data, defaultmem);
   }
 
   AlignedBits(const AlignedBits &) = delete;

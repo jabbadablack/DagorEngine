@@ -3350,6 +3350,9 @@ TEST_CASE("Preserved history blob is not deactivated when producer changes", "[h
   struct TrackingBlob
   {
     uint32_t value = 0;
+    TrackingBlob() = default;
+    TrackingBlob(const TrackingBlob &) = default;
+    TrackingBlob &operator=(const TrackingBlob &) = default;
     ~TrackingBlob() { value = 0xDEAD; }
   };
 

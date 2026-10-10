@@ -59,6 +59,9 @@ TEST_CASE("current case tracks the running test case", "[testEnv]")
 
 TEST_CASE("expected dagor assertions do not fail the test", "[testEnv][logerr]")
 {
+#if DAGOR_DBGLEVEL < 1
+  SKIP("no assertions with DAGOR_DBGLEVEL < 1");
+#endif
   unittest::ExpectLogerr expect("expected assertion");
   G_ASSERTF(1 + 1 == 3, "expected assertion");
 }

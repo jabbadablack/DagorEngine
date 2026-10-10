@@ -399,7 +399,7 @@ TEST_CASE("Erase returns iterator to next element", "[idSparseIndexedMapping]")
   }
 }
 
-static void validate_mapping_equals(const IdSparseIndexedMapping<IdType, uint32_t> &mapping,
+[[maybe_unused]] static void validate_mapping_equals(const IdSparseIndexedMapping<IdType, uint32_t> &mapping,
   const dag::Vector<eastl::pair<uint32_t, uint32_t>> &expected)
 {
   REQUIRE(mapping.used() == expected.size());

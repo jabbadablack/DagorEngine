@@ -315,6 +315,9 @@ TEST_CASE("file cache writes beside a read-only mount", "[datacache][file][romou
 
 TEST_CASE("file cache refuses to write a read-only entry", "[datacache][file][romount]")
 {
+#if DAGOR_DBGLEVEL < 1
+  SKIP("the refusal is an assertion, compiled out with DAGOR_DBGLEVEL < 1");
+#endif
   RoMountFixture f;
   datacache::EntryHolder ent(f.cache->get("1.bin"));
   REQUIRE(ent);

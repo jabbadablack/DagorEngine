@@ -1,12 +1,17 @@
 # Differences between the jam and CMake builds that are intended (see parity.py). One Python regex per line, matched
-# against a report line ('<target>: <source>: <difference>'), then '  # ' and the reason.
-define only in CMake: _TARGET_D3D_MULTI$  # the tests tree has the multi-driver interface for the render tests (decisions.md)
-define only in CMake: (_DEBUG_TAB_|EASTL_DEBUG|EASTL_DEBUGPARAMS_LEVEL=0|EASTL_NAME_ENABLED=0)$  # tests: checked containers in Dev
+# against a report line ('<target>: <source>: <difference>'), then '  # ' and the reason. '@<regex> ' in front limits a
+# rule to the trees whose build dir name matches.
+@tests define only in CMake: _TARGET_D3D_MULTI$  # the tests tree has the multi-driver interface for the render tests (decisions.md)
+@tests define only in CMake: (_DEBUG_TAB_|EASTL_DEBUG|EASTL_DEBUGPARAMS_LEVEL=0|EASTL_NAME_ENABLED=0)$  # tests: checked containers in Dev
 \.c: define only in jam: DAGOR_EXCEPTIONS_ENABLED$  # jam passed the C++ exception setting to C sources too
 include only in CMake: build/  # generated files (stringified .das and the like) go into the build tree, not the sources
 das_ecs_test\.exe: .*define only in CMake: DAS_ECS_TEST_ENGINE_ROOT=  # the test finds daScript from the engine root, not the working dir
+# jam's tests built some libraries in two variants in rel: with exceptions for Catch2 and without logs for the unit
+# tests, without exceptions and with logs (ForceLogs) for das_ecs_test. The tests tree builds them with both.
+@tests (define only in CMake: DAGOR_FORCE_LOGS|kernel/def_logcryptkey\.cpp: compiled only by CMake)$  # the tests keep their logs in Rel
+@tests (define only in jam: _HAS_EXCEPTIONS=0|define only in CMake: DAGOR_EXCEPTIONS_ENABLED)$  # exceptions in every config
 # the tests tree builds only the stub driver until the DX12 and Vulkan drivers are ported (remove these then)
 drv3d_commonCode\.lib: .*(define only in jam: HAS_NVAPI|include only in jam: prog/3rdpartylibs/antilag2|define only in CMake: D3D_STUB_DRIVER_ONLY|(amdfsr_stub|amdlowlatencystub)\.cpp: compiled only by CMake)$
 drv3d_pc_multi~.*: .*(define only in jam: USE_MULTI_D3D_(vulkan|DX12)|hlsl_stub\.cpp: compiled only by CMake)$
-^(engine/drv/(drv3d_(DX12|vulkan)|shadersMetaData/(dxil|spirv))|1stPartyLibs/jsoncpp|3rdPartyLibs/vulkan/smol-v)\.lib: .*: not compiled by CMake$
+^(engine/drv/(drv3d_(DX12|vulkan)|shadersMetaData/(dxil|spirv))|1stPartyLibs/jsoncpp|3rdPartyLibs/vulkan/smol-v|engine/imgui/stub)\.lib: .*: not compiled by CMake$
 (drv3d_commonCode\.lib: .*/(amdFsr|amdLowLatency)|drv3d_pc_multi~.*/hlsl_dx)\.cpp: not compiled by CMake$

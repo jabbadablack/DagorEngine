@@ -72,6 +72,7 @@ function(_daFrameGraph flavor)
   set(deps 3rdPartyLibs.imgui 3rdPartyLibs.imgui-node-editor engine.imgui engine.imgui.util gameLibs.graphLayouter
     gameLibs.render.texDebug)
   list(TRANSFORM deps REPLACE "^(.+)$" "$<${debug}:\\1>")
+  list(APPEND deps engine/consoleProc) # its console variables, in every configuration
 
   set(includes ${DAGOR_PROG_DIR}/gameLibs/publicInclude . ${DAGOR_PROG_DIR}/3rdPartyLibs/imgui
     ${DAGOR_PROG_DIR}/3rdPartyLibs/rapidjson/include)

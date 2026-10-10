@@ -18,4 +18,5 @@ dagor_add_library(
   PRIVATE_DEFINES CATCH_AMALGAMATED_CUSTOM_MAIN
   EXCEPTIONS ON
   LICENSE_FILES LICENSE.txt
+  PROPERTIES SYSTEM ON # its headers are third-party code: the warnings of strict test code do not apply to them
 )
