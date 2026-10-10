@@ -68,7 +68,7 @@ def flags(args, base):
 # include dirs of generated files, which exist only once the tree is built
 GENERATED = os.path.normcase(os.path.join(ENGINE, 'build')).replace(os.sep, '/') + '/'
 # sources the inventory has no commands for: jam's dry run lists compilers only, not assemblers
-ASSEMBLY = ('.asm', '.masm', '.nasm', '.nas', '.s')
+ASSEMBLY = ('.asm', '.masm', '.nasm', '.nas', '.s', '.ispc')  # (and ISPC)
 TARGET_DIR = re.compile(r'CMakeFiles[\\/]([^\\/]+)\.dir[\\/]')
 
 
@@ -119,7 +119,8 @@ def compare(t, cmake):
   report = []
   compared = 0
   # the CMake target of the same name (engine/perfMon/stub.lib -> engine.perfMon.stub) when it compiles the source
-  own = os.path.splitext(t['name'])[0].replace('/', '.')
+  base = os.path.splitext(t['name'])[0]
+  own = {base.replace('/', '.'), os.path.basename(base)}  # libraries by their path, programs by their name
   cmake_targets = collections.Counter()
   for src, cmd in sorted(t['sources'].items()):
     path = norm_path(src, ENGINE)
@@ -128,9 +129,9 @@ def compare(t, cmake):
       continue
     compared += 1
     jd, ji = flags(cmd, ENGINE)  # inventory.py made the include dirs relative to the engine root
-    # the CMake compile of this source in the target of the same name, else the one closest to jam's (a source of
-    # several targets or flavors is compiled several times)
-    target, cd, ci = min(cmake[path], key=lambda c: (c[0] != own, len(jd ^ c[1]) + len(ji ^ c[2])))
+    # the CMake compile of this source closest to jam's, of the target of the same name among equally close ones (a
+    # source of several targets or flavors is compiled several times)
+    target, cd, ci = min(cmake[path], key=lambda c: (len(jd ^ c[1]) + len(ji ^ c[2]), c[0] not in own))
     cmake_targets[target] += 1
     for d in sorted(jd - cd):
       report.append('{}: {}: define only in jam: {}'.format(t['name'], src, d))

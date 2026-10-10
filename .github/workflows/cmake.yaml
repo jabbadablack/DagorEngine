@@ -50,6 +50,16 @@ jobs:
           - os: macos-15
             preset: macos-cdk
             deps: /Users/runner/dagor-deps
+          # the tools on daKernel: daBuild with its exporter plugins, ddsxCvt2
+          - os: windows-2022
+            preset: windows-editor
+            deps: D:/dagor-deps
+          - os: ubuntu-22.04
+            preset: linux-editor
+            deps: /home/runner/dagor-deps
+          - os: macos-15
+            preset: macos-editor
+            deps: /Users/runner/dagor-deps
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     env:

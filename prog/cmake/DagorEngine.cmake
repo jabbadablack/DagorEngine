@@ -56,6 +56,14 @@ if(DAGOR_PLATFORM MATCHES "^(macOS|iOS|tvOS)$")
   enable_language(OBJC OBJCXX)
 endif()
 
+# ISPC (the texture compressor's kernels) in the trees of the editor tools, which build 3rdPartyLibs/convert/ispc_texcomp
+if(DAGOR_VARIANT MATCHES "^(editor|dargbox|all)$" AND NOT DAGOR_ARCH STREQUAL "e2k")
+  dagor_fetch_sdk(ispc _dagor_ispc_dir)
+  find_program(CMAKE_ISPC_COMPILER NAMES ispc PATHS "${_dagor_ispc_dir}/bin" NO_DEFAULT_PATH REQUIRED)
+  enable_language(ISPC)
+  unset(_dagor_ispc_dir)
+endif()
+
 include(DagorCompilerFlags)
 include(DagorTargets)
 include(DagorLicenses)

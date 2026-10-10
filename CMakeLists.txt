@@ -21,6 +21,7 @@ if(DAGOR_VARIANT MATCHES "^(cdk|all)$")
     tools/converters/ddsxCvt
     tools/converters/GuiTex
     tools/FontGenerator
+    tools/sceneTools/assetExp/ddsxConv
     tools/sceneTools/csvUtil
     tools/sceneTools/dbldUtil
     tools/sceneTools/dumpGrp
@@ -36,6 +37,17 @@ if(DAGOR_VARIANT MATCHES "^(cdk|all)$")
   )
   # the data the tools load that is not built (prog/tools/toolsData/README.md), with the cdk-data component
   install(DIRECTORY prog/tools/toolsData/ DESTINATION tools COMPONENT cdk-data PATTERN README.md EXCLUDE)
+endif()
+# the tools on the shared kernel (daKernel): daBuild with its exporter plugins, ddsxCvt2
+if(DAGOR_VARIANT MATCHES "^(editor|all)$")
+  dagor_use(
+    tools/libTools/daKernel
+    tools/sceneTools/assetExp
+    tools/sceneTools/assetExp/exporters
+    tools/sceneTools/assetExp/refProviders
+    gameLibs/vehiclePhys/exporters
+    tools/converters/ddsxCvt2
+  )
 endif()
 
 dagor_finalize()

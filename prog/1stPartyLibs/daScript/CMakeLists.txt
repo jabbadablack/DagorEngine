@@ -35,6 +35,11 @@ if(DAGOR_DAS_LLVM_AOT)
   list(APPEND defines DAS_LLVM_AOT)
 endif()
 set(options)
+if(NOT DAGOR_MSVC_LIKE)
+  # the language's floats are IEEE: its comparisons and isnan/isinf see NaN and infinity (-ffinite-math-only would let
+  # the compiler assume them away, and arm64 code then answers wrongly)
+  list(APPEND options -fno-finite-math-only)
+endif()
 if(DAGOR_CC STREQUAL "gcc")
   list(APPEND options -Wno-stringop-overflow)
 elseif(DAGOR_PLATFORM STREQUAL "macOS")
@@ -59,9 +64,6 @@ foreach(build standard console)
     SOURCE_OPTIONS ${source_options}
     DEPS 3rdPartyLibs/eastl 3rdPartyLibs/uriparser 3rdPartyLibs/fmt
     LICENSE_FILES LICENSE
-    # the language's floats are IEEE: its comparisons and isnan/isinf see NaN and infinity (-ffinite-math-only would let
-    # the compiler assume them away, and arm64 code then answers wrongly)
-    PROPERTIES DAGOR_IEEE_MATH ON
   )
 endforeach()
 dagor_add_link_choice(1stPartyLibs.daScript PROPERTY DAGOR_DAS_CONSOLE

@@ -80,6 +80,7 @@ const char *shader_blob::bytecode_ext(Api api)
     case Api::DX11: return "dxbc";
     case Api::DX12: return "dxil";
     case Api::SPIRV: return "spv";
+    case Api::INVALID: break;
   }
   return "bin";
 }
@@ -124,6 +125,7 @@ bool shader_blob::unpack(Api api, dag::ConstSpan<uint8_t> metadata, dag::ConstSp
     case Api::DX11: return unpack_dx11(metadata, bytecode, main_stage, out, out_error);
     case Api::DX12: return unpack_dxil(metadata, bytecode, out, out_error);
     case Api::SPIRV: return unpack_spirv(metadata, bytecode, main_stage, out, out_error);
+    case Api::INVALID: break;
   }
   return false;
 }

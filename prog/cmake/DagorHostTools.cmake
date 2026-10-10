@@ -17,7 +17,7 @@ set_property(CACHE DAGOR_HOST_TOOLS_CONFIG PROPERTY STRINGS Dev Rel IRel Dbg)
 set(DAGOR_HOST_TOOLS_SCRIPT "${CMAKE_CURRENT_LIST_DIR}/scripts/build_host_tools.cmake")
 
 # the CDK tools jam built rel only, without a config postfix (NO_CONFIG_POSTFIX; the cdk tree checks this list)
-set(_DAGOR_CDK_NO_POSTFIX binBlk ddsx2dds ddsxCvt dolphin whale duktape)
+set(_DAGOR_CDK_NO_POSTFIX binBlk ddsx2dds ddsxCvt dolphin whale duktape pcDdsxConv iosDdsxConv andDdsxConv)
 
 # the file name of a CDK program built in <config>: <tool>-<config postfix>[.exe]; rel-only tools have no postfix
 function(_dagor_host_tool_file tool config out)

@@ -17,3 +17,4 @@ drv3d_pc_multi~.*: .*(define only in jam: USE_MULTI_D3D_(vulkan|DX12)|hlsl_stub\
 (drv3d_commonCode(~[^.]*)?\.lib: .*/(amdFsr|amdLowLatency)|drv3d_pc_multi~.*/hlsl_dx)\.cpp: not compiled by CMake$
 ^(dolphin|whale)\.exe: .*(define only in jam: (NDEBUG|DAGOR_DBGLEVEL=0)|define only in CMake: DAGOR_DBGLEVEL=1)$  # jam built them rel only; CMake in the tree's config (decisions.md)
 (/ShaderCompiler2/(shlex|shsyn)\.cpp: not compiled by CMake|/parsers/(shlex|shsyn)\.cpp: compiled only by CMake)$  # dolphin/whale output goes into the build dir
+ispc_texcomp\.lib: .*include only in jam: prog/3rdpartylibs/convert/ispc_texcomp/x86_64$  # ISPC's headers go into the build dir

@@ -754,6 +754,45 @@
           "name": "macos-cdk"
         }
       ]
+    },
+    {
+      "name": "ci-windows-editor",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "windows-editor"
+        },
+        {
+          "type": "build",
+          "name": "windows-editor"
+        }
+      ]
+    },
+    {
+      "name": "ci-linux-editor",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "linux-editor"
+        },
+        {
+          "type": "build",
+          "name": "linux-editor"
+        }
+      ]
+    },
+    {
+      "name": "ci-macos-editor",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "macos-editor"
+        },
+        {
+          "type": "build",
+          "name": "macos-editor"
+        }
+      ]
     }
   ]
 }

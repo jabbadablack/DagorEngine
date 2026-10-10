@@ -94,7 +94,8 @@ def parse(dump, cwd):
   targets = {}
 
   def target(out_path):
-    path = os.path.normpath(os.path.join(ENGINE, cwd, out_path)).replace(os.sep, '/')
+    # not normalized: jam places the objects of a library's ../ sources under its dir with the ../ kept
+    path = os.path.join(ENGINE, cwd, out_path).replace(os.sep, '/')
     m = OUTPUT_DIR.search(path)
     if not m:
       return None

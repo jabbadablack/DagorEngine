@@ -99,3 +99,46 @@ dagor_sdk(dxc 1.8.2505.1
     SHA256 6d2ea8579c29b87c759ddc1300f9901ad413c483b2bfa1f799cb376f6d0789b3
     EXTRACT */include/dxc/*.h */lib/macosx/* */LICENSE.TXT
 )
+
+# ARM's ASTC encoder 4.6.1 (astcenc-<isa>), which the texture exporter runs for the ASTC formats
+dagor_sdk(astcenc 4.6.1
+  windows-x86_64
+    URL https://github.com/ARM-software/astc-encoder/releases/download/4.6.1/astcenc-4.6.1-windows-x64.zip
+    SHA256 0c4ba7af8b5ec22e9bd4f4173866985d2d10b5be137753171481b9629054e38e
+  windows-arm64
+    URL https://github.com/ARM-software/astc-encoder/releases/download/4.6.1/astcenc-4.6.1-windows-x64.zip
+    SHA256 0c4ba7af8b5ec22e9bd4f4173866985d2d10b5be137753171481b9629054e38e
+  linux-x86_64
+    URL https://github.com/ARM-software/astc-encoder/releases/download/4.6.1/astcenc-4.6.1-linux-x64.zip
+    SHA256 e360aeabf3b5aeda6a7cfabddc49af8b204e28befa04ab8e8942c85620ba071a
+  macOS-x86_64
+    URL https://github.com/ARM-software/astc-encoder/releases/download/4.6.1/astcenc-4.6.1-macos-universal.zip
+    SHA256 40f19df27799f6f2ad6890c147165f8e077ff6547be57b02d7949677d3f1ea9e
+  macOS-arm64
+    URL https://github.com/ARM-software/astc-encoder/releases/download/4.6.1/astcenc-4.6.1-macos-universal.zip
+    SHA256 40f19df27799f6f2ad6890c147165f8e077ff6547be57b02d7949677d3f1ea9e
+)
+
+# Intel's Implicit SPMD Program Compiler 1.23.0 (the ISPC texture compressor's kernels)
+dagor_sdk(ispc 1.23.0
+  windows-x86_64
+    URL https://github.com/ispc/ispc/releases/download/v1.23.0/ispc-v1.23.0-windows.zip
+    SHA256 709350902381968ee58fd67e9aed63df99b1313bc55a94195977bcc8d90bdced
+    EXTRACT */bin/ispc.exe */LICENSE.txt
+  windows-arm64
+    URL https://github.com/ispc/ispc/releases/download/v1.23.0/ispc-v1.23.0-windows.zip
+    SHA256 709350902381968ee58fd67e9aed63df99b1313bc55a94195977bcc8d90bdced
+    EXTRACT */bin/ispc.exe */LICENSE.txt
+  linux-x86_64
+    URL https://github.com/ispc/ispc/releases/download/v1.23.0/ispc-v1.23.0-linux-oneapi.tar.gz
+    SHA256 9183b2dd128fa5ca30ab24ca2cf6730a11572e4efd82fd284d167109f9c9d077
+    EXTRACT */bin/ispc */LICENSE.txt
+  macOS-x86_64
+    URL https://github.com/ispc/ispc/releases/download/v1.23.0/ispc-v1.23.0-macOS.universal.tar.gz
+    SHA256 9c5893cbb5fd0b04cf5109a027bcbe8f8ca54bc8f7eaf468ce0bc13a9b0e06bd
+    EXTRACT */bin/ispc */LICENSE.txt
+  macOS-arm64
+    URL https://github.com/ispc/ispc/releases/download/v1.23.0/ispc-v1.23.0-macOS.universal.tar.gz
+    SHA256 9c5893cbb5fd0b04cf5109a027bcbe8f8ca54bc8f7eaf468ce0bc13a9b0e06bd
+    EXTRACT */bin/ispc */LICENSE.txt
+)
