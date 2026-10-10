@@ -230,9 +230,9 @@ static void on_video_error_fatal_action()
   if (dgs_execute_quiet)
     return;
   send_gpu_net_event("Unsupported_driver", GpuVendor::UNKNOWN, nullptr);
-  const char *addressPrefix = get_localized_text("url/knowledgebase", "https://support.gaijin.net/hc/search?&query=");
-  String address(1024, "%s%X", addressPrefix, 0x8111000B);
-  String text(1024, "Visit <a href=\"%s\">%s</a>", address.str(), address.str());
+  String text(1024, "Error initializing video (0x%X)", 0x8111000B);
+  if (const char *supportUrl = ::dgs_get_settings()->getStr("supportUrl", ""); *supportUrl)
+    text.aprintf(0, "\n<a href=\"%s\">%s</a>", supportUrl, supportUrl);
   ScopeSuspendWndProcComponents wndCompsGuard; // stop handling windows input events during fatal message box
   os_message_box(text, get_localized_text("msgbox/critical_error_header"), GUI_MB_OK | GUI_MB_ICON_ERROR | GUI_MB_FOREGROUND);
   _exit(1);

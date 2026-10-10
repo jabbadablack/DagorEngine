@@ -7097,8 +7097,9 @@ static void verify_driver_caps()
     send_gpu_net_event("old_vid_drv", drvDesc.info.vendor, &drvDesc.info.driverVersion);
     if (!dgs_execute_quiet)
     {
-      const char *address = "https://support.gaijin.net/hc/articles/4405867465489";
-      String message(0, "%s\n<a href=\"%s\">%s</a>", get_localized_text("video/outdated_driver"), address, address);
+      String message(0, "%s", get_localized_text("video/outdated_driver"));
+      if (const char *supportUrl = dgs_get_settings()->getStr("supportUrl", ""); *supportUrl)
+        message.aprintf(0, "\n<a href=\"%s\">%s</a>", supportUrl, supportUrl);
       os_message_box(message.data(), get_localized_text("video/outdated_driver_hdr"), GUI_MB_OK | GUI_MB_ICON_ERROR);
     }
   }

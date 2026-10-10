@@ -1,6 +1,7 @@
 // Game settings (dgs_get_settings()): defaults of the game, overridden by the player's dng_empty.config.blk and by
 // -config:<path>:<type>=<value> arguments.
 windowTitle:t="Dng Empty"
+supportUrl:t="" // link shown in driver, VC++ redist and video init error boxes; empty shows no link
 circuit:t="internal"
 disableRemoteNetServices:b=yes
 

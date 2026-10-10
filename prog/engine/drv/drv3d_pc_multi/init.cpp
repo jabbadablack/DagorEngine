@@ -308,8 +308,9 @@ static DriverCode detect_driver()
               _exit(1);
             }
 
-            const char *address = "https://support.gaijin.net/hc/articles/4405867465489";
-            String message(1024, "%s\n<a href=\"%s\">%s</a>", get_localized_text("video/outdated_driver"), address, address);
+            String message(1024, "%s", get_localized_text("video/outdated_driver"));
+            if (const char *supportUrl = ::dgs_get_settings()->getStr("supportUrl", ""); *supportUrl)
+              message.aprintf(0, "\n<a href=\"%s\">%s</a>", supportUrl, supportUrl);
             drv_message_box(message.data(), get_localized_text("video/outdated_driver_hdr"), GUI_MB_OK | GUI_MB_ICON_ERROR);
           }
           break;

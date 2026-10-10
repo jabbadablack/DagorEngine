@@ -36,10 +36,6 @@ static constexpr auto vcRedistRegKey = L"";
 
 static constexpr auto vcRedistMainDll = L"MSVCP140.dll";
 
-static constexpr auto vcRedistUpdateArticleUrl = "support.gaijin.net/hc/articles/30371868515858";
-static constexpr auto vcRedistInstallerUrl =
-  "learn.microsoft.com/cpp/windows/latest-supported-vc-redist#latest-supported-redistributable-version";
-
 
 eastl::optional<LibraryVersion> get_current_vc_redist_ver()
 {
@@ -97,11 +93,12 @@ void check_vc_redist(const DataBlock *cfg)
   int result = [&] {
     ScopeSetWatchdogTimeout _wd(WATCHDOG_DISABLE);
 
-    const String msg1(1024,                                                                              //
+    String msg(1024,                                                                                     //
       get_localized_text(hasVcRedistInstaller ? "engine/vcredist_install" : "engine/outdated_vcredist"), //
       currentVcRedistVer->toString().c_str(),                                                            //
       vcRedistVer.toString().c_str());                                                                   //
-    const String msg(1024, "%s\n<a href=\"https://%s\">%s</a>", msg1.c_str(), vcRedistUpdateArticleUrl, vcRedistUpdateArticleUrl);
+    if (const char *supportUrl = cfg->getStr("supportUrl", ""); *supportUrl)
+      msg.aprintf(0, "\n<a href=\"%s\">%s</a>", supportUrl, supportUrl);
 
     return os_message_box(msg.c_str(), get_localized_text("engine/outdated_vcredist_hdr"),
       (hasVcRedistInstaller ? GUI_MB_YES_NO_CANCEL : GUI_MB_OK_CANCEL) | GUI_MB_ICON_WARNING);
