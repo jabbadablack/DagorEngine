@@ -21,12 +21,22 @@
 
 namespace unittest
 {
-static Options g_options;
-static String g_current_case;
+// constructed on first use: a String takes strmem when it is constructed, and on macOS (Mach-O has no init_priority)
+// static constructors of this lib may run before the memory manager sets strmem
+static Options &options_storage()
+{
+  static Options opt;
+  return opt;
+}
+static String &current_case_storage()
+{
+  static String name;
+  return name;
+}
 static WinCritSec g_events_cs;
 static file_ptr_t g_events_file = nullptr;
 
-Options &options() { return g_options; }
+Options &options() { return options_storage(); }
 
 static String make_absolute(const String &path)
 {
@@ -47,9 +57,9 @@ static String make_absolute(const String &path)
 
 void set_options(const Options &opt)
 {
-  g_options = opt;
-  g_options.dataDir = make_absolute(opt.dataDir);
-  g_options.artifactDir = make_absolute(opt.artifactDir);
+  options_storage() = opt;
+  options_storage().dataDir = make_absolute(opt.dataDir);
+  options_storage().artifactDir = make_absolute(opt.artifactDir);
 }
 
 static String join_path(const String &dir, const char *rel)
@@ -72,13 +82,13 @@ static String case_dir_name(const char *case_name)
   return dir;
 }
 
-String data_path(const char *rel) { return join_path(g_options.dataDir, rel); }
+String data_path(const char *rel) { return join_path(options_storage().dataDir, rel); }
 
 String artifact_path(const char *rel)
 {
-  if (g_options.artifactDir.empty())
+  if (options_storage().artifactDir.empty())
     return String();
-  String path = join_path(g_options.artifactDir, String(0, "%s/%s", case_dir_name(g_current_case).c_str(), rel).c_str());
+  String path = join_path(options_storage().artifactDir, String(0, "%s/%s", case_dir_name(current_case_storage()).c_str(), rel).c_str());
   dd_mkpath(path);
   return path;
 }
@@ -104,8 +114,8 @@ static String temp_root()
 
 String scratch_dir()
 {
-  const String base = g_options.artifactDir.empty() ? temp_root() : g_options.artifactDir;
-  String dir(0, "%s/%s/scratch", base.c_str(), case_dir_name(g_current_case).c_str());
+  const String base = options_storage().artifactDir.empty() ? temp_root() : options_storage().artifactDir;
+  String dir(0, "%s/%s/scratch", base.c_str(), case_dir_name(current_case_storage()).c_str());
   dag::remove_dirtree(dir);
   dd_mkdir(dir);
   return dir;
@@ -127,9 +137,9 @@ bool http_service(String &out_base_url, String &out_root_dir)
 void set_current_case(const char *case_name)
 {
   WinAutoLock lock(g_events_cs); // the watchdog reads the name from its own thread
-  g_current_case = case_name ? case_name : "";
+  current_case_storage() = case_name ? case_name : "";
 }
-const char *current_case() { return g_current_case.c_str(); }
+const char *current_case() { return current_case_storage().c_str(); }
 
 String json_escape(const char *s)
 {
@@ -155,12 +165,12 @@ String json_escape(const char *s)
 
 void write_event(const char *fields_json)
 {
-  if (g_options.artifactDir.empty())
+  if (options_storage().artifactDir.empty())
     return;
   WinAutoLock lock(g_events_cs);
   if (!g_events_file)
   {
-    String fn = join_path(g_options.artifactDir, "events.jsonl");
+    String fn = join_path(options_storage().artifactDir, "events.jsonl");
     dd_mkpath(fn);
     g_events_file = df_open(fn, DF_WRITE | DF_APPEND);
     if (!g_events_file)
@@ -186,7 +196,7 @@ public:
 
   void execute() override
   {
-    const int timeoutMsec = int(g_options.caseTimeoutSec * 1000);
+    const int timeoutMsec = int(options_storage().caseTimeoutSec * 1000);
     while (!isThreadTerminating())
     {
       sleep_msec(50);
@@ -197,13 +207,13 @@ public:
       String caseName;
       {
         WinAutoLock lock(g_events_cs); // the main thread may be updating the name; take a stable copy
-        caseName = g_current_case;
+        caseName = current_case_storage();
       }
-      fprintf(stderr, "\nunittest: TIMEOUT: test case \"%s\" exceeded %.1f s\n", caseName.c_str(), g_options.caseTimeoutSec);
+      fprintf(stderr, "\nunittest: TIMEOUT: test case \"%s\" exceeded %.1f s\n", caseName.c_str(), options_storage().caseTimeoutSec);
       fflush(stderr);
       fflush(stdout);
       write_event(
-        String(0, "\"event\":\"timeout\",\"case\":\"%s\",\"timeoutSec\":%g", json_escape(caseName).c_str(), g_options.caseTimeoutSec));
+        String(0, "\"event\":\"timeout\",\"case\":\"%s\",\"timeoutSec\":%g", json_escape(caseName).c_str(), options_storage().caseTimeoutSec));
       _exit(EXIT_TIMEOUT);
     }
   }
@@ -213,7 +223,7 @@ static WatchdogThread *g_watchdog = nullptr;
 
 void start_watchdog()
 {
-  if (g_watchdog || g_options.caseTimeoutSec <= 0)
+  if (g_watchdog || options_storage().caseTimeoutSec <= 0)
     return;
   g_watchdog = new WatchdogThread;
   g_watchdog->start();
