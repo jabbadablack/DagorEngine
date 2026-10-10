@@ -628,6 +628,23 @@
       "execution": {
         "noTestsAction": "error"
       }
+    },
+    {
+      "name": "ci-windows-msvc-tests",
+      "configurePreset": "windows-msvc-tests",
+      "configuration": "Dev",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "jobs": 4
+      },
+      "filter": {
+        "exclude": {
+          "label": "requires-gpu|requires-display"
+        }
+      }
     }
   ],
   "workflowPresets": [
@@ -679,6 +696,23 @@
         {
           "type": "test",
           "name": "ci-macos-tests"
+        }
+      ]
+    },
+    {
+      "name": "ci-windows-msvc-tests",
+      "steps": [
+        {
+          "type": "configure",
+          "name": "windows-msvc-tests"
+        },
+        {
+          "type": "build",
+          "name": "windows-msvc-tests"
+        },
+        {
+          "type": "test",
+          "name": "ci-windows-msvc-tests"
         }
       ]
     }

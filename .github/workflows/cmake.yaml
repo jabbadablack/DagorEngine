@@ -1,7 +1,8 @@
 name: cmake
 
 # The CMake build, which replaces jam step by step (see prog/cmake). It runs next to the jam-based tests.yaml until the
-# port is complete. The deps cache (SDKs, LLVM, the codegen venv) is keyed on the pinned manifest.
+# port is complete: configure, build and test with the ci-<preset> workflow presets (hosted runners have no GPU, so
+# tests labeled requires-gpu or requires-display are excluded). The deps cache (SDKs, LLVM) is keyed on the manifest.
 
 on:
   push:
@@ -18,8 +19,8 @@ permissions:
   contents: read
 
 jobs:
-  configure:
-    name: configure (${{ matrix.preset }})
+  tests:
+    name: tests (${{ matrix.preset }})
     strategy:
       fail-fast: false
       matrix:
@@ -33,11 +34,11 @@ jobs:
           - os: ubuntu-22.04
             preset: linux-tests
             deps: /home/runner/dagor-deps
-          - os: macos-15
+          - os: macos-15 # Xcode 16: the Metal driver needs the macOS 15 SDK (MTLResidencySet)
             preset: macos-tests
             deps: /Users/runner/dagor-deps
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    timeout-minutes: 120
     env:
       DAGOR_DEPS_DIR: ${{ matrix.deps }}
     steps:
@@ -50,11 +51,26 @@ jobs:
       - name: Install CMake and Ninja
         run: python -m pip install "cmake>=4.0,<5" "ninja>=1.11"
 
+      - name: Install the system libraries (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libx11-dev libxrandr-dev libxcursor-dev libxkbcommon-dev libfltk1.3-dev \
+            libxkbfile-dev libudev-dev libpulse-dev uuid-dev nasm
+
       - name: Cache deps
         uses: actions/cache@v4
         with:
           path: ${{ matrix.deps }}/sdk
           key: dagor-deps-${{ matrix.os }}-${{ hashFiles('prog/cmake/sdk/manifest.cmake') }}
 
-      - name: Configure
-        run: cmake --preset ${{ matrix.preset }}
+      - name: Configure, build and test
+        run: cmake --workflow --preset ci-${{ matrix.preset }}
+
+      - name: Upload test artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts-${{ matrix.preset }}
+          path: build/${{ matrix.preset }}/test-artifacts
+          if-no-files-found: ignore

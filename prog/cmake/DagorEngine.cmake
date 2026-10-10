@@ -52,6 +52,10 @@ else()
   enable_language(ASM)
 endif()
 
+if(DAGOR_PLATFORM MATCHES "^(macOS|iOS|tvOS)$")
+  enable_language(OBJC OBJCXX)
+endif()
+
 include(DagorCompilerFlags)
 include(DagorTargets)
 include(DagorPython)

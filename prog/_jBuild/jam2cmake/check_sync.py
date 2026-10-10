@@ -13,7 +13,10 @@ ENGINE = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)
 
 
 def git(*args):
-  return subprocess.run(['git', *args], cwd=ENGINE, capture_output=True, text=True, check=True).stdout.split('\n')
+  proc = subprocess.run(['git', *args], cwd=ENGINE, capture_output=True, text=True)
+  if proc.returncode != 0 and not (args[0] == 'grep' and proc.returncode == 1):  # grep: 1 is no match
+    sys.exit('git {} failed: {}'.format(' '.join(args), proc.stderr.strip()))
+  return proc.stdout.split('\n')
 
 
 def main(argv):

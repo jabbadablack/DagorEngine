@@ -65,8 +65,9 @@ add_library(Dagor::Lax ALIAS DagorLax)
 
 # conditions
 set(_always 1)
-set(_c_cxx "$<COMPILE_LANGUAGE:C,CXX>")
-set(_cxx "$<COMPILE_LANGUAGE:CXX>")
+# Objective-C(++) sources get the settings of C(++)
+set(_c_cxx "$<COMPILE_LANGUAGE:C,CXX,OBJC,OBJCXX>")
+set(_cxx "$<COMPILE_LANGUAGE:CXX,OBJCXX>")
 set(_dev "$<CONFIG:Dev>")
 set(_rel "$<CONFIG:Rel>")
 set(_dbg "$<CONFIG:Dbg>")
@@ -297,6 +298,8 @@ else()
       -Wno-logical-not-parentheses -Wno-c++1z-compat -Wno-undefined-var-template -Wno-inconsistent-missing-override
       -Wno-deprecated-builtins -Wno-nontrivial-memcall -fdiagnostics-absolute-paths)
   else()
+    _dagor_settings(COMPILE "$<COMPILE_LANGUAGE:OBJC,OBJCXX>" -fno-objc-exceptions)
+    _dagor_settings(COMPILE "$<COMPILE_LANGUAGE:OBJCXX>" -Wno-c99-designator -Wno-deprecated-enum-enum-conversion)
     # Apple clang: the Apple builds have always been warning-free
     _dagor_settings(COMPILE "${_c_cxx}" -Werror -Wno-unused-value -Wno-uninitialized -Wno-inline-new-delete
       -Wno-unknown-warning-option -Wno-deprecated-register -Wno-nonportable-include-path -Wno-null-dereference
