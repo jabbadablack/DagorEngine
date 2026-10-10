@@ -356,7 +356,7 @@ elseif(DAGOR_PLATFORM STREQUAL "linux")
 elseif(DAGOR_PLATFORM STREQUAL "macOS")
   _dagor_settings(LINK "${_linked}" -ObjC LINKER:-headerpad_max_install_names)
   foreach(framework Foundation QuartzCore CoreLocation Cocoa IOKit CoreFoundation Security Carbon SystemConfiguration Metal)
-    _dagor_settings(LIBS "${_exe}" "-Wl,-framework,${framework}")
+    _dagor_settings(LIBS "${_linked}" "-Wl,-framework,${framework}") # programs and shared libraries (daKernel)
   endforeach()
 endif()
 

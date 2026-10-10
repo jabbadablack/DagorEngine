@@ -46,3 +46,21 @@ jam's `if $(X) in a b` is true when `X` is unset, so a few conditions did the op
 CMake build keeps what jam built: `CppStcode` defaults to `both` (the shader stcode compiled in and validated), and
 quirrelHost's `ENABLE_RE_USE=0` applies only under the sanitizers other than ASan. The tests tree on every platform
 uses the multi-driver interface, which jam's test driver lists (stub with DX12 or Vulkan) gave it on Windows and Linux.
+
+The tool trees (Phase 2):
+- The cdk tree has the static-kernel tools; the editor tree (DAGOR_KERNEL_LINKAGE dynamic) has daKernel, daBuild with
+  its plugins and ddsxCvt2. `cmake --install <tree> --component cdk` puts them into tools/dagor_cdk/<platform>-<arch>
+  as jam did; `--component cdk-data` adds prog/tools/toolsData and the GUI shader dumps (dagor_add_shaders).
+- Generated sources go into the build dir, not next to their inputs: the dolphin/whale parsers of the shader
+  compilers, the ISPC headers, stringified files. A build step removes stale copies jam left in the source tree.
+- Trees that run CDK tools without building them (projects, cross builds) get them through dagor_host_tool():
+  DAGOR_HOST_TOOLS_DIR, or a locked on-demand build of the engine's host cdk tree (prog/cmake/DagorHostTools.cmake).
+- Programs choose what jam set with globals for a whole build through link choices: DAGOR_MEASURE_PERF (anim, animChar,
+  fastPhys, math), DAGOR_LINUX_GUI (also bindQuirrelEx); flavors where only one program uses another build
+  (mimalloc:nodebug and engine/memory:mimalloc.off for the shader compilers, the emb builds for gameLibs/assets_import).
+- A target's own options come after the tree's and its warning set's, as jam ordered them (CMake would put the options
+  of linked interface libraries last).
+- MSVC links without identical-code folding (/OPT:NOICF): daFrameGraph compares the addresses of functions with the
+  same code, which link.exe would fold; lld-link folds only what clang marks safe (/OPT:SAFEICF).
+- Checked against jam's tools: the GUI shader dumps (DX11, DX12, SPIR-V) are byte-identical; daBuild's output for
+  outerSpace is identical except riDesc.bin, which jam's own daBuild writes differently on every run.
