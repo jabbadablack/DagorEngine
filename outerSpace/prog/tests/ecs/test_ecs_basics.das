@@ -4,7 +4,7 @@ require AppTime
 require DagorSystem
 require danetlibs/test_harness/ecs_test
 
-// In-game tests: run with `python test_all.py run --project outerSpace -k outerSpace.ecs` (see test.blk next to this file)
+// In-game tests: run with `python dng.py test run --project outerSpace -k outerSpace.ecs` (see test.blk next to this file)
 
 [ecs_test]
 def entities_are_created_and_destroyed(t : T?) {

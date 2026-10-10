@@ -122,7 +122,7 @@ here.
 
 ### `templates`
 
-Project templates for `new_project.py` (see [Creating a Project](new_project.md)). Each is a buildable project
+Project templates for `dng.py new` (see [Creating a Project](new_project.md)). Each is a buildable project
 inside the engine, built and tested like the samples.
 
 **Library Development Principles**

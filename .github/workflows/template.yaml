@@ -1,13 +1,13 @@
 name: template
 
-# Creates a project from templates/dng-empty with new_project.py outside the engine checkout (on Windows on another
+# Creates a project from templates/dng-empty with dng.py new outside the engine checkout (on Windows on another
 # drive, which needs an absolute engine path and jam Location), builds its game and runs its tests that need no GPU.
 # See _docs/source/getting-started/new_project.md.
 
 on:
   push:
     branches: [ "main" ]
-    paths: [ "templates/**", "new_project.py", "prog/tools/pythonCommon/dagorProject/**", "prog/setup_package.py",
+    paths: [ "templates/**", "dng.py", "prog/tools/pythonCommon/dagorProject/**", "prog/setup_package.py",
              "prog/_jBuild/**", "prog/daNetGame/**", "prog/daNetGameLibs/**", ".github/workflows/template.yaml" ]
   schedule:
     - cron: '0 3 * * 1' # weekly: engine changes outside the paths above can break the template too
@@ -72,7 +72,7 @@ jobs:
 
       - name: Create the project
         shell: bash
-        run: python new_project.py --name CiGame --dest "$PROJECT_DIR"
+        run: python dng.py new --name CiGame --dest "$PROJECT_DIR"
 
       - name: Build the game
         shell: bash

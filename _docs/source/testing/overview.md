@@ -1,6 +1,6 @@
 # Overview
 
-Tests of the engine and of game projects are built and run by one tool, `test_all.py` in the engine root. Every test
+Tests of the engine and of game projects are built and run by one tool, `dng.py test` in the engine root. Every test
 *target* is declared in a `test.blk` manifest next to its sources, and belongs to one of these layers:
 
 | Layer | What runs | Written in | Typical use |
@@ -14,13 +14,13 @@ Tests of the engine and of game projects are built and run by one tool, `test_al
 ## Quick start
 
 ```bash
-python test_all.py                       # build and run every engine target for this machine
-python test_all.py list                  # what would run
-python test_all.py run -k "engine.*"     # only targets whose id matches
-python test_all.py run --project ../MyGame --no-engine
+python dng.py test                       # build and run every engine target for this machine
+python dng.py test list                  # what would run
+python dng.py test run -k "engine.*"     # only targets whose id matches
+python dng.py test run --project ../MyGame --no-engine
 ```
 
-A project made with `new_project.py` runs its own with `python project.py test` (the same command, from the engine it
+A project made with `dng.py new` runs its own with `python project.py test` (the same command, from the engine it
 is linked to); every layer has an example target there (see [Creating a Project](../getting-started/new_project.md)).
 
 Each run writes `_output/test_results/<run id>/` with `report.html` (open it in a browser), `junit.xml`,
@@ -39,7 +39,7 @@ Every test executable, whatever the layer, reports with the same exit codes:
 | 3 | timeout: a test case ran longer than its limit |
 | 77 | skipped: the environment can't run these tests (e.g. no GPU) |
 
-`test_all.py` itself exits with 0 when everything passed or was skipped, 1 on failures or timeouts and 2 on errors
+`dng.py test` itself exits with 0 when everything passed or was skipped, 1 on failures or timeouts and 2 on errors
 (build failures, broken manifests).
 
 ## Rules all layers share

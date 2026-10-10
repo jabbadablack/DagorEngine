@@ -114,12 +114,12 @@ CHECK_IMAGE(image, "lit_scene", tolerant);
 
 References are looked up as `references/<name>.<variant>.png` first (the variant is the 3d driver name in GPU
 tests), then `references/<name>.png`. On a mismatch the actual, reference and diff images go to the report. A missing
-reference fails; `python test_all.py run --update-references` creates or replaces references with the actual images.
+reference fails; `python dng.py test run --update-references` creates or replaces references with the actual images.
 
 ## Command line
 
 Besides the Catch2 options, test executables accept `--data-dir`, `--artifact-dir`, `--case-timeout <sec>`,
-`--image-variant`, `--gpu-driver` and `--update-references`. `test_all.py` passes them; run executables directly to
+`--image-variant`, `--gpu-driver` and `--update-references`. `dng.py test` passes them; run executables directly to
 debug a single case:
 
 ```bash

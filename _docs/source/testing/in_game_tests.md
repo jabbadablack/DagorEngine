@@ -58,7 +58,7 @@ keyboards, mice and gamepads are disabled in scenario runs, so the person at the
 `check_screenshot` takes a screenshot without UI, waits for it and compares it with `references/<name>.png`
 (`references/<name>.<3d driver>.png` first). The tolerances are parameters: `channel_tolerance` (default 8),
 `max_rms` (1.0) and `max_bad_pixels_percent` (0.5). Create or update references with
-`python test_all.py run --update-references` and review the images before committing them.
+`python dng.py test run --update-references` and review the images before committing them.
 
 A screenshot needs a rendered 3d world: `check_screenshot` fails while the game shows a menu or a level that renders
 nothing (`level__blk:t="__empty__"`). For a world without level data use `level__blk:t="__default__"`: sky and lighting

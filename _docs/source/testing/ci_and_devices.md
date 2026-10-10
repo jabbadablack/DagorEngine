@@ -7,7 +7,7 @@ macOS hosted runners it sets up the devtools (`make_devtools.py` answers its que
 `DAGOR_NONINTERACTIVE`), then runs
 
 ```bash
-python test_all.py run --gpu no -j 4 --out _output/test_results/ci --junit test-results.xml --summary-md "$GITHUB_STEP_SUMMARY"
+python dng.py test run --gpu no -j 4 --out _output/test_results/ci --junit test-results.xml --summary-md "$GITHUB_STEP_SUMMARY"
 ```
 
 Hosted runners have no GPU: GPU targets are skipped, while their `*.stub` variants run the same tests on the stub 3d

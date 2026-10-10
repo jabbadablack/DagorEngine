@@ -3,7 +3,7 @@ require ecs
 require DngCamera
 require danetlibs/test_harness/scenario
 
-// Scenario tests render with the client game: python test_all.py run --project outerSpace -k outerSpace.scenarios
+// Scenario tests render with the client game: python dng.py test run --project outerSpace -k outerSpace.scenarios
 // Reference images are in references/; recreate them with --update-references after an intended visual change.
 
 [ecs_test]

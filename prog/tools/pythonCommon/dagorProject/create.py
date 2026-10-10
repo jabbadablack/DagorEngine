@@ -1,4 +1,4 @@
-"""Creating a game project from a template in <engine>/templates (new_project.py in the engine root).
+"""Creating a game project from a template in <engine>/templates (dng.py new in the engine root).
 
 A template is a buildable project with its own engine.blk; its template.blk lists the name tokens (tokens{}) that are
 replaced in file names and text files. Only files git tracks (or would track) are copied: build outputs and generated
@@ -20,9 +20,9 @@ TEMPLATE_BLK = 'template.blk'
 TOKEN_KEYS = ('bundleId', 'title', 'name', 'codename')
 
 EPILOG = '''examples:
-  python new_project.py --name MyGame --dest ../MyGame
-  python new_project.py --name MyGame --title "My Game" --company com.example --dest D:/Games/MyGame
-  python new_project.py --list'''
+  python dng.py new --name MyGame --dest ../MyGame
+  python dng.py new --name MyGame --title "My Game" --company com.example --dest D:/Games/MyGame
+  python dng.py new --list'''
 
 
 def engine_root() -> str:
@@ -164,7 +164,7 @@ def create(template_id: str, name: str, dest: str, codename=None, title=None, co
   validate(name, codename, title, company, dest)
   template = os.path.join(templates_dir(), template_id)
   if not os.path.isfile(os.path.join(template, TEMPLATE_BLK)):
-    raise ProjectError('no template "{}" in {} (python new_project.py --list)'.format(template_id, templates_dir()))
+    raise ProjectError('no template "{}" in {} (python dng.py new --list)'.format(template_id, templates_dir()))
   _, tok = read_template_blk(os.path.join(template, TEMPLATE_BLK))
   values = {'bundleId': company + '.' + name, 'title': title, 'name': name, 'codename': codename}
   tokens = sorted(((tok[k], values[k]) for k in TOKEN_KEYS), key=lambda t: -len(t[0]))  # longest first
@@ -215,7 +215,7 @@ def create(template_id: str, name: str, dest: str, codename=None, title=None, co
 
 
 def make_parser():
-  p = argparse.ArgumentParser(prog='new_project.py', description='Creates a game project from a template in templates/. '
+  p = argparse.ArgumentParser(prog='dng.py new', description='Creates a game project from a template in templates/. '
                               'The project can be anywhere: it finds this engine through its engine.blk.',
                               epilog=EPILOG, formatter_class=argparse.RawDescriptionHelpFormatter)
   p.add_argument('--template', default='dng-empty', help='template id (default: dng-empty)')

@@ -1,4 +1,4 @@
-"""Command line of the test runner (test_all.py in the engine root)."""
+"""Command line of the test runner (dng.py test in the engine root)."""
 import argparse
 import datetime
 import multiprocessing
@@ -18,12 +18,12 @@ Every test target is declared in a test.blk manifest (see prog/tools/pythonCommo
 manifests are found under prog/, project ones under each --project root.'''
 
 EPILOG = '''examples:
-  python test_all.py                                  build and run every engine target for the host
-  python test_all.py list --layer cpp
-  python test_all.py run -t engine -k "engine.*" -j 8
-  python test_all.py run --gpu no --junit results.xml CI without a GPU
-  python test_all.py run --project ../MyGame --no-engine
-  python test_all.py report _output/test_results/latest  regenerate reports of a run
+  python dng.py test                                  build and run every engine target for the host
+  python dng.py test list --layer cpp
+  python dng.py test run -t engine -k "engine.*" -j 8
+  python dng.py test run --gpu no --junit results.xml CI without a GPU
+  python dng.py test run --project ../MyGame --no-engine
+  python dng.py test report _output/test_results/latest  regenerate reports of a run
 
 exit codes: 0 all selected targets passed or were skipped, 1 test failures or timeouts, 2 errors (build failures,
 broken manifests, harness or runner errors)'''
@@ -37,7 +37,7 @@ def _csv(values):
 
 
 def make_parser(host, host_arch):
-  p = argparse.ArgumentParser(prog='test_all.py', description=DESCRIPTION, epilog=EPILOG,
+  p = argparse.ArgumentParser(prog='dng.py test', description=DESCRIPTION, epilog=EPILOG,
                               formatter_class=argparse.RawDescriptionHelpFormatter)
   p.add_argument('command', nargs='?', default='run', choices=['run', 'build', 'list', 'report'])
   p.add_argument('run_dir', nargs='?', help='for "report": the run dir (or its run.json) to regenerate reports for')

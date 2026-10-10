@@ -1,4 +1,4 @@
-// A project template for new_project.py in the engine root; this file is not copied into new projects.
+// A project template for dng.py new in the engine root; this file is not copied into new projects.
 // The tokens are replaced in file names and text files: longer ones first, so title, name and bundle id stay intact.
 description:t="Empty daNetGame game: client and dedicated server, an empty default world, tool scripts and tests of every layer"
 tokens{

@@ -48,7 +48,7 @@ def check_screenshot(t : T?; name : string; channel_tolerance : int = 8; max_rms
                      max_bad_pixels_percent : float = 0.5; max_frames : int = 300) : bool {
   //! Takes a screenshot (without UI) and compares it with references/<name>.png next to the test file
   //! (references/<name>.<3d driver>.png first). Mismatches write actual, reference and diff images to the report.
-  //! A missing reference fails; rerun with test_all.py --update-references to create it.
+  //! A missing reference fails; rerun with dng.py test --update-references to create it.
   if (test_mode_is_dedicated()) {
     t |> failure("screenshots need a rendering game: use game:t=\"client\" in test.blk")
     return false

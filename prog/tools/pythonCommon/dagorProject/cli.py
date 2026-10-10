@@ -12,7 +12,7 @@ EPILOG = '''examples:
   python project.py setup                  regenerate the engine glue after changing prog/danetgamelibs.txt
   python project.py relink ../DagorEngine  build with another engine checkout
   python project.py build                  code, shaders and vromfs (python project.py build code builds only code)
-  python project.py test --layer ecs       build and run the project tests (any test_all.py run option)'''
+  python project.py test --layer ecs       build and run the project tests (any dng.py test run option)'''
 
 
 def make_parser(project: Project):
@@ -28,7 +28,7 @@ def make_parser(project: Project):
   # build and test pass every following argument on (see PASS_THROUGH in main)
   sub.add_parser('build', help='setup, then prog/build.py with the given arguments: components (default: all, e.g. code '
                  'shaders vromfs assets), arch:<arch>, --dry-run')
-  sub.add_parser('test', help='build and run the project tests: "test_all.py run --project <this project> --no-engine" of '
+  sub.add_parser('test', help='build and run the project tests: "dng.py test run --project <this project> --no-engine" of '
                  'the engine with the given arguments (python project.py test -h lists them)')
   sub.add_parser('info', help='print the engine and project paths')
   return p
@@ -63,7 +63,7 @@ def main(project: Project, argv):
       return _run([sys.executable, 'build.py'] + args.args, cwd=project.prog)
     if args.command == 'test':
       engine_root = project.engine_root()
-      return _run([sys.executable, os.path.join(engine_root, 'test_all.py'), 'run', '--project', project.root, '--no-engine']
+      return _run([sys.executable, os.path.join(engine_root, 'dng.py'), 'test', 'run', '--project', project.root, '--no-engine']
                   + args.args, cwd=engine_root)
   except ProjectError as e:
     print('ERROR: {}'.format(e), file=sys.stderr)

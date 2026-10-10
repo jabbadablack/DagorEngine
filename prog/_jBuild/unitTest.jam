@@ -9,7 +9,7 @@
 #   UseProgLibs += engine/... ;
 #   include $(Root)/prog/_jBuild/build.jam ;
 #
-# Every test target also needs a test.blk manifest next to its jamfile so that test_all.py can find and run it.
+# Every test target also needs a test.blk manifest next to its jamfile so that dng.py test can find and run it.
 # Target names must be unique across the engine and the project, since all test executables share one OutDir.
 
 ConsoleExe = yes ;

@@ -73,7 +73,7 @@ bool consume_expected_logerr(const char *msg);
 void queue_unexpected_logerr(const char *msg);
 bool pop_unexpected_logerr(String &out_msg);
 
-// HTTP server provided by test_all.py to targets with requires:t="http_server" in test.blk: it serves root_dir, an empty
+// HTTP server provided by dng.py test to targets with requires:t="http_server" in test.blk: it serves root_dir, an empty
 // writable directory where tests put the files to serve, at base_url (ends with '/'). Returns false when the server isn't
 // available (e.g. the test executable is run by hand); such tests should be skipped.
 bool http_service(String &out_base_url, String &out_root_dir);

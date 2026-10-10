@@ -1,4 +1,4 @@
-// tests of the project tools (engine.blk, project glue, new_project.py)
+// tests of the project tools (engine.blk, project glue, dng.py new)
 target{
   name:t="tools.dagorProject"
   layer:t="exec"

@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// HTTP cases use the server test_all.py provides (requires:t="http_server" in test.blk, see unittest::http_service);
+// HTTP cases use the server dng.py test provides (requires:t="http_server" in test.blk, see unittest::http_service);
 // without it they are skipped.
 
 static constexpr const char *SAMPLE_FILE = "data/sample.txt";
@@ -75,7 +75,7 @@ ServedSample serve_sample()
 {
   String baseUrl, root;
   if (!unittest::http_service(baseUrl, root))
-    SKIP("no HTTP server (run with test_all.py or set DAGOR_TEST_HTTP_URL and DAGOR_TEST_HTTP_ROOT)");
+    SKIP("no HTTP server (run with dng.py test or set DAGOR_TEST_HTTP_URL and DAGOR_TEST_HTTP_ROOT)");
   ServedSample s{String(0, "%ssample.txt", baseUrl.c_str()), String(0, "%s/sample.txt", root.c_str())};
   REQUIRE(dag::copy_file(unittest::data_path(SAMPLE_FILE), s.path));
   return s;

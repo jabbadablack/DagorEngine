@@ -2,6 +2,8 @@
 """Dagor Engine commands: python dng.py <command> [arguments], python dng.py <command> -h for its arguments.
 
   build     builds the engine tools, dargbox, the project template and, when named, the samples
+  new       creates a game project from a template in templates/
+  test      builds and runs the engine and project tests
 """
 import os
 import sys
@@ -16,7 +18,18 @@ def build(argv):
   return cli.main(argv)
 
 
-COMMANDS = {'build': build}
+def new(argv):
+  from pythonCommon.dagorProject import create
+  return create.main(argv)
+
+
+def test(argv):
+  from pythonCommon.dagorBuild import ENGINE_ROOT, HOST, HOST_ARCH, TOOLS_DIR
+  from pythonCommon.dagorTest import cli
+  return cli.main(argv, ENGINE_ROOT, HOST, HOST_ARCH, TOOLS_DIR)
+
+
+COMMANDS = {'build': build, 'new': new, 'test': test}
 
 if __name__ == '__main__':
   if len(sys.argv) < 2 or sys.argv[1] not in COMMANDS:

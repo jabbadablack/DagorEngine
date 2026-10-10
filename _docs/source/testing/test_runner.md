@@ -1,12 +1,12 @@
 # The Test Runner
 
-`test_all.py` (engine root, implemented in `prog/tools/pythonCommon/dagorTest`) finds `test.blk` manifests, builds
+`dng.py test` (engine root, implemented in `prog/tools/pythonCommon/dagorTest`) finds `test.blk` manifests, builds
 what they need with jam, runs the targets in parallel and writes the reports.
 
 ## Command line
 
 ```text
-python test_all.py [run|build|list|report] [options]
+python dng.py test [run|build|list|report] [options]
 
 selection    --project DIR (repeatable)  --no-engine  --layer cpp,das,ecs,scenario,exec
              -t TAG / --exclude-tag TAG  -k GLOB (target id)  -c NAME (test case, passed to the executables)
@@ -69,5 +69,5 @@ _output/test_results/<run id>/
 ## Adding a test target
 
 1. Write the tests and a `test.blk` next to them (see the layer pages).
-2. `python test_all.py list -k <your id>` checks the manifest.
-3. `python test_all.py run -k <your id>` builds and runs it.
+2. `python dng.py test list -k <your id>` checks the manifest.
+3. `python dng.py test run -k <your id>` builds and runs it.

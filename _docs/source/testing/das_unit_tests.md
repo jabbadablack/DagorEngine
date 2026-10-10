@@ -32,5 +32,5 @@ target{
 }
 ```
 
-The engine registers the daScript language suite as `daScript.suite`. `-c <name>` on the `test_all.py` command line
+The engine registers the daScript language suite as `daScript.suite`. `-c <name>` on the `dng.py test` command line
 selects tests by name prefix.

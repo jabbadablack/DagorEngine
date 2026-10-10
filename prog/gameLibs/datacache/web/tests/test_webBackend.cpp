@@ -15,7 +15,7 @@
 #include <sys/stat.h>
 #include <zlib.h>
 
-// The web cache downloads from the HTTP server test_all.py provides (requires:t="http_server" in test.blk, see
+// The web cache downloads from the HTTP server dng.py test provides (requires:t="http_server" in test.blk, see
 // unittest::http_service); without it every case is skipped. Each case serves its own files from a fresh subdir of the
 // server root and keeps its cache in its own scratch dir.
 
@@ -88,7 +88,7 @@ struct WebCacheFixture
     static int caseCounter = 0;
     String baseUrl, root;
     if (!unittest::http_service(baseUrl, root))
-      SKIP("no HTTP server (run with test_all.py or set DAGOR_TEST_HTTP_URL and DAGOR_TEST_HTTP_ROOT)");
+      SKIP("no HTTP server (run with dng.py test or set DAGOR_TEST_HTTP_URL and DAGOR_TEST_HTTP_ROOT)");
     const String subdir(0, "webcache%d", ++caseCounter);
     servedUrl.printf(0, "%s%s", baseUrl.c_str(), subdir.c_str());
     servedDir.printf(0, "%s/%s", root.c_str(), subdir.c_str());

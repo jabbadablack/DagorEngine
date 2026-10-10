@@ -1,11 +1,11 @@
 # Creating a Project
 
-`new_project.py` in the engine root creates a game project from a template in `templates/`. The project can live
+`dng.py new` in the engine root creates a game project from a template in `templates/`. The project can live
 anywhere: its `engine.blk` names the engine checkout it is built with, and the build, the game and the tools find the
 engine through it.
 
 ```bash
-python new_project.py --name MyGame --dest ../MyGame
+python dng.py new --name MyGame --dest ../MyGame
 cd ../MyGame
 python project.py build
 game/client.cmd

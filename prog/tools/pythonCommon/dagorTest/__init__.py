@@ -1,1 +1,1 @@
-"""Dagor Engine test runner: see test_all.py in the engine root and cli.py."""
+"""Dagor Engine test runner: see dng.py test in the engine root and cli.py."""

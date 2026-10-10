@@ -1,6 +1,6 @@
 name: tests
 
-# Builds and runs the engine's tests with test_all.py (see _docs/source/testing). Hosted runners have no GPU, so targets
+# Builds and runs the engine's tests with dng.py test (see _docs/source/testing). Hosted runners have no GPU, so targets
 # that require one are skipped (--gpu no); GPU code is still covered by the *.stub variants on the stub 3d driver.
 
 on:
@@ -58,7 +58,7 @@ jobs:
       - name: Run tests
         shell: bash
         run: |
-          python test_all.py run --gpu no -j 4 --out _output/test_results/ci \
+          python dng.py test run --gpu no -j 4 --out _output/test_results/ci \
             --junit test-results.xml --summary-md "$GITHUB_STEP_SUMMARY"
 
       - name: Upload report
