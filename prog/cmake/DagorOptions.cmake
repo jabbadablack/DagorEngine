@@ -74,8 +74,16 @@ option(DAGOR_COVERAGE "Clang source-based code coverage" OFF)
 option(DAGOR_UNITY_BUILD "Unity (jumbo) builds of the targets that allow it" OFF)
 option(DAGOR_CLANG_TIDY "Run clang-tidy as part of the compile" OFF)
 
+# the Linux GUI layer of programs with a GUI (engine/osApiWrappers/linuxGUI)
+option(DAGOR_LINUX_X11 "X11 support of Linux GUI programs" ON)
+option(DAGOR_LINUX_WAYLAND "Wayland support of Linux GUI programs" ON)
+
+# features of game trees (jam's per-game globals)
+option(DAGOR_BREAKPAD "Crash reports with breakpad" OFF)
+option(DAGOR_SYNC_ASYNC_READ "Serve the dfa_* async file API with blocking reads instead of AIO (posix)" OFF)
+
 # release stamping
-set(DAGOR_BUILD_STAMP "" CACHE STRING "Build identifier embedded into programs (CI sets it; empty for local builds)")
+option(DAGOR_BUILD_STAMP "Stamp programs with the configure date and time (CI); off, they say '*' and never relink for it" OFF)
 
 if(DAGOR_COVERAGE AND NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   message(FATAL_ERROR "DAGOR_COVERAGE needs a clang compiler")

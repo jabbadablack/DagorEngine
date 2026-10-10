@@ -6,4 +6,8 @@ include(prog/cmake/DagorBootstrap.cmake)
 project(DagorEngine LANGUAGES C CXX)
 include(DagorEngine)
 
+if(DAGOR_VARIANT MATCHES "^(tests|all)$")
+  dagor_use_tests()
+endif()
+
 dagor_finalize()

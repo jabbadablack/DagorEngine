@@ -45,6 +45,16 @@ set(CMAKE_MAP_IMPORTED_CONFIG_DBG Debug "")
 if(DAGOR_PLATFORM STREQUAL "linux" AND DAGOR_KERNEL_LINKAGE STREQUAL "dynamic")
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
+if(DAGOR_PLATFORM STREQUAL "linux")
+  # the engine's static libraries depend on each other in cycles (kernel <-> osApiWrappers, ...): as jam did, the GNU
+  # linkers get them in one group that they rescan
+  foreach(lang C CXX)
+    set(CMAKE_${lang}_LINK_EXECUTABLE
+      "<CMAKE_${lang}_COMPILER> <FLAGS> <CMAKE_${lang}_LINK_FLAGS> <LINK_FLAGS> <OBJECTS> -o <TARGET> -Wl,--start-group <LINK_LIBRARIES> -Wl,--end-group")
+    set(CMAKE_${lang}_CREATE_SHARED_LIBRARY
+      "<CMAKE_${lang}_COMPILER> <CMAKE_SHARED_LIBRARY_${lang}_FLAGS> <LANGUAGE_COMPILE_FLAGS> <LINK_FLAGS> <CMAKE_SHARED_LIBRARY_CREATE_${lang}_FLAGS> <SONAME_FLAG><TARGET_SONAME> -o <TARGET> <OBJECTS> -Wl,--start-group <LINK_LIBRARIES> -Wl,--end-group")
+  endforeach()
+endif()
 
 add_library(DagorBuildSettings INTERFACE)
 add_library(Dagor::BuildSettings ALIAS DagorBuildSettings)
@@ -107,7 +117,8 @@ function(_dagor_flags target kind cond)
   if(kind STREQUAL "COMPILE")
     target_compile_options(${target} INTERFACE "${item}")
   elseif(kind STREQUAL "DEFINE")
-    target_compile_definitions(${target} INTERFACE "${item}")
+    # not for the assemblers: jam passed them only include dirs and their own options
+    target_compile_definitions(${target} INTERFACE "$<$<COMPILE_LANGUAGE:C,CXX,OBJC,OBJCXX,RC>:${item}>")
   elseif(kind STREQUAL "LINK")
     target_link_options(${target} INTERFACE "${item}")
   elseif(kind STREQUAL "LIBS")

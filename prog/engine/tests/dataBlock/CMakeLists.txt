@@ -1,0 +1,30 @@
+# DataBlock (BLK) unit tests
+dagor_add_catch2_test(datablock-tests
+  TAGS engine
+  SOURCES
+    main.cpp
+    test_construction.cpp
+    test_params.cpp
+    test_blocks.cpp
+    test_loading.cpp
+    test_saving.cpp
+    test_type_safety.cpp
+    test_tree_ops.cpp
+    test_iteration.cpp
+    test_comparison.cpp
+    test_dedup.cpp
+    test_errors.cpp
+    test_robust.cpp
+    test_edge_cases.cpp
+    test_malformed_binary.cpp
+    test_no_includes.cpp
+  DEPS
+    engine/memory
+    engine/kernel
+    engine/osApiWrappers
+    engine/baseUtil
+    engine/ioSys
+    engine/math
+    engine/perfMon/daProfilerStub
+    3rdPartyLibs/eastl
+)

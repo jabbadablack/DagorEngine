@@ -139,6 +139,10 @@ class Parser:
     if t in ('for', 'switch', 'rule', 'while', 'actions'):
       return ('other', ' '.join(self.skip_braced()))
     if t == 'local':
+      if self.peek(2) in ('=', '+='):
+        self.next()
+        var, op = self.next(), self.next()
+        return ('assign', var, op, self.until_semicolon())
       words = self.until_semicolon()
       return ('other', ' '.join(words) + ' ;')
     if t == '{':
@@ -174,6 +178,9 @@ class Untranslatable(Exception):
 def value(word, kind):
   """A jam word as a CMake list item; Untranslatable for variables it does not know."""
   w = word
+  if w == '$(Root)/$(Location)':
+    return '${CMAKE_CURRENT_SOURCE_DIR}'
+  w = re.sub(r'^\$\(Root\)/\$\(Location\)/', '', w)
   w = w.replace('$(Root)/prog/', '${DAGOR_PROG_DIR}/').replace('$(Root)/', '${DAGOR_ENGINE_ROOT}/')
   w = re.sub(r'^\$\(Location\)/', '', w)
   w = w.replace('$(Platform)', '${DAGOR_PLATFORM}').replace('$(PlatformArch)', '${DAGOR_ARCH}')
@@ -260,7 +267,9 @@ def condition(words):
     if op == '!=':
       if not lits:
         return 'TRUE'
-      return 'NOT {} STREQUAL "{}"'.format(cvar(var), lits[0])
+      if len(lits) == 1:
+        return 'NOT {} STREQUAL "{}"'.format(cvar(var), lits[0])
+      return 'NOT {} MATCHES "^({})$"'.format(cvar(var), '|'.join(re.escape(l) for l in lits))
     raise Untranslatable(op)
 
   while i < len(words):
@@ -308,6 +317,39 @@ class Converter:
     self.used = set()
     self.after_build = False
     self.todo = 0
+    self.user_vars = set()
+    self.derived = 0
+
+  def refs(self, depth, values):
+    """values with $(V) and $(V:D=dir) of the jamfile's own list variables as CMake ${...}"""
+    out = []
+    for v in values:
+      m = re.fullmatch(r'\$\((\w+)(?::D=([^)]*))?\)', v)
+      if m and m.group(1) in self.user_vars:
+        if m.group(2) is None:
+          out.append('${' + m.group(1) + '}')
+        else:
+          self.derived += 1
+          name = '_{}_{}'.format(m.group(1), self.derived)
+          self.emit(depth, 'set({} ${{{}}})'.format(name, m.group(1)))
+          self.emit(depth, 'list(TRANSFORM {} PREPEND "{}/")'.format(name, value(m.group(2), 'dirs')))
+          out.append('${' + name + '}')
+      else:
+        out.append(v)
+    return out
+
+  def autoscan(self, depth, src):
+    """AutoscanBuildLists <dirs> : <pattern> : Sources [: <exclude regex>] ;"""
+    groups = [g.split() for g in src.rstrip(' ;').split(' : ')]
+    groups[0] = groups[0][1:]
+    if len(groups) < 3 or groups[2] != ['Sources']:
+      raise Untranslatable(src)
+    dirs = [value(d, 'dirs') for d in self.refs(depth, groups[0])]
+    line = 'dagor_glob_sources(sources DIRS {} GLOB {}'.format(' '.join(dirs), ' '.join(groups[1]))
+    if len(groups) > 3:
+      line += ' EXCLUDE "{}"'.format(' '.join(groups[3]).replace('\\\\', '\\'))
+    self.emit(depth, line + ')')
+    self.used.add('sources')
 
   def emit(self, depth, text):
     self.lines.append('  ' * depth + text.replace(' \n', '\n'))
@@ -318,6 +360,11 @@ class Converter:
       self.emit(depth, ('# TODO(jam): ' if i == 0 else '#   ') + part.strip())
 
   def assign(self, depth, var, op, values, src):
+    try:
+      values = self.refs(depth, values)
+    except Untranslatable:
+      self.todo_line(depth, src)
+      return
     if var in LIST_VARS:
       name = LIST_VARS[var]
       try:
@@ -347,12 +394,16 @@ class Converter:
     if var in SCALAR_VARS and depth == 0 and op in ('=', '?='):
       self.scalars[var] = values
       return
-    if var in ('AllSrcFolder_CPP', 'AllSrcFolder_C'):
+    # the jamfile's own lists of sources and dirs
+    if re.search(r'(?i)(sources|src|folder|dirs?|files)', var) and op in ('=', '+=', '?='):
       try:
-        self.emit(depth, 'list(APPEND source_dirs {})'.format(cmake_values([value(v, 'dirs') for v in values])))
-        self.used.add('source_dirs')
+        vals = [value(v, 'dirs') for v in values]
       except Untranslatable:
         self.todo_line(depth, src)
+        return
+      head = ('list(APPEND {} ' if op == '+=' and var in self.user_vars else 'set({} ').format(var)
+      self.emit(depth, head + cmake_values(vals, depth, head) + ')')
+      self.user_vars.add(var)
       return
     self.todo_line(depth, src)
 
@@ -378,6 +429,9 @@ class Converter:
             self.scalars['unitTest'] = True
           if base == 'build.jam':
             self.after_build = True
+        elif base == 'add_null_include.jam':
+          self.emit(depth, 'list(APPEND force_includes supp/dag_null.h)')
+          self.used.add('force_includes')
         else:
           self.todo_line(depth, src)
       elif kind == 'if':
@@ -409,6 +463,11 @@ class Converter:
             self.statements(else_block, depth)
         if emitted:
           self.emit(depth, 'endif()')
+      elif s[1].startswith('AutoscanBuildLists '):
+        try:
+          self.autoscan(depth, s[1])
+        except Untranslatable:
+          self.todo_line(depth, s[1])
       else:
         self.todo_line(depth, s[1])
 
@@ -451,7 +510,7 @@ class Converter:
         args.append('OUTPUT_DIR ' + value(s['OutDir'][0], 'dirs'))
       except Untranslatable:
         self.todo_line(0, 'OutDir = {} ;'.format(' '.join(s['OutDir'])))
-    for var, kw in (('sources', 'SOURCES'), ('source_dirs', 'SOURCE_DIRS'), ('includes', 'PRIVATE_INCLUDES'),
+    for var, kw in (('sources', 'SOURCES'), ('force_includes', 'FORCE_INCLUDES'), ('includes', 'PRIVATE_INCLUDES'),
                     ('defines', 'PRIVATE_DEFINES'), ('options', 'COMPILE_OPTIONS'), ('c_options', 'C_OPTIONS'),
                     ('source_options', 'SOURCE_OPTIONS'), ('deps', 'DEPS'), ('libs', 'SYSTEM_LIBS'),
                     ('link_options', 'LINK_OPTIONS')):
