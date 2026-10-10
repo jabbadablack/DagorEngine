@@ -174,6 +174,11 @@ elseif(DAGOR_PLATFORM STREQUAL "linux")
   endif()
 elseif(DAGOR_PLATFORM STREQUAL "macOS")
   _dagor_settings(DEFINE 1 _TARGET_PC=2 _TARGET_PC_MACOSX=2 _TARGET_APPLE=1 _TARGET_64BIT __MACOSX__)
+  if(CMAKE_GENERATOR STREQUAL "Xcode")
+    # Xcode's default build settings add warnings of their own; the one clang does not enable anyway is turned off, so
+    # the project builds as it does with Ninja
+    set(CMAKE_XCODE_ATTRIBUTE_GCC_WARN_64_TO_32_BIT_CONVERSION NO)
+  endif()
   _dagor_settings(DEFINE "${_dbg}" DAS_FUSION=0)
   # a universal binary compiles each file for both archs, so the arch settings go to one -arch each
   set(_x64 -D_TARGET_ARCH_X86_64 -D_TARGET_SIMD_SSE=${DAGOR_SSE} -msse4.1)
