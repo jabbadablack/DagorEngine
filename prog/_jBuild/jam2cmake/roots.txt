@@ -47,3 +47,7 @@ maxplug prog/tools -sRoot=../.. -sMaxVer=Max2024 -f maxplug/jamfile
 
 # DAGOR_VARIANT=dargbox
 dargbox prog/tools -sRoot=../.. -f dargbox/jamfile
+
+# the dng-empty template (Phase 3): the client and the dedicated server, in the project's tree
+game templates/dng-empty/prog
+game-dedicated templates/dng-empty/prog -sDedicated=yes

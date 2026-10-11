@@ -1,0 +1,47 @@
+{
+  "version": 10,
+  "$comment": "The game's presets: <platform>-client and <platform>-dedicated. Build presets build Dev; pass --config Rel|IRel|Dbg for another configuration. Local presets go into CMakeUserPresets.json (ignored by git).",
+  "cmakeMinimumRequired": {
+    "major": 4,
+    "minor": 0,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja Multi-Config",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": { "DAGOR_VARIANT": "game" }
+    },
+    { "name": "on-windows", "hidden": true,
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Windows" } },
+    { "name": "on-linux", "hidden": true,
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" } },
+    { "name": "on-macos", "hidden": true,
+      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Darwin" } },
+    { "name": "windows", "hidden": true, "inherits": ["base", "on-windows"],
+      "cacheVariables": { "DAGOR_PLATFORM": "windows", "DAGOR_ARCH": "x86_64", "DAGOR_COMPILER": "clang" } },
+    { "name": "linux", "hidden": true, "inherits": ["base", "on-linux"],
+      "cacheVariables": { "DAGOR_PLATFORM": "linux", "DAGOR_ARCH": "x86_64", "DAGOR_COMPILER": "gcc" } },
+    { "name": "macos", "hidden": true, "inherits": ["base", "on-macos"],
+      "cacheVariables": { "DAGOR_PLATFORM": "macOS", "DAGOR_COMPILER": "clang" } },
+    { "name": "dedicated", "hidden": true, "cacheVariables": { "DAGOR_DEDICATED": "ON" } },
+
+    { "name": "windows-client", "displayName": "Game client: Windows x64, clang-cl", "inherits": ["windows"] },
+    { "name": "windows-dedicated", "displayName": "Dedicated server: Windows x64, clang-cl",
+      "inherits": ["windows", "dedicated"] },
+    { "name": "linux-client", "displayName": "Game client: Linux x86_64, gcc", "inherits": ["linux"] },
+    { "name": "linux-dedicated", "displayName": "Dedicated server: Linux x86_64, gcc", "inherits": ["linux", "dedicated"] },
+    { "name": "macos-client", "displayName": "Game client: macOS, clang", "inherits": ["macos"] },
+    { "name": "macos-dedicated", "displayName": "Dedicated server: macOS, clang", "inherits": ["macos", "dedicated"] }
+  ],
+  "buildPresets": [
+    { "name": "windows-client", "configurePreset": "windows-client", "configuration": "Dev" },
+    { "name": "windows-dedicated", "configurePreset": "windows-dedicated", "configuration": "Dev" },
+    { "name": "linux-client", "configurePreset": "linux-client", "configuration": "Dev" },
+    { "name": "linux-dedicated", "configurePreset": "linux-dedicated", "configuration": "Dev" },
+    { "name": "macos-client", "configurePreset": "macos-client", "configuration": "Dev" },
+    { "name": "macos-dedicated", "configurePreset": "macos-dedicated", "configuration": "Dev" }
+  ]
+}

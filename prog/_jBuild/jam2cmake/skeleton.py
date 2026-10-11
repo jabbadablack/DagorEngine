@@ -6,6 +6,9 @@ UseProgLibs, CPPopt, AddLibs, ...), 'opt on <file>', Autoscan source dirs, and '
 KernelLinkage, PlatformSpec, SSEVersion and Sanitize. Branches only consoles take are dropped. What it cannot translate
 is kept as '# TODO(jam): <statement>' at its place, to be ported by hand (the CI lint fails on TODO(jam) in ported dirs).
 
+A game module (build_module.jam) becomes dagor_add_dng_module(); a library's _lib.jam and _aot.jam (what it adds to the
+game and to its AOT compiler) become _lib.cmake and _aot.cmake with dagor_game_lib() calls.
+
 python skeleton.py <jamfile>... [--write] [--force]   -- prints the CMakeLists.txt, or writes it next to the jamfile
 """
 import argparse
@@ -18,12 +21,18 @@ ENGINE = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)
 CONSOLES = {'ps4', 'ps5', 'xboxOne', 'scarlett', 'nswitch'}
 PLATFORMS = {'windows', 'linux', 'macOS', 'iOS', 'tvOS', 'android'}
 ARCHS = {'x86_64': 'x86_64', 'arm64': 'arm64', 'arm64-v8a': 'arm64', 'e2k': 'e2k'}
-# jam switches whose value is fixed in CMake builds: the vendored OpenSSL and libcurl, NEON on Android arm64
-CONSTANT_VARS = {'UseSystemOpenSSL': 'no', 'UseSystemLibcurl': 'no', 'AndroidHasNeon': 'yes'}
+# jam switches whose value is fixed in CMake builds: the vendored OpenSSL and libcurl, NEON on Android arm64, no APEX
+CONSTANT_VARS = {'UseSystemOpenSSL': 'no', 'UseSystemLibcurl': 'no', 'AndroidHasNeon': 'yes',
+                 'UseApex': 'no'}  # the fork has no APEX
 # jam yes/no switches that are CMake tree options
 BOOL_VARS = {'NeedDasAotCompile': 'DAGOR_DAS_AOT', 'NeedDasLLVMAotCompile': 'DAGOR_DAS_LLVM_AOT',
              'Dedicated': 'DAGOR_DEDICATED', 'ForceLogs': 'DAGOR_FORCE_LOGS', 'BreakpadEnabled': 'DAGOR_BREAKPAD',
-             'SqVarTrace': 'DAGOR_SQ_VAR_TRACE'}
+             'SqVarTrace': 'DAGOR_SQ_VAR_TRACE', 'BuildingTools': 'DAGOR_BUILDING_TOOLS',
+             # the game's switches (DagorGame.cmake; those jam turned off in Rel are generator expressions, not here)
+             'HaveRenderer': 'DAGOR_GAME_RENDERER', 'HaveFx': 'DAGOR_GAME_FX', 'HaveSound': 'DAGOR_GAME_SOUND',
+             'HaveSoundNet': 'DAGOR_GAME_SOUND_NET', 'HaveOverlayUI': 'DAGOR_GAME_OVERLAY_UI',
+             'HaveDngInput': 'DAGOR_GAME_DNG_INPUT', 'HaveEmbeddedBrowser': 'DAGOR_GAME_EMBEDDED_BROWSER',
+             'HaveAssetManager': 'DAGOR_GAME_ASSET_MANAGER', 'BVHSupport': 'DAGOR_GAME_BVH'}
 CONDITION_VARS = {'Platform': 'DAGOR_PLATFORM', 'PlatformArch': 'DAGOR_ARCH', 'KernelLinkage': 'DAGOR_KERNEL_LINKAGE',
                   'SSEVersion': 'DAGOR_SSE', 'Sanitize': 'DAGOR_SANITIZE', 'PlatformSpec': 'DAGOR_CC'}
 LIST_VARS = {'Sources': 'sources', 'AddIncludes': 'includes', 'UseProgLibs': 'deps', 'CPPopt': 'cpp_opt',
@@ -199,6 +208,8 @@ def value(word, kind):
   w = w.replace('$(Root)/prog/', '${DAGOR_PROG_DIR}/').replace('$(Root)/', '${DAGOR_ENGINE_ROOT}/')
   w = re.sub(r'^\$\(Location\)/', '', w)
   w = w.replace('$(Platform)', '${DAGOR_PLATFORM}').replace('$(PlatformArch)', '${DAGOR_ARCH}')
+  if kind == 'deps' and re.fullmatch(r'(\$\(Root\)/prog/)?engine/phys/phys\$\(PhysName\)', word):
+    return 'Dagor::Phys'  # the tree's physics engine
   for var, fixed in FIXED_VERSIONS.items():
     w = w.replace('$({})'.format(var), fixed)
   if '$(' in w or '[' in w:
@@ -346,6 +357,8 @@ def condition(words):
 class Converter:
   def __init__(self, jamfile):
     self.jamfile = jamfile
+    # a library's _lib.jam / _aot.jam: what it adds to the game (or its AOT compiler), dagor_game_lib() calls
+    self.lib_mode = os.path.basename(jamfile) in ('_lib.jam', '_aot.jam')
     self.lines = []
     self.scalars = {}
     self.used = set()
@@ -353,6 +366,7 @@ class Converter:
     self.todo = 0
     self.user_vars = set()
     self.derived = 0
+    self.locals = {}
 
   def refs(self, depth, values):
     """values with $(V) and $(V:D=dir) of the jamfile's own list variables as CMake ${...}"""
@@ -374,14 +388,14 @@ class Converter:
 
   def stringify(self, depth, src):
     """StringifySourceFile <f> : <f>.inl : <user> [: --array] ; alone or in a for loop over a list; True if done"""
-    m = re.fullmatch(r'for (\w+) in \$\((\w+)\) \{ StringifySourceFile \$\(\1\) : \$\(\1\)\.inl : \S+ ;'
-                     r'(?: : (--array|--full-string) ;)? \}', src.strip())
+    m = re.fullmatch(r'for (\w+) in \$\((\w+)\) \{ StringifySourceFile \$\(\1\) : \$\(\1\)\.inl : \S+'
+                     r'(?: :(?: (--array|--full-string))?)? ; \}', src.strip())
     if m and m.group(2) in self.user_vars and m.group(3) != '--full-string':
       var = 'stringify_array' if m.group(3) else 'stringify'
       self.emit(depth, 'list(APPEND {} ${{{}}})'.format(var, m.group(2)))
       self.used.add(var)
       return True
-    m = re.fullmatch(r'StringifySourceFile (\S+) : \1\.inl : \S+(?: : (--array))? ;', src.strip())
+    m = re.fullmatch(r'StringifySourceFile (\S+) : \1\.inl : \S+(?: :(?: (--array))?)? ;', src.strip())
     if m and '$(' not in m.group(1):
       var = 'stringify_array' if m.group(2) else 'stringify'
       self.emit(depth, 'list(APPEND {} {})'.format(var, m.group(1)))
@@ -393,14 +407,22 @@ class Converter:
     """AutoscanBuildLists <dirs> : <pattern> : Sources [: <exclude regex>] ;"""
     groups = [g.split() for g in src.rstrip(' ;').split(' : ')]
     groups[0] = groups[0][1:]
-    if len(groups) < 3 or groups[2] != ['Sources']:
+    if len(groups) < 3 or len(groups[2]) != 1:
+      raise Untranslatable(src)
+    out = groups[2][0]
+    if out == 'Sources':
+      out = 'sources'
+    elif groups[1] == ['*ES.cpp.inl']:
+      self.user_vars.add(out)  # the entity systems, for the ES codegen loop that follows
+    else:
       raise Untranslatable(src)
     dirs = [value(d, 'dirs') for d in self.refs(depth, groups[0])]
-    line = 'dagor_glob_sources(sources DIRS {} GLOB {}'.format(' '.join(dirs), ' '.join(groups[1]))
+    line = 'dagor_glob_sources({} DIRS {} GLOB {}'.format(out, ' '.join(dirs), ' '.join(groups[1]))
     if len(groups) > 3:
       line += ' EXCLUDE "{}"'.format(' '.join(groups[3]).replace('\\\\', '\\'))
     self.emit(depth, line + ')')
-    self.used.add('sources')
+    if out == 'sources':
+      self.used.add('sources')
 
   def emit(self, depth, text):
     self.lines.append('  ' * depth + text.replace(' \n', '\n'))
@@ -411,10 +433,33 @@ class Converter:
       self.emit(depth, ('# TODO(jam): ' if i == 0 else '#   ') + part.strip())
 
   def assign(self, depth, var, op, values, src):
+    if depth == 0 and op == '=':
+      self.locals[var] = values  # for the Location check (Location = prog/$(LibPath) ;)
     try:
       values = self.refs(depth, values)
     except Untranslatable:
       self.todo_line(depth, src)
+      return
+    if self.lib_mode and var == 'R':
+      return  # local R = prog/<lib> ; of the sources below
+    if self.lib_mode and var == 'Sources' and op == '+=':
+      # engine-relative sources ($(R)/<file>, prog/<file>) compiled into the game or its AOT compiler
+      files = [re.sub(r'\$\((\w+)\)', lambda m: ' '.join(self.locals.get(m.group(1), [m.group(0)])), v) for v in values]
+      if any('$(' in f or not f.startswith('prog/') for f in files):
+        self.todo_line(depth, src)
+        return
+      head = 'dagor_game_lib(SOURCES '
+      self.emit(depth, head + cmake_values(['${DAGOR_ENGINE_ROOT}/' + f for f in files], depth, head) + ')')
+      return
+    if self.lib_mode and var in ('UseProgLibs', 'AddIncludes') and op == '+=':
+      kind = 'deps' if var == 'UseProgLibs' else 'includes'
+      try:
+        vals = [value(v, kind) for v in values]
+      except Untranslatable:
+        self.todo_line(depth, src)
+        return
+      head = 'dagor_game_lib({} '.format('DEPS' if kind == 'deps' else 'INCLUDES')
+      self.emit(depth, head + cmake_values(vals, depth, head) + ')')
       return
     if var in LIST_VARS:
       name = LIST_VARS[var]
@@ -442,6 +487,27 @@ class Converter:
           self.emit(depth, 'set({})'.format(name))
         self.used.add(name)
       return
+    # game modules (build_module.jam): dagor_add_dng_module
+    if var == 'Module' and depth == 0 and op == '=' and len(values) == 1:
+      self.scalars['Module'] = values
+      return
+    if var == 'DasModule' and depth == 0:
+      self.scalars['DasModule'] = values
+      return
+    if var == 'ModuleDependsOnVars':
+      if 'PhysName' in values:  # build_module.jam includes setup-phys.jam then
+        self.emit(depth, 'list(APPEND deps Dagor::Phys)')
+        self.used.add('deps')
+      return  # otherwise only jam's naming of the library
+    if var == 'AddPullVars':
+      head = 'list(APPEND pull_vars '
+      self.emit(depth, head + cmake_values(values, depth, head) + ')')
+      self.used.add('pull_vars')
+      return
+    if var == 'gamePulls' and op == '+=':
+      head = 'dagor_game_lib(PULLS '
+      self.emit(depth, head + cmake_values(values, depth, head) + ')')
+      return
     if var in IGNORED_VARS or (var in FIXED_VERSIONS and values == [FIXED_VERSIONS[var]]):
       return
     if var == 'FullOOPEnabled' and depth == 0 and values == ['yes']:
@@ -449,6 +515,10 @@ class Converter:
       self.scalars['Exceptions'] = ['SEH']
       self.scalars['Rtti'] = ['yes']
       return
+    if var in BOOL_VARS and op == '?=':
+      return  # the default of a tree option
+    if var == 'Target' and depth > 0:
+      return  # jam named the library after its settings; a CMake tree has one
     if var in SCALAR_VARS and depth == 0 and op in ('=', '?='):
       self.scalars[var] = values
       return
@@ -505,6 +575,13 @@ class Converter:
           self.scalars['cdk'] = True
         elif base == 'add_quirrel.jam':
           self.scalars['quirrelHeaders'] = True
+        elif path.endswith('3rdPartyLibs/phys/setup-phys.jam'):
+          self.emit(depth, 'list(APPEND deps Dagor::Phys)')  # the tree's physics engine: its settings and library
+          self.used.add('deps')
+        elif path.endswith('prog/daNetGame/setup.jam'):
+          pass  # the game's switches are the tree's (DagorGame.cmake)
+        elif base == 'build_module.jam':
+          self.scalars['module'] = True
         elif base == 'add_null_include.jam':
           self.emit(depth, 'list(APPEND force_includes supp/dag_null.h)')
           self.used.add('force_includes')
@@ -555,6 +632,9 @@ class Converter:
         # the ES codegen of a list of <name>ES.cpp.inl (ES_SOURCES of dagor_add_*)
         var = re.fullmatch(r'for (\w+) in \$\((\w+)\).*', s[1]).group(2)
         self.emit(depth, 'list(APPEND es_sources ${{{}}})'.format(var))
+        self.used.add('es_sources')
+      elif re.fullmatch(r'GenESSourceFile [\w./]+ ;', s[1]):
+        self.emit(depth, 'list(APPEND es_sources {})'.format(s[1].split()[1]))
         self.used.add('es_sources')
       else:
         self.todo_line(depth, s[1])
@@ -642,7 +722,22 @@ class Converter:
                     ('stringify_array', 'STRINGIFY_ARRAY'), ('es_sources', 'ES_SOURCES')):
       if var in self.used:
         args.append('{} ${{{}}}'.format(kw, var))
-    if s.get('unitTest'):
+    if s.get('module'):
+      # build_module.jam: STRICT QUIRREL, its own sources; the dirs of the module's lists
+      args = [a for a in args if a not in ('STRICT', 'QUIRREL') and not a.startswith('SOURCES ')]
+      dirs = []
+      for var, kw in (('AllSrcFolder_CPP', 'CPP_DIRS'), ('AllSrcFolder_ES', 'ES_DIRS')):
+        if var in self.user_vars:
+          dirs.append('{} ${{{}}}'.format(kw, var))
+      if s.get('DasModule'):
+        dirs.append('DAS')
+        if 'AllSrcFolder_DAS' in self.user_vars:
+          dirs.append('DAS_DIRS ${AllSrcFolder_DAS}')
+      if 'pull_vars' in self.used:
+        dirs.append('PULL_VARS ${pull_vars}')
+      args = dirs + args
+      head = 'dagor_add_dng_module({}'.format((s.get('Module') or ['TODO'])[0])
+    elif s.get('unitTest'):
       head = 'dagor_add_catch2_test({}'.format(name)
     elif type_ == 'exe':
       head = 'dagor_add_executable({}'.format(name)
@@ -663,9 +758,15 @@ class Converter:
     stmts = Parser(tokens(text)).parse()
     body_start = len(self.lines)
     self.statements(stmts, 0)
-    self.lines.append('')
-    self.call()
     rel = os.path.relpath(self.jamfile, ENGINE).replace(os.sep, '/')
+    # the sources are relative to Location, which some jamfiles set to another dir than theirs
+    location = ' '.join(self.scalars.get('Location') or [])
+    location = re.sub(r'\$\((\w+)\)', lambda m: ' '.join(self.locals.get(m.group(1), [m.group(0)])), location)
+    if location and not self.lib_mode and os.path.normpath(location) != os.path.dirname(os.path.normpath(rel)):
+      self.todo_line(0, 'Location = {} ; (not the jamfile\'s dir: the paths are relative to it)'.format(location))
+    if not self.lib_mode:
+      self.lines.append('')
+      self.call()
     header = ['# Ported from {} (jam2cmake/skeleton.py{})'.format(
       rel, '; {} TODO(jam) to port by hand'.format(self.todo) if self.todo else '')]
     return '\n'.join(header + self.lines[body_start:]).replace('\n\n\n', '\n\n') + '\n'
@@ -684,7 +785,9 @@ def main(argv):
     if not args.write:
       sys.stdout.write(out)
       continue
-    dest = os.path.join(os.path.dirname(jamfile), 'CMakeLists.txt')
+    base = os.path.basename(jamfile)
+    dest = os.path.join(os.path.dirname(jamfile),
+                        base.replace('.jam', '.cmake') if base in ('_lib.jam', '_aot.jam') else 'CMakeLists.txt')
     if os.path.exists(dest) and not args.force:
       print('{} exists, skipped (--force overwrites)'.format(dest), file=sys.stderr)
       status = 1

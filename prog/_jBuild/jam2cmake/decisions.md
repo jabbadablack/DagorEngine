@@ -64,3 +64,29 @@ The tool trees (Phase 2):
   same code, which link.exe would fold; lld-link folds only what clang marks safe (/OPT:SAFEICF).
 - Checked against jam's tools: the GUI shader dumps (DX11, DX12, SPIR-V) are byte-identical; daBuild's output for
   outerSpace is identical except riDesc.bin, which jam's own daBuild writes differently on every run.
+
+The game trees (Phase 3):
+- A project's top-level CMakeLists.txt reads the engine root from engine.blk (DAGOR_ENGINE_ROOT overrides it), includes
+  the engine's DagorBootstrap.cmake and adds its prog/. The project's presets are self-contained (<platform>-client,
+  <platform>-dedicated): they set cache variables only, so they never name the engine's path.
+- As with jam, the executables go to <project>/game/<platform>-<arch> and the built content into <project>/game; only
+  intermediates are in build/<preset>.
+- daNetGame's switches (setup.jam's Have*, BVH, the D3D drivers, exceptions off, -march=haswell on Linux x86_64,
+  TIME_PROFILER_ENABLED=0 on the Linux servers) are tree settings (DagorOptions.cmake, DagorGame.cmake). Those jam
+  turned off in Rel only (the editor, webui, ImGui, the console) are generator expressions: daNetGame and the libraries
+  build the parts of some configurations only, and the entity systems and pulls of those parts follow.
+- dagor_add_dng_game() generates what game.jam wrote (gameproj::, the auth keys, the pull of every module); the libs of
+  danetgamelibs.txt / gamelibs.txt add themselves to the game through their _lib.cmake (jam's _lib.jam), and to the
+  AOT compiler through their _aot.cmake. Game modules (build_module.jam) are dagor_add_dng_module().
+- daFrameGraph's daScript and daECS integration (jam's DAFG_ENABLE_* globals) is the default target's in game trees
+  (DAGOR_DAFG_FEATURES); BVH's feature switches are DAGOR_BVH_STUBS.
+- daScript AOT: a sub-build of the project's own tree with DAGOR_DAS_AOT_COMPILER makes <game>-aot (Dev, under a lock,
+  in build/_host/aot-<host>), as jam's AotJamfile sub-build did; the game tree compiles the DAS_AOT scripts with it in
+  batches of 10 and names each target's pull (DAS_AOT_PULL).
+- daNetGame uses its precompiled header in every configuration (jam: Dev and Dbg); the Ninja generator cannot have a
+  precompiled header in some configurations only.
+- On Windows, CMake 4.2's SHORT intermediate dirs keep the objects of a project tree's engine dirs under MAX_PATH.
+- Checked: the Windows dedicated server of dng-empty registers the same component types, components and entity systems
+  as jam's (its startup log is identical but for dates), and the 78 entity systems' generated code it compiles is
+  byte-identical to the committed .gen.es.cpp files. A jam build from a project rewrites those committed files with
+  absolute paths; the CMake build never writes into the source tree.

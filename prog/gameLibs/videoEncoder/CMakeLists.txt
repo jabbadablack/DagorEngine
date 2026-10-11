@@ -1,0 +1,12 @@
+# Ported from prog/gameLibs/videoEncoder/jamfile (jam2cmake/skeleton.py)
+if(DAGOR_PLATFORM STREQUAL "windows")
+  set(sources videoEncoder.cpp)
+else()
+  set(sources videoEncoderStub.cpp)
+endif()
+if(DAGOR_PLATFORM STREQUAL "windows")
+  list(APPEND libs mfuuid Winmm)
+endif()
+list(APPEND includes ${DAGOR_PROG_DIR}/gameLibs/publicInclude ${DAGOR_PROG_DIR}/engine/drv/drv3d_commonCode)
+
+dagor_add_library(SOURCES ${sources} PRIVATE_INCLUDES ${includes} SYSTEM_LIBS ${libs})

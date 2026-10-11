@@ -1,0 +1,11 @@
+# Ported from prog/3rdPartyLibs/libev/jamfile (jam2cmake/skeleton.py)
+set(sources ev.c)
+if(DAGOR_PLATFORM STREQUAL "linux" AND DAGOR_SANITIZE STREQUAL "thread")
+  list(APPEND c_options -Wno-tsan -fno-sanitize=thread)
+endif()
+if(DAGOR_CC MATCHES "^(clang|clang\-cl|gcc)$")
+  list(APPEND c_options -Wno-unused-parameter)
+endif()
+set(defines HAVE_CONFIG_H)
+
+dagor_add_library(SOURCES ${sources} PRIVATE_DEFINES ${defines} C_OPTIONS ${c_options})

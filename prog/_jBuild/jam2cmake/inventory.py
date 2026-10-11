@@ -29,6 +29,8 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 DIGEST = re.compile(r'^\s*echo digest_(\w+) = (.*?) ; >>(\S+)\.digest\s*$')
 COMPILE = re.compile(r'^\s*call_filtered (\S+) (.*?)#\\\((.*)\)\\#\s*$')
 OUTPUT_DIR = re.compile(r'_output/([^/]+)/_(.+?\.(?:lib|a|exe|dll|so|dylib))(?:/|$)')  # objects of subdirs too
+# targets with a TargetCodeName (daNetGame.framework, daNetGameLibs-<module>.framework, the game): a dir of that name
+CODE_NAME_DIR = re.compile(r'_output/([^/]+)/_([^/]+?)(?:\.framework)?(?:/|$)')
 COMPILERS = {'cl', 'clang-cl', 'clang', 'clang++', 'gcc', 'g++', 'lcc', 'l++'}
 
 
@@ -96,7 +98,7 @@ def parse(dump, cwd):
   def target(out_path):
     # not normalized: jam places the objects of a library's ../ sources under its dir with the ../ kept
     path = os.path.join(ENGINE, cwd, out_path).replace(os.sep, '/')
-    m = OUTPUT_DIR.search(path)
+    m = OUTPUT_DIR.search(path) or CODE_NAME_DIR.search(path)
     if not m:
       return None
     cfg, name = m.group(1), m.group(2)

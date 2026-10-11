@@ -67,24 +67,9 @@ set(deps
 dagor_use(gameLibs/render/debugMesh gameLibs/render/debugMesh/stub)
 list(APPEND deps "$<IF:$<CONFIG:Rel>,gameLibs.render.debugMesh.stub,gameLibs.render.debugMesh>")
 set(options)
-if(DAGOR_CC MATCHES "^(clang|clang-cl|gcc)$")
-  # no fused multiply-adds: the generated positions must match on every platform (contract=off alone does not stop
-  # the backend from fusing under fast-math)
-  set(xclang -)
-  if(DAGOR_CC STREQUAL "clang-cl")
-    set(xclang /clang:-)
-  endif()
-  if(DAGOR_CC MATCHES "^(clang|clang-cl)$")
-    list(APPEND options -Wno-overriding-option)
-  endif()
-  if(DAGOR_PLATFORM MATCHES "^(iOS|linux|macOS)$")
-    list(APPEND options -Wno-overriding-t-option)
-  endif()
-  list(APPEND options ${xclang}fno-unsafe-math-optimizations ${xclang}ffp-contract=off)
-  if(DAGOR_ARCH STREQUAL "x86_64")
-    list(APPEND options ${xclang}mno-fma)
-  endif()
-endif()
+# no fused multiply-adds: the generated positions must match on every platform (contract=off alone does not stop
+# the backend from fusing under fast-math)
+dagor_deterministic_fp(options KEEP_TRAPPING_MATH)
 
 dagor_add_library(STRICT
   SOURCES ${sources}

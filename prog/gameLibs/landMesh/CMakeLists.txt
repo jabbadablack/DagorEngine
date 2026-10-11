@@ -41,23 +41,8 @@ list(APPEND sources "$<IF:${debug},${dir}/clipmapDebug.cpp,${dir}/clipmapDebugSt
 dagor_use(3rdPartyLibs/imgui engine/imgui)
 list(APPEND deps "$<${debug}:3rdPartyLibs.imgui>" "$<${debug}:engine.imgui>")
 set(options)
-if(DAGOR_CC MATCHES "^(clang|clang-cl|gcc)$")
-  # no fused multiply-adds and no unsafe math: the land heights must match on every platform
-  set(xclang -)
-  if(DAGOR_CC STREQUAL "clang-cl")
-    set(xclang /clang:-)
-  endif()
-  if(DAGOR_CC MATCHES "^(clang|clang-cl)$")
-    list(APPEND options -Wno-overriding-option)
-  endif()
-  if(DAGOR_PLATFORM MATCHES "^(iOS|linux|macOS)$")
-    list(APPEND options -Wno-overriding-t-option)
-  endif()
-  list(APPEND options ${xclang}fno-unsafe-math-optimizations ${xclang}fno-trapping-math ${xclang}ffp-contract=off)
-  if(DAGOR_ARCH STREQUAL "x86_64")
-    list(APPEND options ${xclang}mno-fma)
-  endif()
-endif()
+# no fused multiply-adds and no unsafe math: the land heights must match on every platform
+dagor_deterministic_fp(options)
 list(APPEND defines VECMATH_NO_FMA) # v_madd on NEON is explicit vfmaq that ignores ffp-contract=off
 
 dagor_add_library(SOURCES ${sources}

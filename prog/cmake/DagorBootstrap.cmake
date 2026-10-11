@@ -86,6 +86,12 @@ else()
 endif()
 unset(_dagor_multi_config)
 
+# the objects of Windows builds under hashed dir and file names: the engine dirs of a project tree are deep enough for
+# the full names to pass MAX_PATH (CMake 4.2)
+if(CMAKE_HOST_WIN32 AND CMAKE_VERSION VERSION_GREATER_EQUAL 4.2)
+  set(CMAKE_INTERMEDIATE_DIR_STRATEGY SHORT CACHE STRING "Target intermediate dirs: FULL or SHORT (hashed names)")
+endif()
+
 # a compiler cache (sccache, then ccache) for the Ninja and Makefile generators
 set(DAGOR_COMPILER_LAUNCHER auto CACHE STRING "Compiler cache: auto, none or a path")
 if(NOT CMAKE_GENERATOR MATCHES "Visual Studio|Xcode" AND NOT DAGOR_COMPILER_LAUNCHER STREQUAL "none"

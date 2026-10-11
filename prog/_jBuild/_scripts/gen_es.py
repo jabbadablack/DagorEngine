@@ -18,6 +18,19 @@ def is_es_name(name):
        or name.endswith(es_suffix + event_handler_suffix)
 
 
+# @<file> arguments: the arguments in that file, one per line (the CMake build passes the compiler's that way)
+def expand_response_files(args):
+  result = []
+  for arg in args:
+    if arg.startswith('@') and os.path.isfile(arg[1:]):
+      with io.open(arg[1:], 'rt', encoding='utf-8') as f:
+        result += [line.rstrip(chr(13) + chr(10)) for line in f if line.strip()]
+    else:
+      result.append(arg)
+  return result
+
+sys.argv = expand_response_files(sys.argv)
+
 if len(sys.argv) < 4:
   print("ERROR: expected 3 arguments.\nUsage: gen_es.py input output rel_path_for_include [CHECK]")
   sys.exit(1)

@@ -1,0 +1,12 @@
+# Ported from prog/gameLibs/ioEventsPoll/jamfile (jam2cmake/skeleton.py)
+set(includes ${DAGOR_PROG_DIR}/3rdPartyLibs/libev ${DAGOR_PROG_DIR}/gameLibs/publicInclude)
+if(DAGOR_PLATFORM STREQUAL "windows")
+  list(APPEND includes ${DAGOR_PROG_DIR}/3rdPartyLibs/posix/include/win32)
+endif()
+if(DAGOR_PLATFORM MATCHES "^(iOS|macOS|tvOS)$")
+  set(options -Wno-c++1z-compat-mangling)
+endif()
+list(APPEND deps 3rdPartyLibs/libev)
+set(sources ioEventsPoll.cpp)
+
+dagor_add_library(SOURCES ${sources} PRIVATE_INCLUDES ${includes} COMPILE_OPTIONS ${options} DEPS ${deps})

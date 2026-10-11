@@ -1,0 +1,12 @@
+# Ported from prog/engine/daECS/net/jamfile (jam2cmake/skeleton.py)
+set(includes ${DAGOR_PROG_DIR}/3rdPartyLibs/enet/include ${DAGOR_PROG_DIR}/3rdPartyLibs/arc)
+list(APPEND deps engine/daNet engine/crypto 3rdPartyLibs/arc/lz4)
+dagor_glob_sources(sources DIRS . GLOB *.cpp)
+list(APPEND es_sources replicationES.cpp.inl)
+list(APPEND es_sources msgSinkES.cpp.inl)
+list(APPEND es_sources componentFiltersES.cpp.inl)
+list(APPEND es_sources netEventES.cpp.inl)
+list(APPEND es_sources netEventsES.cpp.inl)
+list(APPEND deps engine/daECS/io/datablock engine/daECS/core 3rdPartyLibs/eastl)
+
+dagor_add_library(STRICT SOURCES ${sources} PRIVATE_INCLUDES ${includes} DEPS ${deps} ES_SOURCES ${es_sources})

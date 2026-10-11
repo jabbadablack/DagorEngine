@@ -1,6 +1,7 @@
 # daFrameGraph: the render graph (node registry, IR, scheduling of passes, resources and barriers, runtime), with its
 # debug visualization in Dev and Dbg. Flavors combine with '.': das (daScript bindings), ecs (daECS node integration),
-# ut (the unit tests embedded in the sources, for daFrameGraph-tests); e.g. gameLibs/render/daFrameGraph:das.ecs
+# ut (the unit tests embedded in the sources, for daFrameGraph-tests); e.g. gameLibs/render/daFrameGraph:das.ecs. The
+# default target has the features of DAGOR_DAFG_FEATURES (a game's: das and ecs, DagorGame.cmake).
 
 function(_daFrameGraph flavor)
   set(sources
@@ -77,7 +78,11 @@ function(_daFrameGraph flavor)
   set(includes ${DAGOR_PROG_DIR}/gameLibs/publicInclude . ${DAGOR_PROG_DIR}/3rdPartyLibs/imgui
     ${DAGOR_PROG_DIR}/3rdPartyLibs/rapidjson/include)
   set(defines)
+  set(es)
   string(REPLACE "." ";" features "${flavor}")
+  if(flavor STREQUAL "")
+    set(features ${DAGOR_DAFG_FEATURES})
+  endif()
   foreach(feature IN LISTS features)
     if(feature STREQUAL "das")
       list(APPEND sources api/das/enumerations.cpp api/das/frameGraphModule.cpp api/das/nodeDataAnnotation.cpp
@@ -88,7 +93,7 @@ function(_daFrameGraph flavor)
       list(APPEND defines DAFG_UNIT_TESTS=1)
       list(APPEND includes ${DAGOR_PROG_DIR}/3rdPartyLibs/catch2/src)
     elseif(feature STREQUAL "ecs")
-      message(FATAL_ERROR "gameLibs/render/daFrameGraph:ecs needs the ES codegen of the CMake build, not ported yet")
+      set(es api/ecs/frameGraphNodeES.cpp.inl)
     else()
       message(FATAL_ERROR "gameLibs/render/daFrameGraph has no flavor '${feature}'")
     endif()
@@ -107,6 +112,7 @@ function(_daFrameGraph flavor)
     PRIVATE_DEFINES ${defines}
     COMPILE_OPTIONS ${options}
     DEPS ${deps}
+    ES_SOURCES ${es}
   )
 endfunction()
 

@@ -1,0 +1,16 @@
+# Ported from prog/engine/drv/hid_mouse/jamfile (jam2cmake/skeleton.py); on Linux for programs with the GUI layer
+# (DAGOR_LINUX_GUI)
+set(sources ms_device_common.cpp ms_classdrv_win.cpp ms_device_win.cpp)
+set(includes ${DAGOR_PROG_DIR}/engine/sharedInclude)
+if(DAGOR_PLATFORM STREQUAL "macOS")
+  list(APPEND sources macosx_ms_api.mm)
+endif()
+if(DAGOR_PLATFORM STREQUAL "linux")
+  list(APPEND sources linux_ms_api.cpp)
+  list(APPEND deps engine/osApiWrappers/linuxGUI)
+endif()
+if(DAGOR_PLATFORM STREQUAL "windows")
+  list(APPEND sources windows_ms_api.cpp)
+endif()
+
+dagor_add_library(SOURCES ${sources} PRIVATE_INCLUDES ${includes} DEPS ${deps})

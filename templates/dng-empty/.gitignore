@@ -21,3 +21,7 @@
 /develop/dabuild-dbg*
 *.das.inl
 *.pyc
+
+# CMake build trees (cmake --preset ...) and local presets
+/build/
+/CMakeUserPresets.json
