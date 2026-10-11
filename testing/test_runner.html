@@ -1,0 +1,233 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Test Runner</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=55b73dce" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster.custom.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster.bundle.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-shadow.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-punk.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-noir.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-light.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-borderless.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/micromodal.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/sphinx_rtd_theme.css?v=3234e928" />
+      <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css?v=6ad1a40c" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=fe408b2f" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/js/hoverxref.js"></script>
+      <script src="../_static/js/tooltipster.bundle.min.js"></script>
+      <script src="../_static/js/micromodal.min.js"></script>
+      <script src="../_static/js/versionwarning.js?v=d4224a34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=36754332"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CI and Devices" href="ci_and_devices.html" />
+    <link rel="prev" title="In-Game Tests (ECS and Scenarios)" href="in_game_tests.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Dagor Documentation
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dagor-home/index.html">Dagor Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/index.html">Getting Started with Dagor</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Testing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cpp_unit_tests.html">C++ Unit Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="das_unit_tests.html">daScript Unit Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="in_game_tests.html">In-Game Tests (ECS and Scenarios)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">The Test Runner</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#command-line">Command line</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manifests">Manifests</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#reports">Reports</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adding-a-test-target">Adding a test target</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="ci_and_devices.html">CI and Devices</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../assets/index.html">Assets and Assets Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dagor-tools/index.html">Dagor Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../projects/index.html">Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials and Manuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api-references/index.html">API References and Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Dagor Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Testing</a></li>
+      <li class="breadcrumb-item active">The Test Runner</li>
+  
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/testing/test_runner.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  <li class="wy-breadcrumbs-aside.github-icon">
+    <a href="https://github.com/GaijinEntertainment/DagorEngine" target="_blank" rel="noopener">
+      <img src="../_static/_images/github-mark.png"
+           alt="GitHub"
+           style="height: 1.5em; vertical-align: text-bottom; " />
+    </a>
+  </li>
+
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="the-test-runner">
+<h1>The Test Runner<a class="headerlink" href="#the-test-runner" title="Link to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">dng.py</span> <span class="pre">test</span></code> (engine root, implemented in <code class="docutils literal notranslate"><span class="pre">prog/tools/pythonCommon/dagorTest</span></code>) finds <code class="docutils literal notranslate"><span class="pre">test.blk</span></code> manifests, builds
+what they need with jam, runs the targets in parallel and writes the reports.</p>
+<section id="command-line">
+<h2>Command line<a class="headerlink" href="#command-line" title="Link to this heading"></a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>python dng.py test [run|build|list|report] [options]
+
+selection    --project DIR (repeatable)  --no-engine  --layer cpp,das,ecs,scenario,exec
+             -t TAG / --exclude-tag TAG  -k GLOB (target id)  -c NAME (test case, passed to the executables)
+build        --platform --arch --config (jam Platform, PlatformArch, Config; default: this machine, dev)
+             --jam-arg ARG  --no-build
+execution    -j N  --retries N  --timeout-scale F  --gpu auto|yes|no  --network  --update-references
+             --fail-fast  --device BACKEND[:ID]
+output       --out DIR  --junit FILE  --json FILE  --html FILE  --summary-md FILE  -v
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">build</span></code> only builds; <code class="docutils literal notranslate"><span class="pre">list</span></code> prints the selected targets; <code class="docutils literal notranslate"><span class="pre">report</span> <span class="pre">&lt;run</span> <span class="pre">dir&gt;</span></code> regenerates the reports of a run.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--gpu</span> <span class="pre">auto</span></code> (default) runs GPU targets, which skip themselves without a usable device; <code class="docutils literal notranslate"><span class="pre">--gpu</span> <span class="pre">yes</span></code> turns that skip
+into an error, <code class="docutils literal notranslate"><span class="pre">--gpu</span> <span class="pre">no</span></code> doesn’t run them.</p></li>
+<li><p>GPU and <code class="docutils literal notranslate"><span class="pre">serial</span></code> targets always run alone; others run <code class="docutils literal notranslate"><span class="pre">-j</span></code> at a time.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">--retries</span> <span class="pre">N</span></code> reruns failed targets; a target that passes on a retry is reported as <code class="docutils literal notranslate"><span class="pre">FLAKY</span></code> in its message.</p></li>
+</ul>
+</section>
+<section id="manifests">
+<h2>Manifests<a class="headerlink" href="#manifests" title="Link to this heading"></a></h2>
+<p>A <code class="docutils literal notranslate"><span class="pre">test.blk</span></code> holds one or more targets. Engine manifests are found under <code class="docutils literal notranslate"><span class="pre">prog/</span></code>, project manifests under each
+<code class="docutils literal notranslate"><span class="pre">--project</span></code> root (except its <code class="docutils literal notranslate"><span class="pre">game</span></code>, <code class="docutils literal notranslate"><span class="pre">develop</span></code> and <code class="docutils literal notranslate"><span class="pre">tools</span></code> dirs). Paths are relative to the manifest.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>target{
+  name:t="gameLibs.foo"      // unique id, used by -k and in reports
+  layer:t="cpp"              // cpp | das | ecs | scenario | exec
+  tag:t="gameLibs"           // repeatable
+  platform:t="windows"       // repeatable; omitted: every platform
+  requires:t="http_server"   // repeatable: gpu | display | network | http_server
+  timeout:r=600              // whole target, seconds (default 600)
+  caseTimeout:r=60           // single test case, seconds
+  serial:b=yes               // never in parallel with other targets
+  args:t='--extra "quoted arg"'
+
+  // cpp:      jamfile, exe (jam Target), dataDir (default "."), exeDir (default: the shared test OutDir)
+  // das:      path (repeatable), project, isolated
+  // ecs:      path (repeatable), scene, game (dedicated | client)
+  // scenario: path (repeatable), scene, game (client | dedicated)
+  // exec:     command, cwd, jamfile (built first), exe (a jam executable target, available as {exe})
+}
+</pre></div>
+</div>
+<p>Unknown keys, keys of another layer and duplicate ids are errors. <code class="docutils literal notranslate"><span class="pre">exec</span></code> commands may use <code class="docutils literal notranslate"><span class="pre">{python}</span></code>, <code class="docutils literal notranslate"><span class="pre">{engine}</span></code>,
+<code class="docutils literal notranslate"><span class="pre">{tools}</span></code>, <code class="docutils literal notranslate"><span class="pre">{out}</span></code> (the target’s output dir), <code class="docutils literal notranslate"><span class="pre">{exe}</span></code>, <code class="docutils literal notranslate"><span class="pre">{platform}</span></code>, <code class="docutils literal notranslate"><span class="pre">{arch}</span></code>, <code class="docutils literal notranslate"><span class="pre">{config}</span></code>, <code class="docutils literal notranslate"><span class="pre">{host}</span></code> and <code class="docutils literal notranslate"><span class="pre">{hostArch}</span></code>.</p>
+<p><code class="docutils literal notranslate"><span class="pre">requires:t=&quot;http_server&quot;</span></code> starts an HTTP server for the target: it serves an empty writable dir, and the test reads
+its URL and dir from <code class="docutils literal notranslate"><span class="pre">DAGOR_TEST_HTTP_URL</span></code> and <code class="docutils literal notranslate"><span class="pre">DAGOR_TEST_HTTP_ROOT</span></code> (<code class="docutils literal notranslate"><span class="pre">unittest::http_service</span></code> in C++).</p>
+</section>
+<section id="reports">
+<h2>Reports<a class="headerlink" href="#reports" title="Link to this heading"></a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>_output/test_results/&lt;run id&gt;/
+  report.html        everything in one file: filters, per case messages, logs, image viewer (actual/reference/diff/slider)
+  junit.xml          for CI systems; image artifacts as [[ATTACHMENT|path]] lines
+  run.json           the canonical result (schema 1), what `report` regenerates the others from
+  summary.md         a short table, e.g. for $GITHUB_STEP_SUMMARY
+  _build/            jam logs
+  &lt;target id&gt;/       output.log, native results (junit.xml, dastest.json, events.jsonl), artifacts/
+</pre></div>
+</div>
+</section>
+<section id="adding-a-test-target">
+<h2>Adding a test target<a class="headerlink" href="#adding-a-test-target" title="Link to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Write the tests and a <code class="docutils literal notranslate"><span class="pre">test.blk</span></code> next to them (see the layer pages).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">dng.py</span> <span class="pre">test</span> <span class="pre">list</span> <span class="pre">-k</span> <span class="pre">&lt;your</span> <span class="pre">id&gt;</span></code> checks the manifest.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">dng.py</span> <span class="pre">test</span> <span class="pre">run</span> <span class="pre">-k</span> <span class="pre">&lt;your</span> <span class="pre">id&gt;</span></code> builds and runs it.</p></li>
+</ol>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="in_game_tests.html" class="btn btn-neutral float-left" title="In-Game Tests (ECS and Scenarios)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="ci_and_devices.html" class="btn btn-neutral float-right" title="CI and Devices" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Gaijin Entertainment 2026.
+      <span class="lastupdated">Last updated on Oct 11, 2026.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

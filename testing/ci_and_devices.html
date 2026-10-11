@@ -1,0 +1,210 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CI and Devices</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=55b73dce" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster.custom.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster.bundle.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-shadow.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-punk.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-noir.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-light.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-borderless.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/micromodal.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/sphinx_rtd_theme.css?v=3234e928" />
+      <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css?v=6ad1a40c" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=fe408b2f" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/js/hoverxref.js"></script>
+      <script src="../_static/js/tooltipster.bundle.min.js"></script>
+      <script src="../_static/js/micromodal.min.js"></script>
+      <script src="../_static/js/versionwarning.js?v=d4224a34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=36754332"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Assets and Assets Management" href="../assets/index.html" />
+    <link rel="prev" title="The Test Runner" href="test_runner.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Dagor Documentation
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dagor-home/index.html">Dagor Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/index.html">Getting Started with Dagor</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Testing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cpp_unit_tests.html">C++ Unit Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="das_unit_tests.html">daScript Unit Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="in_game_tests.html">In-Game Tests (ECS and Scenarios)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test_runner.html">The Test Runner</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">CI and Devices</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#github-actions">GitHub Actions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#device-backends">Device backends</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../assets/index.html">Assets and Assets Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dagor-tools/index.html">Dagor Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../projects/index.html">Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials and Manuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api-references/index.html">API References and Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Dagor Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Testing</a></li>
+      <li class="breadcrumb-item active">CI and Devices</li>
+  
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/testing/ci_and_devices.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  <li class="wy-breadcrumbs-aside.github-icon">
+    <a href="https://github.com/GaijinEntertainment/DagorEngine" target="_blank" rel="noopener">
+      <img src="../_static/_images/github-mark.png"
+           alt="GitHub"
+           style="height: 1.5em; vertical-align: text-bottom; " />
+    </a>
+  </li>
+
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="ci-and-devices">
+<h1>CI and Devices<a class="headerlink" href="#ci-and-devices" title="Link to this heading"></a></h1>
+<section id="github-actions">
+<h2>GitHub Actions<a class="headerlink" href="#github-actions" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">.github/workflows/tests.yaml</span></code> runs on every push and pull request to <code class="docutils literal notranslate"><span class="pre">main</span></code> and on demand: on Windows, Linux and
+macOS hosted runners it sets up the devtools (<code class="docutils literal notranslate"><span class="pre">dng.py</span> <span class="pre">devtools</span></code> answers its questions itself in CI, see
+<code class="docutils literal notranslate"><span class="pre">DAGOR_NONINTERACTIVE</span></code>), then runs</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>dng.py<span class="w"> </span><span class="nb">test</span><span class="w"> </span>run<span class="w"> </span>--gpu<span class="w"> </span>no<span class="w"> </span>-j<span class="w"> </span><span class="m">4</span><span class="w"> </span>--out<span class="w"> </span>_output/test_results/ci<span class="w"> </span>--junit<span class="w"> </span>test-results.xml<span class="w"> </span>--summary-md<span class="w"> </span><span class="s2">"</span><span class="nv">$GITHUB_STEP_SUMMARY</span><span class="s2">"</span>
+</pre></div>
+</div>
+<p>Hosted runners have no GPU: GPU targets are skipped, while their <code class="docutils literal notranslate"><span class="pre">*.stub</span></code> variants run the same tests on the stub 3d
+driver. The HTML report and logs are uploaded as the <code class="docutils literal notranslate"><span class="pre">test-report-&lt;os&gt;</span></code> artifact of the run.</p>
+<p>In-game targets need a built game, which takes too long for every push: run them on a machine with the game built, or
+in a scheduled job that builds it.</p>
+</section>
+<section id="device-backends">
+<h2>Device backends<a class="headerlink" href="#device-backends" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">--device</span> <span class="pre">&lt;backend&gt;[:&lt;id&gt;]</span></code> runs test executables somewhere else than the host. A backend (see
+<code class="docutils literal notranslate"><span class="pre">prog/tools/pythonCommon/dagorTest/devices/base.py</span></code>) deploys the executable and its data, maps the paths the test needs
+(data dir, artifact dir, result files) to device paths, runs it with a timeout and copies the outputs back. Test
+executables get every path on their command line and write their exit code as the last event of <code class="docutils literal notranslate"><span class="pre">events.jsonl</span></code>, so
+backends work on devices that don’t report process exit codes.</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Backend</th>
+<th>Platforms</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>local</code></td>
+<td>windows, linux, macOS</td>
+<td>the default</td>
+</tr>
+<tr>
+<td><code>android</code></td>
+<td>android</td>
+<td>skeleton, not verified on a device yet (adb)</td>
+</tr>
+<tr>
+<td><code>ios</code></td>
+<td>iOS</td>
+<td>skeleton, not verified yet (simctl / devicectl)</td>
+</tr>
+</tbody>
+</table>
+<p>Backends for platforms under NDA (consoles) don’t belong in the public engine: put them in your own repository and list
+their directories in <code class="docutils literal notranslate"><span class="pre">DAGOR_TEST_DEVICE_PATH</span></code> (separated like <code class="docutils literal notranslate"><span class="pre">PATH</span></code>). Every <code class="docutils literal notranslate"><span class="pre">*.py</span></code> file there is loaded and its
+<code class="docutils literal notranslate"><span class="pre">DeviceBackend</span></code> subclasses with a <code class="docutils literal notranslate"><span class="pre">name</span></code> become available to <code class="docutils literal notranslate"><span class="pre">--device</span></code>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="test_runner.html" class="btn btn-neutral float-left" title="The Test Runner" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../assets/index.html" class="btn btn-neutral float-right" title="Assets and Assets Management" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Gaijin Entertainment 2026.
+      <span class="lastupdated">Last updated on Oct 11, 2026.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

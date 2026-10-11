@@ -1,0 +1,307 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>In-Game Tests (ECS and Scenarios)</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=55b73dce" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster.custom.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster.bundle.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-shadow.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-punk.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-noir.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-light.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-borderless.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/micromodal.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/sphinx_rtd_theme.css?v=3234e928" />
+      <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css?v=6ad1a40c" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=fe408b2f" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/js/hoverxref.js"></script>
+      <script src="../_static/js/tooltipster.bundle.min.js"></script>
+      <script src="../_static/js/micromodal.min.js"></script>
+      <script src="../_static/js/versionwarning.js?v=d4224a34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=36754332"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="The Test Runner" href="test_runner.html" />
+    <link rel="prev" title="daScript Unit Tests" href="das_unit_tests.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Dagor Documentation
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dagor-home/index.html">Dagor Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/index.html">Getting Started with Dagor</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Testing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cpp_unit_tests.html">C++ Unit Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="das_unit_tests.html">daScript Unit Tests</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">In-Game Tests (ECS and Scenarios)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#writing-tests">Writing tests</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#scenarios">Scenarios</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#project-setup">Project setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#running-the-game-in-test-mode-by-hand">Running the game in test mode by hand</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="test_runner.html">The Test Runner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ci_and_devices.html">CI and Devices</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../assets/index.html">Assets and Assets Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dagor-tools/index.html">Dagor Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../projects/index.html">Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials and Manuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api-references/index.html">API References and Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Dagor Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Testing</a></li>
+      <li class="breadcrumb-item active">In-Game Tests (ECS and Scenarios)</li>
+  
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/testing/in_game_tests.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  <li class="wy-breadcrumbs-aside.github-icon">
+    <a href="https://github.com/GaijinEntertainment/DagorEngine" target="_blank" rel="noopener">
+      <img src="../_static/_images/github-mark.png"
+           alt="GitHub"
+           style="height: 1.5em; vertical-align: text-bottom; " />
+    </a>
+  </li>
+
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="in-game-tests-ecs-and-scenarios">
+<h1>In-Game Tests (ECS and Scenarios)<a class="headerlink" href="#in-game-tests-ecs-and-scenarios" title="Link to this heading"></a></h1>
+<p>daNetGame based games have a <em>test mode</em>: started with <code class="docutils literal notranslate"><span class="pre">-das_test:&lt;path&gt;</span></code>, the game loads normally, then loads the
+test files like any other game script, runs every <code class="docutils literal notranslate"><span class="pre">[ecs_test]</span></code> function and exits with the
+<a class="reference internal" href="overview.html#results"><span class="std std-ref">test exit code</span></a>. Tests see the whole game: every das module, ECS system, template and the loaded
+scene. Two layers use it:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ecs</span></code>: the headless dedicated server; fast, for gameplay logic over entities and frames.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">scenario</span></code>: the rendering client; for end-to-end behavior, input and screenshots.</p></li>
+</ul>
+<section id="writing-tests">
+<h2>Writing tests<a class="headerlink" href="#writing-tests" title="Link to this heading"></a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>options gen2
+require ecs
+require danetlibs/test_harness/ecs_test
+
+[ecs_test]
+def projectile_hits_target(t : T?) {
+  let target = createEntitySync("dummy_target")
+  createEntitySync("test_projectile") &lt;| $(var init) {
+    set(init, "transform", ...)
+  }
+  t |&gt; success(advance_until(t, 120) &lt;| $() { return get_bool(target, "hit") ?? false; })
+  t |&gt; expect_logerr("target destroyed without owner", 1) &lt;| $() {
+    destroyEntity(target)
+    advance_frames(1)
+  }
+}
+</pre></div>
+</div>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">[ecs_test]</span> <span class="pre">def</span> <span class="pre">name(t</span> <span class="pre">:</span> <span class="pre">T?)</span></code> declares a test; the body uses dastest’s <code class="docutils literal notranslate"><span class="pre">T</span></code> API (see
+<a class="reference internal" href="das_unit_tests.html"><span class="std std-doc">daScript unit tests</span></a>), sub tests (<code class="docutils literal notranslate"><span class="pre">t</span> <span class="pre">|&gt;</span> <span class="pre">run(...)</span></code>) are reported as <code class="docutils literal notranslate"><span class="pre">name/sub</span></code>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">advance_frames(n)</span></code> runs n complete game frames (act, ECS updates, rendering on the client), each advancing the game by
+<code class="docutils literal notranslate"><span class="pre">test_mode_fixed_dt()</span></code> seconds (1/60 unless <code class="docutils literal notranslate"><span class="pre">-test_dt</span></code> is passed), as fast as the machine allows.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">advance_until(t,</span> <span class="pre">max_frames)</span> <span class="pre">&lt;|</span> <span class="pre">$()</span> <span class="pre">{</span> <span class="pre">return</span> <span class="pre">condition;</span> <span class="pre">}</span></code> runs frames until the condition holds, failing the test
+otherwise.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">expect_logerr(t,</span> <span class="pre">substring,</span> <span class="pre">count)</span> <span class="pre">&lt;|</span> <span class="pre">$()</span> <span class="pre">{</span> <span class="pre">...</span> <span class="pre">}</span></code> declares errors the block provokes on purpose. Any other error
+fails the running test, including errors logged during game startup (reported as <code class="docutils literal notranslate"><span class="pre">&lt;game</span> <span class="pre">startup&gt;</span></code>).</p></li>
+<li><p>Test files may declare their own entity systems (<code class="docutils literal notranslate"><span class="pre">[es]</span></code>) and use queries like any game script; they are loaded only
+in test mode, never shipped.</p></li>
+</ul>
+<section id="scenarios">
+<h3>Scenarios<a class="headerlink" href="#scenarios" title="Link to this heading"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">require</span> <span class="pre">danetlibs/test_harness/scenario</span></code> adds what a player does and sees:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[ecs_test]
+def flashlight_toggles(t : T?) {
+  send_action(t, "Human.Flashlight")    // an input action, as if its binding was pressed
+  advance_frames(10)
+  check_screenshot(t, "flashlight_on")  // compares with references/flashlight_on.png next to this file
+}
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">set_axis(t,</span> <span class="pre">action,</span> <span class="pre">value)</span></code> drives analog actions; <code class="docutils literal notranslate"><span class="pre">console_command(&quot;...&quot;)</span></code> runs console commands. Physical
+keyboards, mice and gamepads are disabled in scenario runs, so the person at the machine can’t affect results.
+<code class="docutils literal notranslate"><span class="pre">check_screenshot</span></code> takes a screenshot without UI, waits for it and compares it with <code class="docutils literal notranslate"><span class="pre">references/&lt;name&gt;.png</span></code>
+(<code class="docutils literal notranslate"><span class="pre">references/&lt;name&gt;.&lt;3d</span> <span class="pre">driver&gt;.png</span></code> first). The tolerances are parameters: <code class="docutils literal notranslate"><span class="pre">channel_tolerance</span></code> (default 8),
+<code class="docutils literal notranslate"><span class="pre">max_rms</span></code> (1.0) and <code class="docutils literal notranslate"><span class="pre">max_bad_pixels_percent</span></code> (0.5). Create or update references with
+<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">dng.py</span> <span class="pre">test</span> <span class="pre">run</span> <span class="pre">--update-references</span></code> and review the images before committing them.</p>
+<p>A screenshot needs a rendered 3d world: <code class="docutils literal notranslate"><span class="pre">check_screenshot</span></code> fails while the game shows a menu or a level that renders
+nothing (<code class="docutils literal notranslate"><span class="pre">level__blk:t=&quot;__empty__&quot;</span></code>). For a world without level data use <code class="docutils literal notranslate"><span class="pre">level__blk:t=&quot;__default__&quot;</span></code>: sky and lighting
+from the default world renderer.</p>
+<p>Screenshots must be the same on every run. In test mode the game time stands still while the game loads, so every
+test starts at the same game time however long loading took, and then advances by the fixed dt every frame. Beyond that:</p>
+<ul class="simple">
+<li><p>fix the level’s random seeds in the test scene: <code class="docutils literal notranslate"><span class="pre">level__timeSeed:i=1</span></code> and <code class="docutils literal notranslate"><span class="pre">level__weatherSeed:i=1</span></code>;</p></li>
+<li><p>use a weather without volumetric clouds: they accumulate over wall-clock time and differ a little every run
+(<code class="docutils literal notranslate"><span class="pre">templates/dng-empty</span></code> has <code class="docutils literal notranslate"><span class="pre">weather_clear_cloudless</span></code> for its screenshot test);</p></li>
+<li><p>scenario runs turn temporal antialiasing off (<code class="docutils literal notranslate"><span class="pre">video/antialiasing_mode:t=off</span></code>), its jitter follows the frame index.</p></li>
+</ul>
+<p>A scene for tests can be next to them: <code class="docutils literal notranslate"><span class="pre">scene:t=</span></code> is a path the game opens from its run dir, e.g.
+<code class="docutils literal notranslate"><span class="pre">scene:t=&quot;../prog/tests/scenarios/default_world.blk&quot;</span></code>.</p>
+</section>
+</section>
+<section id="project-setup">
+<h2>Project setup<a class="headerlink" href="#project-setup" title="Link to this heading"></a></h2>
+<p>The game needs to find dastest and the test harness:</p>
+<ul class="simple">
+<li><p>a mount point for dastest in <code class="docutils literal notranslate"><span class="pre">settings.blk</span></code>:
+<code class="docutils literal notranslate"><span class="pre">&quot;%dastest&quot;</span> <span class="pre">{</span> <span class="pre">forSource:t=&quot;&lt;engine&gt;/prog/1stPartyLibs/daScript/dastest&quot;;</span> <span class="pre">forVromfs:t=&quot;dastest&quot;;</span> <span class="pre">}</span></code></p></li>
+<li><p>two entries in the game’s <code class="docutils literal notranslate"><span class="pre">.das_project</span></code>: <code class="docutils literal notranslate"><span class="pre">&quot;dastest&quot;</span> <span class="pre">=&gt;</span> <span class="pre">&quot;%dastest&quot;</span></code> in the module prefixes and
+<code class="docutils literal notranslate"><span class="pre">&quot;testing&quot;</span> <span class="pre">=&gt;</span> <span class="pre">&quot;%dastest/testing.das&quot;</span></code> in the aliases (dastest’s own modules require each other by those names).</p></li>
+</ul>
+<p>Tests run from sources (the runner passes <code class="docutils literal notranslate"><span class="pre">-config:debug/useAddonVromSrc:b=yes</span></code>), so neither the tests nor the
+<code class="docutils literal notranslate"><span class="pre">test_harness</span></code> lib need to be in the game’s vromfs. The project’s root <code class="docutils literal notranslate"><span class="pre">test.blk</span></code> names the game:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>game{
+  codename:t="my_game"                 // executable base name (my_game-dev, my_game-ded-dev)
+  dir:t="game"                         // runtime dir with &lt;platform&gt;-&lt;arch&gt;/ executables
+  build:t="{python} project.py build code" // optional: run once from the project root before in-game targets
+}
+</pre></div>
+</div>
+<p>and targets point at test files:</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>target{ name:t="myGame.ecs"; layer:t="ecs"; path:t="tests/ecs"; scene:t="gamedata/scenes/test.blk"; caseTimeout:r=60 }
+target{ name:t="myGame.scenarios"; layer:t="scenario"; path:t="tests/scenarios"; scene:t="gamedata/scenes/test.blk" }
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">game:t=&quot;client&quot;</span></code> runs <code class="docutils literal notranslate"><span class="pre">ecs</span></code> tests in the client, <code class="docutils literal notranslate"><span class="pre">game:t=&quot;dedicated&quot;</span></code> runs scenarios headless (screenshots then fail).
+Scenario targets require a GPU and a display and never run in parallel with other GPU targets.</p>
+<p><code class="docutils literal notranslate"><span class="pre">args:t=</span></code> adds game arguments, e.g. switches that make the game start the scene directly instead of its menu
+(outerSpace: <code class="docutils literal notranslate"><span class="pre">args:t=&quot;-config:disableMenu:b=yes</span> <span class="pre">-config:licenseAccepted:b=yes&quot;</span></code>).</p>
+<p>Test functions run like entity systems: <code class="docutils literal notranslate"><span class="pre">query</span></code> and <code class="docutils literal notranslate"><span class="pre">find_query</span></code> work in them, and an <code class="docutils literal notranslate"><span class="pre">[es]</span></code> declared in a test file
+runs every frame of <code class="docutils literal notranslate"><span class="pre">advance_frames</span></code>.</p>
+</section>
+<section id="running-the-game-in-test-mode-by-hand">
+<h2>Running the game in test mode by hand<a class="headerlink" href="#running-the-game-in-test-mode-by-hand" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>game
+windows-x86_64/my_game-ded-dev.exe<span class="w"> </span>-das_test:../prog/tests/ecs<span class="w"> </span>-test_out:../_test_out<span class="w"> </span>-scene:gamedata/scenes/test.blk<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-nolisten<span class="w"> </span>-stdout<span class="w"> </span>-config:debug/useAddonVromSrc:b<span class="o">=</span>yes
+</pre></div>
+</div>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-das_test:&lt;path&gt;</code></td>
+<td>test file or directory (recursive); repeatable; named mounts allowed</td>
+</tr>
+<tr>
+<td><code>-test_filter:&lt;prefix&gt;</code></td>
+<td>only tests whose name starts with the prefix; repeatable</td>
+</tr>
+<tr>
+<td><code>-test_out:&lt;dir&gt;</code></td>
+<td>where <code>dastest.json</code> (results) and <code>events.jsonl</code> are written</td>
+</tr>
+<tr>
+<td><code>-test_timeout:&lt;sec&gt;</code></td>
+<td>per test limit (default 300): the game exits with code 3 when exceeded</td>
+</tr>
+<tr>
+<td><code>-test_dt:&lt;sec&gt;</code></td>
+<td>game time per frame (default 1/60)</td>
+</tr>
+<tr>
+<td><code>-test_update_references</code></td>
+<td>image checks write missing or mismatching references</td>
+</tr>
+</tbody>
+</table></section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="das_unit_tests.html" class="btn btn-neutral float-left" title="daScript Unit Tests" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="test_runner.html" class="btn btn-neutral float-right" title="The Test Runner" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Gaijin Entertainment 2026.
+      <span class="lastupdated">Last updated on Oct 11, 2026.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

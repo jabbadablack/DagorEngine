@@ -1,0 +1,272 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Creating a Project</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=55b73dce" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster.custom.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster.bundle.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-shadow.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-punk.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-noir.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-light.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-borderless.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/micromodal.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/sphinx_rtd_theme.css?v=3234e928" />
+      <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css?v=6ad1a40c" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=fe408b2f" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/js/hoverxref.js"></script>
+      <script src="../_static/js/tooltipster.bundle.min.js"></script>
+      <script src="../_static/js/micromodal.min.js"></script>
+      <script src="../_static/js/versionwarning.js?v=d4224a34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=36754332"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Directory Structure Overview" href="directory_structure.html" />
+    <link rel="prev" title="How to Build" href="how_to_build.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Dagor Documentation
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dagor-home/index.html">Dagor Home</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Getting Started with Dagor</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="how_to_access.html">How to Access</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_to_build.html">How to Build</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Creating a Project</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#options">Options</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#the-dng-empty-template">The dng-empty template</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#linking-a-project-to-an-engine">Linking a project to an engine</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="directory_structure.html">Directory Structure Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_to_contribute.html">Contributing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="license.html">License Information</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../testing/index.html">Testing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../assets/index.html">Assets and Assets Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dagor-tools/index.html">Dagor Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../projects/index.html">Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials and Manuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api-references/index.html">API References and Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Dagor Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Getting Started with Dagor</a></li>
+      <li class="breadcrumb-item active">Creating a Project</li>
+  
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/getting-started/new_project.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  <li class="wy-breadcrumbs-aside.github-icon">
+    <a href="https://github.com/GaijinEntertainment/DagorEngine" target="_blank" rel="noopener">
+      <img src="../_static/_images/github-mark.png"
+           alt="GitHub"
+           style="height: 1.5em; vertical-align: text-bottom; " />
+    </a>
+  </li>
+
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="creating-a-project">
+<h1>Creating a Project<a class="headerlink" href="#creating-a-project" title="Link to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">dng.py</span> <span class="pre">new</span></code> in the engine root creates a game project from a template in <code class="docutils literal notranslate"><span class="pre">templates/</span></code>. The project can live
+anywhere: its <code class="docutils literal notranslate"><span class="pre">engine.blk</span></code> names the engine checkout it is built with, and the build, the game and the tools find the
+engine through it.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>dng.py<span class="w"> </span>new<span class="w"> </span>--name<span class="w"> </span>MyGame<span class="w"> </span>--dest<span class="w"> </span>../MyGame
+<span class="nb">cd</span><span class="w"> </span>../MyGame
+python<span class="w"> </span>project.py<span class="w"> </span>build
+game/client.cmd
+</pre></div>
+</div>
+<section id="options">
+<h2>Options<a class="headerlink" href="#options" title="Link to this heading"></a></h2>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--name</code></td>
+<td>PascalCase name (<code>MyGame</code>): macOS bundle and Windows manifest names</td>
+</tr>
+<tr>
+<td><code>--codename</code></td>
+<td>lowercase name of the executables, the main vromfs and script dirs (default from <code>--name</code>: <code>my_game</code>)</td>
+</tr>
+<tr>
+<td><code>--title</code></td>
+<td>human readable name: window title, executable info (default from <code>--name</code>: <code>My Game</code>)</td>
+</tr>
+<tr>
+<td><code>--company</code></td>
+<td>reverse domain name for the bundle id <code>&lt;company&gt;.&lt;name&gt;</code> (default <code>com.example</code>)</td>
+</tr>
+<tr>
+<td><code>--dest</code></td>
+<td>the project dir: new or empty, ASCII without spaces (default <code>../&lt;name&gt;</code> next to the engine)</td>
+</tr>
+<tr>
+<td><code>--template</code></td>
+<td>template id (<code>--list</code> shows them; default <code>dng-empty</code>)</td>
+</tr>
+<tr>
+<td><code>--absolute-engine-path</code></td>
+<td><code>engine.blk</code> stores an absolute path (by default relative, absolute only across drives)</td>
+</tr>
+<tr>
+<td><code>--no-git</code></td>
+<td>no <code>git init</code> in the new project</td>
+</tr>
+<tr>
+<td><code>--dry-run</code></td>
+<td>print the files it would create</td>
+</tr>
+</tbody>
+</table>
+<p>The engine’s tools have to be built (<code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">dng.py</span> <span class="pre">build</span> <span class="pre">cdk</span></code> in the engine) before the project builds its
+shaders, vromfs and assets.</p>
+</section>
+<section id="the-dng-empty-template">
+<h2>The dng-empty template<a class="headerlink" href="#the-dng-empty-template" title="Link to this heading"></a></h2>
+<p>An empty daNetGame game: a client and a dedicated server, an empty default world (sky and lighting, no level data)
+with a camera, one sample entity system, the scripts of the tools (daEditor, daViewer, dabuild, daImpostor) and a test
+target of every <a class="reference internal" href="../testing/overview.html"><span class="std std-doc">test layer</span></a>. Its <code class="docutils literal notranslate"><span class="pre">README.md</span></code> describes the layout.</p>
+<p>The template is under the engine’s license, like <code class="docutils literal notranslate"><span class="pre">prog/</span></code>. It takes nothing from the content of the sample games
+(<code class="docutils literal notranslate"><span class="pre">outerSpace</span></code>, the downloadable sample assets), which is licensed differently: the textures the renderer needs by name
+(stars, moon, strata clouds, a paint palette) are generated placeholders in <code class="docutils literal notranslate"><span class="pre">develop/assets/base</span></code> to be replaced, and
+water, glass scratches, fluid wind and UI fonts are off until a game brings their assets (see <code class="docutils literal notranslate"><span class="pre">gameparams.blk</span></code> and
+<code class="docutils literal notranslate"><span class="pre">settings.blk</span></code> in the template).</p>
+<p><code class="docutils literal notranslate"><span class="pre">templates/dng-empty</span></code> is itself a buildable project inside the engine (<code class="docutils literal notranslate"><span class="pre">engine.blk</span></code> points at <code class="docutils literal notranslate"><span class="pre">../..</span></code>): CI builds and
+tests it, and changes to it are made and checked there before they reach new projects. The names in it
+(<code class="docutils literal notranslate"><span class="pre">dng_empty</span></code>, <code class="docutils literal notranslate"><span class="pre">DngEmpty</span></code>, <code class="docutils literal notranslate"><span class="pre">Dng</span> <span class="pre">Empty</span></code>, <code class="docutils literal notranslate"><span class="pre">com.dagor.DngEmpty</span></code>) are the tokens <code class="docutils literal notranslate"><span class="pre">template.blk</span></code> lists; the generator
+replaces them in file names and text files, and refuses to finish if one is left.</p>
+</section>
+<section id="linking-a-project-to-an-engine">
+<h2>Linking a project to an engine<a class="headerlink" href="#linking-a-project-to-an-engine" title="Link to this heading"></a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>engineRoot:t="../DagorEngine"   // engine.blk: relative to the project, or absolute
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">project.py</span> <span class="pre">relink</span> <span class="pre">&lt;engine</span> <span class="pre">dir&gt;</span></code> rewrites it and regenerates the files that depend on it:</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Generated file</th>
+<th>For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>prog/_engine.jam</code></td>
+<td>jam: <code>EngineRoot</code>, <code>ProjectProgLocation</code> (the jam <code>Location</code> of the project's <code>prog</code>) and <code>Root</code></td>
+</tr>
+<tr>
+<td><code>_engine.cmd</code>, <code>_engine.sh</code></td>
+<td>the develop scripts: <code>DAGOR_ENGINE_ROOT</code> and <code>DAGOR_CDK_DIR</code></td>
+</tr>
+<tr>
+<td><code>prog/_libs*</code></td>
+<td>the libs of <code>prog/danetgamelibs.txt</code> and <code>prog/gamelibs.txt</code>: jam, AOT jam, vromfs, templates, das init, shaders</td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">project.py</span> <span class="pre">setup</span></code> writes them; <code class="docutils literal notranslate"><span class="pre">project.py</span> <span class="pre">build</span></code> runs it first, so they are never stale. They are not
+committed. Inside the engine, data files name engine paths through the <code class="docutils literal notranslate"><span class="pre">%engine</span></code> named mount, which the engine resolves
+from <code class="docutils literal notranslate"><span class="pre">engine.blk</span></code> too (from the first <code class="docutils literal notranslate"><span class="pre">engine.blk</span></code> or engine checkout above the current dir, unless the
+<code class="docutils literal notranslate"><span class="pre">DAGOR_ENGINE_ROOT</span></code> environment variable names one): settings <code class="docutils literal notranslate"><span class="pre">mountPoints</span></code>, shader and vromfs configs and
+<code class="docutils literal notranslate"><span class="pre">application.blk</span></code> use <code class="docutils literal notranslate"><span class="pre">%engine/prog/...</span></code> and work wherever the project is.</p>
+<p>A project on another drive than the engine stores an absolute engine path and gets an absolute jam <code class="docutils literal notranslate"><span class="pre">Location</span></code>
+(see <code class="docutils literal notranslate"><span class="pre">LocationDir</span></code> in <code class="docutils literal notranslate"><span class="pre">prog/_jBuild/jCommonRules.jam</span></code>).</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="how_to_build.html" class="btn btn-neutral float-left" title="How to Build" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="directory_structure.html" class="btn btn-neutral float-right" title="Directory Structure Overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Gaijin Entertainment 2026.
+      <span class="lastupdated">Last updated on Oct 11, 2026.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

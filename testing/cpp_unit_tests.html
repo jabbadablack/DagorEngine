@@ -1,0 +1,313 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>C++ Unit Tests</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=55b73dce" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster.custom.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster.bundle.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-shadow.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-punk.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-noir.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-light.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/tooltipster-sideTip-borderless.min.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/micromodal.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/sphinx_rtd_theme.css?v=3234e928" />
+      <link rel="stylesheet" type="text/css" href="../_static/design-style.4045f2051d55cab465a707391d5b2007.min.css?v=6ad1a40c" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css?v=fe408b2f" />
+
+  
+    <link rel="shortcut icon" href="../_static/favicon.ico"/>
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/js/hoverxref.js"></script>
+      <script src="../_static/js/tooltipster.bundle.min.js"></script>
+      <script src="../_static/js/micromodal.min.js"></script>
+      <script src="../_static/js/versionwarning.js?v=d4224a34"></script>
+      <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+      <script src="../_static/copybutton.js?v=f281be69"></script>
+      <script src="../_static/design-tabs.js?v=36754332"></script>
+      <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="daScript Unit Tests" href="das_unit_tests.html" />
+    <link rel="prev" title="Overview" href="overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            Dagor Documentation
+              <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dagor-home/index.html">Dagor Home</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting-started/index.html">Getting Started with Dagor</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Testing</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">C++ Unit Tests</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#a-test-target">A test target</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#engine-environment">Engine environment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#errors-and-assertions">Errors and assertions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#files">Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#image-checks">Image checks</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#command-line">Command line</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="das_unit_tests.html">daScript Unit Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="in_game_tests.html">In-Game Tests (ECS and Scenarios)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="test_runner.html">The Test Runner</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ci_and_devices.html">CI and Devices</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../assets/index.html">Assets and Assets Management</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dagor-tools/index.html">Dagor Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../projects/index.html">Projects</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials/index.html">Tutorials and Manuals</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api-references/index.html">API References and Documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Dagor Documentation</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Testing</a></li>
+      <li class="breadcrumb-item active">C++ Unit Tests</li>
+  
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/testing/cpp_unit_tests.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  <li class="wy-breadcrumbs-aside.github-icon">
+    <a href="https://github.com/GaijinEntertainment/DagorEngine" target="_blank" rel="noopener">
+      <img src="../_static/_images/github-mark.png"
+           alt="GitHub"
+           style="height: 1.5em; vertical-align: text-bottom; " />
+    </a>
+  </li>
+
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section class="tex2jax_ignore mathjax_ignore" id="c-unit-tests">
+<h1>C++ Unit Tests<a class="headerlink" href="#c-unit-tests" title="Link to this heading"></a></h1>
+<p>C++ tests use <a class="reference external" href="https://github.com/catchorg/Catch2">Catch2</a> (<code class="docutils literal notranslate"><span class="pre">prog/3rdPartyLibs/catch2</span></code>) with the engine’s test main,
+<code class="docutils literal notranslate"><span class="pre">prog/dagorInclude/unittest/mainCatch2.inc.cpp</span></code>.</p>
+<section id="a-test-target">
+<h2>A test target<a class="headerlink" href="#a-test-target" title="Link to this heading"></a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>prog/gameLibs/foo/tests/
+  jamfile
+  main.cpp
+  test_foo.cpp
+  test.blk
+  references/        // optional: reference images
+  data/              // optional: anything the tests read
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">jamfile</span></code>: include <code class="docutils literal notranslate"><span class="pre">prog/_jBuild/unitTest.jam</span></code> instead of <code class="docutils literal notranslate"><span class="pre">defaults.jam</span></code>. It makes a console executable with
+exceptions enabled, links Catch2 and the test environment (<code class="docutils literal notranslate"><span class="pre">engine/unitTest</span></code>), and puts it into
+<code class="docutils literal notranslate"><span class="pre">_output/tests/&lt;platform&gt;-&lt;arch&gt;/</span></code>. Target names must be unique.</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Root    ?= ../../../.. ;
+Location = prog/gameLibs/foo/tests ;
+Target   = foo-tests ;
+
+include $(Root)/prog/_jBuild/unitTest.jam ;
+
+Sources = main.cpp test_foo.cpp ;
+UseProgLibs += engine/memory engine/kernel engine/osApiWrappers engine/baseUtil engine/ioSys engine/math
+  engine/perfMon/daProfilerStub 3rdPartyLibs/eastl gameLibs/foo ;
+
+include $(Root)/prog/_jBuild/build.jam ;
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">main.cpp</span></code>:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unittest/mainCatch2.inc.cpp&gt;</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">test.blk</span></code> (see <a class="reference internal" href="test_runner.html"><span class="std std-doc">the test runner</span></a>):</p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>target{ name:t="gameLibs.foo"; layer:t="cpp"; tag:t="gameLibs"; jamfile:t="jamfile"; exe:t="foo-tests" }
+</pre></div>
+</div>
+<p>Tests include <code class="docutils literal notranslate"><span class="pre">&lt;unittest/dag_unitTest.h&gt;</span></code>, which brings the Catch2 macros, EASTL printing and the helpers below.</p>
+</section>
+<section id="engine-environment">
+<h2>Engine environment<a class="headerlink" href="#engine-environment" title="Link to this heading"></a></h2>
+<p>By default only memory, the kernel and the file system are available. Define <code class="docutils literal notranslate"><span class="pre">UNITTEST_ENV</span></code> before including the main
+to bring up more:</p>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th><code>UNITTEST_ENV</code> flag</th>
+<th>What is initialized</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>UNITTEST_ENV_SETTINGS</code></td>
+<td><code>settings.blk</code> from the data dir (<code>UNITTEST_SETTINGS_BLK</code> overrides the name)</td>
+</tr>
+<tr>
+<td><code>UNITTEST_ENV_CPUJOBS</code></td>
+<td>the job system</td>
+</tr>
+<tr>
+<td><code>UNITTEST_ENV_GPU</code></td>
+<td>settings, jobs, the 3d driver and video (window title <code>UNITTEST_APP_NAME</code>)</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="cp">#define UNITTEST_ENV UNITTEST_ENV_GPU</span>
+<span class="cp">#define UNITTEST_APP_NAME "fooTests"</span>
+<span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unittest/mainCatch2.inc.cpp&gt;</span>
+</pre></div>
+</div>
+<p>When the 3d driver can’t start the executable exits with 77 (skipped). <code class="docutils literal notranslate"><span class="pre">--gpu-driver</span> <span class="pre">stub</span></code> runs GPU tests on the stub
+driver; tests that need real GPU results should <code class="docutils literal notranslate"><span class="pre">SKIP()</span></code> there. <code class="docutils literal notranslate"><span class="pre">CUSTOM_UNITTEST_CODE</span></code> and
+<code class="docutils literal notranslate"><span class="pre">CUSTOM_UNITTEST_SHUTDOWN_CODE</span></code> add project specific setup and teardown.</p>
+</section>
+<section id="errors-and-assertions">
+<h2>Errors and assertions<a class="headerlink" href="#errors-and-assertions" title="Link to this heading"></a></h2>
+<p>Errors logged inside a test case fail it, and so do failed <code class="docutils literal notranslate"><span class="pre">G_ASSERT</span></code>s and EASTL assertions (the code continues, as in
+a release build, instead of unwinding through engine code). Fatal errors end the case. Declare errors a test provokes on
+purpose:</p>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">TEST_CASE</span><span class="p">(</span><span class="s">"bad input is reported"</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">unittest</span><span class="o">::</span><span class="n">ExpectLogerr</span><span class="w"> </span><span class="n">expect</span><span class="p">(</span><span class="s">"invalid header"</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="c1">// exactly one such error, checked at scope exit</span>
+<span class="w">  </span><span class="n">CHECK_FALSE</span><span class="p">(</span><span class="n">parse</span><span class="p">(</span><span class="n">bad_input</span><span class="p">));</span>
+<span class="p">}</span>
+
+<span class="n">TEST_CASE</span><span class="p">(</span><span class="s">"errors can be inspected"</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="w">  </span><span class="n">String</span><span class="w"> </span><span class="n">errors</span><span class="p">;</span>
+<span class="w">  </span><span class="p">{</span>
+<span class="w">    </span><span class="n">unittest</span><span class="o">::</span><span class="n">CaptureLogerr</span><span class="w"> </span><span class="nf">capture</span><span class="p">(</span><span class="n">errors</span><span class="p">);</span>
+<span class="w">    </span><span class="n">run_something</span><span class="p">();</span>
+<span class="w">  </span><span class="p">}</span>
+<span class="w">  </span><span class="n">CHECK</span><span class="p">(</span><span class="n">strstr</span><span class="p">(</span><span class="n">errors</span><span class="p">,</span><span class="w"> </span><span class="s">"expected text"</span><span class="p">));</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="files">
+<h2>Files<a class="headerlink" href="#files" title="Link to this heading"></a></h2>
+<table border="1" class="docutils">
+<thead>
+<tr>
+<th>Function</th>
+<th>Path</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>unittest::data_path("x")</code></td>
+<td>the test's data dir (its source dir unless <code>--data-dir</code> is passed)</td>
+</tr>
+<tr>
+<td><code>unittest::artifact_path("x")</code></td>
+<td>the case's artifact dir, kept with the report</td>
+</tr>
+<tr>
+<td><code>unittest::scratch_dir()</code></td>
+<td>an empty writable dir for the current case</td>
+</tr>
+<tr>
+<td><code>unittest::http_service(url, root)</code></td>
+<td>an HTTP server for targets with <code>requires:t="http_server"</code></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="image-checks">
+<h2>Image checks<a class="headerlink" href="#image-checks" title="Link to this heading"></a></h2>
+<div class="highlight-cpp notranslate"><div class="highlight"><pre><span></span><span class="n">CHECK_IMAGE</span><span class="p">(</span><span class="n">image</span><span class="p">,</span><span class="w"> </span><span class="s">"gradient"</span><span class="p">,</span><span class="w"> </span><span class="n">ImageCompareParams</span><span class="p">{});</span><span class="w">           </span><span class="c1">// references/gradient.png</span>
+<span class="n">ImageCompareParams</span><span class="w"> </span><span class="n">tolerant</span><span class="p">;</span>
+<span class="n">tolerant</span><span class="p">.</span><span class="n">perChannelTolerance</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span><span class="p">;</span><span class="w">                                </span><span class="c1">// a pixel is bad above this difference</span>
+<span class="n">tolerant</span><span class="p">.</span><span class="n">maxRms</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.5f</span><span class="p">;</span><span class="w">                                          </span><span class="c1">// whole image root mean square limit</span>
+<span class="n">tolerant</span><span class="p">.</span><span class="n">maxBadPixelsPercent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.1f</span><span class="p">;</span>
+<span class="n">CHECK_IMAGE</span><span class="p">(</span><span class="n">image</span><span class="p">,</span><span class="w"> </span><span class="s">"lit_scene"</span><span class="p">,</span><span class="w"> </span><span class="n">tolerant</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>References are looked up as <code class="docutils literal notranslate"><span class="pre">references/&lt;name&gt;.&lt;variant&gt;.png</span></code> first (the variant is the 3d driver name in GPU
+tests), then <code class="docutils literal notranslate"><span class="pre">references/&lt;name&gt;.png</span></code>. On a mismatch the actual, reference and diff images go to the report. A missing
+reference fails; <code class="docutils literal notranslate"><span class="pre">python</span> <span class="pre">dng.py</span> <span class="pre">test</span> <span class="pre">run</span> <span class="pre">--update-references</span></code> creates or replaces references with the actual images.</p>
+</section>
+<section id="command-line">
+<h2>Command line<a class="headerlink" href="#command-line" title="Link to this heading"></a></h2>
+<p>Besides the Catch2 options, test executables accept <code class="docutils literal notranslate"><span class="pre">--data-dir</span></code>, <code class="docutils literal notranslate"><span class="pre">--artifact-dir</span></code>, <code class="docutils literal notranslate"><span class="pre">--case-timeout</span> <span class="pre">&lt;sec&gt;</span></code>,
+<code class="docutils literal notranslate"><span class="pre">--image-variant</span></code>, <code class="docutils literal notranslate"><span class="pre">--gpu-driver</span></code> and <code class="docutils literal notranslate"><span class="pre">--update-references</span></code>. <code class="docutils literal notranslate"><span class="pre">dng.py</span> <span class="pre">test</span></code> passes them; run executables directly to
+debug a single case:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>_output/tests/windows-x86_64/foo-tests-dev.exe<span class="w"> </span><span class="s2">"my case name"</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="overview.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="das_unit_tests.html" class="btn btn-neutral float-right" title="daScript Unit Tests" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright Gaijin Entertainment 2026.
+      <span class="lastupdated">Last updated on Oct 11, 2026.
+      </span></p>
+  </div>
+
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
