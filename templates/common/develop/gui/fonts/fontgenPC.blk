@@ -1,0 +1,9 @@
+hRes { hRes:i=720; hRes:i=1080; hRes:i=1440; hRes:i=2160; }
+copyto:t="../pc.out.ui"
+atlas:t="fonts"
+forcePow2:b=yes
+font {
+  name:t="default"
+  file:t="JetBrainsMono-Regular.ttf"
+  size_percents:r=2.0
+}

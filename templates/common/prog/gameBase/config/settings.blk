@@ -1,0 +1,34 @@
+windowTitle:t="@GAME_NAME@"
+disableRemoteNetServices:b=yes
+disableMenu:b=yes
+skipSplashScreenAnimation:b=yes
+scene:t="gamedata/scenes/starter.blk"
+entitiesPath:t="gamedata/templates/entities.blk"
+game_das_project:t="%scripts/project.das_project"
+game_das_script:t="%scripts/game/main.das"
+game_sq_script:t="%scripts/game/start.nut"
+game_das_gen_2_make_syntax:b=yes
+game_das_loading_threads:i=1
+game_das_sandbox_project:t=""
+game_das_script_thread_init:t=""
+game_das_script_init:t=""
+video { mode:t="windowed"; resolution:t="1280 x 720"; driver:t="auto"; }
+graphics { preset:t="low"; }
+ui { overlay_ui_script:t="%scripts/ui/main.nut"; }
+mountPoints {
+  "%scripts" { forSource:t="../prog/scripts"; forVromfs:t="scripts"; }
+  "%darg" { forSource:t="@ENGINE_ROOT@/prog/scripts/sq/daRg"; forVromfs:t="sq/darg"; }
+  "%sqstd" { forSource:t="@ENGINE_ROOT@/prog/scripts/sq/std"; forVromfs:t="sq/std"; }
+  "%daeditor" { forSource:t="@ENGINE_ROOT@/prog/scripts/sq/daeditor"; forVromfs:t="sq/daeditor"; }
+  "%dngscripts" { forSource:t="@ENGINE_ROOT@/prog/daNetGame/scripts/globals"; forVromfs:t="daNetGame/qscripts"; }
+  "%dngdas" { forSource:t="@ENGINE_ROOT@/prog/daNetGame/scripts/das"; forVromfs:t="das"; }
+  "%daslib" { forSource:t="@ENGINE_ROOT@/prog/1stPartyLibs/daScript/daslib"; forVromfs:t="daslib"; }
+  "%gameLibs" { forSource:t="@ENGINE_ROOT@/prog/gameLibs"; forVromfs:t="gameLibs"; }
+  "%danetlibs" { forSource:t="@ENGINE_ROOT@/prog/daNetGameLibs"; forVromfs:t="danetlibs"; }
+}
+addonBasePath {
+  addon { vromed:b=yes; vrom:t="@GAME_ID@.vromfs.bin"; src:t="../prog/gameBase"; src:t="../prog/scripts"; }
+}
+addons { folder:t="content/@GAME_ID@"; }
+vromList { pack { path:t="ui/fonts.vromfs.bin"; mnt:t="ui/"; } }
+es_order:t=""

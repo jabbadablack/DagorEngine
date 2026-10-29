@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import sys
 sys.path.append('../../..')
+from pathlib import Path
+sys.path.insert(0, str(next(p for p in Path(__file__).resolve().parents if (p / 'prog/_jBuild/bootstrap/build_all.py').exists()) / 'prog/_jBuild/bootstrap'))
 from build_all import run, run_per_platform, DABUILD_CMD, BUILD_COMPONENTS, JAM_BUILD_TARGET_ARCH_OPTIONS
 sys.path.pop()
 

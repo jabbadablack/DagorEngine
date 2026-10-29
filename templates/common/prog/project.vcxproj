@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <PropertyGroup>
+    <DagorEngineRoot Condition="'$(DAGOR_ENGINE_ROOT)' != ''">$(DAGOR_ENGINE_ROOT)</DagorEngineRoot>
+    <DagorEngineRoot Condition="'$(DagorEngineRoot)' == ''">@ENGINE_ROOT_XML@</DagorEngineRoot>
+  </PropertyGroup>
+  <Import Project="$(DagorEngineRoot)/prog/_jBuild/msbuild/projectConfigurations.props" />
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>@PROJECT_GUID@</ProjectGuid>
+    <GameName>@GAME_NAME@</GameName>
+    <GameType>game</GameType>
+    <GameDir>$(MSBuildProjectDirectory)\..\game\</GameDir>
+    <OutDir>$(GameDir)windows-x86_64\</OutDir>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsDir)defaults.props" />
+  <Import Project="$(MSBuildToolsDir)config.props" />
+  <ItemGroup>
+    <CppSource Include="**\*.cpp;**\*.mm" />
+    <CppHeader Include="**\*.h;**\*.inl" />
+    <DagorMisc Include="jamfile;**\*.das;**\*.nut;**\*.blk;..\develop\**\*.blk" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsDir)common.targets" />
+</Project>

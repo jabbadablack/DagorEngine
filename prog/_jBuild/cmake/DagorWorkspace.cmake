@@ -81,3 +81,7 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${DAGOR_ENGINE_R
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${DAGOR_JAMFILE}" "${_dagor_script}" "${DAGOR_ENGINE_ROOT}/prog/platform.jam")
 message(STATUS "Default Jam target: ${DAGOR_ACTIVE_PROJECT}; executable: ${DAGOR_EXECUTABLE}")
 message(STATUS "Debugger working directory: ${DAGOR_WORKING_DIRECTORY}")
+
+add_custom_target(dagor_tools
+  COMMAND "${Python3_EXECUTABLE}" "${DAGOR_ENGINE_ROOT}/dng.py" tools
+  USES_TERMINAL VERBATIM)

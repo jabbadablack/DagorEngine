@@ -282,7 +282,7 @@ if $(OS) = NT {
     set_filter nul /1 file\(s\) copied/
     call_filtered $(ComSpec) /C copy /Y /B /V #\( "$(srcAbs:E=$(2))" "$(dstAbs:E=$(1))" )\# >nul
     clr_filters
-    if not exist $(dstAbs:E=$(1)) set errorlevel=13
+    call $(ComSpec) /C #\( if not exist "$(dstAbs:E=$(1))" exit /b 13 )\#
   }
 } else {
   actions together quietly raw_copy_file

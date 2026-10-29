@@ -1,0 +1,5 @@
+export {
+  gameResPack:t="*name_src"
+  ddsxTexPack:t="*name_src"
+  package:t="@GAME_ID@"
+}

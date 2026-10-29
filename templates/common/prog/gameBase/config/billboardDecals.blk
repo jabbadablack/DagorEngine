@@ -1,0 +1,2 @@
+// Default material has no bullet-hole textures. Games can add decal types here.
+default_billboard_decal {}

@@ -25,8 +25,12 @@ class WorkspaceTests(unittest.TestCase):
             patcher = patch.object(module, 'ROOT', self.root)
             patcher.start()
             self.addCleanup(patcher.stop)
+        for _, relative in generate_projects.PROJECTS:
+            placeholder = self.root / relative
+            placeholder.parent.mkdir(parents=True, exist_ok=True)
+            placeholder.write_text('<Project/>')
         shared = self.root / 'prog' / 'prog.vcxproj'
-        shared.parent.mkdir(parents=True)
+        shared.parent.mkdir(parents=True, exist_ok=True)
         shared.write_text('<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"><PropertyGroup><ProjectGuid>{89D18E89-8553-4D5B-842E-EE8D4F78043F}</ProjectGuid></PropertyGroup></Project>')
 
     def options(self, **values):
@@ -43,19 +47,31 @@ class WorkspaceTests(unittest.TestCase):
         result = create_game.create_game('MyGame', False, False, directory=self.root / 'projects/MyGame')
         game = Path(result['directory'])
         self.assertTrue((game / 'CMakeLists.txt').exists())
-        self.assertTrue((game / 'prog' / 'macosx_main.mm').exists())
-        self.assertTrue((game / 'prog/editor.cpp').exists())
-        self.assertTrue((game / 'prog/engine_paths.h').exists())
+        self.assertTrue((game / 'prog/scripts/game/main.das').exists())
+        self.assertTrue((game / 'prog/scripts/ui/main.nut').exists())
+        self.assertTrue((game / 'develop/assets/primitives/cube.lod00.dag').exists())
+        self.assertTrue((game / 'develop/gui/fonts/OFL.txt').exists())
+        self.assertFalse(list((game / 'game').rglob('*.das')))
+        self.assertFalse((game / 'prog/editor.cpp').exists())
         self.assertIn(str(self.root).replace('\\', '/'), (game / 'CMakeLists.txt').read_text())
-        self.assertIn('vulkan', (game / 'prog' / 'jamfile').read_text())
-        self.assertIn('Metal', (game / 'prog' / 'jamfile').read_text())
-        self.assertNotIn('@GAME_NAME@', (game / 'prog' / 'main.cpp').read_text())
-        self.assertIn('Dagor Engine', Path(result['solution']).read_text(encoding='utf-8-sig'))
+        self.assertIn('daNetGame/setup.jam', (game / 'prog/jamfile').read_text())
+        self.assertIn('%daeditor/editor.nut', (game / 'prog/scripts/ui/main.nut').read_text())
+        for file in game.rglob('*'):
+            if file.is_file() and file.suffix in ('.py', '.blk', '.das', '.nut', '.json', '.jam', '.md'):
+                text = file.read_text(encoding='utf-8')
+                self.assertNotIn('outerSpace', text, str(file))
+                self.assertNotIn('outer_space', text, str(file))
+                self.assertNotIn('testGI', text, str(file))
+        self.assertIn('MyGame.vcxproj', Path(result['solution']).read_text(encoding='utf-8-sig'))
+        self.assertNotIn('Dagor Engine', Path(result['solution']).read_text(encoding='utf-8-sig'))
+        self.assertTrue((game / 'prog/build.py').exists())
+        self.assertNotIn('dng.py', (game / 'build.cmd').read_text())
+        self.assertTrue((game / 'CMakePresets.json').exists())
         ET.parse(result['project'])
-        before = (game / 'prog' / 'main.cpp').read_bytes()
+        before = (game / 'prog/scripts/game/main.das').read_bytes()
         with self.assertRaises(ValueError):
             create_game.create_game('MyGame', False, False)
-        self.assertEqual(before, (game / 'prog' / 'main.cpp').read_bytes())
+        self.assertEqual(before, (game / 'prog/scripts/game/main.das').read_bytes())
 
     def test_platform_and_architecture_reach_jam(self):
         for platform in ('windows', 'linux', 'macOS'):
@@ -72,7 +88,8 @@ class WorkspaceTests(unittest.TestCase):
         self.assertEqual(before, registry.read_bytes())
         _, _, args = ide.invocation(self.options(project='MoveableGame'))
         self.assertIn('-sRoot=' + self.root.as_posix(), args)
-        self.assertIn('-sLocation=projects/MoveableGame/prog', args)
+        self.assertNotIn('-sLocation=projects/MoveableGame/prog', args)
+        self.assertIn('Location ?= "projects/MoveableGame/prog"', (self.root / 'projects/MoveableGame/prog/jamfile').read_text())
 
     def test_runtime_paths_follow_platform_layout(self):
         create_game.create_game('MyGame', False, False, directory=self.root / 'projects/MyGame')
@@ -82,17 +99,34 @@ class WorkspaceTests(unittest.TestCase):
         exe, _ = ide.runtime(self.options(project='MyGame', platform='linux', config='rel'))
         self.assertEqual(exe, self.root / 'projects/MyGame/game/linux-x86_64/MyGame')
 
+    def test_moving_game_to_another_engine_rebases_content_and_build_paths(self):
+        result = create_game.create_game('MoveableGame', False, False, directory=self.root / 'projects/MoveableGame')
+        game = Path(result['directory'])
+        new_engine = self.root / 'another engine'
+        source = game / 'prog/scripts/game/main.das'
+        before = source.read_bytes()
+        with patch.object(ide, 'ROOT', new_engine):
+            ide.register_project(game)
+        manifest = json.loads((game / 'dng-project.json').read_text())
+        self.assertEqual(manifest['engine'], str(new_engine))
+        settings = (game / 'prog/gameBase/config/settings.blk').read_text()
+        self.assertIn(new_engine.as_posix() + '/prog/scripts/sq/daRg', settings)
+        self.assertNotIn(self.root.as_posix() + '/prog/scripts/sq/daRg', settings)
+        self.assertIn(manifest['engine_from_prog'] + '/prog/gameLibs', (game / 'prog/mk.vromfs.blk').read_text())
+        self.assertEqual(source.read_bytes(), before)
+
     def test_multiplayer_template_contains_real_host_client_transport(self):
         result = create_game.create_game('NetworkGame', False, False, directory=self.root / 'projects/NetworkGame', template_name='multiplayer')
         game = Path(result['directory'])
-        self.assertTrue((game / 'prog/multiplayer.cpp').exists())
-        self.assertTrue((game / 'prog/editor.cpp').exists())
-        self.assertIn('3rdPartyLibs/enet', (game / 'prog/jamfile').read_text())
-        self.assertIn('multiplayer::update()', (game / 'prog/main.cpp').read_text())
+        self.assertTrue((game / 'host.cmd').exists())
+        self.assertTrue((game / 'client.sh').exists())
+        self.assertTrue((game / 'prog/scripts/ui/main.nut').exists())
+        self.assertIn('daNetGame', (game / 'prog/jamfile').read_text())
+        self.assertIn('--listen', (game / 'host.cmd').read_text())
 
     def test_standard_compilation_database_has_source_and_output_arguments(self):
         folder = self.root / 'prog/tools/converters/dag2blk'
-        folder.mkdir(parents=True)
+        folder.mkdir(parents=True, exist_ok=True)
         source = folder / 'main.cpp'
         source.write_text('int main() {}')
         entry = {'directory': str(folder), 'arguments': ['/bin/clang++', '-Iinclude', '-DTEST=1', ''],

@@ -1,0 +1,16 @@
+/_output/
+/.vs/
+/.idea/
+/cmake-build-*/
+/CMakeUserPresets.json
+*.vcxproj.user
+*.vcxproj.filters
+__pycache__/
+*.pyc
+*.dascache
+*.dshl.log
+/develop/.cache/
+/prog/shaders/shaders_*/
+/tools/*.shdump.bin
+/game/*
+!/game/*.config.blk

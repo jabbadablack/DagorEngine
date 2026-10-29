@@ -61,8 +61,10 @@ def invocation(opts):
         raise ValueError('Unknown/unsupported project. Choices: ' + ', '.join(registry))
     directory, extra = registry[opts.project]
     if opts.project not in {n for n, _ in PROJECTS}:
-        write_engine_header(directory.parent)
-        extra = [*extra, '-sRoot=' + ROOT.as_posix(), '-sLocation=' + os.path.relpath(directory, ROOT).replace('\\', '/')]
+        if not (directory.parent / 'dng-project.json').exists(): write_engine_header(directory.parent)
+        extra = [*extra, '-sRoot=' + ROOT.as_posix()]
+        if not (directory.parent / 'dng-project.json').exists():
+            extra += ['-sLocation=' + os.path.relpath(directory, ROOT).replace('\\', '/')]
     arch = host_arch() if opts.arch == 'native' else opts.arch
     args = [f'-sPlatform={opts.platform}', f'-sPlatformArch={arch}', f'-sConfig={opts.config}', *extra]
     return jam_executable(opts.jam), directory, args
@@ -111,9 +113,15 @@ def cmake_value(value):
 
 def write_engine_header(directory):
     header = Path(directory) / 'prog/engine_paths.h'
-    content = '#pragma once\n#define DAGOR_EDITOR_SHADER_PREFIX ' + json.dumps((ROOT / 'samples/testGI/game/compiledShaders/game').as_posix()) + '\n'
+    content = '#pragma once\n#define DAGOR_EDITOR_SHADER_PREFIX ' + json.dumps((ROOT / 'samples/testGI/game/compiledShaders/game').as_posix()) + '\n#define DAGOR_DAS_ROOT ' + json.dumps((ROOT / 'prog/1stPartyLibs/daScript').as_posix()) + '\n'
     if not header.exists() or header.read_text(encoding='utf-8') != content:
         header.write_text(content, encoding='utf-8')
+
+
+def project_name(directory):
+    candidates = list((Path(directory).resolve() / "prog").glob("*.vcxproj"))
+    if len(candidates) != 1: raise ValueError("Expected one project under directory/prog")
+    return candidates[0].stem
 
 
 def register_project(directory, name=None):
@@ -122,8 +130,40 @@ def register_project(directory, name=None):
     if len(candidates) != 1:
         raise ValueError('Expected one project under the selected directory/prog.')
     project = candidates[0]
-    write_engine_header(folder)
+    if not (folder / 'dng-project.json').exists(): write_engine_header(folder)
     name = name or project.stem
+    if (folder / 'dng-project.json').exists():
+        manifest = folder / 'dng-project.json'
+        data = json.loads(manifest.read_text(encoding='utf-8'))
+        old_engine = data['engine'].replace('\\', '/')
+        new_engine = ROOT.as_posix()
+        engine_from_prog = os.path.relpath(ROOT, folder / 'prog').replace('\\', '/')
+        # A game can be checked out on another host. Rebase the generated engine
+        # references while retaining game code and content customizations.
+        if old_engine != new_engine:
+            from xml.sax.saxutils import escape
+            files = [folder / 'CMakeLists.txt', project,
+                     *(folder / 'prog').rglob('*.blk'), *(folder / 'game').glob('*.config.blk')]
+            for file in files:
+                if not file.exists(): continue
+                original = file.read_text(encoding='utf-8')
+                text = original.replace(escape(old_engine), escape(new_engine)) if file.suffix == '.vcxproj' else original.replace(old_engine, new_engine)
+                if text != original: file.write_text(text, encoding='utf-8')
+        pack = folder / 'prog/mk.vromfs.blk'
+        old_relative = data.get('engine_from_prog')
+        if pack.exists() and old_relative and old_relative != engine_from_prog:
+            original = pack.read_text(encoding='utf-8')
+            text = original.replace('path:t="' + old_relative + '/prog/', 'path:t="' + engine_from_prog + '/prog/')
+            if text != original: pack.write_text(text, encoding='utf-8')
+        if data.get('engine') != str(ROOT) or old_relative != engine_from_prog:
+            data.update(engine=str(ROOT), engine_from_prog=engine_from_prog)
+            manifest.write_text(json.dumps(data, indent=2) + '\n', encoding='utf-8')
+        jamfile = folder / 'prog/jamfile'
+        text = jamfile.read_text(encoding='utf-8')
+        text = re.sub(r'^Root \?=.*?;', lambda _: 'Root ?= "' + ROOT.as_posix() + '" ;', text, count=1, flags=re.M)
+        location = os.path.relpath(folder / 'prog', ROOT).replace('\\', '/')
+        text = re.sub(r'^Location \?=.*?;', lambda _: 'Location ?= "' + location + '" ;', text, count=1, flags=re.M)
+        if text != jamfile.read_text(encoding='utf-8'): jamfile.write_text(text, encoding='utf-8')
     if not re.fullmatch(r'[A-Za-z][A-Za-z0-9_]{0,63}', name) or name != project.stem:
         raise ValueError('Project name must match its vcxproj filename.')
     if name.casefold() in {n.casefold() for n, _ in PROJECTS}:
@@ -163,7 +203,7 @@ def generate(opts):
         'DAGOR_JAMFILE': [directory / next((a[2:] for a in args if a.startswith('-f')), 'jamfile')],
         'DAGOR_INDEX_SOURCES': sorted({e['file'] for e in entries if Path(e['file']).exists()}),
         'DAGOR_INDEX_INCLUDES': includes, 'DAGOR_INDEX_DEFINES': defines,
-        'DAGOR_INDEX_FORCED': forced, 'DAGOR_PROJECT_NAMES': list(projects(opts.platform)),
+        'DAGOR_INDEX_FORCED': forced, 'DAGOR_PROJECT_NAMES': [opts.project] if opts.project not in {name for name, _ in PROJECTS} else list(projects(opts.platform)),
         'DAGOR_EXECUTABLE': [executable], 'DAGOR_WORKING_DIRECTORY': [workdir],
     }
     lines = [f'set({key}\n' + '\n'.join('  ' + cmake_value(value) for value in values) + '\n)' for key, values in variables.items()]
@@ -171,7 +211,7 @@ def generate(opts):
     print(f'Generated {len(entries)} compiler commands for {opts.project} ({opts.platform}/{opts.arch}/{opts.config})')
 
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action', choices=('list', 'generate', 'build', 'rebuild', 'clean', 'run', 'new', 'register'))
     parser.add_argument('--project', default='testGI')
@@ -184,7 +224,7 @@ def main():
     parser.add_argument('--directory')
     parser.add_argument('--template', choices=('singleplayer', 'multiplayer'), default='singleplayer')
     parser.add_argument('--dry-run', action='store_true')
-    opts, extra = parser.parse_known_args()
+    opts, extra = parser.parse_known_args(argv)
     if extra[:1] == ['--']:
         extra = extra[1:]
     if extra and opts.action not in ('build', 'rebuild', 'clean', 'run'):

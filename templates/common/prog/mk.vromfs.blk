@@ -1,0 +1,19 @@
+platform:t="PC"
+outputRoot_PC:t="../game/"
+output:t="@GAME_ID@.vromfs.bin"
+allowMkDir:b=yes
+pack:b=yes
+rootFolder:t="."
+folder { path:t="gameBase"; dest_path:t="."; scan_folder:b=yes; scan_subfolders:b=yes; wildcard:t="*.das"; wildcard:t="*.das_project"; wildcard:t="*.blk"; wildcard:t="*.nut"; wildcard:t="*.svg"; wildcard:t="*.json"; }
+folder { path:t="scripts"; dest_path:t="scripts"; scan_folder:b=yes; scan_subfolders:b=yes; wildcard:t="*.das"; wildcard:t="*.das_project"; wildcard:t="*.blk"; wildcard:t="*.nut"; wildcard:t="*.svg"; wildcard:t="*.json"; }
+folder { path:t="@ENGINE_FROM_PROG@/prog/scripts/sq/daRg"; dest_path:t="sq/darg"; scan_folder:b=yes; scan_subfolders:b=yes; wildcard:t="*.das"; wildcard:t="*.das_project"; wildcard:t="*.blk"; wildcard:t="*.nut"; wildcard:t="*.svg"; wildcard:t="*.json"; }
+folder { path:t="@ENGINE_FROM_PROG@/prog/scripts/sq/std"; dest_path:t="sq/std"; scan_folder:b=yes; scan_subfolders:b=yes; wildcard:t="*.das"; wildcard:t="*.das_project"; wildcard:t="*.blk"; wildcard:t="*.nut"; wildcard:t="*.svg"; wildcard:t="*.json"; }
+folder { path:t="@ENGINE_FROM_PROG@/prog/scripts/sq/daeditor"; dest_path:t="sq/daeditor"; scan_folder:b=yes; scan_subfolders:b=yes; wildcard:t="*.das"; wildcard:t="*.das_project"; wildcard:t="*.blk"; wildcard:t="*.nut"; wildcard:t="*.svg"; wildcard:t="*.json"; }
+folder { path:t="@ENGINE_FROM_PROG@/prog/1stPartyLibs/daScript/daslib"; dest_path:t="daslib"; scan_folder:b=yes; scan_subfolders:b=yes; wildcard:t="*.das"; wildcard:t="*.das_project"; wildcard:t="*.blk"; wildcard:t="*.nut"; wildcard:t="*.svg"; wildcard:t="*.json"; }
+folder { path:t="@ENGINE_FROM_PROG@/prog/daNetGame/scripts/globals"; dest_path:t="daNetGame/qscripts"; scan_folder:b=yes; scan_subfolders:b=yes; wildcard:t="*.das"; wildcard:t="*.das_project"; wildcard:t="*.blk"; wildcard:t="*.nut"; wildcard:t="*.svg"; wildcard:t="*.json"; }
+folder { path:t="@ENGINE_FROM_PROG@/prog/daNetGame/scripts/das"; dest_path:t="das"; scan_folder:b=yes; scan_subfolders:b=yes; wildcard:t="*.das"; wildcard:t="*.das_project"; wildcard:t="*.blk"; wildcard:t="*.nut"; wildcard:t="*.svg"; wildcard:t="*.json"; }
+folder { path:t="@ENGINE_FROM_PROG@/prog/daNetGameLibs"; dest_path:t="danetlibs"; scan_folder:b=yes; scan_subfolders:b=yes; wildcard:t="*.das"; wildcard:t="*.das_project"; wildcard:t="*.blk"; wildcard:t="*.nut"; wildcard:t="*.svg"; wildcard:t="*.json"; }
+folder { path:t="@ENGINE_FROM_PROG@/prog/gameLibs"; dest_path:t="gameLibs"; scan_folder:b=yes; scan_subfolders:b=yes; wildcard:t="*.das"; wildcard:t="*.das_project"; wildcard:t="*.blk"; wildcard:t="*.nut"; wildcard:t="*.svg"; wildcard:t="*.json"; }
+
+sign_private_key:t=""
+sign_digest:t="sha256"

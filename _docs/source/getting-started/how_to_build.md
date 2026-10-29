@@ -36,14 +36,14 @@ Requirements for building and using the Dagor Engine toolkit:
    cd DagorEngine
    ```
 
-7. Run the `make_devtools.py` script.
+7. Bootstrap the engine with `dng.py`.
 
    This script will download, install, and configure the build toolkit. You
    should provide the path to the build toolkit directory as an argument, and
    the script will create this directory if it doesn't exist.
 
    ```text
-   python3 make_devtools.py X:\develop\devtools
+   python3 dng.py bootstrap --install-devtools --devtools X:\develop\devtools
    ```
 
    ```{important}
@@ -75,6 +75,22 @@ Requirements for building and using the Dagor Engine toolkit:
 
 8. Restart the command line console to make the new environment variables
    available.
+
+## Create an independent game
+
+Create a single-player or multiplayer project, then build it from its own folder:
+
+```text
+python dng.py new --name MyGame --template singleplayer --directory ../MyGame
+cd ../MyGame
+python prog/build.py
+```
+
+Open `MyGame.sln` in Visual Studio or `CMakeLists.txt` in Rider/CLion. Each game
+has its own solution, CMake presets, `build.cmd`/`build.sh`, and local build script.
+Subsequent game builds do not require calling the engine's root command. Gameplay
+sources live in `prog/scripts/game`, source assets in `develop`, and build outputs
+in `game`. See [IDE workspaces](../../ide_workspaces.md) for the current workflow.
 
 ## How to Build: Prebuilt Binaries
 

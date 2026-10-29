@@ -64,7 +64,8 @@ def discover_projects():
     registry = ROOT / '_output' / 'ide' / 'project-registry.json'
     records = json.loads(registry.read_text(encoding='utf-8')) if registry.exists() else []
     external = [(record['name'], record['project']) for record in records if Path(record['project']).is_file()]
-    return PROJECTS[:-1] + sorted(external) + PROJECTS[-1:]
+    builtin = [(name, path) for name, path in PROJECTS if (ROOT / path).is_file()]
+    return [p for p in builtin if p[0] != 'Dagor Engine'] + sorted(external) + [p for p in builtin if p[0] == 'Dagor Engine']
 
 
 def write_solution(destination, projects):

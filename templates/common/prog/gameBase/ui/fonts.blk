@@ -1,0 +1,3 @@
+fontbins { name:t="ui/fonts"; }
+refHRes:i=1080
+dynamicGen { texCount:i=2; texSz:i=1024; prefix:t="ui"; }

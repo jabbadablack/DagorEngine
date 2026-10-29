@@ -1,0 +1,34 @@
+shaders:t="tools/tools"
+dngShaders:t="game/compiledShaders/game"
+collision:t="Jolt"
+useDynrend:b=yes
+SDK { sdk_folder:t="develop"; levels_folder:t="develop/levels"; }
+game {
+  game_folder:t="game"
+  base_path:t="prog/gameBase"
+  levels_bin_folder:t="game/content/@GAME_ID@/levels"
+  physmat:t="prog/gameBase/config/physmat.blk"
+  params:t="prog/gameBase/config/gameparams.blk"
+  entities:t="prog/gameBase/gamedata/templates/entities.blk"
+  scene:t="prog/gameBase/gamedata/scenes/starter.blk"
+  main_vromfs:t="@GAME_ID@.vromfs.bin"
+  daNetGameRender:b=yes
+  daNetGameEditorRender:b=yes
+}
+assets {
+  types { type:t="tex"; type:t="rendInst"; type:t="collision"; type:t="prefab"; type:t="ecs_template"; }
+  base:t="develop/assets"
+  export {
+    types { type:t="tex"; type:t="rendInst"; type:t="collision"; }
+    plugins { folder:t="*common"; }
+    folderDefaults { gameResPack:t="*parent"; ddsxTexPack:t="*parent"; }
+    cache:t="develop/.cache"
+    packlist:t="resPacks.blk"
+    destGrpHdrCache { gameRelatedPath:t="."; PC:t="game/content/@GAME_ID@/res/grp_hdr.vromfs.bin"; }
+    destination {
+      PC:t="game/content/@GAME_ID@/res"
+      additional { PC:t="game/content"; suffix:t="res/"; gluePackage:t="_"; }
+    }
+    packages { forceExplicitList:b=yes; @GAME_ID@ { PC:b=yes; } }
+  }
+}

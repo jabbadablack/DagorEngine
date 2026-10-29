@@ -1,0 +1,19 @@
+platform:t="PC"
+outputRoot_PC:t="../../game/"
+output:t="ui/fonts.vromfs.bin"
+allowMkDir:b=yes
+pack:b=no
+rootFolder:t="."
+folder {
+  path:t="pc.out.ui"
+  dest_path:t="."
+  scan_folder:b=yes
+  scan_subfolders:b=yes
+  wildcard:t="*.bin"
+  wildcard:t="*.dynFont.blk"
+  wildcard:t="*.ttf"
+}
+folder { path:t="../../prog/gameBase/ui"; dest_path:t="."; scan_folder:b=yes; wildcard:t="fonts.blk"; }
+
+sign_private_key:t=""
+sign_digest:t="sha256"

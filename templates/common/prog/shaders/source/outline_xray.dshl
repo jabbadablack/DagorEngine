@@ -1,0 +1,2 @@
+// No x-ray gameplay pass in the starter.
+shader edge_detect, edge_detect_box { dont_render; }

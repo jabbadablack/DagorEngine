@@ -1,0 +1,12 @@
+// Fixed exposure for the original graybox starter.
+float const_frame_exposure = 1;
+macro INIT_EXPOSURE(stage)
+endmacro
+macro USE_EXPOSURE(stage)
+  hlsl(stage) {
+    half getExposureScale() { return half(1); }
+    half getInvExposureScale() { return half(1); }
+    half getPrevExposureRatio() { return half(1); }
+    half getPrevInvExposure() { return half(1); }
+  }
+endmacro

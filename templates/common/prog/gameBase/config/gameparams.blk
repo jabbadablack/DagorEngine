@@ -1,0 +1,8 @@
+use_damage_model:b=no
+use_flight_model:b=no
+use_ai:b=no
+use_water_render:b=no
+use_da_skies:b=no
+use_blood_puddles:b=no
+rendinstExtraMaxCnt:i=4096
+commonClientScenes { scene:t="gamedata/scenes/render.blk"; }

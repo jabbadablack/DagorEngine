@@ -1,0 +1,55 @@
+starter_camera {
+  _tags:t="gameClient"
+  "camera_view:tag"{}
+  camera__active:b=yes
+  fov:r=75
+  znear:r=0.05
+  zfar:r=10000
+  transform:m=[[1,0,0] [0,1,0] [0,0,1] [0,3,-10]]
+}
+starter_cube {
+  transform:m=[[1,0,0] [0,1,0] [0,0,1] [0,0,0]]
+  starter__elapsed:r=0.0
+  ri_extra__name:t="cube"
+  ri_extra{}
+}
+starter_sphere { _use:t="starter_cube"; ri_extra__name:t="sphere"; }
+starter_plane { _use:t="starter_cube"; ri_extra__name:t="plane"; starter__animate:b=no; }
+
+// Engine camera component contract; no sample templates are imported.
+free_cam {
+  _use:t="starter_camera"
+  camera__active:b=no
+  camera__input_enabled:b=yes
+  editableObj:b=no
+  free_cam{}
+  input{}
+  free_cam__mouse:p2=0,0
+  free_cam__move:p2=0,0
+  free_cam__rotate:p2=0,0
+  free_cam__shiftY:r=0
+  free_cam__turbo:b=no
+  free_cam__bank:r=0
+  free_cam__angSpdScale:p2=0.001,0.001
+  free_cam__move_speed:r=5
+  free_cam__moveSpeedDefault:r=5
+  base_transform:m=[[1,0,0] [0,1,0] [0,0,1] [0,0,0]]
+  _tracked:t="camera__active"
+  _tracked:t="free_cam__move_speed"
+  _tracked:t="free_cam__angSpdScale"
+  "free_cam_input__move:u16" { value:i=-1; }
+  "free_cam_input__rotate:u16" { value:i=-1; }
+  "free_cam_input__shiftY:u16" { value:i=-1; }
+  "free_cam_input__zoomIn:u16" { value:i=-1; }
+  "free_cam_input__zoomOut:u16" { value:i=-1; }
+  "free_cam_input__turbo:u16" { value:i=-1; }
+  "free_cam_input__speedUp:u16" { value:i=-1; }
+  "free_cam_input__speedDown:u16" { value:i=-1; }
+  "free_cam_input__speedReset:u16" { value:i=-1; }
+  "free_cam_input__bank:u16" { value:i=-1; }
+}
+daeditor_selected { "daeditor__selected:tag"{}; }
+
+include "network.blk"
+
+msg_sink { _singleton:b=yes; msg_sink{}; replication { _tags:t="net"; } }

@@ -1,0 +1,54 @@
+Root ?= "@ENGINE_ROOT@" ;
+Location ?= "@PROJECT_LOCATION@" ;
+Game = @GAME_ID@ ;
+TargetType ?= exe ;
+Target ?= projects/@GAME_NAME@ ;
+TargetCodeName = $(Game) ;
+GameWindowTitle = "@GAME_NAME@" ;
+GameUserDirName = "@GAME_NAME@" ;
+GameMainVromFilePath = @GAME_ID@.vromfs.bin ;
+UseSystemOpenSSL = no ;
+UseModulesAI = no ;
+UseModulesDM = no ;
+UseModulesWeapon = no ;
+UseGameCallbacks = yes ;
+UseHostedInternalServer = no ;
+HaveSound = no ;
+ContentUpdater = no ;
+UseEpic = no ;
+VRDeviceSupport = no ;
+include $(Root)/prog/_jBuild/defPlatform.jam ;
+if $(Platform) = windows { UseD3DMultiList = DX11 ; }
+include $(Root)/prog/daNetGame/setup.jam ;
+if $(Dedicated) = yes { CPPopt += -DSTARTER_DEDICATED=1 ; }
+SetupOutputDir ;
+GameDir = $(Root)/$(Location)/../game ;
+OutDir = $(GameDir)/$(Platform)-$(PlatformArch) ;
+include $(Root)/prog/daNetGame/game.jam ;
+
+Sources += host.cpp ;
+UseProgLibs += daNetGame daNetGameLibs/native_dasevents daNetGameLibs/dm/stub ;
+if $(Config) in dbg dev { UseProgLibs += gameLibs/dasModules/pathFinder gameLibs/pathFinder gameLibs/pathFinder/tileCache ; }
+gamePulls_action = make_module_pull_cpp ;
+gamePulls = daECS/core/componentType.h game_pulls ;
+gamePulls += daNetGameLibs_native_dasevents_DAS_pull_AOT ;
+if $(Dedicated) != yes {
+  UseProgLibs += daNetGameLibs/frame_graph_renderer daNetGameLibs/render_debug ;
+  gamePulls += daNetGameLibs_render_debug_DAS_pull_AOT daNetGameLibs_frame_graph_renderer_DAS_pull_AOT ;
+} else {
+  UseProgLibs += engine/drv/drv3d_stub ;
+}
+AddGamePullsToSources ;
+AddIncludes += $(Root)/prog/daNetGameLibs $(Root)/prog/gameLibs ;
+AddIncludes += $(Root)/prog/daNetGame $(Root)/prog/1stPartyLibs/daScript/include
+  $(Root)/prog/1stPartyLibs/daScript/include/das_hash_map ;
+if $(Platform) = windows && $(Dedicated) != yes {
+  include $(Root)/prog/engine/drv/drv3d_DX12/copy_bundles.jam ;
+  include $(Root)/prog/engine/drv/drv3d_commonCode/copy_bundles.jam ;
+}
+if $(Platform) = macOS {
+  BundleName = @GAME_NAME@ ;
+  BundleID = local.@GAME_ID@ ;
+  BundlePlist = @$(Root)/prog/_jBuild/macOS/generic.info.plist ../Info.plist ;
+}
+include $(Root)/prog/_jBuild/build.jam ;

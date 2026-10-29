@@ -1,0 +1,5 @@
+PhysMats {
+  __DefaultParams { physStaticFriction:r=0.8; physRestitution:r=0.0; }
+  default {}
+}
+InteractPropsList {}

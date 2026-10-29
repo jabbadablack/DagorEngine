@@ -1,0 +1,11 @@
+configVer:i=1
+Camera.Move {
+  dev:i=31
+  xMinBtn { dev:i=1; btn:i=30; }
+  xMaxBtn { dev:i=1; btn:i=32; }
+  yMinBtn { dev:i=1; btn:i=31; }
+  yMaxBtn { dev:i=1; btn:i=17; }
+}
+Camera.Rotate { dev:i=2; xAxis:i=0; yAxis:i=1; dzone:r=0; maxVal:r=1; }
+Camera.ShiftY { dev:i=31; minBtn { dev:i=1; btn:i=46; } maxBtn { dev:i=1; btn:i=18; } }
+Camera.Turbo { dev:i=31; maxBtn { dev:i=1; btn:i=42; } }

@@ -1,0 +1,8 @@
+network_state {
+  _singleton:b=yes
+  replication { _tags:t="net"; }
+  network__serverTime:r=0
+  _replicated:t="network__serverTime"
+  _tracked:t="network__serverTime"
+  "net__inInitialScope:tag"{}
+}

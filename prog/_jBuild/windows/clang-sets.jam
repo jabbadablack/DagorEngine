@@ -135,7 +135,9 @@ if $(UseLLDLink) != yes {
 } else {
   _LINK = $(_CLANG_DIR)/bin/lld-link.exe ; #we have to allow /force:multiple, otherwise it is not linking with effects :(
 }
-_LIB  = $(_CLANG_DIR)/bin/lld-link.exe /lib ;
+# Use the librarian directly. lld-link /lib redispatches response files and can
+# leave a literal @filename for large archives under Jam's response expansion.
+_LIB  = $(_CLANG_DIR)/bin/llvm-lib.exe ;
 LINK_RESPONSE_MARKER = @@@ ;
 
 # CI sets it to a compiler cache launcher (e.g. sccache) via `jam -sCompilerWrapper=sccache`; empty by default

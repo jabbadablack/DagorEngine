@@ -1,0 +1,18 @@
+configVer:i=1
+actionSets {
+  Globals {}
+  Camera {
+    internal:b=yes
+    Camera.Move { type:t="joystick_move"; }
+    Camera.Rotate { type:t="absolute_mouse"; }
+    Camera.ShiftY { type:t="steerwheel"; }
+    Camera.Turbo { type:t="trigger"; }
+    Camera.LookAround { type:t="trigger"; }
+    Camera.ZoomIn { type:t="digital_button"; }
+    Camera.ZoomOut { type:t="digital_button"; }
+    Camera.SpeedUp { type:t="digital_button"; }
+    Camera.SpeedDown { type:t="digital_button"; }
+    Camera.SpeedReset { type:t="digital_button"; }
+    Camera.Bank { type:t="steerwheel"; }
+  }
+}

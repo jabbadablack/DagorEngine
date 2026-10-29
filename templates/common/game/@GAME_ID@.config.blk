@@ -1,0 +1,2 @@
+// Use editable sources in development. Release loads the packaged VROMFS.
+debug { useAddonVromSrc:b=yes; vromSrcPath:t="../prog/gameBase/"; }

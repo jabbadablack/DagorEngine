@@ -25,10 +25,10 @@ git clone https://github.com/GaijinEntertainment/DagorEngine.git
 cd DagorEngine
 ```
 
-Run the `make_devtools.py` script. This script will download, install, and configure the build toolkit. You should provide the path to the build toolkit folder as an argument, and the script will create this folder if it doesn't exist.
+Run `dng.py bootstrap --install-devtools --skip-build`. This script will download, install, and configure the build toolkit. You should provide the path to the build toolkit folder as an argument, and the script will create this folder if it doesn't exist.
 
 ```
-python3 make_devtools.py X:\develop\devtools
+python3 dng.py bootstrap --install-devtools --skip-build --devtools X:\develop\devtools
 ```
 
 If the script is not run as an administrator, installers of certain programs may request permission for installation, which you should grant. If you plan to use plugins for 3ds Max, press 'Y' when the script asks if you want to install the 3ds Max SDK. The script will also ask to add the path X:\develop\devtools to the PATH environment variable and set the GDEVTOOL variable to point to this folder.
@@ -98,36 +98,28 @@ If you are going to run samples unpack [samples-base.7z](https://dagorenginedata
 
 To build and run OuterSpace sample project unpack also [outerSpace-devsrc.7z](https://dagorenginedata.cdn.gaijin.net/head-2026.10.11/outerSpace-devsrc.7z) to DagorEngine root.
 
-Then run `build_all.py` in DagorEngine root.
+Use the single root entry point for engine and game development:
 
-This builds the entire project toolkit from the source code. This process may take a considerable amount of time.
-After tools are built and ready to be used script builds game and UI resources using daBuild and other utilities.
+```sh
+python dng.py bootstrap                         # CMake configure + engine tools + default project
+python dng.py bootstrap --skip-build            # Configure using an existing toolchain
+python dng.py build --project testGI
+python dng.py new --name MyGame --template singleplayer --directory ../MyGame
+cd ../MyGame
+python prog/build.py                            # This game
+python prog/build.py --no-build --run
+python prog/build.py --level-editor
+python prog/build.py --asset-viewer
+```
 
-You can use direct build commands instead of using Python script.<br>
-For example we will build "skiesSample" sample:<br>
-* **To build code**, navigate to the `X:\develop\DagorEngine\samples\skiesSample\prog` folder and run the `jam` command (it builds `jamfile` script found in that folder).<br>After building the executable file will be placed in the `skiesSample\game` folder.<br>
-* **To build shaders**, navigate to the `X:\develop\DagorEngine\samples\skiesSample\prog\shaders` folder and run any of `compile_shaders_*` scripts.<br>After building the shader-dump file will be placed in the `skiesSample\game\compiledShaders` folder.<br>
-* **To build resources**, navigate to the `X:\develop\DagorEngine\samples\skiesSample\develop` folder and run the `dabuild.cmd` script.<br>After building the game resources will be placed in the `skiesSample\game\res` folder.<br>
+CMake entry files remain under `prog/_jBuild`. Jam is the native build backend;
+`dng.py` uses CMake to configure and build its targets. The old platform installer
+and sample build recipes are internal modules under `prog/_jBuild/bootstrap`,
+not additional root commands. See [_docs/ide_workspaces.md](_docs/ide_workspaces.md).
 
-You can also build everything for **Outer Space** sample game project or **daNetGame-based Scene Viewer** with their own scripts:<br>
-* `X:\develop\DagorEngine\outerSpace\prog\build.py`<br>
-* `X:\develop\DagorEngine\samples\dngSceneViewer\prog\build.py`<br>
-
-Just be aware that these scripts use DagorEngine tools so they must be built beforehand or downloaded as prebuilt archive as described earlier.
-
-`build*.py` script may accept optional parameters to limit components to be built:
-`code`, `shaders`, `assets`, `vromfs`, `gui`.
-If no parameters passed script builds all components.
-
-`build*.py` script may accept optional parameters to force target architecture to be built, e.g. `arch:x86_64`, `arch:arm64`, `arch:x86`.
-If none is specified code is built to default architecture (depends on host OS and jamfile settings).
-Not all code applies target architecture now (only **Outer Space** and **daNetGame-based Scene Viewer**).
-
-`build_all.py` script in addition to components accepts optional list of projects to be built:
-`project:dagorTools`, `project:physTest`, `project:skiesSample`, `project:testGI`, `project:outerSpace`, `project:dngSceneViewer`.
-If none is passed script builds all projects.
-
-Example: `build_all.py project:dngSceneViewer code shaders` will build only code and shaders for **daNetGame-based Scene Viewer** project.
+New templates are independent of sample projects and assets. They provide
+original graybox meshes, daScript gameplay, and Quirrel/daRg embedded editor UI.
+Editable sources stay in `prog`/`develop`; build outputs stay in `game`.
 
 ### Basic dagor samples
 

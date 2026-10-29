@@ -4,6 +4,8 @@ import shutil
 import os
 
 sys.path.append('../..')
+from pathlib import Path
+sys.path.insert(0, str(next(p for p in Path(__file__).resolve().parents if (p / 'prog/_jBuild/bootstrap/build_all.py').exists()) / 'prog/_jBuild/bootstrap'))
 from build_all import run, run_per_platform, VROMFS_PACKER_EXE, DABUILD_CMD, FONTGEN_EXE, BUILD_COMPONENTS, DAGOR_HOST, BUILD_TARGET_ARCH, DAGOR_HOST_ARCH, JAM_BUILD_TARGET_ARCH_OPTIONS
 sys.path.pop()
 
