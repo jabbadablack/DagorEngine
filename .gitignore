@@ -24,3 +24,9 @@ ShaderLog-*
 *.vcxproj.user
 *.vcxproj.filters
 /prog/_jBuild/msbuild/bin/
+/.idea/
+/.cache/
+/cmake-build-*/
+/CMakeUserPresets.json
+/prog/_jBuild/CMakeUserPresets.json
+/prog/_jBuild/cmake-build-*/

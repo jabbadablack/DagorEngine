@@ -1,5 +1,9 @@
 # Visual Studio and Visual Dagor
 
+For Rider/CLion, native host builds and standalone single-player/multiplayer
+templates, see [Portable IDE workspaces](ide_workspaces.md). The CMake entry point
+is `prog/_jBuild/CMakeLists.txt`; the Visual Studio solution remains Windows-only.
+
 Open `DagorEngine.sln` with Visual Studio 2022 or 2026, Desktop development with
 C++, and the Visual Dagor extension installed. The integration currently targets
 Windows x86_64 with `dbg`, `dev`, and `rel` configurations. It runs the existing
@@ -18,7 +22,7 @@ The default extension source directory is `..\DagorVisualStudioTools`. This
 checkout needs the Visual Studio 18 build fixes. Pass `-ExtensionRoot <path>` if
 it is elsewhere. Setup builds its MSBuild task project, copies the task and its
 runtime dependencies to `prog\_jBuild\msbuild\bin`, generates solution/filter
-files, and asks Jam for compiler settings in all 24 executable/configuration
+files, and asks Jam for compiler settings in all configured executable/configuration
 combinations. It does not compile the engine or rebuild the VSIX.
 
 `GDEVTOOL` selects the devtools directory; the fallback is `..\devtools`. The
@@ -48,7 +52,7 @@ without unsupported wildcard project items. Keep the tracked `CppSource` and
    Jamfile. Runtime assets still come from the normal engine setup.
 
 The solution includes testGI, skiesSample, dng_scene_viewer, outer_space,
-ShaderCompiler2 (DX12), AssetViewer, daEditorX and dag2blk, plus the shared engine
+ShaderCompiler2 (DX12), AssetViewer, daEditorX, dag2blk and dargbox, plus the shared engine
 source project. Build Solution selects testGI by default. Build other projects
 explicitly or enable them in Configuration Manager.
 

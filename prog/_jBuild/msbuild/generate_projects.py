@@ -1,5 +1,7 @@
 """Recreate the solution and folder filters without editing engine project source lists."""
 from pathlib import Path
+import os
+import json
 import uuid
 import xml.etree.ElementTree as ET
 
@@ -13,6 +15,7 @@ PROJECTS = [
     ('AssetViewer', 'prog/tools/AssetViewer/AssetViewer.vcxproj'),
     ('daEditorX', 'prog/tools/sceneTools/daEditorX/daEditorX.vcxproj'),
     ('dag2blk', 'prog/tools/converters/dag2blk/dag2blk.vcxproj'),
+    ('dargbox', 'prog/tools/dargbox/dargbox.vcxproj'),
     ('Dagor Engine', 'prog/prog.vcxproj'),
 ]
 NS = 'http://schemas.microsoft.com/developer/msbuild/2003'
@@ -57,16 +60,22 @@ def filters(project):
     ET.ElementTree(items_root).write(destination, encoding='utf-8', xml_declaration=True)
 
 
-def main():
+def discover_projects():
+    registry = ROOT / '_output' / 'ide' / 'project-registry.json'
+    records = json.loads(registry.read_text(encoding='utf-8')) if registry.exists() else []
+    external = [(record['name'], record['project']) for record in records if Path(record['project']).is_file()]
+    return PROJECTS[:-1] + sorted(external) + PROJECTS[-1:]
+
+
+def write_solution(destination, projects):
     lines = ['Microsoft Visual Studio Solution File, Format Version 12.00',
              '# Visual Studio Version 18', 'VisualStudioVersion = 18.0.0.0',
              'MinimumVisualStudioVersion = 17.0.0.0']
     guids = []
-    for name, relative in PROJECTS:
-        project = ROOT / relative
+    for name, project in projects:
         guid = ET.parse(project).find(f'.//{{{NS}}}ProjectGuid').text.upper()
         guids.append(guid)
-        path = relative.replace('/', '\\')
+        path = os.path.relpath(project, destination.parent).replace('/', '\\')
         lines += [f'Project("{{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}}") = "{name}", "{path}", "{guid}"', 'EndProject']
         filters(project)
     lines += ['Global', '\tGlobalSection(SolutionConfigurationPlatforms) = preSolution']
@@ -79,7 +88,11 @@ def main():
         # Build Solution builds one sample by default. Other executables are built explicitly.
         lines.append(f'\t\t{guids[0]}.{config}|x64.Build.0 = {config}|x64')
     lines += ['\tEndGlobalSection', 'EndGlobal']
-    (ROOT / 'DagorEngine.sln').write_text('\n'.join(lines) + '\n', encoding='utf-8-sig')
+    destination.write_text('\n'.join(lines) + '\n', encoding='utf-8-sig')
+
+
+def main():
+    write_solution(ROOT / 'DagorEngine.sln', [(name, ROOT / path) for name, path in discover_projects()])
     print('Generated DagorEngine.sln and project folder filters')
 
 

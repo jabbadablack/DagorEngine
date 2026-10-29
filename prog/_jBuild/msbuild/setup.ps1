@@ -27,9 +27,15 @@ if (!(Test-Path -LiteralPath $python)) { $python = 'python' }
 & $python (Join-Path $PSScriptRoot 'generate_projects.py')
 if ($LASTEXITCODE) { throw 'Generating the Visual Studio solution failed.' }
 if (!$SkipIntelliSense) {
-    foreach ($project in @('samples\testGI\prog\testGI.vcxproj', 'samples\skiesSample\prog\skiesSample.vcxproj', 'samples\dngSceneViewer\prog\dng_scene_viewer.vcxproj', 'outerSpace\prog\outer_space.vcxproj', 'prog\tools\ShaderCompiler2\ShaderCompiler2.vcxproj', 'prog\tools\AssetViewer\AssetViewer.vcxproj', 'prog\tools\sceneTools\daEditorX\daEditorX.vcxproj', 'prog\tools\converters\dag2blk\dag2blk.vcxproj')) {
+    $projects = @('samples\testGI\prog\testGI.vcxproj', 'samples\skiesSample\prog\skiesSample.vcxproj', 'samples\dngSceneViewer\prog\dng_scene_viewer.vcxproj', 'outerSpace\prog\outer_space.vcxproj', 'prog\tools\ShaderCompiler2\ShaderCompiler2.vcxproj', 'prog\tools\AssetViewer\AssetViewer.vcxproj', 'prog\tools\sceneTools\daEditorX\daEditorX.vcxproj', 'prog\tools\converters\dag2blk\dag2blk.vcxproj', 'prog\tools\dargbox\dargbox.vcxproj')
+    $registry = Join-Path $engineRoot '_output\ide\project-registry.json'
+    if (Test-Path -LiteralPath $registry) {
+        $projects += @(Get-Content $registry -Raw | ConvertFrom-Json | ForEach-Object { $_.project } | Where-Object { Test-Path -LiteralPath $_ })
+    }
+    foreach ($project in $projects) {
       foreach ($config in $Configurations) {
-        & $msbuild (Join-Path $engineRoot $project) /t:GenerateDagorIntelliSense /p:Configuration=$config /p:Platform=x64 /nologo /v:minimal /nr:false
+        $projectPath = if ([IO.Path]::IsPathRooted($project)) { $project } else { Join-Path $engineRoot $project }
+        & $msbuild $projectPath /t:GenerateDagorIntelliSense /p:Configuration=$config /p:Platform=x64 /nologo /v:minimal /nr:false
         if ($LASTEXITCODE) { throw "Generating IntelliSense failed for $project" }
       }
     }

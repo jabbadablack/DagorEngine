@@ -1,5 +1,9 @@
 ## How to Build: Environment
 
+For Rider, CLion and portable CMake workspaces, open
+[`prog/_jBuild/CMakeLists.txt`](prog/_jBuild/CMakeLists.txt) and see
+[IDE workspaces and single-player/multiplayer templates](_docs/ide_workspaces.md).
+
 For Visual Studio 2022/2026 and the Visual Dagor extension, see
 [Visual Studio setup, builds and IntelliSense](_docs/visual_studio.md).
 

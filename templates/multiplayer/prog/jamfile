@@ -1,0 +1,42 @@
+Root ?= "@ENGINE_ROOT@" ;
+Location ?= "@PROJECT_LOCATION@" ;
+UseD3DMulti = yes ;
+ForceLinkDebugLines = yes ;
+include $(Root)/prog/samples/samples_setup.jam ;
+if $(Platform) = windows { UseD3DMultiList = DX11 ; }
+else if $(Platform) = linux { UseD3DMultiList = vulkan ; LinuxUseGUI = yes ; }
+else if $(Platform) = macOS { UseD3DMultiList = Metal ; }
+include $(Root)/prog/_jBuild/defaults.jam ;
+TargetType = exe ;
+Target = projects/@GAME_NAME@ ;
+OutDir = $(Root)/$(Location)/../game/$(Platform)-$(PlatformArch) ;
+Sources = main.cpp multiplayer.cpp editor.cpp ;
+if $(Platform) = macOS { Sources += macosx_main.mm ; }
+AddIncludes = $(Root)/prog/gameLibs/publicInclude $(Root)/prog/engine/sharedInclude $(Root)/prog/3rdPartyLibs/enet/include ;
+UseProgLibs =
+  engine/osApiWrappers
+  engine/kernel
+  engine/memory
+  engine/ioSys
+  engine/startup
+  engine/baseUtil
+  engine/coreUtil
+  engine/math
+  engine/lib3d
+  engine/image
+  engine/shaders
+  engine/workCycle
+  engine/guiBase
+  engine/gameRes
+  engine/drv/drv3d_pc_multi
+  engine/drv/hid_nulldrv
+  engine/drv/hid_keyboard
+  engine/drv/hid_mouse
+  engine/imgui
+  gameLibs/imguiInput
+  gameLibs/ecs/input
+  engine/daNet
+  engine/perfMon
+;
+if $(Platform) in linux macOS { UseProgLibs += engine/osApiWrappers/messageBox ; }
+include $(Root)/prog/_jBuild/build.jam ;

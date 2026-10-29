@@ -1,0 +1,9 @@
+game/windows-*/
+game/linux-*/
+game/macOS-*/
+game/.log*/
+game/*.log*
+.vs/
+.idea/
+cmake-build-*/
+/prog/engine_paths.h

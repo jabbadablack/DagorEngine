@@ -5,7 +5,7 @@ from pathlib import Path
 import subprocess
 import xml.etree.ElementTree as ET
 
-from generate_projects import ROOT, PROJECTS, NS
+from generate_projects import ROOT, discover_projects, NS
 
 
 def evaluate(msbuild, project, configuration, extra=()):
@@ -21,7 +21,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--msbuild', required=True)
     opts = parser.parse_args()
-    for _, relative in PROJECTS:
+    for _, relative in discover_projects():
         project = ROOT / relative
         files = ROOT / '_output' / 'visualstudio' / project.stem / 'files.props'
         nodes = ET.parse(files).getroot().findall('./*/*')

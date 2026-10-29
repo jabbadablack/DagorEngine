@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Build">
+  <Import Project="..\..\_jBuild\msbuild\projectConfigurations.props" />
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A568B24F-A9B6-41E3-9BCE-ACEE39B0DBBC}</ProjectGuid>
+    <GameType>tool</GameType>
+    <GameName>dargbox</GameName>
+    <GameDir>$(RootDir)tools\dargbox\</GameDir>
+    <OutDir>$(GameDir)windows-x86_64\</OutDir>
+    <LocalDebuggerWorkingDirectory>$(GameDir)</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <Import Project="$(MSBuildToolsDir)defaults.props" />
+  <Import Project="$(MSBuildToolsDir)config.props" />
+  <ItemGroup>
+    <CppSource Include="**\*.cpp" />
+    <CppHeader Include="**\*.h;**\*.inl" />
+    <DagorMisc Include="jamfile;gamebase\**\*.nut;shaders\**\*.dshl" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsDir)common.targets" />
+</Project>

@@ -1,0 +1,14 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": { "major": 3, "minor": 24, "patch": 0 },
+  "configurePresets": [
+    { "name": "dev", "displayName": "Dagor development", "generator": "Ninja", "binaryDir": "${sourceDir}/../../_output/cmake/dev", "cacheVariables": { "DAGOR_CONFIG": "dev" } },
+    { "name": "dbg", "inherits": "dev", "displayName": "Dagor debug", "binaryDir": "${sourceDir}/../../_output/cmake/dbg", "cacheVariables": { "DAGOR_CONFIG": "dbg" } },
+    { "name": "rel", "inherits": "dev", "displayName": "Dagor release", "binaryDir": "${sourceDir}/../../_output/cmake/rel", "cacheVariables": { "DAGOR_CONFIG": "rel" } }
+  ],
+  "buildPresets": [
+    { "name": "dev", "configurePreset": "dev" },
+    { "name": "dbg", "configurePreset": "dbg" },
+    { "name": "rel", "configurePreset": "rel" }
+  ]
+}

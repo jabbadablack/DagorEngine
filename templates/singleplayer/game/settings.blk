@@ -1,0 +1,8 @@
+video {
+  mode:t="windowed"
+  resolution:t="1280 x 720"
+  driver:t="auto"
+  threadedWindow:b=no
+}
+graphics { limitfps:b=yes }
+workcycle { act_rate:i=60 }

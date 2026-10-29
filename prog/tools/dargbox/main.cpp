@@ -131,7 +131,48 @@ static void unmount_vrom(const char *fn)
     }
 }
 
-void DagorWinMainInit(int, bool) {}
+void DagorWinMainInit(int, bool)
+{
+#if _TARGET_PC_WIN
+  // Architecture-specific binaries live one directory below the runtime data.
+  // Preserve a caller-selected working directory when it already has settings.
+  if (!dd_file_exist("settings.blk"))
+  {
+    wchar_t modulePath[DAGOR_MAX_PATH];
+    const DWORD length = GetModuleFileNameW(nullptr, modulePath, countof(modulePath));
+    if (length > 0 && length < countof(modulePath))
+      if (wchar_t *filename = wcsrchr(modulePath, L'\\'))
+      {
+        *filename = 0;
+        wchar_t settingsPath[DAGOR_MAX_PATH];
+        const int written = _snwprintf(settingsPath, countof(settingsPath), L"%ls\\..\\settings.blk", modulePath);
+        if (written > 0 && written < countof(settingsPath) && GetFileAttributesW(settingsPath) != INVALID_FILE_ATTRIBUTES)
+        {
+          const int rootLength = _snwprintf(settingsPath, countof(settingsPath), L"%ls\\..", modulePath);
+          if (rootLength > 0 && rootLength < countof(settingsPath))
+            G_VERIFY(SetCurrentDirectoryW(settingsPath));
+        }
+      }
+  }
+#elif _TARGET_PC_LINUX
+  if (!dd_file_exist("settings.blk"))
+  {
+    char modulePath[DAGOR_MAX_PATH];
+    const ssize_t length = readlink("/proc/self/exe", modulePath, sizeof(modulePath) - 1);
+    if (length > 0 && static_cast<size_t>(length) < sizeof(modulePath) - 1)
+    {
+      modulePath[length] = 0;
+      if (char *filename = strrchr(modulePath, '/'))
+      {
+        *filename = 0;
+        String settingsPath(0, "%s/../settings.blk", modulePath);
+        if (dd_file_exist(settingsPath))
+          G_VERIFY(chdir(String(0, "%s/..", modulePath)) == 0);
+      }
+    }
+  }
+#endif
+}
 
 static void post_shutdown_handler()
 {

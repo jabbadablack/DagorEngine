@@ -18,6 +18,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "daEditorX", "prog\tools\sce
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dag2blk", "prog\tools\converters\dag2blk\dag2blk.vcxproj", "{A8D9613F-D28E-4420-8B0E-8A88357B709D}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dargbox", "prog\tools\dargbox\dargbox.vcxproj", "{A568B24F-A9B6-41E3-9BCE-ACEE39B0DBBC}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dagor Engine", "prog\prog.vcxproj", "{89D18E89-8553-4D5B-842E-EE8D4F78043F}"
 EndProject
 Global
@@ -35,6 +37,7 @@ Global
 		{3A639BBE-FEB3-4FB0-8FA2-7E661E7DC648}.dev|x64.ActiveCfg = dev|x64
 		{BDCE474E-AF15-412E-BA2D-579623579CE2}.dev|x64.ActiveCfg = dev|x64
 		{A8D9613F-D28E-4420-8B0E-8A88357B709D}.dev|x64.ActiveCfg = dev|x64
+		{A568B24F-A9B6-41E3-9BCE-ACEE39B0DBBC}.dev|x64.ActiveCfg = dev|x64
 		{89D18E89-8553-4D5B-842E-EE8D4F78043F}.dev|x64.ActiveCfg = dev|x64
 		{85EAEB4C-3C9B-4058-B97F-3A92B4A2EF75}.dev|x64.Build.0 = dev|x64
 		{85EAEB4C-3C9B-4058-B97F-3A92B4A2EF75}.dbg|x64.ActiveCfg = dbg|x64
@@ -45,6 +48,7 @@ Global
 		{3A639BBE-FEB3-4FB0-8FA2-7E661E7DC648}.dbg|x64.ActiveCfg = dbg|x64
 		{BDCE474E-AF15-412E-BA2D-579623579CE2}.dbg|x64.ActiveCfg = dbg|x64
 		{A8D9613F-D28E-4420-8B0E-8A88357B709D}.dbg|x64.ActiveCfg = dbg|x64
+		{A568B24F-A9B6-41E3-9BCE-ACEE39B0DBBC}.dbg|x64.ActiveCfg = dbg|x64
 		{89D18E89-8553-4D5B-842E-EE8D4F78043F}.dbg|x64.ActiveCfg = dbg|x64
 		{85EAEB4C-3C9B-4058-B97F-3A92B4A2EF75}.dbg|x64.Build.0 = dbg|x64
 		{85EAEB4C-3C9B-4058-B97F-3A92B4A2EF75}.rel|x64.ActiveCfg = rel|x64
@@ -55,6 +59,7 @@ Global
 		{3A639BBE-FEB3-4FB0-8FA2-7E661E7DC648}.rel|x64.ActiveCfg = rel|x64
 		{BDCE474E-AF15-412E-BA2D-579623579CE2}.rel|x64.ActiveCfg = rel|x64
 		{A8D9613F-D28E-4420-8B0E-8A88357B709D}.rel|x64.ActiveCfg = rel|x64
+		{A568B24F-A9B6-41E3-9BCE-ACEE39B0DBBC}.rel|x64.ActiveCfg = rel|x64
 		{89D18E89-8553-4D5B-842E-EE8D4F78043F}.rel|x64.ActiveCfg = rel|x64
 		{85EAEB4C-3C9B-4058-B97F-3A92B4A2EF75}.rel|x64.Build.0 = rel|x64
 	EndGlobalSection
