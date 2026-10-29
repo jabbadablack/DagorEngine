@@ -16,4 +16,5 @@
 *.pyc
 *.das.inl
 *.dshl.log
+*.dascache
 ShaderLog-*

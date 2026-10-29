@@ -16,6 +16,9 @@ from ..pyparsing                    import ParseException
 from ..constants                    import *
 from ..dagMath                      import mul
 from ..node                         import NodeExp
+from ..lights                       import DagLight, LIGHT_TYPES
+from ..skin                         import read_skin, restore_skins
+from ..mapping                      import read_mesh_channels
 from ..nodeMaterial                 import MaterialExp
 from ..face                         import FaceExp
 from ..mesh                         import MeshExp
@@ -24,6 +27,7 @@ from ..dagormat.build_node_tree     import build_dagormat_node_tree
 from ..dagormat.rw_dagormat_text    import dagormat_to_string
 from ..dagormat.compare_dagormats   import compare_dagormats
 from ..object_properties            import object_properties
+from ..object_properties.codec      import parse_properties
 from ..helpers.props                import fix_type, dagormat_prop_add, valid_props_types
 from ..helpers.texts                import log
 from ..popup.popup_functions        import show_popup
@@ -345,7 +349,7 @@ class DagImporter(Operator, ImportHelper):
         return False
 
 
-    def buildMesh(self, node, tm, parent):
+    def buildMesh(self, node, tm, parent, force_triangles=False):
         if node.mesh is None:
             return
         loops_vert_idx = list()
@@ -353,6 +357,8 @@ class DagImporter(Operator, ImportHelper):
         faces_loop_total = []
         indices = []
         material_indices = []
+        for face in node.mesh.faces:
+            face.neighbors = [[-1, -1, 0], [-1, -1, 0], [-1, -1, 0]]
         buildNeighbors(node.mesh.faces)
         self.findNeighbors(node.mesh.faces)
         i=0
@@ -397,16 +403,36 @@ class DagImporter(Operator, ImportHelper):
 
         me.polygons.foreach_set("loop_start", faces_loop_start)
         me.polygons.foreach_set("loop_total", faces_loop_total)
+        me.update()
+        me.calc_loop_triangles()
+        if not force_triangles and len(me.loop_triangles) != len(node.mesh.faces):
+            # Hidden-edge polygon reconstruction cannot represent every native
+            # topology (holes, overlapping boundaries). Keep original triangles
+            # rather than silently changing the surface in those cases.
+            bpy.data.meshes.remove(me)
+            flags = [face.flg for face in node.mesh.faces]
+            try:
+                for face in node.mesh.faces:
+                    face.flg = DAG_FACEFLG_EDGE0 | DAG_FACEFLG_EDGE1 | DAG_FACEFLG_EDGE2
+                return self.buildMesh(node, tm, parent, force_triangles=True)
+            finally:
+                for face, flag in zip(node.mesh.faces, flags):
+                    face.flg = flag
         if len(node.mesh.uv):
             for i, uvs in enumerate(node.mesh.uv):
                 uvMap = []
-                if len(node.mesh.uv_poly[i]) == 0:
+                if len(node.mesh.uv_poly[i]) == 0 or i + 1 in node.mesh.map_channels:
                     continue
                 for index in indices:
                     uvMap.append(uvs[node.mesh.uv_poly[i][index] * 2])
                     uvMap.append(uvs[node.mesh.uv_poly[i][index] * 2 + 1])
-                me.uv_layers.new(do_init=False)
+                me.uv_layers.new(name='UVMap' if i == 0 else f'UVMap.{i:03d}', do_init=False)
                 me.uv_layers[len(me.uv_layers) - 1].data.foreach_set("uv", tuple(uvMap))
+
+        for channel, (points, polygons) in node.mesh.map_channels.items():
+            attribute = me.attributes.new(name=f'dagor_map_{channel}', type='FLOAT_VECTOR', domain='CORNER')
+            for destination, index in zip(attribute.data, indices):
+                destination.vector = points[polygons[index]]
 
         if len(node.mesh.color_attributes):
             poly = []
@@ -419,7 +445,13 @@ class DagImporter(Operator, ImportHelper):
                 col.append(1.0)
             vcol_lay.data.foreach_set("color_srgb", tuple(col))
 
-        me.validate()
+        # Mesh.validate also deletes coincident duplicate faces. Native assets
+        # can intentionally contain these (including separately mapped layers),
+        # so only repair structurally invalid polygons, not valid duplicates.
+        if any(len(polygon.vertices) < 3 or len(set(polygon.vertices)) < 3 or
+               any(index >= len(me.vertices) for index in polygon.vertices)
+               for polygon in me.polygons):
+            me.validate()
         me.update()
 
         me.attributes.new("SG", 'INT', 'FACE')
@@ -446,6 +478,7 @@ class DagImporter(Operator, ImportHelper):
         elif get_blender_version()< 4.1:
             me.calc_normals_split()
         o = bpy.data.objects.new(name=node.name, object_data=me)
+        o['_dag_node_id'] = node.id
         if get_blender_version() < 4.1:
             me.use_auto_smooth = True
             me.auto_smooth_angle = pi
@@ -501,48 +534,13 @@ class DagImporter(Operator, ImportHelper):
             tm2.transpose()
             self.buildMesh(node, tm2, o)
             self.buildCurves(node, tm2, o)
+            self.buildLight(node, tm2, o)
             self.buildEmpty(node, tm2, o)
         return
 
-    def buildObjProperties(self, o, objProps):
-        blk = datablock.DataBlock()
-        try:
-            blk.parseString(objProps)
-        except ParseException as err:
-            print(f"{err=}: " + objProps)
-            return
-        dagorprops = o.dagorprops
-        lines=objProps.split('\r\n')
-        broken_properties = []
-        for line in lines:
-            if line == "":
-                continue
-            name_type_value = line.split('=')
-            if name_type_value.__len__() != 2:
-                broken_properties.append(line)
-                continue
-            name_type, value = name_type_value
-            if name_type.__len__() == 0:  # no name
-                broken_properties.append(line)
-                continue
-            if name_type == "broken_properties:t":
-                broken_properties.append(value)
-                continue
-            if name_type.split(":").__len__() != 2:  # no type or multiple types
-                broken_properties.append(line)
-                continue
-            name,type = name_type.split(':')
-            if not (type in valid_props_types):
-                broken_properties.append(line)
-                continue
-            if name.__len__() == 0 or type.__len__() == 0:
-                broken_properties.append(line)
-                continue
-            dagorprops[name_type]=fix_type(value, expected_type = type)
-        if broken_properties.__len__() > 0:
-            dagorprops['broken_properties:t'] = ";".join(broken_properties)
-        return
-
+    def buildObjProperties(self, obj, script):
+        for key, value in parse_properties(script).items():
+            obj.dagorprops[key] = value
     def DM_set_params(_self, script):
         params = []
         type_value = script.split('\n')
@@ -631,6 +629,7 @@ class DagImporter(Operator, ImportHelper):
         if node.curves is None:
             return
         curve = bpy.data.curves.new(name=node.name, type='CURVE')
+        curve.dimensions = '3D'
         curve.splines.clear()
         for c in node.curves:
             polyline = curve.splines.new(type='BEZIER')
@@ -646,35 +645,63 @@ class DagImporter(Operator, ImportHelper):
                 polyline.use_cyclic_u = False
                 polyline.use_cyclic_v = False
         o = bpy.data.objects.new(name=node.name, object_data=curve)
+        o['_dag_node_id'] = node.id
         self.collection.objects.link(o)
         if parent is not None:
             o.parent = parent
         o.matrix_world = tm
         tm.transpose()
+        self.buildObjProperties(o, node.objProps)
         for node in node.children:
             tm2 = mul(node.tm, tm)
             tm2.transpose()
             self.buildMesh(node, tm2, o)
             self.buildCurves(node, tm2, o)
+            self.buildLight(node, tm2, o)
             self.buildEmpty(node, tm2, o)
         return
 
     def buildEmpty(self,node,tm,parent):
-        if not (node.curves is None and node.mesh is None):
+        if not (node.curves is None and node.mesh is None and node.light is None):
             return
         o = bpy.data.objects.new(node.name, None)
+        o['_dag_node_id'] = node.id
         self.collection.objects.link(o)
         if parent is not None:
             o.parent = parent
         o.matrix_world = tm
+        self.buildObjProperties(o, node.objProps)
         tm.transpose()
         for node in node.children:
             tm2 = mul(node.tm, tm)
             tm2.transpose()
             self.buildMesh(node, tm2, o)
             self.buildCurves(node, tm2, o)
+            self.buildLight(node, tm2, o)
             self.buildEmpty(node, tm2, o)
         return
+
+    def buildLight(self, node, tm, parent):
+        if node.light is None:
+            return
+        data = bpy.data.lights.new(node.name, LIGHT_TYPES[node.light.type])
+        node.light.apply_to_blender(data)
+        data.use_shadow = bool(node.objFlg & DAG_NF_CASTSHADOW)
+        obj = bpy.data.objects.new(node.name, data)
+        obj['_dag_node_id'] = node.id
+        self.collection.objects.link(obj)
+        obj.parent = parent
+        obj.matrix_world = tm
+        self.buildObjProperties(obj, node.objProps)
+        # Use a copy: other builders in the dispatch sequence share tm.
+        parent_tm = tm.transposed()
+        for child in node.children:
+            child_tm = mul(child.tm, parent_tm)
+            child_tm.transpose()
+            self.buildMesh(child, child_tm, obj)
+            self.buildCurves(child, child_tm, obj)
+            self.buildLight(child, child_tm, obj)
+            self.buildEmpty(child, child_tm, obj)
 
     def loadSplines(self, curves):
         count = self.reader.readDWord()
@@ -708,60 +735,8 @@ class DagImporter(Operator, ImportHelper):
             face.f[1] = tmp
             mesh.faces.append(face)
             count -= 1
-        chn = self.reader.readByte()
-        while chn:
-            tn = self.reader.readUShort()
-            co = self.reader.readByte()
-            chid = self.reader.readByte()
-            ch = chid - 1
-            if ch == -1:
-                count = tn
-                mesh.color_attributes = list()
-                while count:
-                    if co == 1:
-                        mesh.color_attributes.append([self.reader.readFloat(), 0, 0])
-                    elif co == 2:
-                        mesh.color_attributes.append([self.reader.readFloat(), self.reader.readFloat(), 0])
-                    else:
-                        mesh.color_attributes.append(self.reader.readVector())
-                    count -= 1
-                count = faceNumber
-                while count:
-                    mesh.color_attributes_poly.append(self.reader.readUShort())
-                    poly1 = self.reader.readUShort()
-                    poly2 = self.reader.readUShort()
-                    mesh.color_attributes_poly.append(poly2)
-                    mesh.color_attributes_poly.append(poly1)
-                    count -= 1
-            elif ch >= 0 and ch < NUMMESHTCH:
-                count = tn
-                mesh.uv.extend([list() for _ in range(len(mesh.uv), ch + 1)])
-                while count:
-                    if co == 1:
-                        mesh.uv[ch].append(self.reader.readFloat())
-                        mesh.uv[ch].append(0)
-                    else:
-                        mesh.uv[ch].append(self.reader.readFloat())
-                        mesh.uv[ch].append(self.reader.readFloat())
-                        if co == 3:
-                            self.reader.readFloat()
-                    count -= 1
-                count = faceNumber
-                while len(mesh.uv_poly) <= ch:
-                    mesh.uv_poly.append(list())
-                while count:
-                    mesh.uv_poly[ch].append(self.reader.readUShort())
-                    poly1 = self.reader.readUShort()
-                    poly2 = self.reader.readUShort()
-                    mesh.uv_poly[ch].append(poly2)
-                    mesh.uv_poly[ch].append(poly1)
-                    count -= 1
-            else:
-                self.reader.endChunk(co * 4 * tn)
-                self.reader.endChunk(faceNumber * 2 * 3)
-            chn -= 1
+        read_mesh_channels(self.reader, mesh, faceNumber, big=False)
         return
-
     def loadBigMesh(self, mesh):
         count = self.reader.readDWord()
         while count:
@@ -775,63 +750,8 @@ class DagImporter(Operator, ImportHelper):
             face.f[1] = tmp
             mesh.faces.append(face)
             count -= 1
-        chn = self.reader.readByte()
-        while chn:
-            tn = self.reader.readDWord()
-            co = self.reader.readByte()
-            chid = self.reader.readByte()
-            ch = chid - 1
-            if ch == -1:
-                count = tn
-                mesh.color_attributes = list()
-                while count:
-                    if co == 1:
-                        mesh.color_attributes.append([self.reader.readFloat(), 0, 0])
-                    elif co == 2:
-                        mesh.color_attributes.append([self.reader.readFloat(), self.reader.readFloat(), 0])
-                    else:
-                        mesh.color_attributes.append(self.reader.readVector())
-                    count -= 1
-                count = faceNumber
-                while count:
-                    mesh.color_attributes_poly.append(self.reader.readDWord())
-                    poly1 = self.reader.readDWord()
-                    poly2 = self.reader.readDWord()
-                    mesh.color_attributes_poly.append(poly2)
-                    mesh.color_attributes_poly.append(poly1)
-                    count -= 1
-            elif ch >= 0 and ch < NUMMESHTCH:
-                count = tn
-                mesh.uv.extend([list() for _ in range(len(mesh.uv), ch + 1)])
-                while count:
-                    if co == 1:
-                        mesh.uv[ch].append(self.reader.readFloat())
-                        mesh.uv[ch].append(0)
-                    if co == 2:
-                        mesh.uv[ch].append(self.reader.readFloat())
-                        mesh.uv[ch].append(self.reader.readFloat())
-                    else:
-                        mesh.uv[ch].append(self.reader.readFloat())
-                        mesh.uv[ch].append(self.reader.readFloat())
-                        if co == 3:
-                            self.reader.readFloat()
-                    count -= 1
-                count = faceNumber
-                while len(mesh.uv_poly) <= ch:
-                    mesh.uv_poly.append(list())
-                while count:
-                    mesh.uv_poly[ch].append(self.reader.readDWord())
-                    poly1 = self.reader.readDWord()
-                    poly2 = self.reader.readDWord()
-                    mesh.uv_poly[ch].append(poly2)
-                    mesh.uv_poly[ch].append(poly1)
-                    count -= 1
-            else:
-                self.reader.endChunk(co * 4 * tn)
-                self.reader.endChunk(faceNumber * 4 * 3)
-            chn -= 1
+        read_mesh_channels(self.reader, mesh, faceNumber, big=True)
         return
-
     def loadObj(self, node, size):
         endpos = self.reader.file.tell() + size
         while self.reader.file.tell() < endpos:
@@ -845,6 +765,10 @@ class DagImporter(Operator, ImportHelper):
             elif chunk.id == DAG_OBJ_SPLINES:
                 node.curves = []
                 self.loadSplines(node.curves)
+            elif chunk.id == DAG_OBJ_LIGHT:
+                node.light = DagLight.from_bytes(self.reader.file.read(chunk.size))
+            elif chunk.id == DAG_OBJ_BONES:
+                node.skin = read_skin(self.reader.file.read(chunk.size))
             elif chunk.id == DAG_OBJ_FACEFLG:
                 for f in mesh.faces:
                     f.flg = self.reader.readByte()
@@ -970,22 +894,28 @@ class DagImporter(Operator, ImportHelper):
         return
 
     def load(self, filepath):
+        try:
+            return self._load(filepath)
+        finally:
+            if self.reader.file is not None and not self.reader.file.closed:
+                self.reader.close()
+
+    def _load(self, filepath):
         print("\nReading DAG file:\n{}".format(filepath))
 
         self.textures = []
         self.materials = []
         self.end = False
+        self.rootNode = None
         self.reader.open(filepath)
 
         header = self.reader.readDWord()
         if header != DAG_ID:
-            print("Not a DAG file")
-            return
+            raise ValueError(f'Not a DAG file: {filepath}')
 
         chunk = self.reader.beginChunk()
-        if chunk.id != DAG_ID:
-            print("Wrong DAG file")
-            return
+        if chunk is None or chunk.id != DAG_ID:
+            raise ValueError(f'Invalid DAG root chunk: {filepath}')
         chunk = self.reader.beginChunk()
         while chunk is not None:
             if self.end or chunk.id == DAG_END:
@@ -1000,6 +930,8 @@ class DagImporter(Operator, ImportHelper):
                 self.reader.endChunk(chunk.size)
             chunk = self.reader.beginChunk()
         self.reader.close()
+        if self.rootNode is None:
+            raise ValueError(f'DAG file has no scene hierarchy: {filepath}')
         self.build_dagormat_node_trees()
 #searching for existing collection
         col_name = basename(filepath).replace('.dag','')
@@ -1014,37 +946,35 @@ class DagImporter(Operator, ImportHelper):
             node.tm[2] = tmp_r.copy()
             self.buildMesh(node, node.tm, None)
             self.buildCurves(node, node.tm, None)
+            self.buildLight(node, node.tm, None)
             self.buildEmpty(node, node.tm, None)
+        scene = bpy.data.scenes.get('GEOMETRY', bpy.context.scene)
+        with bpy.context.temp_override(scene=scene, view_layer=scene.view_layers[0]):
+            restore_skins(bpy.context, self.collection, self.rootNode)
         return
 
     def filename_to_regex(self):
         filename = basename(self.filepath)
-        dp =    self.with_dps
-        lods =  self.with_lods
-        dmg =   self.with_dmgs
-        destr = self.with_destr
-        dm =    self.with_dm
-        lod_info = re.search("\\.lod\\d\\d\\.dag$", filename)  # '\d' == '[0-9]'
-        if lod_info is None:  # can not find variantions for non-standard names
-            return f"^{filename}$"
-        split_index = lod_info.span()[0]
-        base_name = filename[:split_index]
-        base_lod = filename[split_index+1:-4]  # no dots or extension needed
-        dp_re = "(_dp_\\d\\d|)" if dp else "()"
-        dmg_re = "(_dmg|)" if dmg else "()"
-        lods_re = "\\.lod\\d\\d" if lods else f"\\.{base_lod}"
-        destr_re = "(_destr|)" if destr else ""
-        variants_re = f"^{base_name}{dp_re}{dmg_re}{destr_re}{lods_re}\\.dag$"
-        if dm:
-            variants_re = f"({variants_re})|(^{base_name}_dm\\.dag$)"
-        return variants_re
-
+        lod_info = re.search(r'\.lod\d\d\.dag$', filename, re.IGNORECASE)
+        if lod_info is None:
+            return '^' + re.escape(filename) + '$'
+        base = re.escape(filename[:lod_info.start()])
+        lod = r'\.lod\d\d' if self.with_lods else re.escape(filename[lod_info.start():-4])
+        damage_parts = r'(?:_dp_\d\d)?' if self.with_dps else ''
+        damage = r'(?:_dmg)?' if self.with_dmgs else ''
+        prefix = base + damage_parts + damage
+        variants = [prefix + lod]
+        if self.with_destr:
+            variants.append(prefix + r'_destr\.lod00')
+        if self.with_dm:
+            variants.append(base + '_dm')
+        return '^(?:' + '|'.join(variants) + r')\.dag$'
 #base mode
     def file_to_filepaths(self):
         filepath = abspath(self.filepath)
         filepaths = [filepath]
         regex = self.filename_to_regex()
-        regex = re.compile(regex)
+        regex = re.compile(regex, re.IGNORECASE)
         dirpath = dirname(filepath)
         if self.check_subdirs:
             print("checking subdirs")
@@ -1061,54 +991,23 @@ class DagImporter(Operator, ImportHelper):
                     continue
                 if re.search(regex, filename):
                     filepaths.append(join(dirpath, filename))
-        return list(set(filepaths))
+        return [filepaths[0]] + sorted(set(filepaths[1:]) - {filepaths[0]}, key=str.casefold)
 #advanced mode (wildcard search)
     def includes_to_filepaths(self):
+        includes = [pattern.strip().lower() for pattern in self.includes.split(';') if pattern.strip()]
+        excludes = [pattern.strip().lower() for pattern in self.excludes.split(';') if pattern.strip()]
+        folders = os.walk(self.dirpath) if self.check_subdirs else [(self.dirpath, [], listdir(self.dirpath))]
         filepaths = []
-        includes = self.includes.split(';')
-        excludes = self.excludes.split(';')
-        if self.check_subdirs:
-            for subdir, dirs, files in os.walk(self.dirpath):
-                for file in files:
-                    has_match = False
-                    for include in includes:
-                        if include == "":
-                            continue
-                        if fnmatch(file, include) or fnmatch(file[:-4], include):
-                            has_match = True
-                            break
-                    if not has_match:
-                        continue
-                    for exclude in excludes:
-                        if exclude == "":
-                            continue
-                        if fnmatch(file, exclude) or fnmatch(file[:-4], exclude):
-                            has_match = False
-                            break
-                    if has_match:
-                        filepaths.append(join(subdir, file))
-        else:
-            files = [file for file in listdir(self.dirpath) if isfile(join(self.dirpath,file))]
-            for file in files:
-                has_match = False
-                for include in includes:
-                    if include == "":
-                        continue
-                    if fnmatch(file, include):
-                        has_match = True
-                        break
-                if not has_match:
+        for directory, _, files in folders:
+            for filename in files:
+                name = filename.lower()
+                if not name.endswith('.dag') or not isfile(join(directory, filename)):
                     continue
-                for exclude in excludes:
-                    if exclude == "":
-                        continue
-                    if fnmatch(file, exclude):
-                        has_match = False
-                        break
-                if has_match:
-                    filepaths.append(join(self.dirpath, file))
-        return filepaths
-#expert mode (regex search)
+                def matches(pattern):
+                    return fnmatch(name, pattern) or fnmatch(name[:-4], pattern)
+                if any(matches(pattern) for pattern in includes) and not any(matches(pattern) for pattern in excludes):
+                    filepaths.append(join(directory, filename))
+        return sorted(set(filepaths), key=str.casefold)#expert mode (regex search)
     def regex_to_filepaths(self):
         regex_include = re.compile(self.includes_re)
         regex_exclude = re.compile(self.excludes_re)
@@ -1137,18 +1036,24 @@ class DagImporter(Operator, ImportHelper):
                 bpy.ops.object.mode_set(mode='OBJECT')
             except Exception:
                 pass
-        bpy.ops.dt.init_blend()
-        if self.filepath != "":
-            filepaths = self.file_to_filepaths()
-        elif self.includes_re != "" and self.dirpath != "":
-            filepaths = self.regex_to_filepaths()
-        elif self.includes != "":
-            filepaths = self.includes_to_filepaths()
-        else:
-            filepaths = []  # placeholer, will be replaced by error message for unknown import mode
-            log('Which mode we are in???', type = 'ERROR', show = True)
-        for filepath in filepaths:
-            self.load(filepath)
+        try:
+            if self.filepath:
+                filepaths = self.file_to_filepaths()
+            elif self.includes_re and self.dirpath:
+                filepaths = self.regex_to_filepaths()
+            elif self.includes:
+                filepaths = self.includes_to_filepaths()
+            else:
+                raise ValueError('Choose a DAG file or import directory and filters')
+            if not filepaths:
+                self.report({'WARNING'}, 'No DAG files matched the import filters')
+                return {'CANCELLED'}
+            bpy.ops.dt.init_blend()
+            for filepath in filepaths:
+                self.load(filepath)
+        except (OSError, ValueError, re.error) as error:
+            self.report({'ERROR'}, str(error))
+            return {'CANCELLED'}
         context.window.scene = bpy.data.scenes['GEOMETRY']
         return {'FINISHED'}
 

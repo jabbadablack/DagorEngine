@@ -4,6 +4,7 @@ class MeshExp:
         self.faces = list()
         self.uv = list()
         self.uv_poly = list()
+        self.map_channels = {}
         self.color_attributes = dict()
         self.color_attributes_poly = list()
         self.normals = list()

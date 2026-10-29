@@ -1,76 +1,44 @@
-import os
-import sys
-import pathlib
-import shutil
+"""Build an installable add-on without modifying the source directory."""
+import argparse
+from pathlib import Path
 import zipfile
 
-cwd = os.getcwd()
 
-shutil.copy2('../pythonCommon/pyparsing.py', 'pyparsing.py')
-shutil.copy2('../pythonCommon/datablock.py', 'datablock.py')
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('target', nargs='?', choices=['FINAL'])
+    parser.add_argument('--output', type=Path, help='Write a separate installation archive')
+    args = parser.parse_args(argv)
+    source = Path(__file__).resolve().parent
+    destination = args.output
+    if destination is None:
+        destination = (source.parent.parent.parent / 'tools/dagor_cdk/universal/dag4blend.zip'
+                       if args.target == 'FINAL' else source / 'dag4blend.zip')
+    destination = destination.resolve()
+    dependencies = source.parent / 'pythonCommon'
+    entries = {}
+    for path in sorted(source.rglob('*')):
+        relative = path.relative_to(source)
+        if not path.is_file() or any(part in {'additional', '__pycache__', 'tests', '.git'}
+                                     for part in relative.parts):
+            continue
+        if path.suffix in {'.bak', '.blend1', '.zip', '.pyc', '.pyo'}:
+            continue
+        if path.name in {'__build_pack.py', 'pack.bat'}:
+            continue
+        entries['dag4blend/' + relative.as_posix()] = path
+    for name in ('datablock.py', 'pyparsing.py'):
+        path = dependencies / name
+        if not path.is_file():
+            raise FileNotFoundError(f'Missing packaging dependency: {path}')
+        entries['dag4blend/' + name] = path
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with zipfile.ZipFile(destination, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
+        for name, path in sorted(entries.items()):
+            archive.write(path, name)
+    print(f'Built {destination} ({len(entries)} files)')
+    return destination
 
-# Files to exclude from compression
-exclude_files = [
-  '__build_pack.py',
-  'pack.bat',
-]
 
-exclude_dirs = [
-  'additional',
-]
-
-exclude_extentions = [
-  '.bak',  # winmerge produced backup
-  '.blend1',  # blender produced backup
-  '.zip'  # previous archive
-]
-
-pack_dirs = [dir for dir in os.listdir(cwd)
-            if os.path.isdir(os.path.join(cwd, dir))
-            and dir not in exclude_dirs]
-
-pack_files = [f for f in os.listdir(cwd)
-             if os.path.isfile(os.path.join(cwd, f))
-             and f not in exclude_files]
-
-for file in list(pack_files):
-  for ext in exclude_extentions:
-    if file.endswith(ext):
-      pack_files.remove(file)
-
-for subdir in pack_dirs:
-  for _root, _directories, _files in os.walk(subdir):
-    for filename in _files:
-      try:
-        ext = os.path.splitext(filename)[1]
-        if ext in exclude_extentions:
-          continue
-      except:  # file had no extention at all
-        pass
-      filepath = os.path.join(subdir, filename)
-      pack_files.append(filepath)
-
-os.chdir(os.path.normpath(cwd+'/..'))  # dag4blend directory itself should be archived
-
-# Path to save the zip file
-dest_zip_fn = r"dag4blend/dag4blend.zip"
-if len(sys.argv) > 1:
-  if sys.argv[1] == 'FINAL':
-    dest_zip_fn = r"../../tools/dagor_cdk/universal/dag4blend.zip"
-  else:
-    print('echo usage: {0} [FINAL]'.format(sys.argv[0]))
-    exit(1)
-
-os.makedirs(dest_zip_fn[:dest_zip_fn.rindex('/')], exist_ok=True)
-
-print('building {0} of {1} files'.format(dest_zip_fn, len(pack_files)))
-with zipfile.ZipFile(dest_zip_fn, 'w', compression= zipfile.ZIP_LZMA) as zip:
-  for file in pack_files:
-    zip.write(os.path.join('dag4blend',file))
-    zipfile
-print('done!')
-
-os.remove(os.path.normpath('dag4blend/pyparsing.py'))
-os.remove(os.path.normpath('dag4blend/datablock.py'))
-
-os.chdir(cwd)
+if __name__ == '__main__':
+    main()

@@ -3,7 +3,7 @@ from os         import listdir
 
 import bpy
 
-from   bpy.props    import StringProperty, PointerProperty, FloatProperty
+from   bpy.props    import StringProperty, PointerProperty, FloatProperty, EnumProperty
 from   bpy.utils    import register_class, unregister_class
 from   bpy.types    import Operator, Panel, PropertyGroup
 
@@ -12,6 +12,7 @@ from ..ui.draw_elements import draw_custom_header, draw_custom_toggle
 from ..popup.popup_functions    import show_popup
 from ..helpers.props    import fix_type
 from ..helpers.getters  import get_preferences
+from .codec import parse_properties, serialize_properties
 
 #functions
 def clear_props(obj):
@@ -27,48 +28,13 @@ def update_uniform_scale(self, context):
 
 #func/text
 def text_to_props(obj):
+    values = parse_properties(get_text('props_temp').as_string())
     clear_props(obj)
-    DP=obj.dagorprops
-    txt=get_text('props_temp')
-    broken=''
-    for line in txt.lines:
-        line=line.body
-        line=line.replace(' ','')
-        if line!='':
-            prop=line.split('=')
-            if prop.__len__()!=2:
-                broken+=line+';'
-            elif prop[0].__len__()==0 or prop[1].__len__()==0:
-                broken+=line+';'
-            elif prop[0].endswith(':b') and prop[1].lower() not in ['yes','no', '1', '0', 'true', 'false']:
-                broken+=line+';'
-            elif prop[0]=='broken_properties:t':
-                broken+=line[1:-1]+';'
-            else:
-                DP[prop[0]]=fix_type(prop[1])
-    if broken.__len__()>0:
-        DP['broken_properties:t']=f'"{broken}"'
-
+    for key, value in values.items():
+        obj.dagorprops[key] = value
 def props_to_text(obj):
-    txt=get_text_clear('props_temp')
-    DP=obj.dagorprops
-    for key in obj.dagorprops.keys():
-        txt.write(key+'=')
-        try:
-            value=f"{DP[key].to_list()}"
-            value=value.replace('[','')
-            value=value.replace(']','')
-        except:
-            str_value = f'{DP[key]}'.lower()
-            if str_value == "true":
-                value = "yes"
-            elif str_value == "false":
-                value = "no"
-            else:
-                value = str_value
-        txt.write(f"{value}\n")
-    return
-
+    text = get_text_clear('props_temp')
+    text.write(serialize_properties(dict(obj.dagorprops.items())))
 def get_presets_list():
     pref = get_preferences()
     path = pref.props_presets_path
@@ -253,6 +219,32 @@ class DAGOR_OT_transfer_props(Operator):
 class dagorprops(PropertyGroup):
     pass
 
+
+class DAGOR_OT_Property_Clipboard(Operator):
+    bl_idname = 'dt.property_clipboard'
+    bl_label = 'Object User Properties'
+    bl_options = {'REGISTER', 'UNDO'}
+    operation: EnumProperty(items=[('COPY', 'Copy', 'Copy active object properties as BLK text'),
+                                   ('PASTE', 'Paste', 'Replace properties on selected objects'),
+                                   ('CLEAR', 'Clear', 'Clear properties on selected objects')])
+
+    @classmethod
+    def poll(cls, context):
+        return context.active_object is not None and context.mode == 'OBJECT'
+
+    def execute(self, context):
+        if self.operation == 'COPY':
+            context.window_manager.clipboard = serialize_properties(dict(context.active_object.dagorprops.items()))
+            return {'FINISHED'}
+        values = parse_properties(context.window_manager.clipboard) if self.operation == 'PASTE' else {}
+        for obj in context.selected_objects:
+            if not obj.is_editable:
+                continue
+            clear_props(obj)
+            for key, value in values.items():
+                obj.dagorprops[key] = value
+        return {'FINISHED'}
+
 class DAGOR_PT_Properties(Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'UI'
@@ -339,8 +331,12 @@ class DAGOR_PT_Properties(Panel):
             row.operator('dt.props_to_text', text='Open as text', icon = 'TEXT')
             row.operator('dt.text_to_props', text='Apply from text', icon = 'TEXT')
             tools.operator('dt.properties_transfer', text = 'Transfer Attr')
+            row = tools.row(align=True)
+            for operation, text in [('COPY', 'Copy'), ('PASTE', 'Paste'), ('CLEAR', 'Clear')]:
+                row.operator('dt.property_clipboard', text=text).operation = operation
 
 classes=[dagorprops,
+        DAGOR_OT_Property_Clipboard,
         DAGOR_OT_text_to_props,
         DAGOR_OT_props_to_text,
         DAGOR_OT_transfer_props,

@@ -325,6 +325,21 @@ classes.append(Dag_Import_Props)
 
 #EXPORTER
 class Dag_Export_Props(PropertyGroup):
+    clean_geometry: BoolProperty(name='Clean degenerate and loose geometry', default=False,
+        description='Remove short edges, degenerate faces and unused vertices from the export copy')
+    meshes          :BoolProperty(name='Meshes', default=True)
+    helpers         :BoolProperty(name='Helpers and armatures', default=True)
+    lights          :BoolProperty(name='Lights', default=True)
+    curves          :BoolProperty(name='Splines', default=True)
+    cameras         :BoolProperty(name='Camera helpers', default=True)
+    export_materials:BoolProperty(name='Materials', default=True)
+    include_hidden  :BoolProperty(name='Include hidden', default=False)
+    origin_name     :StringProperty(name='Export origin object')
+    filename_prefix :StringProperty(name='Filename prefix')
+    filename_suffix :StringProperty(name='Filename suffix')
+    include_collisions:BoolProperty(name='Include matching collision objects', default=False)
+    collision_prefix:StringProperty(name='Collision object prefix', default='Cls_')
+    legacy_selected_only:BoolProperty(name='Selected objects in legacy layers', default=False)
     filename        :StringProperty(name = "Name", default = 'Filename', description = 'Name for exported .dag file')
     dirpath         :StringProperty(name = "Path", default = 'C:/tmp/', subtype = 'DIR_PATH',
                         description = "Where your .dag files should be saved?",update = upd_exp_path)
@@ -342,6 +357,7 @@ class Dag_Export_Props(PropertyGroup):
     limit_by        :EnumProperty(
             #(identifier, name, description)
         items = [('Visible','Visible','Export everithing as one dag'),
+                 ('Legacy','Legacy LOD Layers','Export legacy LOD and variation collections'),
                  ('Sel.Joined','Sel.Joined','Selected objects as one dag'),
                  ('Sel.Separated','Sel.Separated','Selected objects as separate dags'),
                  ('Col.Separated','Col.Separated','Chosen collection and subcollections as separate .dags'),

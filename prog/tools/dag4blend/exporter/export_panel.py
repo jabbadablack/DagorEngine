@@ -22,11 +22,19 @@ class DAGOR_OT_BatchExport(bpy.types.Operator):
         start = time()
         P = bpy.data.scenes[0].dag4blend.exporter
         if exists(P.dirpath):
-            if P.limit_by in ['Visible','Sel.Joined']:
+            if P.limit_by in ['Visible','Sel.Joined','Legacy']:
                 path=join(P.dirpath,P.filename)
             else:
                 path=P.dirpath
-            bpy.ops.export_scene.dag(filepath=path, normals=P.vnorm, modifiers=P.modifiers, mopt=P.mopt, orphans=P.orphans,limits=P.limit_by)
+            result = bpy.ops.export_scene.dag(filepath=path, normals=P.vnorm, modifiers=P.modifiers, mopt=P.mopt, orphans=P.orphans,limits=P.limit_by,
+                meshes=P.meshes, helpers=P.helpers, lights=P.lights, curves=P.curves,
+                cameras=P.cameras, export_materials=P.export_materials, include_hidden=P.include_hidden,
+                origin_name=P.origin_name, filename_prefix=P.filename_prefix, filename_suffix=P.filename_suffix,
+                include_collisions=P.include_collisions, collision_prefix=P.collision_prefix,
+                legacy_selected_only=P.legacy_selected_only, clean_geometry=P.clean_geometry)
+            if result == {'CANCELLED'}:
+                self.report({'ERROR'}, 'DAG export failed; see the Dagor log')
+                return {'CANCELLED'}
             time_spent=round(time() - start,5)
             show_popup(message=f'Batch export finished in {time_spent} sec')
         else:
@@ -44,6 +52,13 @@ class DAGOR_PT_Export(bpy.types.Panel):
         P = bpy.data.scenes[0].dag4blend.exporter
         l = self.layout
         toggles = l.column(align = True)
+        data_types = l.box()
+        data_types.label(text='Data Types')
+        for name in ('meshes', 'helpers', 'lights', 'curves', 'cameras', 'export_materials'):
+            data_types.prop(P, name)
+        toggles.prop(P, 'include_hidden')
+        toggles.prop(P, 'clean_geometry')
+        l.prop_search(P, 'origin_name', bpy.data, 'objects')
 
         row = toggles.row()
         row.prop(P, 'vnorm', toggle = True,
@@ -62,10 +77,15 @@ class DAGOR_PT_Export(bpy.types.Panel):
         icon = 'CHECKBOX_HLT' if P.cleanup_names else 'CHECKBOX_DEHLT')
 
         l.prop(P, 'limit_by')
+        if P.limit_by == 'Sel.Separated':
+            for name in ('filename_prefix', 'filename_suffix', 'include_collisions', 'collision_prefix'):
+                l.prop(P, name)
         path_exists = exists(P.dirpath)
 
         l.prop(P, 'dirpath')
-        if P.limit_by == 'Visible':
+        if P.limit_by in {'Visible', 'Legacy'}:
+            if P.limit_by == 'Legacy':
+                l.prop(P, 'legacy_selected_only')
             l.prop(P, 'filename')
             if path_exists:
                 export_row = l.row()
@@ -92,7 +112,7 @@ class DAGOR_PT_Export(bpy.types.Panel):
                 export_row.operator('dt.batch_export', text='EXPORT ' + P.filename + '.dag', icon = 'EXPORT')
                 l.operator('wm.path_open', icon = 'FILE_FOLDER', text='open export folder').filepath = P.dirpath
             else:
-                export_row.operator('dt.batch_export', text='Create directory',icon='ERROR')
+                l.operator('dt.batch_export', text='Create directory',icon='ERROR')
 
         elif P.limit_by == 'Col.Separated':
             l.prop(P, 'collection')

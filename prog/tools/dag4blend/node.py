@@ -6,6 +6,8 @@ class NodeExp:
         self.children = list()
         self.mesh = None
         self.curves = None
+        self.light = None
+        self.skin = None
         self.tm = None
         self.wtm = None
         self.renderable = True
