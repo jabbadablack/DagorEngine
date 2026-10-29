@@ -30,6 +30,15 @@ class EntryPointTests(unittest.TestCase):
     def test_only_one_root_python_entry_point(self):
         self.assertEqual([p.name for p in ROOT.glob('*.py')], ['dng.py'])
 
+    def test_bootstrap_installer_sees_original_environment(self):
+        seen = []
+        def run(command, **kwargs):
+            seen.append(os.environ.get('GDEVTOOL'))
+        with patch.dict(os.environ, {'GDEVTOOL': 'original-toolchain'}), patch.object(dng, 'run', side_effect=run), \
+             patch.object(dng, 'configure'), patch('game_project.ensure_tools_data'):
+            self.assertEqual(dng.main(['bootstrap', '--install-devtools', '--devtools', 'new-toolchain', '--skip-build']), 0)
+            self.assertEqual(seen, ['original-toolchain'])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -67,13 +67,15 @@ def main(argv=None):
     if extra and opts.action not in ('run', 'editor', 'asset-viewer', 'ui-editor'):
         parser.error('Unexpected arguments: ' + ' '.join(extra))
     try:
+        if opts.action == 'bootstrap' and (opts.install_devtools or not Path(opts.devtools, 'jam.exe' if os.name == 'nt' else 'jam').exists()):
+            # Let the installer see the user's original environment so its
+            # persistent GDEVTOOL/PATH setup is not masked by our process values.
+            run([sys.executable, ROOT / 'prog/_jBuild/bootstrap/make_devtools.py', Path(opts.devtools).resolve()], dry_run=opts.dry_run)
         environment(opts.devtools)
         if opts.directory and opts.action != 'new':
             opts.project = ide.project_name(opts.directory)
             if not opts.dry_run: ide.register_project(opts.directory, opts.project)
         if opts.action == 'bootstrap':
-            if opts.install_devtools or not Path(opts.devtools, 'jam.exe' if os.name == 'nt' else 'jam').exists():
-                run([sys.executable, ROOT / 'prog/_jBuild/bootstrap/make_devtools.py', Path(opts.devtools).resolve()], dry_run=opts.dry_run)
             from game_project import ensure_tools_data
             ensure_tools_data(opts, run)
             build = configure(opts)
