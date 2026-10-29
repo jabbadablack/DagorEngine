@@ -2,6 +2,8 @@
 
 `dng.py` is the root command for bootstrap, CMake builds, content and project creation.
 CMakeLists.txt, CMakePresets.json and cmake/ remain in `prog/_jBuild`.
+Install Python 3.10+, CMake 3.24+ and Ninja before bootstrap; CMake and Ninja must
+be available on `PATH`.
 
 ```sh
 python dng.py bootstrap --install-devtools --devtools ../devtools

@@ -13,7 +13,7 @@ Requirements for building and using the Dagor Engine toolkit:
 
 2. Install 7-Zip: <https://www.7-zip.org/>.
 
-3. Install Python 3.
+3. Install Python 3.10+, CMake 3.24+ and Ninja. Add CMake and Ninja to `PATH`.
 
 4. If you plan to use the FMOD sound library, also install FMOD Studio SDK
    2.02.15.

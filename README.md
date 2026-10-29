@@ -92,7 +92,9 @@ X:\develop\DagorEngine\samples\testGI\game
 
 ## How to Build: Build from Source Code
 
-First unpack [tools-base.7z](https://dagorenginedata.cdn.gaijin.net/head-2026.10.11/tools-base.7z) to DagorEngine root to get mandatory binary files in their place.
+Install Python 3.10+, CMake 3.24+ and Ninja, with CMake and Ninja on `PATH`.
+Bootstrap installs mandatory tool data if missing. To install it manually, unpack
+[tools-base.7z](https://dagorenginedata.cdn.gaijin.net/head-2026.10.11/tools-base.7z) to the DagorEngine root.
 
 If you are going to run samples unpack [samples-base.7z](https://dagorenginedata.cdn.gaijin.net/head-2026.10.11/samples-base.7z) to DagorEngine root (if you plan to only build EXE and shaders these binary data are not mandatory).
 
