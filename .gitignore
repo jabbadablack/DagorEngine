@@ -18,3 +18,9 @@
 *.dshl.log
 *.dascache
 ShaderLog-*
+
+# Local Visual Studio state and regenerated project folder filters.
+/.vs/
+*.vcxproj.user
+*.vcxproj.filters
+/prog/_jBuild/msbuild/bin/

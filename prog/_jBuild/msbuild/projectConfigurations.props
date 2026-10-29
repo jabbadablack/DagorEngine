@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildToolsDir>$(MSBuildThisFileDirectory)</MSBuildToolsDir>
+    <RootDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\..\'))</RootDir>
+    <CommonProgDir>$(RootDir)prog\</CommonProgDir>
+    <Configuration Condition="'$(Configuration)' == ''">dev</Configuration>
+    <Platform Condition="'$(Platform)' == ''">x64</Platform>
+    <JamPlatform>windows</JamPlatform>
+    <JamPlatformArch>x86_64</JamPlatformArch>
+    <DaPlatform>win64</DaPlatform>
+    <NameSuffix Condition="'$(Configuration)' != 'rel'">-$(Configuration)</NameSuffix>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="dbg|x64"><Configuration>dbg</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="dev|x64"><Configuration>dev</Configuration><Platform>x64</Platform></ProjectConfiguration>
+    <ProjectConfiguration Include="rel|x64"><Configuration>rel</Configuration><Platform>x64</Platform></ProjectConfiguration>
+  </ItemGroup>
+</Project>

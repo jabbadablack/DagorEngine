@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- The installed extension copies the startup working directory and Jam command here.
+       Resolve its generated include/forced-include settings after those properties change. -->
+  <Import Project="$(RootDir)_output\visualstudio\shared-intellisense.props" Condition="'$(DagorSharedProject)' == 'true' and Exists('$(RootDir)_output\visualstudio\shared-intellisense.props')" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <UsingTask TaskName="Gaijin.MSBuild.Utilities.Exec" AssemblyFile="$(DagorTaskAssembly)" />
+  <PropertyGroup>
+    <JamBuildCommandLine Condition="'$(DagorSharedProject)' != 'true'">-sPlatform=$(JamPlatform) -sPlatformArch=$(JamPlatformArch) -sConfig=$(Configuration) $(AdjunctOptions)</JamBuildCommandLine>
+    <NMakeBuildCommandLine>&quot;$(JamExecutable)&quot; $(JamBuildCommandLine)</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine>$(NMakeBuildCommandLine) -a</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>$(NMakeBuildCommandLine) clean</NMakeCleanCommandLine>
+    <NMakeIntelliSenseOptions>$(AdditionalOptions)</NMakeIntelliSenseOptions>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectCapability Include="DagorProject" />
+    <ProjectCapability Include="DagorSharedProject" Condition="'$(DagorSharedProject)' == 'true'" />
+    <PropertyPageSchema Include="$(MSBuildToolsDir)UI\SharedProject.xml" Condition="'$(DagorSharedProject)' == 'true'">
+      <Context>Project</Context>
+    </PropertyPageSchema>
+    <Natvis Include="$(CommonProgDir)dagor_types.natvis" />
+  </ItemGroup>
+  <Import Project="$(RootDir)_output\visualstudio\$(MSBuildProjectName)\files.props" Condition="Exists('$(RootDir)_output\visualstudio\$(MSBuildProjectName)\files.props')" />
+  <Target Name="DagorValidate" Condition="'$(DagorSharedProject)' != 'true'">
+    <Error Condition="'$(Platform)' != 'x64' or ('$(Configuration)' != 'dbg' and '$(Configuration)' != 'dev' and '$(Configuration)' != 'rel')" Text="Dagor Visual Studio supports dbg/dev/rel | x64. Jam builds Windows x86_64." />
+    <Error Condition="!Exists('$(DagorTaskAssembly)')" Text="Run prog\_jBuild\msbuild\setup.ps1 to deploy the Dagor MSBuild tasks." />
+    <MakeDir Directories="$(IntDir)" />
+  </Target>
+  <Target Name="Build" DependsOnTargets="DagorValidate" Condition="'$(DagorSharedProject)' != 'true'">
+    <Gaijin.MSBuild.Utilities.Exec Command="$(NMakeBuildCommandLine) $(DagorJamOptions)" WorkingDirectory="$(ProjectRootDir)" />
+  </Target>
+  <Target Name="Rebuild" DependsOnTargets="DagorValidate" Condition="'$(DagorSharedProject)' != 'true'">
+    <Gaijin.MSBuild.Utilities.Exec Command="$(NMakeReBuildCommandLine) $(DagorJamOptions)" WorkingDirectory="$(ProjectRootDir)" />
+  </Target>
+  <Target Name="Clean" DependsOnTargets="DagorValidate" Condition="'$(DagorSharedProject)' != 'true'">
+    <Gaijin.MSBuild.Utilities.Exec Command="$(NMakeCleanCommandLine) $(DagorJamOptions)" WorkingDirectory="$(ProjectRootDir)" />
+  </Target>
+  <Target Name="GenerateDagorIntelliSense" DependsOnTargets="DagorValidate" Condition="'$(DagorSharedProject)' != 'true'">
+    <Exec Command="&quot;$(DagorPython)&quot; &quot;$(MSBuildToolsDir)intellisense.py&quot; --jam &quot;$(JamExecutable)&quot; --directory &quot;$(ProjectRootDir).&quot; --source-directory &quot;$(DagorProjectDir).&quot; --output &quot;$(DagorIntelliSenseProps)&quot; -- $(JamBuildCommandLine)" />
+  </Target>
+  <Target Name="ClCompile" DependsOnTargets="DagorValidate">
+    <Error Condition="'$(JamBuildCommandLine)' == ''" Text="Choose a Dagor executable as the startup project before compiling shared engine files." />
+    <Exec Command="&quot;$(DagorPython)&quot; &quot;$(MSBuildToolsDir)intellisense.py&quot; --jam &quot;$(JamExecutable)&quot; --directory &quot;$(ProjectRootDir).&quot; --source-directory &quot;$(DagorProjectDir).&quot; --output &quot;$(DagorIntelliSenseProps)&quot; --compile &quot;$(SelectedFiles)&quot; -- $(JamBuildCommandLine)" />
+  </Target>
+  <Target Name="NMakeCompileSelectedFiles" DependsOnTargets="ClCompile" />
+</Project>

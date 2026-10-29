@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <GameName Condition="'$(GameName)' == ''">$(MSBuildProjectName)</GameName>
+    <DagorExeBase Condition="'$(DagorExeBase)' == '' and '$(GameType)' == 'sample'">$(GameName)-$(JamPlatform)-$(JamPlatformArch)</DagorExeBase>
+    <DagorExeBase Condition="'$(DagorExeBase)' == ''">$(GameName)</DagorExeBase>
+    <ExeName>$(DagorExeBase)$(NameSuffix).exe</ExeName>
+    <JamOutput>$(OutDir)$(ExeName)</JamOutput>
+    <NMakeOutput>$(JamOutput)</NMakeOutput>
+    <LocalDebuggerCommand>$(JamOutput)</LocalDebuggerCommand>
+    <LocalDebuggerWorkingDirectory Condition="'$(GameType)' != 'tool' and '$(GameType)' != 'dsc2'">$(GameDir)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory Condition="'$(LocalDebuggerWorkingDirectory)' == ''">$(ProjectRootDir)</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+</Project>

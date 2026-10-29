@@ -23,10 +23,11 @@
     <AdditionalFiles Condition="'$(AdditionalFiles)' != ''">$(JamOutput)</AdditionalFiles>
     <OriginalAdditionalFiles Condition="'$(OriginalAdditionalFiles)' != ''">$(AdditionalFiles)</OriginalAdditionalFiles>
   </PropertyGroup>
-  <Import Project="$(MSBuildToolsDir)common.targets" />
+
   <ItemGroup Label="Wildcard">
     <CppSource Include="**\*.cpp" />
     <CppHeader Include="**\*.h;**\*.inl" />
     <bat Include="**\*.bat;**\*.cmd" />
   </ItemGroup>
+  <Import Project="$(MSBuildToolsDir)common.targets" />
 </Project>

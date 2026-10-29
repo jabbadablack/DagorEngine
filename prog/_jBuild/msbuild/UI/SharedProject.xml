@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Rule Name="SharedProject" DisplayName="Dagor startup project" PageTemplate="generic" Order="1" xmlns="http://schemas.microsoft.com/build/2009/properties">
+  <Rule.DataSource><DataSource Persistence="ProjectFile" HasConfigurationCondition="true" /></Rule.DataSource>
+  <StringProperty Name="ProjectRootDir" DisplayName="Startup project working directory" />
+  <StringProperty Name="JamBuildCommandLine" DisplayName="Startup project Jam arguments" />
+  <StringProperty Name="NMakePreprocessorDefinitions" DisplayName="Startup project preprocessor definitions" />
+</Rule>

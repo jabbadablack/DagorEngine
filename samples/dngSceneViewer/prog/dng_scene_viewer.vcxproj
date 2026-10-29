@@ -37,10 +37,11 @@
     <LocalGP5File Condition="'$(DaPlatform)' == 'ps5'">$(OutDir)scee\workspace_layout.gp5</LocalGP5File>
     <GameOSFilePath Condition="'$(DaPlatform)' == 'scarlett'">$(OutDir)gameos.xvd</GameOSFilePath>
   </PropertyGroup>
-  <Import Project="$(MSBuildToolsDir)common.targets" />
+
   <ItemGroup Label="Wildcard">
     <CppSource Include="**\*.cpp" />
     <CppHeader Include="**\*.h;**\*.inl" />
     <bat Include="**\*.bat;**\*.cmd" />
   </ItemGroup>
+  <Import Project="$(MSBuildToolsDir)common.targets" />
 </Project>

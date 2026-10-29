@@ -18,7 +18,7 @@
   <PropertyGroup>
     <AdjunctOptions>$(AdjunctOptions) -sRoot=../.. -fsceneTools/daEditorX/jamfile </AdjunctOptions>
   </PropertyGroup>
-  <Import Project="$(MSBuildToolsDir)common.targets" />
+
   <PropertyGroup>
     <JamOutput>$(OutDir)daEditor3x$(NameSuffix).exe</JamOutput>
     <ExeName>daEditor3x$(NameSuffix).exe</ExeName>
@@ -30,4 +30,5 @@
     <CppHeader Include="**\*.h;**\*.inl" />
     <bat Include="**\*.bat;**\*.cmd" />
   </ItemGroup>
+  <Import Project="$(MSBuildToolsDir)common.targets" />
 </Project>

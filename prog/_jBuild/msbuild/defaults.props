@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <Keyword>MakeFileProj</Keyword>
+    <ProjectRootDir Condition="'$(ProjectRootDir)' == ''">$(MSBuildProjectDirectory)\</ProjectRootDir>
+    <DagorProjectDir>$(MSBuildProjectDirectory)\</DagorProjectDir>
+    <GameDir Condition="'$(GameDir)' != ''">$([System.IO.Path]::GetFullPath($([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(GameDir)'))))\</GameDir>
+    <IntDir>$(RootDir)_output\visualstudio\$(MSBuildProjectName)\$(Configuration)\</IntDir>
+    <OutDir Condition="'$(OutDir)' == ''">$(GameDir)</OutDir>
+    <DagorTaskAssembly>$(MSBuildToolsDir)bin\Gaijin.MSBuild.Utilities.dll</DagorTaskAssembly>
+    <DagorDevtools Condition="'$(GDEVTOOL)' != ''">$(GDEVTOOL)</DagorDevtools>
+    <DagorDevtools Condition="'$(DagorDevtools)' == ''">$(RootDir)..\devtools</DagorDevtools>
+    <JamExecutable Condition="'$(JamExecutable)' == '' and Exists('$(DagorDevtools)\jam.exe')">$(DagorDevtools)\jam.exe</JamExecutable>
+    <JamExecutable Condition="'$(JamExecutable)' == ''">jam.exe</JamExecutable>
+    <DagorPython Condition="'$(DagorPython)' == '' and Exists('$(DagorDevtools)\python3\python.exe')">$(DagorDevtools)\python3\python.exe</DagorPython>
+    <DagorPython Condition="'$(DagorPython)' == ''">python</DagorPython>
+    <DagorIntelliSenseProps>$(IntDir)intellisense.props</DagorIntelliSenseProps>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+    <UseDebugLibraries Condition="'$(Configuration)' == 'dbg'">true</UseDebugLibraries>
+    <UseDebugLibraries Condition="'$(Configuration)' != 'dbg'">false</UseDebugLibraries>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
+    <NMakeIncludeSearchPath>$(CommonProgDir)dagorInclude;$(CommonProgDir)engine\sharedInclude;$(CommonProgDir)gameLibs\publicInclude;$(CommonProgDir)1stPartyLibs;$(CommonProgDir)3rdPartyLibs;$(CommonProgDir)3rdPartyLibs\eastl\include;$(CommonProgDir);$(MSBuildProjectDirectory)</NMakeIncludeSearchPath>
+    <NMakePreprocessorDefinitions>_TARGET_PC=1;_TARGET_PC_WIN=1;_TARGET_64BIT;_TARGET_ARCH_X86_64;_TARGET_SIMD_SSE=4;WIN64;NOMINMAX;_USE_MATH_DEFINES;_HAS_EXCEPTIONS=0</NMakePreprocessorDefinitions>
+    <DagorDebugLevel Condition="'$(Configuration)' == 'dbg'">2</DagorDebugLevel>
+    <DagorDebugLevel Condition="'$(Configuration)' == 'dev'">1</DagorDebugLevel>
+    <DagorDebugLevel Condition="'$(Configuration)' == 'rel'">0</DagorDebugLevel>
+    <NMakePreprocessorDefinitions>$(NMakePreprocessorDefinitions);DAGOR_DBGLEVEL=$(DagorDebugLevel)</NMakePreprocessorDefinitions>
+    <AdditionalOptions>/std:c++20</AdditionalOptions>
+  </PropertyGroup>
+  <Import Project="$(DagorIntelliSenseProps)" Condition="Exists('$(DagorIntelliSenseProps)')" />
+</Project>

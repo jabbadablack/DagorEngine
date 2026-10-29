@@ -1,0 +1,61 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 18
+VisualStudioVersion = 18.0.0.0
+MinimumVisualStudioVersion = 17.0.0.0
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "testGI", "samples\testGI\prog\testGI.vcxproj", "{85EAEB4C-3C9B-4058-B97F-3A92B4A2EF75}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "skiesSample", "samples\skiesSample\prog\skiesSample.vcxproj", "{9A8E7914-B5F0-4E32-9F9C-E7D1B9F5040F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dng_scene_viewer", "samples\dngSceneViewer\prog\dng_scene_viewer.vcxproj", "{EC9B6280-58EB-4A39-8E2E-C3D49B7C8A09}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "outer_space", "outerSpace\prog\outer_space.vcxproj", "{F95C9957-BC51-4253-97A5-11842C8E1003}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ShaderCompiler2", "prog\tools\ShaderCompiler2\ShaderCompiler2.vcxproj", "{39917310-4B06-4B67-9D85-EDD764C7C446}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AssetViewer", "prog\tools\AssetViewer\AssetViewer.vcxproj", "{3A639BBE-FEB3-4FB0-8FA2-7E661E7DC648}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "daEditorX", "prog\tools\sceneTools\daEditorX\daEditorX.vcxproj", "{BDCE474E-AF15-412E-BA2D-579623579CE2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dag2blk", "prog\tools\converters\dag2blk\dag2blk.vcxproj", "{A8D9613F-D28E-4420-8B0E-8A88357B709D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Dagor Engine", "prog\prog.vcxproj", "{89D18E89-8553-4D5B-842E-EE8D4F78043F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		dev|x64 = dev|x64
+		dbg|x64 = dbg|x64
+		rel|x64 = rel|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{85EAEB4C-3C9B-4058-B97F-3A92B4A2EF75}.dev|x64.ActiveCfg = dev|x64
+		{9A8E7914-B5F0-4E32-9F9C-E7D1B9F5040F}.dev|x64.ActiveCfg = dev|x64
+		{EC9B6280-58EB-4A39-8E2E-C3D49B7C8A09}.dev|x64.ActiveCfg = dev|x64
+		{F95C9957-BC51-4253-97A5-11842C8E1003}.dev|x64.ActiveCfg = dev|x64
+		{39917310-4B06-4B67-9D85-EDD764C7C446}.dev|x64.ActiveCfg = dev|x64
+		{3A639BBE-FEB3-4FB0-8FA2-7E661E7DC648}.dev|x64.ActiveCfg = dev|x64
+		{BDCE474E-AF15-412E-BA2D-579623579CE2}.dev|x64.ActiveCfg = dev|x64
+		{A8D9613F-D28E-4420-8B0E-8A88357B709D}.dev|x64.ActiveCfg = dev|x64
+		{89D18E89-8553-4D5B-842E-EE8D4F78043F}.dev|x64.ActiveCfg = dev|x64
+		{85EAEB4C-3C9B-4058-B97F-3A92B4A2EF75}.dev|x64.Build.0 = dev|x64
+		{85EAEB4C-3C9B-4058-B97F-3A92B4A2EF75}.dbg|x64.ActiveCfg = dbg|x64
+		{9A8E7914-B5F0-4E32-9F9C-E7D1B9F5040F}.dbg|x64.ActiveCfg = dbg|x64
+		{EC9B6280-58EB-4A39-8E2E-C3D49B7C8A09}.dbg|x64.ActiveCfg = dbg|x64
+		{F95C9957-BC51-4253-97A5-11842C8E1003}.dbg|x64.ActiveCfg = dbg|x64
+		{39917310-4B06-4B67-9D85-EDD764C7C446}.dbg|x64.ActiveCfg = dbg|x64
+		{3A639BBE-FEB3-4FB0-8FA2-7E661E7DC648}.dbg|x64.ActiveCfg = dbg|x64
+		{BDCE474E-AF15-412E-BA2D-579623579CE2}.dbg|x64.ActiveCfg = dbg|x64
+		{A8D9613F-D28E-4420-8B0E-8A88357B709D}.dbg|x64.ActiveCfg = dbg|x64
+		{89D18E89-8553-4D5B-842E-EE8D4F78043F}.dbg|x64.ActiveCfg = dbg|x64
+		{85EAEB4C-3C9B-4058-B97F-3A92B4A2EF75}.dbg|x64.Build.0 = dbg|x64
+		{85EAEB4C-3C9B-4058-B97F-3A92B4A2EF75}.rel|x64.ActiveCfg = rel|x64
+		{9A8E7914-B5F0-4E32-9F9C-E7D1B9F5040F}.rel|x64.ActiveCfg = rel|x64
+		{EC9B6280-58EB-4A39-8E2E-C3D49B7C8A09}.rel|x64.ActiveCfg = rel|x64
+		{F95C9957-BC51-4253-97A5-11842C8E1003}.rel|x64.ActiveCfg = rel|x64
+		{39917310-4B06-4B67-9D85-EDD764C7C446}.rel|x64.ActiveCfg = rel|x64
+		{3A639BBE-FEB3-4FB0-8FA2-7E661E7DC648}.rel|x64.ActiveCfg = rel|x64
+		{BDCE474E-AF15-412E-BA2D-579623579CE2}.rel|x64.ActiveCfg = rel|x64
+		{A8D9613F-D28E-4420-8B0E-8A88357B709D}.rel|x64.ActiveCfg = rel|x64
+		{89D18E89-8553-4D5B-842E-EE8D4F78043F}.rel|x64.ActiveCfg = rel|x64
+		{85EAEB4C-3C9B-4058-B97F-3A92B4A2EF75}.rel|x64.Build.0 = rel|x64
+	EndGlobalSection
+EndGlobal

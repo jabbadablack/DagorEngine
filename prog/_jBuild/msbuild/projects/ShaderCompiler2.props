@@ -1,0 +1,8 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\projectConfigurations.props" />
+  <PropertyGroup>
+    <DagorExeBase>dsc2-dx12</DagorExeBase>
+    <AdjunctOptions>-sRoot=../.. -fShaderCompiler2/jamfile-dx12</AdjunctOptions>
+    <OutDir>$(RootDir)tools\dagor_cdk\windows-x86_64\</OutDir>
+  </PropertyGroup>
+</Project>

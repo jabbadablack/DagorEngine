@@ -1,4 +1,8 @@
 ## How to Build: Environment
+
+For Visual Studio 2022/2026 and the Visual Dagor extension, see
+[Visual Studio setup, builds and IntelliSense](_docs/visual_studio.md).
+
 Requirements for building and using the Dagor Engine toolkit: Windows 10 (x64), 16 GB of RAM, 200 GB of HDD/SSD space.
 
 * Install Git: https://git-scm.com/download/win
