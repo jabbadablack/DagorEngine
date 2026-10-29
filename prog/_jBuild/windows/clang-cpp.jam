@@ -124,7 +124,7 @@ actions together quietly compile_cpp
   $(VC_START_SHOW_INCLUDES_FILTER)
   set_filter $(1:S=.d) /$(VC_SHOW_INCLUDES_FILTER_PREFIX)(.+)/d1 $(1:G=:D=): $1
   echo $(2:G=:D=)
-  call_filtered $(_CPP_COMPILER) $(pre_opt) $(_CPP_BASE_INCLUDES) $(cpp_opt) -showIncludes #\(-Fo$(1) $(2:G=))\#
+  call_filtered $(_CPP_COMPILER) $(pre_opt) $(_CPP_BASE_INCLUDES) $(cpp_opt) -showIncludes #\(-Fo"$(1)" "$(2:G=)")\#
   if errorlevel 1 goto failed
   if not exist $(1) goto failed
   goto end
@@ -141,7 +141,7 @@ actions together quietly compile_c
   $(VC_START_SHOW_INCLUDES_FILTER)
   set_filter $(1:S=.d) /$(VC_SHOW_INCLUDES_FILTER_PREFIX)(.+)/d1 $(1:G=:D=): $1
   echo $(2:G=:D=)
-  call_filtered $(_C_COMPILER) $(pre_opt) $(_C_BASE_INCLUDES) $(c_opt) -showIncludes #\(-Fo$(1) $(2:G=))\#
+  call_filtered $(_C_COMPILER) $(pre_opt) $(_C_BASE_INCLUDES) $(c_opt) -showIncludes #\(-Fo"$(1)" "$(2:G=)")\#
   if errorlevel 1 goto failed
   if not exist $(1) goto failed
   goto end

@@ -13,9 +13,17 @@ actions together quietly updated null_action
 }
 
 # directory creation action
+# Jam's built-in condition parser splits paths at spaces; use cmd for quoted Windows paths.
+if $(OS) = NT {
+actions together quietly MkDir
+{
+  call $(ComSpec) /C #\( if not exist "$(1)" mkdir "$(1)" )\#
+}
+} else {
 actions together quietly MkDir
 {
   if not exist $(1) mkdir $(1)
+}
 }
 
 # directory creation rules
