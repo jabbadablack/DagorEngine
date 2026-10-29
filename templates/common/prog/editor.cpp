@@ -1,4 +1,5 @@
 #include "editor.h"
+#if DAGOR_DBGLEVEL > 0
 #include "engine_paths.h"
 #include <util/dag_flyMode.h>
 #include <util/dag_globDef.h>
@@ -315,3 +316,13 @@ void shutdown()
   objects.clear();
 }
 }
+#else
+namespace starter_editor
+{
+void initialize() {}
+void shutdown() {}
+void update(float) {}
+void render() {}
+bool self_test() { return true; }
+}
+#endif

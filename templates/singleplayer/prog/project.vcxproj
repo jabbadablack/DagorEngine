@@ -5,7 +5,6 @@
     <ProjectGuid>@PROJECT_GUID@</ProjectGuid>
     <GameName>@GAME_NAME@</GameName>
     <GameType>game</GameType>
-    <LocalDebuggerCommandArguments>-editor</LocalDebuggerCommandArguments>
     <GameDir>$(MSBuildProjectDirectory)\..\game\</GameDir>
     <OutDir>$(GameDir)windows-x86_64\</OutDir>
   </PropertyGroup>

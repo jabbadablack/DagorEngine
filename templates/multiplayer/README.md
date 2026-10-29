@@ -15,8 +15,9 @@ and edit transforms in the inspector; Save/Load persists
 `game/scenes/starter_scene.blk`. Close the window or press Escape to exit.
 
 Both templates share this editor and the engine flight-camera integrator. Use
-the `@GAME_NAME@_editor` / `@GAME_NAME@_freecam` CMake targets or `-editor` /
-`-freecam` arguments. Visual Studio starts in editor mode. The inspector uses
+the normal dbg/dev executable and switch modes with F2/F10 during play. There are
+no separate editor/camera targets or rebuilds. Optional `-editor` / `-freecam`
+arguments select an initial mode. Release omits these development tools. The inspector uses
 the engine's testGI shader bundle; install/build the sample shaders with engine
 setup, or override `editorShaderPrefix` in settings. Scene editing is local;
 extend the template networking protocol to replicate your game's scene changes.

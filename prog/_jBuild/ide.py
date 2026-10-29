@@ -164,7 +164,6 @@ def generate(opts):
         'DAGOR_INDEX_SOURCES': sorted({e['file'] for e in entries if Path(e['file']).exists()}),
         'DAGOR_INDEX_INCLUDES': includes, 'DAGOR_INDEX_DEFINES': defines,
         'DAGOR_INDEX_FORCED': forced, 'DAGOR_PROJECT_NAMES': list(projects(opts.platform)),
-        'DAGOR_TEMPLATE_PROJECT_NAMES': [n for n, _ in discover_projects() if n not in {name for name, _ in PROJECTS}],
         'DAGOR_EXECUTABLE': [executable], 'DAGOR_WORKING_DIRECTORY': [workdir],
     }
     lines = [f'set({key}\n' + '\n'.join('  ' + cmake_value(value) for value in values) + '\n)' for key, values in variables.items()]

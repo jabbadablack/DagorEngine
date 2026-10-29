@@ -1,7 +1,6 @@
 Root ?= "@ENGINE_ROOT@" ;
 Location ?= "@PROJECT_LOCATION@" ;
 UseD3DMulti = yes ;
-ForceLinkDebugLines = yes ;
 include $(Root)/prog/samples/samples_setup.jam ;
 if $(Platform) = windows { UseD3DMultiList = DX11 ; }
 else if $(Platform) = linux { UseD3DMultiList = vulkan ; LinuxUseGUI = yes ; }
@@ -32,11 +31,13 @@ UseProgLibs =
   engine/drv/hid_nulldrv
   engine/drv/hid_keyboard
   engine/drv/hid_mouse
-  engine/imgui
-  gameLibs/imguiInput
-  gameLibs/ecs/input
   engine/daNet
+  engine/consoleProc
   engine/perfMon
 ;
 if $(Platform) in linux macOS { UseProgLibs += engine/osApiWrappers/messageBox ; }
+if $(Config) in dbg dev {
+  ForceLinkDebugLines = yes ;
+  UseProgLibs += engine/imgui gameLibs/imguiInput gameLibs/ecs/input ;
+}
 include $(Root)/prog/_jBuild/build.jam ;

@@ -60,9 +60,11 @@ Its window turns green only after the handshake succeeds. Run a host with no
 arguments, then a client with `-connect:127.0.0.1`; `-port:27015` selects the port.
 Game state replication and gameplay rules are left for your project.
 
-Template projects also expose `<name>_editor` and `<name>_freecam` CMake targets.
-Launch directly with `-editor` (or `-edit`) and `-freecam`. Visual Studio F5 starts
-in editor mode. Controls follow the samples: WASD, E/C, mouse, Shift for speed;
+Editor and camera modes are included in the normal dbg/dev game executable;
+switch at runtime with F2/F10, without separate targets or rebuilds. Optional
+`-editor` (or `-edit`) and `-freecam` arguments choose an initial mode. Release
+omits the starter development tools and their UI shader dependency.
+Controls follow the samples: WASD, E/C, mouse, Shift for speed;
 hold RMB in the editor viewport to navigate. Inspector changes persist to
 `game/scenes/starter_scene.blk`; they are local until your game adds replication.
 

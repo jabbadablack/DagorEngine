@@ -12,8 +12,10 @@ inspector selects/adds/deletes objects and edits names, positions and sizes.
 Save/Load writes `game/scenes/starter_scene.blk`. Close the window or press Escape
 to exit. Outputs go to `game/<platform>-<architecture>`.
 
-Use `@GAME_NAME@_editor` / `@GAME_NAME@_freecam` CMake targets, or launch with
-`-editor` / `-freecam`. Visual Studio F5 starts in editor mode. The ImGui inspector
+Editor and free camera are included in the normal dbg/dev executable. No
+separate targets or rebuilds are needed: press F2/F10 during play. Optional
+`-editor` / `-freecam` arguments select an initial mode. Release omits these
+development tools. The ImGui inspector
 uses the engine's testGI shader bundle under `samples/testGI/game/compiledShaders`;
 install or build those shaders with engine setup. `editorShaderPrefix` in settings
 can override it. The free camera uses the same Dagor flight integrator as testGI.
