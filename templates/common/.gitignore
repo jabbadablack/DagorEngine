@@ -9,8 +9,13 @@ __pycache__/
 *.pyc
 *.dascache
 *.dshl.log
+ShaderLog-*
+/.log/
 /develop/.cache/
+/develop/.log/
+/develop/gui/pc.out.ui/
 /prog/shaders/shaders_*/
+/tools/.log/
 /tools/*.shdump.bin
 /game/*
 !/game/*.config.blk
