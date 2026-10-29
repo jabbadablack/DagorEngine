@@ -124,6 +124,16 @@ class WorkspaceTests(unittest.TestCase):
         self.assertIn('daNetGame', (game / 'prog/jamfile').read_text())
         self.assertIn('--listen', (game / 'host.cmd').read_text())
 
+    def test_ui_editor_quotes_script_path_for_inline_config_parser(self):
+        import game_project
+        from unittest.mock import Mock
+        game = self.root / 'game with spaces'
+        run = Mock()
+        opts = argparse.Namespace(directory=str(game), action='ui-editor', dry_run=True)
+        with patch.object(ide, 'runtime', return_value=(Path('dargbox'), self.root)):
+            game_project.launch_tool(opts, [], run)
+        self.assertEqual(run.call_args.args[0][1], '-config:script:t=' + json.dumps((game / 'prog/scripts/ui/main.nut').as_posix()))
+
     def test_standard_compilation_database_has_source_and_output_arguments(self):
         folder = self.root / 'prog/tools/converters/dag2blk'
         folder.mkdir(parents=True, exist_ok=True)

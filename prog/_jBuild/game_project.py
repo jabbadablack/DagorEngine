@@ -88,7 +88,8 @@ def launch_tool(opts, extra, run):
         runtime_opts = argparse.Namespace(project='dargbox', platform=ide.host_platform(), arch='native', config='dev')
         executable, working = ide.runtime(runtime_opts)
         if not executable.exists() and not opts.dry_run: raise RuntimeError('Build dargbox with dng.py bootstrap first')
-        run([executable, '-config:script:t=' + str(directory / 'prog/scripts/ui/main.nut'), *extra], working, opts.dry_run)
+        script = json.dumps((directory / 'prog/scripts/ui/main.nut').as_posix())
+        run([executable, '-config:script:t=' + script, *extra], working, opts.dry_run)
         return
     run(command, directory / 'develop', opts.dry_run)
 
