@@ -1141,6 +1141,8 @@ rule CompileRC
     if $(defm) && ! -D$(defm) in $(rc_opt) { rc_opt += -D$(defm) ; }
   }
   rc_opt    on $(1) = $(rc_opt) $(opt) ;
+  # Keep resource paths absolute, just as linker and librarian outputs are.
+  rc_output on $(1) = [ MakePathAbsolute $(JAM_CWD) : $(1) ] ;
   LOCATE    on $(2) = $(Root) ;
 
   if $(GLOBAL_CacheDryRun) { return ; }
