@@ -1,3 +1,5 @@
+projectName:t="@GAME_NAME@"
+engineRoot:t="@ENGINE_ROOT@"
 shaders:t="tools/tools"
 dngShaders:t="game/compiledShaders/game"
 collision:t="Jolt"

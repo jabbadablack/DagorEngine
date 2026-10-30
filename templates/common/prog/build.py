@@ -3,6 +3,7 @@
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -31,13 +32,17 @@ def main():
         arguments, extra = arguments[:separator], arguments[separator + 1:]
     opts, unknown = parser.parse_known_args(arguments)
     extra = unknown + extra
-    metadata = json.loads((PROJECT / 'dng-project.json').read_text())
-    engine = Path(os.environ.get('DAGOR_ENGINE_ROOT', metadata['engine'])).resolve()
+    application = (PROJECT / 'application.blk').read_text(encoding='utf-8')
+    engine_setting = re.search(r'^engineRoot:t\s*=\s*("(?:\\.|[^"\\])*")', application, re.M)
+    if not engine_setting:
+        parser.error('application.blk must define engineRoot:t=.')
+    engine = Path(os.environ.get('DAGOR_ENGINE_ROOT', json.loads(engine_setting[1]))).resolve()
     if not (engine / 'prog/_jBuild/ide.py').exists():
         parser.error('Set DAGOR_ENGINE_ROOT to your engine checkout.')
     sys.path.insert(0, str(engine / 'prog/_jBuild'))
     import ide
     import game_project
+    metadata = game_project.project_configuration(PROJECT)
     opts.platform = opts.platform or ide.host_platform()
     opts.directory, opts.project, opts.jam = str(PROJECT), metadata['name'], None
     os.environ['DAGOR_ENGINE_ROOT'] = str(engine)
@@ -59,7 +64,7 @@ def main():
         components = ['code'] if opts.clean else [] if opts.no_build else opts.components or ['code', 'shaders', 'assets', 'gui', 'vromfs', 'levels']
         build = PROJECT / '_output/cmake' / opts.config
         if 'code' in components or opts.configure_only or opts.clean:
-            run(['cmake', '-S', PROJECT, '-B', build, '-G', 'Ninja',
+            run(['cmake', '-S', PROJECT / 'prog', '-B', build, '-G', 'Ninja',
                 '-DPython3_EXECUTABLE=' + sys.executable, '-DDAGOR_ENGINE_ROOT=' + str(engine), '-DDAGOR_CONFIG=' + opts.config,
                 '-DDAGOR_PLATFORM=' + opts.platform, '-DDAGOR_ARCH=' + opts.arch])
             if not opts.configure_only:

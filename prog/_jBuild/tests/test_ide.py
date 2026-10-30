@@ -50,14 +50,14 @@ class WorkspaceTests(unittest.TestCase):
     def test_game_has_portable_and_visual_studio_entry_points(self):
         result = create_game.create_game('MyGame', False, False, directory=self.root / 'projects/MyGame')
         game = Path(result['directory'])
-        self.assertTrue((game / 'CMakeLists.txt').exists())
+        self.assertTrue((game / 'prog/CMakeLists.txt').exists())
         self.assertTrue((game / 'prog/scripts/game/main.das').exists())
         self.assertTrue((game / 'prog/scripts/ui/main.nut').exists())
         self.assertTrue((game / 'develop/assets/primitives/cube.lod00.dag').exists())
         self.assertTrue((game / 'develop/gui/fonts/OFL.txt').exists())
         self.assertFalse(list((game / 'game').rglob('*.das')))
         self.assertFalse((game / 'prog/editor.cpp').exists())
-        self.assertIn(str(self.root).replace('\\', '/'), (game / 'CMakeLists.txt').read_text())
+        self.assertIn(str(self.root).replace('\\', '/'), (game / 'application.blk').read_text())
         self.assertIn('daNetGame/setup.jam', (game / 'prog/jamfile').read_text())
         self.assertIn('%daeditor/editor.nut', (game / 'prog/scripts/ui/main.nut').read_text())
         for file in game.rglob('*'):
@@ -75,7 +75,12 @@ class WorkspaceTests(unittest.TestCase):
         self.assertNotIn('dng.py', (game / 'develop/dabuild.cmd').read_text())
         self.assertIn('entName:t="cube"', (game / 'develop/levels/starter/heightmapLand/entities.blk').read_text())
         self.assertIn('content/mygame/levels/starter.bin', (game / 'prog/gameBase/gamedata/levels/starter.blk').read_text())
-        self.assertTrue((game / 'CMakePresets.json').exists())
+        self.assertTrue((game / 'prog/CMakePresets.json').exists())
+        self.assertEqual(Path(result['solution']).parent, game / 'prog')
+        self.assertFalse(list(game.glob('*.json')))
+        self.assertNotIn('projectTemplate', (game / 'application.blk').read_text())
+        self.assertFalse(list(game.rglob('*.md')))
+        self.assertFalse((game / 'CMakeLists.txt').exists())
         ET.parse(result['project'])
         before = (game / 'prog/scripts/game/main.das').read_bytes()
         with self.assertRaises(ValueError):
@@ -116,12 +121,12 @@ class WorkspaceTests(unittest.TestCase):
         before = source.read_bytes()
         with patch.object(ide, 'ROOT', new_engine):
             ide.register_project(game)
-        manifest = json.loads((game / 'dng-project.json').read_text())
-        self.assertEqual(manifest['engine'], str(new_engine))
+        manifest = ide.project_configuration(game)
+        self.assertEqual(manifest['engine'], new_engine.as_posix())
         settings = (game / 'prog/gameBase/config/settings.blk').read_text()
         self.assertIn(new_engine.as_posix() + '/prog/scripts/sq/daRg', settings)
         self.assertNotIn(self.root.as_posix() + '/prog/scripts/sq/daRg', settings)
-        self.assertIn(manifest['engine_from_prog'] + '/prog/gameLibs', (game / 'prog/mk.vromfs.blk').read_text())
+        self.assertIn(os.path.relpath(new_engine, game / 'prog').replace('\\', '/') + '/prog/gameLibs', (game / 'prog/mk.vromfs.blk').read_text())
         self.assertEqual(source.read_bytes(), before)
 
     def test_multiplayer_template_contains_real_host_client_transport(self):

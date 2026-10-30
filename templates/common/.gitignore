@@ -1,8 +1,8 @@
 /_output/
-/.vs/
-/.idea/
-/cmake-build-*/
-/CMakeUserPresets.json
+**/.vs/
+**/.idea/
+**/cmake-build-*/
+**/CMakeUserPresets.json
 *.vcxproj.user
 *.vcxproj.filters
 __pycache__/

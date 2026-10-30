@@ -12,6 +12,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).with_name('msbuild')))
 from generate_projects import ROOT, discover_projects, PROJECTS
 from intellisense import commands_from_jam, settings
+from game_project import project_configuration
 
 
 def host_platform():
@@ -61,9 +62,9 @@ def invocation(opts):
         raise ValueError('Unknown/unsupported project. Choices: ' + ', '.join(registry))
     directory, extra = registry[opts.project]
     if opts.project not in {n for n, _ in PROJECTS}:
-        if not (directory.parent / 'dng-project.json').exists(): write_engine_header(directory.parent)
+        if not project_configuration(directory.parent): write_engine_header(directory.parent)
         extra = [*extra, '-sRoot=' + ROOT.as_posix()]
-        if not (directory.parent / 'dng-project.json').exists():
+        if not project_configuration(directory.parent):
             extra += ['-sLocation=' + os.path.relpath(directory, ROOT).replace('\\', '/')]
     arch = host_arch() if opts.arch == 'native' else opts.arch
     args = [f'-sPlatform={opts.platform}', f'-sPlatformArch={arch}', f'-sConfig={opts.config}', *extra]
@@ -130,11 +131,10 @@ def register_project(directory, name=None):
     if len(candidates) != 1:
         raise ValueError('Expected one project under the selected directory/prog.')
     project = candidates[0]
-    if not (folder / 'dng-project.json').exists(): write_engine_header(folder)
-    name = name or project.stem
-    if (folder / 'dng-project.json').exists():
-        manifest = folder / 'dng-project.json'
-        data = json.loads(manifest.read_text(encoding='utf-8'))
+    data = project_configuration(folder)
+    if not data: write_engine_header(folder)
+    name = name or (data['name'] if data else project.stem)
+    if data:
         old_engine = data['engine'].replace('\\', '/')
         new_engine = ROOT.as_posix()
         engine_from_prog = os.path.relpath(ROOT, folder / 'prog').replace('\\', '/')
@@ -142,7 +142,7 @@ def register_project(directory, name=None):
         # references while retaining game code and content customizations.
         if old_engine != new_engine:
             from xml.sax.saxutils import escape
-            files = [folder / 'CMakeLists.txt', project,
+            files = [folder / 'application.blk', folder / 'prog/CMakeLists.txt', project,
                      *(folder / 'prog').rglob('*.blk'), *(folder / 'game').glob('*.config.blk')]
             for file in files:
                 if not file.exists(): continue
@@ -150,14 +150,13 @@ def register_project(directory, name=None):
                 text = original.replace(escape(old_engine), escape(new_engine)) if file.suffix == '.vcxproj' else original.replace(old_engine, new_engine)
                 if text != original: file.write_text(text, encoding='utf-8')
         pack = folder / 'prog/mk.vromfs.blk'
-        old_relative = data.get('engine_from_prog')
+        pack_text = pack.read_text(encoding='utf-8') if pack.exists() else ''
+        old_path = re.search(r'path:t="([^"]*)/prog/gameLibs"', pack_text)
+        old_relative = old_path[1] if old_path else None
         if pack.exists() and old_relative and old_relative != engine_from_prog:
             original = pack.read_text(encoding='utf-8')
             text = original.replace('path:t="' + old_relative + '/prog/', 'path:t="' + engine_from_prog + '/prog/')
             if text != original: pack.write_text(text, encoding='utf-8')
-        if data.get('engine') != str(ROOT) or old_relative != engine_from_prog:
-            data.update(engine=str(ROOT), engine_from_prog=engine_from_prog)
-            manifest.write_text(json.dumps(data, indent=2) + '\n', encoding='utf-8')
         jamfile = folder / 'prog/jamfile'
         text = jamfile.read_text(encoding='utf-8')
         text = re.sub(r'^Root \?=.*?;', lambda _: 'Root ?= "' + ROOT.as_posix() + '" ;', text, count=1, flags=re.M)

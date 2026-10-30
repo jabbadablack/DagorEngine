@@ -67,7 +67,7 @@ def create_game(name, engine_solution=False, intellisense=True, portable_platfor
     registry.parent.mkdir(parents=True, exist_ok=True)
     registry.write_text(json.dumps(records, indent=2), encoding='utf-8')
     filters(project)
-    write_solution(destination / f'{name}.sln', [(name, project)])
+    write_solution(prog / f'{name}.sln', [(name, project)])
     if engine_solution:
         with redirect_stdout(sys.stderr):
             regenerate()
@@ -87,7 +87,7 @@ def create_game(name, engine_solution=False, intellisense=True, portable_platfor
                             '--project', name, '--platform', target_platform, '--arch', portable_arch,
                             '--output', str(ROOT / '_output/ide' / name)], check=True, stdout=sys.stderr)
     return {'name': name, 'directory': str(destination), 'project': str(project),
-            'solution': str(destination / f'{name}.sln'), 'cmake': str(destination / 'CMakeLists.txt')}
+            'solution': str(prog / f'{name}.sln'), 'cmake': str(prog / 'CMakeLists.txt')}
 
 
 def main():

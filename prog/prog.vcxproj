@@ -16,9 +16,9 @@
     </NMakePreprocessorDefinitions>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='dev|x64'">
-    <ProjectRootDir>C:\Users\cisco\OneDrive\Documents\Dagor Projects\Mischief\prog\</ProjectRootDir>
+    <ProjectRootDir>C:\Users\cisco\develop\DagorEngine\samples\testGI\prog\</ProjectRootDir>
     <JamBuildCommandLine>-sPlatform=windows -sPlatformArch=x86_64 -sConfig=dev </JamBuildCommandLine>
-    <NMakePreprocessorDefinitions>_TARGET_PC=1;_TARGET_PC_WIN=1;_TARGET_SIMD_SSE=4;WIN32_LEAN_AND_MEAN=;_USE_MATH_DEFINES;NOMINMAX;_ALLOW_KEYWORD_MACROS=;DELAYIMP_INSECURE_WRITABLE_HOOKS;WIN64;_TARGET_64BIT;_TARGET_ARCH_X86_64;DAGOR_DBGLEVEL=1;_HAS_EXCEPTIONS=0;_TARGET_STATIC_LIB;_DEBUG_TAB_;EASTL_DEBUG;EASTL_DEBUGPARAMS_LEVEL=0;EASTL_NAME_ENABLED=0</NMakePreprocessorDefinitions>
+    <NMakePreprocessorDefinitions>_TARGET_PC=1;_TARGET_PC_WIN=1;_TARGET_64BIT;_TARGET_ARCH_X86_64;_TARGET_SIMD_SSE=4;WIN64;NOMINMAX;_USE_MATH_DEFINES;_HAS_EXCEPTIONS=0;DAGOR_DBGLEVEL=1</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <ItemGroup>
     <CppSource Include="engine\**\*.cpp;gameLibs\**\*.cpp;daNetGame\**\*.cpp;daNetGameLibs\**\*.cpp;commonFx\**\*.cpp;1stPartyLibs\**\*.cpp" />

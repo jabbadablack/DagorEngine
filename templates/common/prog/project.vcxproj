@@ -6,6 +6,7 @@
   </PropertyGroup>
   <Import Project="$(DagorEngineRoot)/prog/_jBuild/msbuild/projectConfigurations.props" />
   <PropertyGroup Label="Globals">
+    <DagorStandaloneGame>true</DagorStandaloneGame>
     <ProjectGuid>@PROJECT_GUID@</ProjectGuid>
     <GameName>@GAME_NAME@</GameName>
     <GameType>game</GameType>

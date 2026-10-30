@@ -1,11 +1,25 @@
 """Standalone project content and tool pipeline, independent of sample projects."""
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import sys
 
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def project_configuration(directory):
+    application = Path(directory) / 'application.blk'
+    if not application.is_file():
+        return None
+    text = application.read_text(encoding='utf-8')
+    values = {}
+    for key, field in (('name', 'projectName'), ('engine', 'engineRoot')):
+        match = re.search(r'^' + field + r':t\s*=\s*("(?:\\.|[^"\\])*")', text, re.M)
+        if match:
+            values[key] = json.loads(match[1])
+    return values if 'name' in values else None
 
 
 def ensure_tools_data(opts, run):
@@ -35,10 +49,6 @@ def materialize(destination, name, multiplayer=False, engine=None):
         (destination / path).mkdir(parents=True, exist_ok=True)
     from primitives import generate
     generate(destination / 'develop/assets/primitives')
-    manifest = {'schema': 2, 'name': name, 'template': 'multiplayer' if multiplayer else 'singleplayer',
-                'engine_from_prog': os.path.relpath(engine, destination / 'prog').replace('\\', '/'),
-                'engine': str(engine), 'runtime': 'daNetGame'}
-    (destination / 'dng-project.json').write_text(json.dumps(manifest, indent=2) + '\n')
     launchers(destination, engine, multiplayer)
 
 
@@ -115,7 +125,7 @@ def build_content(opts, run):
         editor = cdk(opts, 'daEditor3x-dev')
         if not opts.dry_run:
             batch.parent.mkdir(parents=True, exist_ok=True)
-            metadata = json.loads((directory / 'dng-project.json').read_text())
+            metadata = project_configuration(directory)
             (directory / 'game/content' / metadata['name'].lower() / 'levels').mkdir(parents=True, exist_ok=True)
             workspace = Path(os.path.relpath(directory / 'application.blk', editor.parent)).as_posix()
             batch.write_text('set_workspace "' + workspace + '" no\n' +

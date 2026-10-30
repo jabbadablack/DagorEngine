@@ -10,7 +10,6 @@
     <NMakeBuildCommandLine>&quot;$(JamExecutable)&quot; $(JamBuildCommandLine)</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine>$(NMakeBuildCommandLine) -a</NMakeReBuildCommandLine>
     <NMakeCleanCommandLine>$(NMakeBuildCommandLine) clean</NMakeCleanCommandLine>
-    <DagorStandaloneGame Condition="Exists('$(MSBuildProjectDirectory)\..\dng-project.json')">true</DagorStandaloneGame>
     <NMakeBuildCommandLine Condition="'$(DagorStandaloneGame)' == 'true'">&quot;$(DagorPython)&quot; &quot;$(MSBuildProjectDirectory)\build.py&quot; --config $(Configuration) --platform windows --arch x86_64</NMakeBuildCommandLine>
     <NMakeCleanCommandLine Condition="'$(DagorStandaloneGame)' == 'true'">$(NMakeBuildCommandLine) --clean</NMakeCleanCommandLine>
     <NMakeReBuildCommandLine Condition="'$(DagorStandaloneGame)' == 'true'">$(NMakeCleanCommandLine) &amp;&amp; $(NMakeBuildCommandLine)</NMakeReBuildCommandLine>
