@@ -1,3 +1,11 @@
-// Editable source level workspace. Runtime ECS scene: prog/gameBase/gamedata/scenes/starter.blk.
-version:i=1
-description:t="@GAME_NAME@ starter level"
+lastUniqueId:i=3
+exportPath:t="content/@GAME_ID@/levels/starter.bin"
+ambient_light_color:c=100,120,200,255
+ambient_light_mult:r=0.375
+direct_light_color:c=255,255,242,255
+direct_light_mult:r=0.685272
+light_direction_alpha:r=0.998888
+light_direction_beta:r=3.03013
+use_direct_light:b=yes
+pluginsExport { heightmapLand:b=yes; environment:b=no; scnExport:b=no; clipping:b=no; ecsEditor:b=no; }
+filters_export { _singleEnt:b=yes; _riEntMgr:b=yes; }

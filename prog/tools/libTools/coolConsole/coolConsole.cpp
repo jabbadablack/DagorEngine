@@ -506,10 +506,9 @@ bool CoolConsole::runCommand(const char *cmd, bool silent)
   }
 
   limitOutputLinesLeft = 1024;
-  command.updateSz(); // after `conStrtok`
-  for (auto &p : params)
-    command.aprintf(0, " %s", p);
-  if (console::command(command.c_str()))
+  // Tokenization above is only for display. Preserve quotes when forwarding
+  // paths with spaces to the engine console's command parser.
+  if (console::command(cmd))
   {
     limitOutputLinesLeft = -1;
     return true;

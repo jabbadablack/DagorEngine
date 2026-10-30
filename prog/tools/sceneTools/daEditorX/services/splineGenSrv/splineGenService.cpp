@@ -574,4 +574,6 @@ struct SplineAndPolygonGenService : public ISplineGenService
 static SplineAndPolygonGenService splSrv;
 
 extern void init_spline_gen_mgr_service() { splSrv.init(); }
-extern void *get_generic_spline_gen_service() { return &splSrv; }
+// Asset Viewer initializes this service only when the workspace supports splines.
+// Do not expose it to rendering before its entity managers have been registered.
+extern void *get_generic_spline_gen_service() { return splSrv.splMgr && splSrv.polyMgr ? &splSrv : nullptr; }

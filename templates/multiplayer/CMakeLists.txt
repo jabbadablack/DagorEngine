@@ -16,6 +16,14 @@ add_custom_target(@GAME_NAME@_server
   COMMAND "${Python3_EXECUTABLE}" "${DAGOR_ENGINE_ROOT}/prog/_jBuild/ide.py" build
     --project "@GAME_NAME@" ${_dagor_args} -- -sDedicated=yes -sTarget=projects/@GAME_NAME@-server
   USES_TERMINAL VERBATIM)
+add_custom_target(@GAME_NAME@_server_code
+  COMMAND "${Python3_EXECUTABLE}" "${DAGOR_ENGINE_ROOT}/prog/_jBuild/ide.py" build
+    --project "@GAME_NAME@" ${_dagor_args} -- -sDedicated=yes -sTarget=projects/@GAME_NAME@-server
+  USES_TERMINAL VERBATIM)
+add_custom_command(TARGET @GAME_NAME@_server POST_BUILD
+  COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/prog/build.py"
+    shaders assets gui vromfs levels --platform "${DAGOR_PLATFORM}" --arch "${DAGOR_ARCH}" --config "${DAGOR_CONFIG}"
+  USES_TERMINAL VERBATIM)
 
 foreach(_action clean rebuild)
   add_custom_target(@GAME_NAME@_server_${_action}

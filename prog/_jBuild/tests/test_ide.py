@@ -69,7 +69,12 @@ class WorkspaceTests(unittest.TestCase):
         self.assertIn('MyGame.vcxproj', Path(result['solution']).read_text(encoding='utf-8-sig'))
         self.assertNotIn('Dagor Engine', Path(result['solution']).read_text(encoding='utf-8-sig'))
         self.assertTrue((game / 'prog/build.py').exists())
-        self.assertNotIn('dng.py', (game / 'build.cmd').read_text())
+        self.assertEqual({p.stem.lower() for p in (game / 'develop').glob('*.cmd')}, {'dabuild', 'daviewer', 'daeditor'})
+        self.assertFalse(list(game.glob('*.cmd')))
+        self.assertFalse(list(game.glob('*.sh')))
+        self.assertNotIn('dng.py', (game / 'develop/dabuild.cmd').read_text())
+        self.assertIn('entName:t="cube"', (game / 'develop/levels/starter/heightmapLand/entities.blk').read_text())
+        self.assertIn('content/mygame/levels/starter.bin', (game / 'prog/gameBase/gamedata/levels/starter.blk').read_text())
         self.assertTrue((game / 'CMakePresets.json').exists())
         ET.parse(result['project'])
         before = (game / 'prog/scripts/game/main.das').read_bytes()
@@ -122,11 +127,9 @@ class WorkspaceTests(unittest.TestCase):
     def test_multiplayer_template_contains_real_host_client_transport(self):
         result = create_game.create_game('NetworkGame', False, False, directory=self.root / 'projects/NetworkGame', template_name='multiplayer')
         game = Path(result['directory'])
-        self.assertTrue((game / 'host.cmd').exists())
-        self.assertTrue((game / 'client.sh').exists())
+        self.assertTrue((game / 'develop/daEditor.cmd').exists())
         self.assertTrue((game / 'prog/scripts/ui/main.nut').exists())
         self.assertIn('daNetGame', (game / 'prog/jamfile').read_text())
-        self.assertIn('--listen', (game / 'host.cmd').read_text())
 
     def test_ui_editor_quotes_script_path_for_inline_config_parser(self):
         import game_project

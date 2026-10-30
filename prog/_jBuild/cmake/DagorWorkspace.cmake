@@ -63,6 +63,15 @@ foreach(_project IN LISTS DAGOR_PROJECT_NAMES)
   add_custom_target(${_project} ${_all}
     COMMAND "${Python3_EXECUTABLE}" "${_dagor_script}" build --project "${_project}" ${_dagor_args}
     USES_TERMINAL VERBATIM)
+  if(DAGOR_PROJECT_DIRECTORY)
+    add_custom_target(${_project}_code
+      COMMAND "${Python3_EXECUTABLE}" "${_dagor_script}" build --project "${_project}" ${_dagor_args}
+      USES_TERMINAL VERBATIM)
+    add_custom_command(TARGET ${_project} POST_BUILD
+      COMMAND "${Python3_EXECUTABLE}" "${DAGOR_PROJECT_DIRECTORY}/prog/build.py"
+        shaders assets gui vromfs levels --platform "${DAGOR_PLATFORM}" --arch "${DAGOR_ARCH}" --config "${DAGOR_CONFIG}"
+      USES_TERMINAL VERBATIM)
+  endif()
   foreach(_action clean rebuild run)
     add_custom_target(${_project}_${_action}
       COMMAND "${Python3_EXECUTABLE}" "${_dagor_script}" ${_action} --project "${_project}" ${_dagor_args}

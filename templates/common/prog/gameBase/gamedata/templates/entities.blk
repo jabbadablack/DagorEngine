@@ -13,7 +13,7 @@ depth_of_field {
   "downsampled_dof_frame_fallback:UniqueTex" {}
 }
 
-// The host provides an empty world level without requiring a sample bindump.
+// Load the project's exported daEditor level.
 starter_level {
   level {}
   level__blk:t="gamedata/levels/starter.blk"
@@ -34,15 +34,6 @@ starter_camera {
   zfar:r=10000
   transform:m=[[1,0,0] [0,1,0] [0,0,1] [0,3,-10]]
 }
-starter_cube {
-  transform:m=[[1,0,0] [0,1,0] [0,0,1] [0,0,0]]
-  starter__elapsed:r=0.0
-  ri_extra__name:t="cube"
-  ri_extra { _tags:t="gameClient"; }
-}
-starter_sphere { _use:t="starter_cube"; ri_extra__name:t="sphere"; }
-starter_plane { _use:t="starter_cube"; ri_extra__name:t="plane"; starter__animate:b=no; }
-
 // Engine camera component contract; no sample templates are imported.
 free_cam {
   _use:t="starter_camera"

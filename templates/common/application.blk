@@ -2,9 +2,23 @@ shaders:t="tools/tools"
 dngShaders:t="game/compiledShaders/game"
 collision:t="Jolt"
 useDynrend:b=yes
-// The starter edits ECS grayboxes before any terrain/scene bindump is exported.
-dagored_disabled_plugins { plugin:t="Scene view"; plugin:t="Landscape"; }
-SDK { sdk_folder:t="develop"; levels_folder:t="develop/levels"; }
+dagored_disabled_plugins {
+  disable:t="Scene view"
+  disable:t="Streaming Scene View"
+  disable:t="(srv) Built Scene View"
+}
+projectDefaults {
+  disableGrass:b=yes
+  preferZSTD:b=yes
+  riMgr { type:t="aces"; gen { PC:b=yes; } tmInst12x32bit:b=yes; perInstDataDwords:i=1; perInstDataUseSeed:b=yes; }
+  hmap { type:t="aces"; }
+}
+SDK {
+  sdk_folder:t="develop"
+  levels_folder:t="develop/levels"
+  exclude_dll:t="heightmapLand-dev[.](dll|so)"
+}
+mountPoints { "%toolScripts" { forSource:t="%appDir/prog/scripts/game"; } }
 game {
   game_folder:t="game"
   base_path:t="prog/gameBase"
@@ -12,14 +26,24 @@ game {
   physmat:t="prog/gameBase/config/physmat.blk"
   params:t="prog/gameBase/config/gameparams.blk"
   entities:t="prog/gameBase/gamedata/templates/entities.blk"
-  scene:t="prog/gameBase/gamedata/scenes/starter.blk"
+  scene:t="develop/for_editor/scene.blk"
+  empty_scene:t="develop/for_editor/scene.blk"
   main_vromfs:t="@GAME_ID@.vromfs.bin"
   daNetGameRender:b=yes
   daNetGameEditorRender:b=yes
 }
+levelsBlkPrefix { useExportBinPath:b=yes; try:t="./prog/gameBase/gamedata"; }
+heightMap {
+  landClassLayers {
+    layer { name:t="detailTex"; bits:i=4; attr:t="detTexSlot"; }
+    layer { name:t="land"; bits:i=4; attr:t="landClassSlot"; }
+    layer { name:t="adds"; bits:i=4; attr:t="landClassSlot"; }
+    layer { name:t="importanceMask"; bits:i=8; attr:t="importanceMaskSlot"; }
+  }
+}
 assets {
   build { preferZSTD:b=yes; }
-  types { type:t="tex"; type:t="rendInst"; type:t="collision"; type:t="prefab"; type:t="ecs_template"; }
+  types { type:t="tex"; type:t="rendInst"; type:t="collision"; type:t="prefab"; type:t="ecs_template"; type:t="spline"; type:t="land"; }
   base:t="develop/assets"
   export {
     types { type:t="tex"; type:t="rendInst"; type:t="collision"; }

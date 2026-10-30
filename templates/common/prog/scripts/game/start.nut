@@ -4,11 +4,15 @@ import "%dngscripts/ecs.nut" as ecs
 import "app" as app
 from "dagor.system" import get_arg_value_by_name, dgs_get_settings
 from "dagor.workcycle" import defer, setTimeout
+from "%sqstd/datablock.nut" import getParamsListByName
 ecs.clear_vm_entity_systems()
 
 // The host first opens the UI shell. Start the actual game/session once;
 // source reloads must not restart an already running session.
 function startWhenReady() {
+// Standalone tools load their scene themselves; do not launch a game session.
+if (getParamsListByName(dgs_get_settings(), "esTag").contains("inside_tools"))
+  return
 if (!app.is_initial_loading_complete()) {
   setTimeout(0.05, startWhenReady)
   return

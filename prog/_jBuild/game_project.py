@@ -43,19 +43,12 @@ def materialize(destination, name, multiplayer=False, engine=None):
 
 
 def launchers(destination, engine, multiplayer):
-    # Every launcher enters the game's own build script; no engine CLI invocation.
-    commands = {
-      'build': '', 'build-content': 'shaders assets gui vromfs',
-      'run': '--no-build --run', 'editor': '--no-build --editor',
-      'free-camera': '--no-build --freecam', 'level-editor': '--level-editor',
-      'asset-viewer': '--asset-viewer', 'ui-editor': '--ui-editor'}
-    if multiplayer:
-        commands['host'] = '--no-build --server --run -- --listen:127.0.0.1:20000 -scene:gamedata/scenes/starter.blk -nopeerauth -nonetenc -nostatsd'
-        commands['client'] = '--no-build --run -- --connect:127.0.0.1:20000 -nopeerauth -nonetenc -nostatsd'
+    # Match the sample's develop entry points; F2/F10 are in-game controls.
+    commands = {'dabuild': 'assets', 'daViewer': '--asset-viewer', 'daEditor': '--level-editor'}
     for name, args in commands.items():
-        (destination / (name + '.cmd')).write_text(f'@echo off\npython "%~dp0prog\\build.py" {args} %*\n')
-        script = destination / (name + '.sh')
-        script.write_text('#!/bin/sh\nset -eu\nproject_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)\n' +
+        (destination / 'develop' / (name + '.cmd')).write_text(f'@echo off\npython "%~dp0..\\prog\\build.py" {args} %*\n')
+        script = destination / 'develop' / (name + '.sh')
+        script.write_text('#!/bin/sh\nset -eu\nproject_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)\n' +
             f'exec python3 "$project_dir/prog/build.py" {args} "$@"\n')
         script.chmod(0o755)
 
@@ -80,7 +73,8 @@ def cdk(opts, program):
 def launch_tool(opts, extra, run):
     directory = project_directory(opts)
     if opts.action == 'editor':
-        command = [cdk(opts, 'daEditor3x-dev'), directory / 'application.blk', *extra]
+        # daEditor resolves this argument relative to the workspace SDK folder.
+        command = [cdk(opts, 'daEditor3x-dev'), directory / 'application.blk', 'levels/starter/starter.level.blk', *extra]
     elif opts.action == 'asset-viewer':
         command = [cdk(opts, 'assetViewer2-dev'), directory / 'application.blk', *extra]
     else:
@@ -116,6 +110,22 @@ def build_content(opts, run):
             run([cdk(opts, 'vromfsPacker-dev'), config, '-quiet'], directory / 'develop/gui', opts.dry_run)
     if 'vromfs' in opts.components:
         run([cdk(opts, 'vromfsPacker-dev'), 'mk.vromfs.blk', '-quiet', '-addpath:.'], directory / 'prog', opts.dry_run)
+    if 'levels' in opts.components:
+        batch = directory / '_output/export-levels.dcmd'
+        editor = cdk(opts, 'daEditor3x-dev')
+        if not opts.dry_run:
+            batch.parent.mkdir(parents=True, exist_ok=True)
+            metadata = json.loads((directory / 'dng-project.json').read_text())
+            (directory / 'game/content' / metadata['name'].lower() / 'levels').mkdir(parents=True, exist_ok=True)
+            workspace = Path(os.path.relpath(directory / 'application.blk', editor.parent)).as_posix()
+            batch.write_text('set_workspace "' + workspace + '" no\n' +
+                'project.open levels/starter/starter.level.blk no no\nproject.export.pc starter.bin\n')
+            batch.with_suffix('.dcmd.err').unlink(missing_ok=True)
+        run([editor, batch, '-drv:stub', '-quiet', '-fatals_to_stderr'], directory / 'develop', opts.dry_run)
+        if not opts.dry_run:
+            output = directory / 'game/content' / metadata['name'].lower() / 'levels/starter.bin'
+            if batch.with_suffix('.dcmd.err').exists() or not output.is_file():
+                raise RuntimeError('daEditor level export failed; see ' + str(batch) + '.err')
 
 
 def build_tools(opts, run):

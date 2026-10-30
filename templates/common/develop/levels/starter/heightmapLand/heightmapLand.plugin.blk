@@ -1,0 +1,11 @@
+// A graybox level with placed render instances; no terrain or sample assets.
+hmapExportType:t="plane"
+gridCellSize:r=1
+heightMapSizeX:i=32
+heightMapSizeY:i=32
+heightMapOffset:p2=-16,-16
+riMaxCellSz:r=64
+riMaxGenLayerCellDiv:i=8
+hasWorldOcean:b=no
+hasWaterSurface:b=no
+navMesh { export:b=no; }

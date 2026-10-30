@@ -12,17 +12,14 @@ PROJECT = Path(__file__).resolve().parent.parent
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('components', nargs='*', choices=('code', 'shaders', 'assets', 'gui', 'vromfs'))
+    parser.add_argument('components', nargs='*', choices=('code', 'shaders', 'assets', 'gui', 'vromfs', 'levels'))
     parser.add_argument('--config', choices=('dbg', 'dev', 'rel'), default='dev')
     parser.add_argument('--platform', choices=('windows', 'linux', 'macOS'))
     parser.add_argument('--arch', default='native')
     parser.add_argument('--server', action='store_true')
     parser.add_argument('--run', action='store_true')
-    parser.add_argument('--editor', action='store_true', help='Start the embedded editor')
-    parser.add_argument('--freecam', action='store_true')
     parser.add_argument('--level-editor', action='store_true')
     parser.add_argument('--asset-viewer', action='store_true')
-    parser.add_argument('--ui-editor', action='store_true')
     parser.add_argument('--clean', action='store_true')
     parser.add_argument('--configure-only', action='store_true')
     parser.add_argument('--no-build', action='store_true')
@@ -54,30 +51,29 @@ def main():
 
     try:
         if not opts.dry_run: ide.register_project(PROJECT, opts.project)
-        tool = 'editor' if opts.level_editor else 'asset-viewer' if opts.asset_viewer else 'ui-editor' if opts.ui_editor else None
+        tool = 'editor' if opts.level_editor else 'asset-viewer' if opts.asset_viewer else None
         if tool:
             opts.action = tool
             game_project.launch_tool(opts, extra, run)
             return 0
-        components = ['code'] if opts.clean else [] if opts.no_build else opts.components or ['code', 'shaders', 'assets', 'gui', 'vromfs']
+        components = ['code'] if opts.clean else [] if opts.no_build else opts.components or ['code', 'shaders', 'assets', 'gui', 'vromfs', 'levels']
         build = PROJECT / '_output/cmake' / opts.config
         if 'code' in components or opts.configure_only or opts.clean:
             run(['cmake', '-S', PROJECT, '-B', build, '-G', 'Ninja',
                 '-DPython3_EXECUTABLE=' + sys.executable, '-DDAGOR_ENGINE_ROOT=' + str(engine), '-DDAGOR_CONFIG=' + opts.config,
                 '-DDAGOR_PLATFORM=' + opts.platform, '-DDAGOR_ARCH=' + opts.arch])
             if not opts.configure_only:
-                target = opts.project + ('_server' if opts.server else '') + ('_clean' if opts.clean else '')
+                target = opts.project + ('_server' if opts.server else '') + ('_clean' if opts.clean else '_code')
                 run(['cmake', '--build', build, '--target', target])
         opts.components = [c for c in components if c != 'code']
         if opts.components and not opts.configure_only:
             game_project.build_content(opts, run)
-        if opts.run or opts.editor or opts.freecam:
+        if opts.run:
             executable, working = ide.runtime(opts)
             if opts.server:
                 suffix = '' if opts.config == 'rel' else '-' + opts.config
                 executable = executable.with_name(opts.project + '-server' + suffix + executable.suffix)
-            args = (['-edit'] if opts.editor else []) + (['-freecam'] if opts.freecam else []) + extra
-            run([executable, *args], working)
+            run([executable, *extra], working)
     except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as error:
         print(error, file=sys.stderr)
         return 1

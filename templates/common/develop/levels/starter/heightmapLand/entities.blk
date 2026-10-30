@@ -1,0 +1,21 @@
+entity {
+  name:t="cube_001"
+  entName:t="cube"
+  place_type:i=0
+  tm:m=[[1,0,0] [0,1,0] [0,0,1] [0,1,5]]
+  entSeed:i=1
+}
+entity {
+  name:t="sphere_001"
+  entName:t="sphere"
+  place_type:i=0
+  tm:m=[[1,0,0] [0,1,0] [0,0,1] [3,1,5]]
+  entSeed:i=2
+}
+entity {
+  name:t="plane_001"
+  entName:t="plane"
+  place_type:i=0
+  tm:m=[[1,0,0] [0,1,0] [0,0,1] [0,0,0]]
+  entSeed:i=3
+}

@@ -1,0 +1,2 @@
+// Tool renderer setup only. daEditor owns the level and viewport camera.
+include "../../prog/gameBase/gamedata/scenes/render.blk"
