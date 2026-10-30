@@ -2,6 +2,8 @@ shaders:t="tools/tools"
 dngShaders:t="game/compiledShaders/game"
 collision:t="Jolt"
 useDynrend:b=yes
+// The starter edits ECS grayboxes before any terrain/scene bindump is exported.
+dagored_disabled_plugins { plugin:t="Scene view"; plugin:t="Landscape"; }
 SDK { sdk_folder:t="develop"; levels_folder:t="develop/levels"; }
 game {
   game_folder:t="game"
@@ -16,6 +18,7 @@ game {
   daNetGameEditorRender:b=yes
 }
 assets {
+  build { preferZSTD:b=yes; }
   types { type:t="tex"; type:t="rendInst"; type:t="collision"; type:t="prefab"; type:t="ecs_template"; }
   base:t="develop/assets"
   export {

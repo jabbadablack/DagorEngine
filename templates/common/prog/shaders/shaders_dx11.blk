@@ -76,4 +76,9 @@ incDir:t="@ENGINE_ROOT@/prog/dagorInclude/occlusion"
 incDir:t="source"
 incDir:t="@ENGINE_ROOT@/prog/gameLibs"
 
-"@override:source" { file:t="@ENGINE_ROOT@/prog/gameLibs/render/shaders/loading/rgbTriangle.dshl"; }
+incDir:t="@ENGINE_ROOT@/prog/daNetGameLibs"
+incDir:t="@ENGINE_ROOT@/prog/daNetGameLibs/daGdp/shaders"
+"@override:source" {
+  file:t="@ENGINE_ROOT@/prog/gameLibs/render/shaders/loading/rgbTriangle.dshl"
+  include "@ENGINE_ROOT@/prog/daNetGameLibs/daGdp/_shaders.blk"
+}

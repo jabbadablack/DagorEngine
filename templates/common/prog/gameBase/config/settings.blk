@@ -11,7 +11,7 @@ game_das_gen_2_make_syntax:b=yes
 game_das_loading_threads:i=1
 game_das_sandbox_project:t=""
 game_das_script_thread_init:t=""
-game_das_script_init:t=""
+game_das_script_init:t="%scripts/game/bootstrap.das"
 video { mode:t="windowed"; resolution:t="1280 x 720"; driver:t="auto"; }
 graphics { preset:t="low"; }
 ui { overlay_ui_script:t="%scripts/ui/main.nut"; }

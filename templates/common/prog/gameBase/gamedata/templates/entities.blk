@@ -1,6 +1,33 @@
+import:t="%danetlibs/renderer/templates/dng_camera_nodes.template.blk"
+import:t="%danetlibs/renderer/templates/aa_benchmark.template.blk"
+import:t="%danetlibs/renderer/templates/render_settings.template.blk"
+import:t="%danetlibs/renderer/templates/dynamic_lighting.template.blk"
+import:t="%danetlibs/renderer/templates/ui_nodes.template.blk"
+import:t="%danetlibs/frame_graph_renderer/templates/frame_graph_nodes.template.blk"
+
+replicating { replication { _tags:t="net"; } }
+depth_of_field {
+  _singleton:b=yes
+  _tags:t="render"
+  "dof:DepthOfFieldPS" {}
+  "downsampled_dof_frame_fallback:UniqueTex" {}
+}
+
+// The host provides an empty world level without requiring a sample bindump.
+starter_level {
+  level {}
+  level__blk:t="gamedata/levels/starter.blk"
+  level__weather:t=""
+  level__timeRange:p2=12,12
+  level__timeSeed:i=1
+  level__timeOfDay:r=12
+  level__weatherSeed:i=1
+  level__cloudsHoleEnabled:b=no
+  "level__weatherChoice:object" {}
+  level__render:b=no
+}
 starter_camera {
-  _tags:t="gameClient"
-  "camera_view:tag"{}
+  "camera_view:tag" { _tags:t="gameClient"; }
   camera__active:b=yes
   fov:r=75
   znear:r=0.05
@@ -11,7 +38,7 @@ starter_cube {
   transform:m=[[1,0,0] [0,1,0] [0,0,1] [0,0,0]]
   starter__elapsed:r=0.0
   ri_extra__name:t="cube"
-  ri_extra{}
+  ri_extra { _tags:t="gameClient"; }
 }
 starter_sphere { _use:t="starter_cube"; ri_extra__name:t="sphere"; }
 starter_plane { _use:t="starter_cube"; ri_extra__name:t="plane"; starter__animate:b=no; }
@@ -22,9 +49,10 @@ free_cam {
   camera__active:b=no
   camera__input_enabled:b=yes
   editableObj:b=no
-  free_cam{}
-  input{}
+  free_cam { _tags:t="gameClient"; }
+  input { _tags:t="input"; }
   free_cam__mouse:p2=0,0
+  starter__cameraInputOwned:b=no
   free_cam__move:p2=0,0
   free_cam__rotate:p2=0,0
   free_cam__shiftY:r=0
@@ -48,8 +76,15 @@ free_cam {
   "free_cam_input__speedReset:u16" { value:i=-1; }
   "free_cam_input__bank:u16" { value:i=-1; }
 }
-daeditor_selected { "daeditor__selected:tag"{}; }
+daeditor_selected { "daeditor__selected:tag"{} }
 
 include "network.blk"
 
-msg_sink { _singleton:b=yes; msg_sink{}; replication { _tags:t="net"; } }
+msg_sink { _singleton:b=yes; msg_sink{} replication { _tags:t="net"; } }
+
+// Required by the host's input lifecycle, independently of game input systems.
+glob_input {
+  input { _tags:t="input"; }
+  "glob_input:tag" { _tags:t="input"; }
+  "glob_input__inputMode:i" { _tags:t="input"; value:i=0; }
+}

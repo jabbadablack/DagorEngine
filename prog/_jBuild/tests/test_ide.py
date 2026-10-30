@@ -1,5 +1,9 @@
 import argparse
+import contextlib
+import importlib.util
+import io
 import json
+import os
 from pathlib import Path
 import sys
 import tempfile
@@ -133,6 +137,22 @@ class WorkspaceTests(unittest.TestCase):
         with patch.object(ide, 'runtime', return_value=(Path('dargbox'), self.root)):
             game_project.launch_tool(opts, [], run)
         self.assertEqual(run.call_args.args[0][1], '-config:script:t=' + json.dumps((game / 'prog/scripts/ui/main.nut').as_posix()))
+
+    def test_game_local_launcher_forwards_runtime_arguments_after_separator(self):
+        result = create_game.create_game('LaunchGame', False, False, directory=self.root / 'projects/game with spaces')
+        game = Path(result['directory'])
+        helper = self.root / 'prog/_jBuild/ide.py'
+        helper.parent.mkdir(parents=True, exist_ok=True)
+        helper.touch()
+        spec = importlib.util.spec_from_file_location('game_local_build', game / 'prog/build.py')
+        build = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(build)
+        output = io.StringIO()
+        with patch.object(sys, 'argv', ['build.py', '--no-build', '--run', '--dry-run', '--', '--connect:127.0.0.1:20000']), \
+             patch.object(sys, 'path', list(sys.path)), patch.dict(os.environ), contextlib.redirect_stdout(output):
+            self.assertEqual(build.main(), 0)
+        self.assertIn('--connect:127.0.0.1:20000', output.getvalue())
+        self.assertIn('LaunchGame-dev.exe' if ide.host_platform() == 'windows' else 'LaunchGame-dev', output.getvalue())
 
     def test_standard_compilation_database_has_source_and_output_arguments(self):
         folder = self.root / 'prog/tools/converters/dag2blk'

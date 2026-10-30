@@ -1,5 +1,6 @@
 configVer:i=1
 actionSets {
+  StopInput {}
   Globals {}
   Camera {
     internal:b=yes

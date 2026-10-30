@@ -27,8 +27,13 @@ def main():
     parser.add_argument('--configure-only', action='store_true')
     parser.add_argument('--no-build', action='store_true')
     parser.add_argument('--dry-run', action='store_true')
-    opts, extra = parser.parse_known_args()
-    if extra[:1] == ['--']: extra = extra[1:]
+    arguments = sys.argv[1:]
+    extra = []
+    if '--' in arguments:
+        separator = arguments.index('--')
+        arguments, extra = arguments[:separator], arguments[separator + 1:]
+    opts, unknown = parser.parse_known_args(arguments)
+    extra = unknown + extra
     metadata = json.loads((PROJECT / 'dng-project.json').read_text())
     engine = Path(os.environ.get('DAGOR_ENGINE_ROOT', metadata['engine'])).resolve()
     if not (engine / 'prog/_jBuild/ide.py').exists():

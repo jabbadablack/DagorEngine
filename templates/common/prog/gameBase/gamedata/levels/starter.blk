@@ -1,0 +1,3 @@
+// The original graybox uses ECS meshes, with no terrain bindump.
+levelBin:t="__empty__"
+global_paint_details_tex:t="starter_white"
