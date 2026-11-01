@@ -1,0 +1,10 @@
+Root ?= ../../../../.. ;
+Location = prog/tools/libTools/CSG/tests ;
+ConsoleExe = yes ;
+TargetType = exe ;
+Target = csg-tests ;
+OutDir = $(Root)/_output/csg-tests-native ;
+AddIncludes = $(Root)/prog/tools/sharedInclude ;
+Sources = main.cpp ;
+UseProgLibs = tools/libTools/CSG engine/kernel engine/memory engine/osApiWrappers engine/baseUtil engine/math engine/perfMon/daProfilerStub ;
+include $(Root)/prog/_jBuild/build.jam ;

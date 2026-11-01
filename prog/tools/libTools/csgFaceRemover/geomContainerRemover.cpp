@@ -45,6 +45,11 @@ void remove_inside_faces(StaticGeometryContainer &cont, RemoverNotificationCB *c
     StaticGeometryNode &node = *cont.nodes[i];
     if (!node.mesh || node.mesh->user_data == (void *)1) // invalid mesh
       continue;
+    // Editable brushes have already been evaluated as an ordered CSG tree.
+    // Re-welding their point/edge contacts and unioning them again both loses
+    // source surface boundaries and can create invalid Carve inputs.
+    if (node.script.getBool("csgBrushGenerated", false))
+      continue;
     void *poly = NULL;
 
     node.mesh->mesh.kill_unused_verts(0.0001f);

@@ -93,6 +93,7 @@ public:
   void mouseClick(int button);
   void mouseClickModifier(int button, int modifier);
   void mousePosition(Point2 at);
+  void mouseWheel(float vertical);
   void mouseMove(Point2 from, Point2 to, float over_seconds = 1.0f);
   void keyDown(int key);
   void keyUp(int key);

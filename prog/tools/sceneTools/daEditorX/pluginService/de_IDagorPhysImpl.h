@@ -2,11 +2,14 @@
 #pragma once
 
 #include <oldEditor/pluginService/de_IDagorPhys.h>
+#include <de3_csgCollision.h>
 
 
-class DeDagorPhys : public IDagorPhys
+class DeDagorPhys : public IDagorPhys, public ICsgCollisionPreparation
 {
 public:
+  void *prepare(const StaticGeometryContainer &) override;
+  void release(void *) override;
   bool traceRayStatic(const Point3 &p, const Point3 &dir, real &maxt) const override;
   bool traceRayStatic(const Point3 &p, const Point3 &dir, real &maxt, Point3 &norm) const override;
   bool rayHitStatic(const Point3 &p, const Point3 &dir, real maxt) const override;

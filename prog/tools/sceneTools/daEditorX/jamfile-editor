@@ -342,4 +342,5 @@ opt on dng_pulls.cpp = -I$(Root)/prog/daNetGameLibs ;
 
 include $(Root)/prog/gameLibs/render/ambientOcclusion/_lib.jam ;
 
+if $(ImguiTestRuntime) = yes { CPPopt += -DIMGUI_ENABLE_TEST_ENGINE ; }
 include $(Root)/prog/_jBuild/build.jam ;

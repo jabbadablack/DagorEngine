@@ -30,6 +30,7 @@
 
 #include "plugin.h"
 #include "box_csg.h"
+#include "brushEditor.h"
 
 #include <EditorCore/ec_IEditorCore.h>
 #include "csg.h"
@@ -53,6 +54,7 @@ bool CSGPlugin::begin(int toolbar_id, unsigned menu_id)
   PropPanel::ContainerPropertyControl *toolbar = DAGORED2->getCustomPanel(toolbar_id);
   G_ASSERT(toolbar);
   objEd.initUi(toolbar_id);
+  objEd.brushEditor().show();
   return true;
 }
 
@@ -70,6 +72,8 @@ void CSGPlugin::actObjects(float dt)
   if (DAGORED2->curPlugin() == this)
     objEd.update(dt);
 }
+
+void CSGPlugin::updateImgui() { objEd.brushEditor().updateImgui(); }
 
 
 void CSGPlugin::beforeRenderObjects(IGenViewportWnd *vp)
@@ -92,6 +96,20 @@ void CSGPlugin::renderTransObjects()
 {
   if (isVisible)
     objEd.objRenderTr();
+}
+
+void CSGPlugin::renderGeometry(Stage stage)
+{
+  if (!isVisible) return;
+  switch (stage)
+  {
+    case STG_RENDER_STATIC_OPAQUE:
+    case STG_RENDER_SHADOWS:
+      objEd.brushEditor().render(); break;
+    case STG_RENDER_STATIC_TRANS:
+      objEd.brushEditor().renderTrans(); break;
+    default: break;
+  }
 }
 
 
@@ -148,6 +166,8 @@ void CSGPlugin::processGeometry(StaticGeometryContainer &cont)
   for (int i = 0; i < cont.nodes.size(); ++i)
   {
     StaticGeometryNode &node = *cont.nodes[i];
+    if (node.script.getBool("csgBrushGenerated", false))
+      continue;
     void *poly = NULL;
     if (node.mesh->getRefCount() > 1)
     {
@@ -294,6 +314,8 @@ void *CSGPlugin::queryInterfacePtr(unsigned huid)
 {
   RETURN_INTERFACE(huid, IPostProcessGeometry);
   RETURN_INTERFACE(huid, IGatherStaticGeometry);
+  RETURN_INTERFACE(huid, IRenderingService);
+  RETURN_INTERFACE(huid, IBinaryDataBuilder);
   return NULL;
 }
 
@@ -333,6 +355,7 @@ void CSGPlugin::clearObjects()
 
 void CSGPlugin::gatherStaticCollisionGeomGame(StaticGeometryContainer &cont)
 {
+  objEd.brushEditor().gather(cont, true);
   BBox3 bbox;
   for (int b = 0; b < objEd.objectCount(); b++)
   {
@@ -352,3 +375,18 @@ void CSGPlugin::gatherStaticCollisionGeomGame(StaticGeometryContainer &cont)
 }
 
 void CSGPlugin::gatherStaticCollisionGeomEditor(StaticGeometryContainer &cont) { gatherStaticCollisionGeomGame(cont); }
+
+void CSGPlugin::gatherStaticVisualGeometry(StaticGeometryContainer &cont) { objEd.brushEditor().gather(cont, false); }
+
+bool CSGPlugin::validateBuild(int, ILogWriter &, PropPanel::ContainerPropertyControl *)
+{
+  if (objEd.brushEditor().validForExport())
+    return true;
+  DAEDITOR3.conError("CSG brushes have invalid or stale derived geometry. Resolve the CSG diagnostics before export.");
+  return false;
+}
+
+bool CSGPlugin::buildAndWrite(BinDumpSaveCB &, const ITextureNumerator &, PropPanel::ContainerPropertyControl *)
+{
+  return objEd.brushEditor().validForExport(); // Geometry is exported through IGatherStaticGeometry.
+}

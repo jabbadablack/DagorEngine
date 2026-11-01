@@ -204,6 +204,15 @@ void TestInput::mouseClick(int button)
   mouseButtonUp(button);
 }
 
+void TestInput::mouseWheel(float vertical)
+{
+  ImGuiIO &io=ImGui::GetIO();
+  io.SetAppAcceptingEvents(true);
+  io.AddMouseWheelEvent(0,vertical);
+  io.SetAppAcceptingEvents(false);
+  runtime.yieldFrame();
+}
+
 void TestInput::mouseClickModifier(int button, int modifier)
 {
   keyDown(modifier);
@@ -387,6 +396,7 @@ void TestInput::register_script_class(HSQUIRRELVM vm)
     .Func("mouseClick", &TestInput::mouseClick)
     .Func("mouseClickModifier", &TestInput::mouseClickModifier)
     .Func("mousePosition", &TestInput::mousePosition)
+    .Func("mouseWheel", &TestInput::mouseWheel)
     .Func("mouseMove", &TestInput::mouseMove)
     .Func("keyDown", &TestInput::keyDown)
     .Func("keyUp", &TestInput::keyUp)
@@ -721,6 +731,21 @@ void TestWindow::updateImgui()
 
 //==================================================================================================
 
+// Test scripts are explicitly selected local files. The embedded game's
+// VROM-only script policy must not make them unreadable, and changing that
+// process-global policy would also affect unrelated game VMs.
+class EditorTestFileAccess final : public SqModulesDagorFileAccess
+{
+public:
+  EditorTestFileAccess() : SqModulesDagorFileAccess(true) {}
+  bool readFile(const string &resolved, const char *requested, vector<char> &buffer, string &error) override
+  {
+    DefSqModulesFileAccess local;
+    return local.readFile(resolved, requested, buffer, error) ||
+      SqModulesDagorFileAccess::readFile(resolved, requested, buffer, error);
+  }
+};
+
 TestScriptModule::TestScriptModule(TestRuntime &rt) : runtime(rt), scriptFilename("") { init(); }
 
 static void script_print_func(HSQUIRRELVM /*v*/, const char *s, ...)
@@ -750,7 +775,7 @@ void TestScriptModule::init()
   sqstd_seterrorhandlers(vm);
   sq_setprintfunc(vm, script_print_func, script_err_print_func);
 
-  moduleMgr = new SqModules(vm, &sq_modules_dagor_file_access);
+  moduleMgr = new SqModules(vm, new EditorTestFileAccess);
   moduleMgr->registerMathLib();
   moduleMgr->registerStringLib();
   moduleMgr->registerIoStreamLib();

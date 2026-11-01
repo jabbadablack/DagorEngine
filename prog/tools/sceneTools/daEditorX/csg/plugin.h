@@ -8,7 +8,8 @@
 #include "objEd_csg.h"
 #include <libTools/dagFileRW/dagFileNode.h>
 
-class CSGPlugin : public IGenEditorPlugin, public IGenEventHandlerWrapper, public IGatherStaticGeometry, public IPostProcessGeometry
+class CSGPlugin : public IGenEditorPlugin, public IGenEventHandlerWrapper, public IGatherStaticGeometry, public IPostProcessGeometry,
+                  public IBinaryDataBuilder, public IRenderingService
 {
 public:
   static CSGPlugin *self;
@@ -57,9 +58,11 @@ public:
   void invertSelection() override {}
 
   void actObjects(float dt) override;
+  void updateImgui() override;
   void beforeRenderObjects(IGenViewportWnd *vp) override;
   void renderObjects() override;
   void renderTransObjects() override;
+  void renderGeometry(Stage stage) override;
 
   void *queryInterfacePtr(unsigned huid) override;
 
@@ -68,7 +71,11 @@ public:
   void registerEditorCommands(IEditorCommandSystem &command_system) override;
   void registerMenuAccelerators() override;
 
-  void gatherStaticVisualGeometry(StaticGeometryContainer &cont) override {}
+  void gatherStaticVisualGeometry(StaticGeometryContainer &cont) override;
+  bool validateBuild(int target, ILogWriter &rep, PropPanel::ContainerPropertyControl *params) override;
+  bool addUsedTextures(ITextureNumerator &) override { return true; }
+  bool buildAndWrite(BinDumpSaveCB &, const ITextureNumerator &, PropPanel::ContainerPropertyControl *) override;
+  bool checkMetrics(const DataBlock &) override { return true; }
 
   void gatherStaticCollisionGeomGame(StaticGeometryContainer &cont) override;
 
@@ -77,5 +84,5 @@ public:
   void gatherStaticEnviGeometry(StaticGeometryContainer &container) override {}
 
 private:
-  bool isVisible;
+  bool isVisible = true;
 };

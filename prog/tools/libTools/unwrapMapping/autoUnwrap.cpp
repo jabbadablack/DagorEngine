@@ -17,6 +17,7 @@
 #include <libTools/util/progressInd.h>
 #include <libTools/util/svgWrite.h>
 #include <stdio.h>
+#include <memory>
 
 #if _TARGET_PC_WIN
 #include <direct.h>
@@ -35,6 +36,7 @@
 
 static void print_mapping_stat();
 static void clear_mapping_stat();
+static bool memoryMappingSession = false;
 
 namespace LightMapMapper
 {
@@ -78,10 +80,11 @@ struct FaceGroup
   int minS, maxS;
 
   Tab<Point2> uv;
+  Tab<Point2> originalUv;
   Tab<IPoint3> tfaces;
   int sv;
 
-  FaceGroup() : faces(tmpmem), uv(tmpmem), tfaces(tmpmem), sv(-1), finalized(false), transf(0)
+  FaceGroup() : faces(tmpmem), uv(tmpmem), originalUv(tmpmem), tfaces(tmpmem), sv(-1), finalized(false), transf(0)
   {
     lower = NULL;
     upper = NULL;
@@ -93,19 +96,21 @@ struct FaceGroup
   }
   ~FaceGroup() { clear(); }
 
-  void saveOriginalUv(IGenSave &cwr)
+  void saveOriginalUv(IGenSave *cwr)
   {
-    uvDataPos = cwr.tell();
-    cwr.writeTab(uv);
+    if (!cwr) { originalUv = uv; return; }
+    uvDataPos = cwr->tell();
+    cwr->writeTab(uv);
   }
 
-  void loadOriginalUv(IGenLoad &crd)
+  void loadOriginalUv(IGenLoad *crd)
   {
+    if (!crd) { uv = originalUv; return; }
     if (uvDataPos == -1)
       return;
 
-    crd.seekto(uvDataPos);
-    crd.readTab(uv);
+    crd->seekto(uvDataPos);
+    crd->readTab(uv);
   }
 
   // translates and shrinks uv-coords to fit into (0..LTMAPSZ)
@@ -1135,6 +1140,7 @@ static FILE *fp_svg = NULL;
 
 void AutoUnwrapMapping::start_mapping(int lm_sz)
 {
+  memoryMappingSession = false;
   clear_mapping_stat();
   for (int lm = 0; lm < ltmap.size(); lm++)
     delete ltmap[lm];
@@ -1150,6 +1156,12 @@ void AutoUnwrapMapping::start_mapping(int lm_sz)
   debug("LM mapping: using lightmaps %dx%d", LIGHTMAPSZ, LIGHTMAPSZ);
 }
 
+void AutoUnwrapMapping::start_mapping_in_memory(int lm_sz)
+{
+  start_mapping(lm_sz);
+  memoryMappingSession = true;
+}
+
 int AutoUnwrapMapping::request_mapping(Face *face, int fnum, Point3 *vert, int vnum, float samplesize, bool perobj, int unwrap_scheme)
 {
   lmid = NULL;
@@ -1159,7 +1171,8 @@ int AutoUnwrapMapping::request_mapping(Face *face, int fnum, Point3 *vert, int v
 
 void AutoUnwrapMapping::prepare_facegroups(IGenericProgressIndicator &pbar, SimpleProgressCB &progr_cb)
 {
-  FullFileSaveCB uv_orig_cwr("facegrp.orig.uv");
+  std::unique_ptr<FullFileSaveCB> uv_orig_cwr;
+  if (!memoryMappingSession) uv_orig_cwr.reset(new FullFileSaveCB("facegrp.orig.uv"));
 
   pbar.setDone(0);
   pbar.setTotal(ltmobjs.size());
@@ -1178,7 +1191,7 @@ void AutoUnwrapMapping::prepare_facegroups(IGenericProgressIndicator &pbar, Simp
     for (int i = 0; i < ltmobjs[l].fgrps.size(); ++i)
     {
       ltmobjs[l].fgrps[i]->objid = l;
-      ltmobjs[l].fgrps[i]->saveOriginalUv(uv_orig_cwr);
+      ltmobjs[l].fgrps[i]->saveOriginalUv(uv_orig_cwr.get());
     }
   }
 }
@@ -1198,7 +1211,8 @@ int AutoUnwrapMapping::repack_facegroups(float samplesize_scale, float *out_lm_a
 
   pbar.incDone();
 
-  FullFileLoadCB uv_orig_crd("facegrp.orig.uv");
+  std::unique_ptr<FullFileLoadCB> uv_orig_crd;
+  if (!memoryMappingSession) uv_orig_crd.reset(new FullFileLoadCB("facegrp.orig.uv"));
 
   // measure all objects/facegroups
   Tab<int> obj_order(tmpmem);
@@ -1209,7 +1223,7 @@ int AutoUnwrapMapping::repack_facegroups(float samplesize_scale, float *out_lm_a
       return -1;
 
     for (int j = 0; j < ltmobjs[i].fgrps.size(); ++j)
-      ltmobjs[i].fgrps[j]->loadOriginalUv(uv_orig_crd);
+      ltmobjs[i].fgrps[j]->loadOriginalUv(uv_orig_crd.get());
 
     ltmobjs[i].prepareForPacking(samplesize_scale);
     ltmobjs[i].measure();
@@ -1439,7 +1453,8 @@ void AutoUnwrapMapping::finish_mapping()
   print_mapping_stat();
   clear_and_shrink(ltmobjs);
 
-  ::unlink("facegrp.orig.uv");
+  if (!memoryMappingSession) ::unlink("facegrp.orig.uv");
+  memoryMappingSession = false;
 }
 
 

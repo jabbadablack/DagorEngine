@@ -1,6 +1,7 @@
 Root    ?= ../../../../.. ;
 Location = prog/tools/sceneTools/daEditorX/csg ;
 KernelLinkage ?= dynamic ;
+ImguiTestRuntime ?= yes ;
 include $(Root)/prog/tools/tools_setup.jam ;
 
 TargetType  = dll ;
@@ -18,12 +19,19 @@ Sources =
   csg.cpp
   objEd_csg.cpp
   box_csg.cpp
+  brushDocument.cpp
+  brushEditor.cpp
+  brushLegacyTests.cpp
+  ../services/csgEntMgr/csgApi.cpp
 ;
 
 
 UseProgLibs =
   tools/libTools/winGuiWrapper
   tools/libTools/staticGeom
+  tools/libTools/dagFileRW
+  tools/libTools/unwrapMapping
+  tools/libTools/CSG
   3rdPartyLibs/math/carve
 ;
 

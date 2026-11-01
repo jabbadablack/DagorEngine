@@ -1469,6 +1469,8 @@ bool CollisionPlugin::compileCollision(bool for_game, Tab<int> &plugs, unsigned 
       for (int j = 0; j < geoCont.nodes.size(); ++j)
       {
         StaticGeometryNode &n = *geoCont.nodes[j];
+        if (n.script.getBool("csgBrushGenerated", false))
+          continue; // Authored solid meshes are not legacy subtraction boxes.
         if (is_bad_wtm(n.wtm))
           continue;
         csgBox.resize(csgBox.size() + 1);
@@ -1500,9 +1502,6 @@ bool CollisionPlugin::compileCollision(bool for_game, Tab<int> &plugs, unsigned 
     IGenEditorPlugin *plugin = DAGORED2->getPlugin(plugs[i]);
     clipPlug.push_back() = plugin->getMenuCommandName();
 
-    if (strcmp(plugin->getInternalName(), "csg") == 0)
-      continue;
-
     IGatherStaticGeometry *geom = plugin->queryInterface<IGatherStaticGeometry>();
     if (!geom)
       continue;
@@ -1513,6 +1512,16 @@ bool CollisionPlugin::compileCollision(bool for_game, Tab<int> &plugs, unsigned 
       geom->gatherStaticCollisionGeomGame(geoCont);
     else
       geom->gatherStaticCollisionGeomEditor(geoCont);
+
+    if (strcmp(plugin->getInternalName(), "csg") == 0)
+      for (int j = geoCont.nodes.size() - 1; j >= 0; --j)
+        if (!geoCont.nodes[j]->script.getBool("csgBrushGenerated", false))
+        {
+          // The first pass already consumed legacy box markers. Only actual
+          // authored geometry belongs in the mesh collision builder.
+          delete geoCont.nodes[j];
+          erase_items(geoCont.nodes, j, 1);
+        }
 
     if (report_stats)
       DAEDITOR3.conNote("----- collision geom from: %s (%d nodes)", plugin->getMenuCommandName(), geoCont.nodes.size());

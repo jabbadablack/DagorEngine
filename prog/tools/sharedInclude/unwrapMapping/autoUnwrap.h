@@ -23,6 +23,9 @@ void set_graphite_folder(const char *folder);
 
 //! starts mapping process (reset internal structures)
 void start_mapping(int lm_sz = 1024);
+//! Same mapping algorithm, with original chart UVs retained in memory rather
+//! than a temporary file. Intended for short interactive mapping sessions.
+void start_mapping_in_memory(int lm_sz = 1024);
 
 
 //! performs mesh unwrap (dividing into facegroups) and returns object mapping handle

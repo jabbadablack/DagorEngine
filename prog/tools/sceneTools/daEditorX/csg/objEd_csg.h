@@ -7,6 +7,7 @@
 class StaticGeometryContainer;
 class GeomObject;
 class Node;
+class BrushEditor;
 
 class ObjEd : public ObjectEditor
 {
@@ -49,6 +50,7 @@ public:
   void objRenderTr();
 
   void onClick(int pcb_id, PropPanel::ContainerPropertyControl *panel) override;
+  BrushEditor &brushEditor() { return *brushes; }
 
 public:
   bool showLocalBoxCSG;
@@ -59,4 +61,5 @@ protected:
   real secTime;
   DynRenderBuffer *ptDynBuf;
   IObjectCreator *objCreator;
+  BrushEditor *brushes = nullptr;
 };

@@ -40,6 +40,7 @@
 
 #include <math.h>
 
+#include <algorithm>
 #include <iomanip>
 #include <list>
 #include <map>

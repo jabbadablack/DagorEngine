@@ -68,6 +68,8 @@
 #include <EditorCore/ec_IEditorCore.h>
 #include <EditorCore/ec_imguiInitialization.h>
 #include <EditorCore/ec_testSystem.h>
+#include <EditorCore/ec_imguiTestHooks.h>
+#include <de3_csgCollision.h>
 #include <EditorCore/ec_input.h>
 #include <EditorCore/ec_startup.h>
 #include <EditorCore/ec_viewportSplitter.h>
@@ -2523,6 +2525,20 @@ void DagorEdAppWindow::startWithWorkspace(const char *wspName, const char *app_b
 
 void *DagorEdAppWindow::queryEditorInterfacePtr(unsigned huid)
 {
+#ifdef USE_JOLT_PHYSICS
+  if(huid==ICsgCollisionPreparation::HUID)
+    return static_cast<ICsgCollisionPreparation *>(&deDagorPhysImpl);
+#endif
+  if (huid == EditorImguiTestHooks::HUID)
+  {
+#ifdef IMGUI_ENABLE_TEST_ENGINE
+    static const EditorImguiTestHooks hooks{ImGuiTestEngineHook_ItemAdd,ImGuiTestEngineHook_ItemInfo,
+      ImGuiTestEngine_FindItemDebugLabel};
+    return const_cast<EditorImguiTestHooks *>(&hooks);
+#else
+    return nullptr;
+#endif
+  }
   const bool useDngBasedSceneRender = DAGORED2->getWorkspace().isUsingDngBasedSceneRender();
   if (huid == HUID_IDaEditor3Engine)
     return static_cast<IDaEditor3Engine *>(&IDaEditor3Engine::get());
@@ -4518,6 +4534,19 @@ void DagorEdAppWindow::updateImgui()
   editor_core_update_imgui_style_editor();
 
   renderUI();
+
+  // Opt-in unattended authoring acceptance through the existing editor UI
+  // test runtime. Start only after the first real UI frame exposes its items.
+  static bool uiTestStarted = false;
+  if (!uiTestStarted)
+  {
+    uiTestStarted = true;
+    const char *script = dgs_get_settings()->getBlockByNameEx("debug")->getStr("editorUiTest", nullptr);
+    if (script && !editor_core_test_runtime_run_script(script, [](bool failed) {
+          DAEDITOR3.conNote("Editor UI acceptance %s", failed ? "FAIL" : "PASS");
+        }))
+      DAEDITOR3.conError("Editor UI acceptance failed to load script: %s", script);
+  }
 
   PropPanel::before_end_frame();
 

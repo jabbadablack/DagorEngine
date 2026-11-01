@@ -2,6 +2,7 @@
 
 #include "objEd_csg.h"
 #include "box_csg.h"
+#include "brushEditor.h"
 #include "plugin.h"
 
 #include <EditorCore/ec_editorCommandSystem.h>
@@ -28,12 +29,16 @@ enum
 {
   CM_ = CM_PLUGIN_BASE + 1,
   CM_CREATE_OCCLUDER_BOX,
+  CM_EDIT_BRUSHES,
+  CM_DUPLICATE_BRUSH,
 };
 
 namespace EditorCommandIds
 {
 
 static constexpr const char *CREATE_OCCLUDER_BOX = "Plugin.CSG.CreateOccluderBox";
+static constexpr const char *EDIT_BRUSHES = "Plugin.CSG.EditBrushes";
+static constexpr const char *DUPLICATE_BRUSH = "Plugin.CSG.DuplicateBrush";
 
 }
 
@@ -43,16 +48,19 @@ ObjEd::ObjEd() : cloneMode(false), objCreator(NULL)
   ptDynBuf = dagRender->newDynRenderBuffer("editor_helper_no_tex_blend", midmem);
   secTime = 0;
   showLocalBoxCSG = true;
+  brushes = new BrushEditor(*this);
 }
 
 
-ObjEd::~ObjEd() { dagRender->deleteDynRenderBuffer(ptDynBuf); }
+ObjEd::~ObjEd() { delete brushes; dagRender->deleteDynRenderBuffer(ptDynBuf); }
 
 void ObjEd::registerEditorCommands(IEditorCommandSystem &command_system)
 {
   ObjectEditor::registerEditorCommands(command_system);
 
   command_system.addCommand(EditorCommandIds::CREATE_OCCLUDER_BOX, ImGuiKey_1);
+  command_system.addCommand(EditorCommandIds::EDIT_BRUSHES, ImGuiKey_2);
+  command_system.addCommand(EditorCommandIds::DUPLICATE_BRUSH, ImGuiMod_Ctrl | ImGuiKey_D);
 }
 
 void ObjEd::registerViewportAccelerators(IWndManager &wndManager)
@@ -60,6 +68,8 @@ void ObjEd::registerViewportAccelerators(IWndManager &wndManager)
   ObjectEditor::registerViewportAccelerators(wndManager);
 
   wndManager.addViewportAccelerator(CM_CREATE_OCCLUDER_BOX, EditorCommandIds::CREATE_OCCLUDER_BOX);
+  wndManager.addViewportAccelerator(CM_EDIT_BRUSHES, EditorCommandIds::EDIT_BRUSHES);
+  wndManager.addViewportAccelerator(CM_DUPLICATE_BRUSH, EditorCommandIds::DUPLICATE_BRUSH);
 }
 
 
@@ -71,6 +81,7 @@ void ObjEd::fillToolBar(PropPanel::ContainerPropertyControl *toolbar)
     true);
 
   tb1->createSeparator();
+  addEditorCommandButton(tb1, CM_EDIT_BRUSHES, EditorCommandIds::EDIT_BRUSHES, "create_box", "Edit CSG brushes", false);
 
   ObjectEditor::fillToolBar(toolbar);
 }
@@ -92,6 +103,7 @@ void ObjEd::updateToolbarButtons()
 
 void ObjEd::reset()
 {
+  if (brushes) brushes->reset();
   setCreateBySampleMode(NULL);
   del_it(objCreator);
   showLocalBoxCSG = true;
@@ -113,6 +125,7 @@ void ObjEd::objRender()
         p->render();
     }
   }
+  brushes->renderHandles();
   dagRender->endLinesRender();
 
   if (objCreator)
@@ -174,6 +187,7 @@ void ObjEd::gizmoEnded(bool apply)
 
 void ObjEd::save(DataBlock &blk)
 {
+  brushes->save(blk);
   for (int i = 0; i < objects.size(); i++)
   {
     BoxCSG *p = RTTI_cast<BoxCSG>(objects[i]);
@@ -185,6 +199,7 @@ void ObjEd::save(DataBlock &blk)
 
 void ObjEd::load(const DataBlock &blk)
 {
+  brushes->load(blk);
   int nid = blk.getNameId("CSG_Box");
 
   for (int i = 0; i < blk.blockCount(); i++)
@@ -254,6 +269,7 @@ void ObjEd::onSelectedNames(const Tab<String> &names)
 
 void ObjEd::update(real dt)
 {
+  brushes->update();
   updateGizmo();
   if (objCreator && objCreator->isFinished())
   {
@@ -300,6 +316,8 @@ bool ObjEd::handleMouseLBPress(IGenViewportWnd *wnd, int x, int y, bool inside, 
 {
   if (objCreator)
     return objCreator->handleMouseLBPress(wnd, x, y, inside, buttons, key_modif);
+  if (brushes->pick(wnd, x, y, dagInput->isCtrlKeyDown()))
+    return true;
   return ObjectEditor::handleMouseLBPress(wnd, x, y, inside, buttons, key_modif);
 }
 
@@ -324,6 +342,15 @@ void ObjEd::onClick(int pcb_id, PropPanel::ContainerPropertyControl *panel)
 {
   switch (pcb_id)
   {
+    case CM_DUPLICATE_BRUSH:
+      brushes->duplicateSelection();
+      return;
+    case CM_OBJED_DELETE:
+      if(brushes->deleteSelection()) return;
+      break;
+    case CM_EDIT_BRUSHES:
+      brushes->show();
+      return;
     case CM_OBJED_MODE_SELECT:
     case CM_OBJED_MODE_MOVE:
     case CM_OBJED_MODE_ROTATE:
