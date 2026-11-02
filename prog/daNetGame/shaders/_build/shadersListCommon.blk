@@ -1,4 +1,5 @@
   // This list is a common for ALL shaders builds
+  file:t = "../../../gameLibs/render/shaders/csg_static.dshl"
   include "../../../gameLibs/daSkies2/shaders/daSkiesList.blk"
   file:t = "../computeFullTonemapLUT.dshl"
   file:t = "../../../gameLibs/render/shaders/debug_tri_count.dshl"

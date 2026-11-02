@@ -63,6 +63,7 @@ struct TraceMeshFaces
   BBox3 box;
   carray<vec4f, MAX_TRIANGLES * 3> triangles;
   int trianglesCount;
+  uint64_t staticCollisionRevision = 0;
   struct HeightmapCache
   {
     static constexpr int MAX_HEIGHTMAP_VERTICES = 15 * 15;

@@ -3,8 +3,12 @@ Location = prog/tools/libTools/CSG/tests ;
 ConsoleExe = yes ;
 TargetType = exe ;
 Target = csg-tests ;
-OutDir = $(Root)/_output/csg-tests-native ;
-AddIncludes = $(Root)/prog/tools/sharedInclude ;
+RuntimeCSG ?= no ;
+if $(RuntimeCSG) = yes { OutDir = $(Root)/_output/csg-tests-runtime ; }
+else { OutDir = $(Root)/_output/csg-tests-native ; }
+AddIncludes = $(Root)/prog/tools/sharedInclude $(Root)/prog/gameLibs/publicInclude ;
 Sources = main.cpp ;
-UseProgLibs = tools/libTools/CSG engine/kernel engine/memory engine/osApiWrappers engine/baseUtil engine/math engine/perfMon/daProfilerStub ;
+if $(RuntimeCSG) = yes { UseProgLibs = gameLibs/csg ; }
+else { UseProgLibs = tools/libTools/CSG ; }
+UseProgLibs += engine/kernel engine/memory engine/osApiWrappers engine/baseUtil engine/math engine/perfMon/daProfilerStub ;
 include $(Root)/prog/_jBuild/build.jam ;

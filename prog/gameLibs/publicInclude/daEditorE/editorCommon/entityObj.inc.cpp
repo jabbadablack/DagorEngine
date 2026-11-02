@@ -26,6 +26,7 @@
 ECS_DECLARE_GET_FAST(TMatrix, transform);
 ECS_REGISTER_EVENT(EditorToDeleteEntitiesEvent)
 ECS_REGISTER_EVENT(EditorOnInitClonedEntity)
+ECS_REGISTER_EVENT(EditorComponentSavedEvent)
 
 enum EntityObjectFlags
 {
@@ -153,6 +154,8 @@ void EntityObj::updateEntityPosition(bool)
 
 void EntityObj::update(float)
 {
+  if (g_entity_mgr->has(eid, ECS_HASH("custom_edit_box__min")))
+    updateLbb();
   if (hasTransform())
     EditableObject::setWtm(ECS_GET_OR(eid, transform, TMatrix::IDENT));
 }

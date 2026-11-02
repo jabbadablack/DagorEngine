@@ -21,6 +21,7 @@
 class Sbuffer;
 class CollisionResource;
 struct CollisionNode;
+class BBox3;
 
 class LRURendinstCollision
 {
@@ -37,6 +38,18 @@ public:
   // so two live instances would alias each other's buffers: every user in a
   // process must share the one instance this returns
   static eastl::shared_ptr<LRURendinstCollision> acquire();
+
+  // Immutable world-space geometry supplied by runtime systems. The owner
+  // keeps the resource alive until release; prepare is invisible to gathers.
+  // Call on the render owner thread between submissions, as for static scenes.
+  rendinst::riex_handle_t prepareWorldCollision(const CollisionResource *resource);
+  static void publishWorldCollision(rendinst::riex_handle_t handle);
+  void releaseWorldCollision(rendinst::riex_handle_t handle);
+  static bool isWorldCollision(rendinst::riex_handle_t handle);
+  static uint32_t worldCollisionType(rendinst::riex_handle_t handle);
+  static const CollisionResource *worldCollisionResource(uint32_t type);
+  static void gatherWorldCollisions(const BBox3 &bounds,
+    const eastl::fixed_function<32,void(rendinst::riex_handle_t)> &append);
 
   bool updateLRU(dag::ConstSpan<rendinst::riex_handle_t> ri);
   void reset();

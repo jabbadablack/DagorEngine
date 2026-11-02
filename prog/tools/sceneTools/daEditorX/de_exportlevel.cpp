@@ -236,6 +236,16 @@ int TextureRemapHelper::addTextureName(const char *src_fname)
   dd_strlwr(name);
   return texname.addNameId(name);
 }
+int TextureRemapHelper::addManagedTexture(TEXTUREID id)
+{
+  const char *name=get_managed_texture_name(id);
+  return name ? addTextureName(name):-1;
+}
+int TextureRemapHelper::getManagedTextureOrdinal(TEXTUREID id) const
+{
+  const char *name=get_managed_texture_name(id);
+  return name ? getTextureOrdinal(name):-1;
+}
 int TextureRemapHelper::addDDSxTexture(const char *fname, ddsx::Buffer &b)
 {
   int id = ddsxTexName.addNameId(fname);

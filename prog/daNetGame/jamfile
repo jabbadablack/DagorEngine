@@ -149,6 +149,7 @@ if $(HaveRenderer) = yes {
   ;
 } else {
   Sources +=
+    render/stub/csgScene.cpp
     render/stub/rendererStub.cpp
     render/stub/screencapStub.cpp
     render/stub/billboardStub.cpp
@@ -174,12 +175,13 @@ if $(HaveEditor) = yes {
     editor/de4entityObj.cpp
     editor/de4sceneObj.cpp
     editor/editorDasModules.cpp
+    editor/csgEditorTests.cpp
   ;
   AllSrcFolder_ES +=
     editor
   ;
 } else {
-  Sources += editor/embeddedEditorStub.cpp ;
+  Sources += editor/embeddedEditorStub.cpp editor/csgEditorTestsStub.cpp ;
 }
 
 if $(HaveRenderer) = yes && ( $(Platform)-$(PlatformArch) = windows-x86_64 ||  $(Platform) in linux scarlett ps5 ) {
@@ -536,6 +538,7 @@ if $(HaveEmbeddedBrowser) = yes {
 if $(HaveRenderer) = yes {
   UseProgLibs +=
     3rdPartyLibs/image/avif
+    gameLibs/csg/scene
     3rdPartyLibs/image/jpeg-6b
     3rdPartyLibs/image/libpng-1.4.22
     3rdPartyLibs/image/psdRead

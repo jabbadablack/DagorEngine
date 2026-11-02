@@ -1,5 +1,6 @@
 // Copyright (C) Gaijin Games KFT. All rights reserved.
 #include <libTools/CSG/brush.h>
+#include "precise.h"
 #include <carve/csg.hpp>
 #include <carve/interpolator.hpp>
 #include <carve/csg_triangulator.hpp>
@@ -9,6 +10,7 @@
 #include <map>
 #include <set>
 #include <stdexcept>
+#include <numeric>
 
 namespace csg
 {
@@ -101,10 +103,42 @@ Transform compose(const Transform &a,const Transform &b)
   for (unsigned i=0;i<3;++i) r.column[i]=a.vector(b.column[i]);
   r.column[3]=a.point(b.column[3]); return r;
 }
+// Shared publication partitioning for both the editor and runtime. Keep
+// inward cavity shells with their enclosing boundary; never weld by position.
+std::vector<ResultChunk> publicationChunks(const Mesh &mesh)
+{
+  std::vector<uint32_t> parent(mesh.vertices.size());
+  for(uint32_t i=0;i<parent.size();++i) parent[i]=i;
+  auto root=[&](uint32_t i) { while(parent[i]!=i) { parent[i]=parent[parent[i]]; i=parent[i]; } return i; };
+  for(const auto &face:mesh.faces) for(auto i:face.vertices) parent[root(i)]=root(face.vertices[0]);
+  std::map<uint32_t,Mesh> components;
+  std::map<uint32_t,std::map<uint32_t,uint32_t>> remaps;
+  for(const auto &face:mesh.faces) {
+    auto component=root(face.vertices[0]); auto &out=components[component]; auto &remap=remaps[component]; auto f=face;
+    for(auto &index:f.vertices) {
+      auto inserted=remap.emplace(index,uint32_t(remap.size()));
+      if(inserted.second) out.vertices.push_back(mesh.vertices[index]);
+      index=inserted.first->second;
+    }
+    out.faces.push_back(std::move(f));
+  }
+  for(const auto &component:components) if(volume(component.second)<=0) {
+    components.clear(); components.emplace(0,mesh); break;
+  }
+  std::vector<ResultChunk> chunks;
+  for(auto &component:components) {
+    Node key; key.brush=std::move(component.second);
+    chunks.push_back({fingerprint(key),std::make_shared<Mesh>(std::move(key.brush))});
+  }
+  return chunks;
+}
 } // namespace
 Result booleanOperation(const Mesh &a,const Mesh &b,Operation op,Id node,const Surface *cutOverride)
 {
   Result result;
+  if(op!=Operation::Union && op!=Operation::Subtract && op!=Operation::Intersect) {
+    result.diagnostics.push_back({Code::InvalidDocument,node,0,"Unknown CSG boolean operation"}); return result;
+  }
   if (!validate(a,result.diagnostics,node) || !validate(b,result.diagnostics,node)) return result;
   auto done=[&](Mesh mesh) {
     result.mesh=std::make_shared<Mesh>(std::move(mesh)); result.success=true; return result;
@@ -165,7 +199,19 @@ Result booleanOperation(const Mesh &a,const Mesh &b,Operation op,Id node,const S
       }
       else mesh.faces.push_back(std::move(f));
     }
-    if (!validate(mesh,result.diagnostics,node)) return result;
+    Diagnostics validation;
+    if (!validate(mesh,validation,node)) {
+      // Carve can leave a collinear ear across an intersection bridge. Reuse
+      // publication's topology-preserving retriangulation before rejecting it;
+      // this moves no vertices and never welds separate components.
+      Mesh repaired;
+      if(validation.size()!=1 || validation.front().message!="Degenerate face" ||
+        !triangulateForPublication(mesh,repaired,result.diagnostics)) {
+        if(result.diagnostics.empty()) result.diagnostics=std::move(validation);
+        return result;
+      }
+      mesh=std::move(repaired);
+    }
     return done(std::move(mesh));
   }
   catch (const carve::exception &e) { result.diagnostics.push_back({Code::BackendFailure,node,0,e.str()}); }
@@ -177,18 +223,31 @@ std::shared_ptr<const Mesh> Evaluator::evaluateNode(const Node &n,const Transfor
 {
   if (!n.visible) return std::make_shared<Mesh>();
   Transform tm=compose(parent,n.transform);
-  uint64_t hash=fingerprint(n);
+  uint64_t hash=inputHashes.at(n.id);
   // Parent transforms are dependencies too, including texture locking.
   Node transformKey; transformKey.transform=tm; hash^=fingerprint(transformKey);
   auto found=cache.find(n.id);
-  if (found!=cache.end() && found->second.hash==hash) { ++result.cacheHits; return found->second.mesh; }
+  if (found!=cache.end() && found->second.hash==hash) {
+    ++result.cacheHits;
+    if(n.id==rootId) result.chunks=found->second.chunks;
+    return found->second.mesh;
+  }
   std::shared_ptr<const Mesh> mesh;
-  if (!n.brush.faces.empty())
+  if (n.parametric || !n.brush.faces.empty())
   {
-    if (!validate(n.brush,result.diagnostics,n.id,true)) return {};
+    Mesh generated; const Mesh *input=&n.brush;
+    if(n.parametric) {
+      if(!generateExtrusion(n.extrusion,generated,result.diagnostics)) {
+        for(auto &error:result.diagnostics) if(!error.node) error.node=n.id;
+        return {};
+      }
+      for(auto &face:generated.faces) { face.id=n.extrusionSurfaces[size_t(face.id-1)]; face.sourceBrush=n.id; }
+      input=&generated;
+    }
+    else if (n.closedMesh ? !validateClosedMesh(n.brush,result.diagnostics):!validate(n.brush,result.diagnostics,n.id,true)) return {};
     if (!std::isfinite(tm.determinant()) || std::abs(tm.determinant())<1e-15)
     { result.diagnostics.push_back({Code::InvalidMesh,n.id,0,"Singular or non-finite brush transform"}); return {}; }
-    auto transformedMesh=std::make_shared<Mesh>(transformed(n.brush,tm));
+    auto transformedMesh=std::make_shared<Mesh>(transformed(*input,tm));
     if (!validate(*transformedMesh,result.diagnostics,n.id)) return {};
     mesh=std::move(transformedMesh);
   }
@@ -196,13 +255,14 @@ std::shared_ptr<const Mesh> Evaluator::evaluateNode(const Node &n,const Transfor
   // A collection of pairwise disjoint additive solids needs no boolean work.
   // Testing only the accumulated AABB is insufficient: it encloses the empty
   // spaces between prior components and sends unrelated brushes through Carve.
-  if (n.brush.faces.empty() && n.children.size()>1)
+  if (!n.parametric && n.brush.faces.empty() && n.children.size()>1)
   {
     bool additive=true;
     for (const auto &child:n.children) if (child.visible && child.operation!=Operation::Union) additive=false;
     if (additive)
     {
       std::vector<std::shared_ptr<const Mesh>> parts;
+      std::vector<uint64_t> partHashes;
       std::vector<Bounds> bounds;
       bool disjoint=true;
       for (const auto &child:n.children)
@@ -211,33 +271,54 @@ std::shared_ptr<const Mesh> Evaluator::evaluateNode(const Node &n,const Transfor
         auto part=evaluateNode(child,tm,result); if (!part) return {};
         if (part->faces.empty()) continue;
         Bounds bound(*part);
-        for (const auto &previous:bounds) if (!separated(previous,bound,false)) { disjoint=false; break; }
         bounds.push_back(bound); parts.push_back(part);
+        partHashes.push_back(cache.at(child.id).hash);
       }
+      // Broadphase only proves pairwise separation for this all-union group.
+      // Keep touching bounds as candidates so ordered face-contact processing
+      // and the explicit point/edge-contact rules remain unchanged.
+      std::vector<size_t> order(bounds.size()); std::iota(order.begin(),order.end(),0);
+      std::sort(order.begin(),order.end(),[&](size_t a,size_t b) { return bounds[a].lo.x<bounds[b].lo.x; });
+      for(size_t i=0;i<order.size() && disjoint;++i)
+        for(size_t j=i+1;j<order.size() && bounds[order[j]].lo.x<=bounds[order[i]].hi.x;++j)
+          if(!separated(bounds[order[i]],bounds[order[j]],false)) { disjoint=false; break; }
       if (disjoint)
       {
-        auto joined=std::make_shared<Mesh>();
+        if(n.id==rootId) for(size_t i=0;i<parts.size();++i) result.chunks.push_back({partHashes[i],parts[i]});
+        std::shared_ptr<Mesh> joined;
+        if(n.id==rootId) {
+          // Recycle only buffers retained solely by this bounded pool. Published
+          // results, cache entries and caller snapshots must stay immutable.
+          for(const auto &buffer:aggregateBuffers) if(buffer.use_count()==1) { joined=buffer; break; }
+          if(!joined && aggregateBuffers.size()<2) {
+            joined=std::make_shared<Mesh>(); aggregateBuffers.push_back(joined);
+          }
+        }
+        if(!joined) joined=std::make_shared<Mesh>();
         size_t vertices=0,faces=0;
         for (const auto &part:parts) { vertices+=part->vertices.size(); faces+=part->faces.size(); }
-        joined->vertices.reserve(vertices); joined->faces.reserve(faces);
+        joined->vertices.clear(); joined->vertices.reserve(vertices); joined->faces.resize(faces);
+        size_t faceIndex=0;
         for (const auto &part:parts)
         {
           uint32_t offset=uint32_t(joined->vertices.size());
           joined->vertices.insert(joined->vertices.end(),part->vertices.begin(),part->vertices.end());
-          for (auto face:part->faces) { for (auto &index:face.vertices) index+=offset; joined->faces.push_back(std::move(face)); }
+          for(const auto &face:part->faces) {
+            auto &output=joined->faces[faceIndex++]; output=face;
+            for(auto &index:output.vertices) index+=offset;
+          }
         }
-        cache[n.id]={hash,joined}; return joined;
+        cache[n.id]={hash,joined,n.id==rootId ? result.chunks:std::vector<ResultChunk>{}}; return joined;
       }
     }
   }
-  Node base=n; base.children.clear();
-  uint64_t prefixHash=fingerprint(base)^fingerprint(transformKey);
+  uint64_t prefixHash=fingerprint(n,false)^fingerprint(transformKey);
   auto &savedPrefixes=prefixes[n.id];
   size_t prefixIndex=0;
   for (const auto &child:n.children)
   {
     if (!child.visible) continue;
-    prefixHash^=fingerprint(child)+0x9e3779b97f4a7c15ULL+(prefixHash<<6)+(prefixHash>>2);
+    prefixHash^=inputHashes.at(child.id)+0x9e3779b97f4a7c15ULL+(prefixHash<<6)+(prefixHash>>2);
     if(prefixIndex<savedPrefixes.size() && savedPrefixes[prefixIndex].hash==prefixHash)
     { mesh=savedPrefixes[prefixIndex++].mesh; ++result.cacheHits; continue; }
     auto next=evaluateNode(child,tm,result); if (!next) return {};
@@ -257,28 +338,120 @@ std::shared_ptr<const Mesh> Evaluator::evaluateNode(const Node &n,const Transfor
 }
 Result Evaluator::evaluate(const Document &doc)
 {
+  rootId=doc.root.id;
   Result result; result.revision=++revision;
-  std::set<Id> ids,liveNodes;
+  std::vector<std::pair<Id,Id>> ids;
+  std::set<Id> liveNodes;
   std::function<bool(const Node &,unsigned)> check=[&](const Node &n,unsigned depth) {
     auto fail=[&](const char *message) { result.diagnostics.push_back({Code::InvalidDocument,n.id,0,message}); return false; };
     if (depth>128) return fail("CSG hierarchy exceeds 128 levels");
-    if (!n.id || n.id>=doc.nextId || !ids.insert(n.id).second) return fail("Invalid or duplicate node ID");
+    if(n.operation!=Operation::Union && n.operation!=Operation::Subtract && n.operation!=Operation::Intersect)
+      return fail("Unknown CSG boolean operation");
+    for(auto column:n.transform.column) if(!finite(column)) return fail("Non-finite source transform");
+    if (!n.id || n.id>=doc.nextId) return fail("Invalid or duplicate node ID");
+    ids.emplace_back(n.id,n.id);
     liveNodes.insert(n.id);
     if (!n.brush.faces.empty() && !n.children.empty()) return fail("Brushes cannot also contain child operations");
-    for (const auto &f:n.brush.faces)
-      if (!f.id || f.id>=doc.nextId || !ids.insert(f.id).second || f.sourceBrush!=n.id) return fail("Invalid surface identity");
+    if(n.parametric) {
+      if(n.closedMesh) return fail("A source cannot be both a closed mesh and a parametric extrusion");
+      if(!n.brush.vertices.empty() || !n.brush.faces.empty() || !n.children.empty()) return fail("Parametric sources cannot contain editable mesh data or child operations");
+      if(n.extrusionSurfaces.size()!=n.extrusion.polygon.size()+2) return fail("Parametric surface identities do not match the profile");
+      for(auto id:n.extrusionSurfaces)
+        if(!id || id>=doc.nextId) return fail("Invalid or duplicate parametric surface ID");
+        else ids.emplace_back(id,n.id);
+    }
+    for (const auto &f:n.brush.faces) {
+      if (!f.id || f.id>=doc.nextId || f.sourceBrush!=n.id) return fail("Invalid surface identity");
+      ids.emplace_back(f.id,n.id);
+    }
     for (const auto &c:n.children) if (!check(c,depth+1)) return false;
     return true;
   };
   if (!check(doc.root,0)) return result;
+  std::sort(ids.begin(),ids.end());
+  for(size_t i=1;i<ids.size();++i) if(ids[i].first==ids[i-1].first) {
+    result.diagnostics.push_back({Code::InvalidDocument,ids[i].second,ids[i].first,"Duplicate source or surface ID"}); return result;
+  }
   for (auto it=cache.begin();it!=cache.end();) if (!liveNodes.count(it->first)) it=cache.erase(it); else ++it;
   for(auto it=prefixes.begin();it!=prefixes.end();) if(!liveNodes.count(it->first)) it=prefixes.erase(it); else ++it;
+  for(auto it=inputHashes.begin();it!=inputHashes.end();) if(!liveNodes.count(it->first)) it=inputHashes.erase(it); else ++it;
+  // Hash each immutable source once, bottom-up. The root and ordered prefixes
+  // reuse those exact fingerprints instead of rehashing descendant geometry.
+  hashNode(doc.root);
   result.mesh=evaluateNode(doc.root,Transform{},result);
   result.success=bool(result.mesh);
+  if(result.success && result.chunks.empty() && !result.mesh->faces.empty()) {
+    result.chunks=publicationChunks(*result.mesh);
+    auto root=cache.find(rootId);
+    if(root!=cache.end() && root->second.mesh==result.mesh) root->second.chunks=result.chunks;
+  }
   if (result.success) published=result;
   return result;
 }
-void Evaluator::clear() { cache.clear(); prefixes.clear(); published=Result{}; revision=0; }
+void Evaluator::clear() { cache.clear(); prefixes.clear(); inputHashes.clear(); aggregateBuffers.clear(); published=Result{}; revision=0; }
+bool prepareFloatPublication(const Mesh &source,Mesh &output,Vec &origin,Diagnostics &errors)
+{
+  if(!validate(source,errors)) return false;
+  if(source.vertices.empty()) { output={}; origin={}; return true; }
+  // Static-scene and collision exporters consume world-space floats. Use that
+  // same representation here, so adding a node origin cannot round a second
+  // time and collapse an edge after publication validation has passed.
+  Vec localOrigin{}; Mesh rounded=source;
+  for(auto &p:rounded.vertices) {
+    p=p-localOrigin; p={double(float(p.x)),double(float(p.y)),double(float(p.z))};
+    if(!finite(p)) { errors.push_back({Code::InvalidResult,0,0,"Float publication coordinate overflow"}); return false; }
+  }
+  // Choose diagonals in the coordinates actually sent to Dagor. An ear that
+  // has tiny positive area in doubles may be collinear after float conversion;
+  // triangulating first locks in that invalid diagonal unnecessarily.
+  Mesh triangles; Diagnostics conversionErrors;
+  if(!triangulateForPublication(rounded,triangles,conversionErrors)) {
+    // Some boolean faces arrive already triangulated. Float-identical ends of
+    // an existing edge can then leave a zero-area pair. Contract only such an
+    // edge, and only when the simplicial link condition preserves topology.
+    Mesh originalTriangles;
+    if(!triangulateForPublication(source,originalTriangles,errors)) return false;
+    for(auto &p:originalTriangles.vertices) {
+      p=p-localOrigin; p={double(float(p.x)),double(float(p.y)),double(float(p.z))};
+    }
+    for(size_t pass=0;pass<originalTriangles.vertices.size();++pass) {
+      uint32_t a=0,b=0; bool collapsed=false;
+      for(const auto &face:originalTriangles.faces) {
+        for(int i=0;i<3;++i) {
+          auto x=face.vertices[i],y=face.vertices[(i+1)%3];
+          auto p=originalTriangles.vertices[x],q=originalTriangles.vertices[y];
+          if(p.x==q.x && p.y==q.y && p.z==q.z) { a=x; b=y; collapsed=true; break; }
+        }
+        if(collapsed) break;
+      }
+      if(!collapsed) break;
+      std::set<uint32_t> neighborsA,neighborsB,opposite;
+      size_t incident=0;
+      for(const auto &face:originalTriangles.faces) {
+        bool hasA=std::find(face.vertices.begin(),face.vertices.end(),a)!=face.vertices.end();
+        bool hasB=std::find(face.vertices.begin(),face.vertices.end(),b)!=face.vertices.end();
+        for(auto v:face.vertices) {
+          if(hasA && v!=a) neighborsA.insert(v);
+          if(hasB && v!=b) neighborsB.insert(v);
+          if(hasA && hasB && v!=a && v!=b) opposite.insert(v);
+        }
+        if(hasA && hasB) ++incident;
+      }
+      std::set<uint32_t> common;
+      std::set_intersection(neighborsA.begin(),neighborsA.end(),neighborsB.begin(),neighborsB.end(),std::inserter(common,common.end()));
+      if(incident!=2 || opposite.size()!=2 || common!=opposite) {
+        errors.push_back({Code::InvalidResult,0,0,"Float conversion would change solid topology"}); return false;
+      }
+      for(auto &face:originalTriangles.faces) for(auto &v:face.vertices) if(v==b) v=a;
+      auto &faces=originalTriangles.faces;
+      faces.erase(std::remove_if(faces.begin(),faces.end(),[](const Face &f) {
+        return f.vertices[0]==f.vertices[1] || f.vertices[1]==f.vertices[2] || f.vertices[2]==f.vertices[0];
+      }),faces.end());
+    }
+    if(!triangulateForPublication(originalTriangles,triangles,errors)) return false;
+  }
+  output=std::move(triangles); origin=localOrigin; return true;
+}
 bool triangulateForPublication(const Mesh &source,Mesh &output,Diagnostics &errors)
 {
   Mesh result; result.vertices=source.vertices;
@@ -331,6 +504,29 @@ bool triangulateForPublication(const Mesh &source,Mesh &output,Diagnostics &erro
       }
       for(auto t:triangles)
       { Face f=face; f.vertices={face.vertices[t.a],face.vertices[t.b],face.vertices[t.c]}; result.faces.push_back(std::move(f)); }
+    }
+    // Float conversion can make an already-triangulated Carve ear collinear.
+    // Repair across face records too, retaining the nonzero neighbor's mapping
+    // and attribution on both replacement triangles. No vertices are welded.
+    for(size_t ti=0;ti<result.faces.size();++ti) {
+      auto p=result.faces[ti].vertices;
+      auto position=[&](uint32_t i){return result.vertices[i];};
+      if(length(cross(position(p[1])-position(p[0]),position(p[2])-position(p[0])))!=0) continue;
+      int longest=0;
+      for(int i=1;i<3;++i) if(length(position(p[i])-position(p[(i+1)%3]))>length(position(p[longest])-position(p[(longest+1)%3]))) longest=i;
+      auto a=p[longest],b=p[(longest+1)%3],middle=p[(longest+2)%3];
+      if(dot(position(middle)-position(a),position(middle)-position(b))>=0) continue;
+      bool repaired=false;
+      for(size_t other=0;other<result.faces.size() && !repaired;++other) {
+        if(other==ti) continue; auto q=result.faces[other].vertices;
+        for(int edge=0;edge<3;++edge) if(q[edge]==b && q[(edge+1)%3]==a) {
+          auto d=q[(edge+2)%3];
+          if(length(cross(position(middle)-position(b),position(d)-position(b)))==0 ||
+             length(cross(position(a)-position(middle),position(d)-position(middle)))==0) continue;
+          result.faces[ti]=result.faces[other]; result.faces[ti].vertices={middle,a,d};
+          result.faces[other].vertices={b,middle,d}; repaired=true; break;
+        }
+      }
     }
     if(!validate(result,errors)) return false;
     output=std::move(result); return true;

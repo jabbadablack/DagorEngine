@@ -1,5 +1,6 @@
 // Copyright (C) Gaijin Games KFT. All rights reserved.
 #include <libTools/CSG/brush.h>
+#include "precise.h"
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -35,6 +36,10 @@ void Document::assignIds(Node &n)
 {
   n.id = allocate();
   for (auto &f : n.brush.faces) { f.id = allocate(); f.sourceBrush = n.id; }
+  if(n.parametric) {
+    n.extrusionSurfaces.resize(n.extrusion.polygon.size()+2);
+    for(auto &id:n.extrusionSurfaces) id=allocate();
+  }
   for (auto &c : n.children) assignIds(c);
 }
 static Vec faceNormal(const Mesh &m, const Face &f)
@@ -68,15 +73,24 @@ bool validate(const Mesh &m, Diagnostics &errors, Id node, bool convex)
   // Numerical validation tolerance, deliberately much smaller than the 1 cm
   // authoring envelope. It never modifies Carve's global epsilon.
   const double tolerance = std::max(1e-10, extent * 1e-10);
-  std::map<std::pair<uint32_t, uint32_t>, unsigned> edges;
-  std::set<Id> ids;
+  // Flat incidence tables retain the same edge/fan checks without allocating
+  // one tree node per corner on every validation of a cached boolean result.
+  struct Corner { uint32_t vertex,before,after; Id face; };
+  std::vector<Corner> corners;
+  size_t cornerCount=0; for(const auto &f:m.faces) cornerCount+=f.vertices.size();
+  corners.reserve(cornerCount);
+  std::vector<size_t> seen(m.vertices.size(),0);
+  size_t faceIndex=0;
   for (const auto &f : m.faces)
   {
     if (f.vertices.size() < 3) return fail(Code::InvalidMesh, f.id, "Face has fewer than three vertices");
-    std::set<uint32_t> unique;
+    ++faceIndex;
     for (uint32_t i : f.vertices)
-      if (i >= m.vertices.size() || !unique.insert(i).second)
+    {
+      if (i >= m.vertices.size() || seen[i]==faceIndex)
         return fail(Code::InvalidMesh, f.id, "Invalid or repeated face vertex");
+      seen[i]=faceIndex;
+    }
     Vec n = faceNormal(m, f);
     if (length(n) < 0.5) return fail(Code::InvalidMesh, f.id, "Degenerate face");
     const Vec origin = m.vertices[f.vertices[0]];
@@ -90,8 +104,9 @@ bool validate(const Mesh &m, Diagnostics &errors, Id node, bool convex)
     for (size_t i = 0; i < f.vertices.size(); ++i)
     {
       auto edge = std::make_pair(f.vertices[i], f.vertices[(i + 1) % f.vertices.size()]);
-      if (length(m.vertices[edge.first] - m.vertices[edge.second]) <= tolerance || ++edges[edge] != 1)
-        return fail(Code::InvalidMesh, f.id, "Collapsed or multiply directed edge");
+      if (length(m.vertices[edge.first] - m.vertices[edge.second]) <= tolerance)
+        return fail(Code::InvalidMesh, f.id, "Collapsed edge");
+      corners.push_back({edge.first,f.vertices[(i+f.vertices.size()-1)%f.vertices.size()],edge.second,f.id});
       if (convex)
       {
         Vec a = m.vertices[edge.first], b = m.vertices[edge.second];
@@ -105,8 +120,31 @@ bool validate(const Mesh &m, Diagnostics &errors, Id node, bool convex)
         if (dot(n, p - origin) > tolerance)
           return fail(Code::NonConvex, f.id, "Edit would make the brush concave or invert a face");
   }
-  for (const auto &e : edges)
-    if (!edges.count({e.first.second, e.first.first})) return fail(Code::InvalidMesh, 0, "Open or inconsistently wound solid");
+  auto less=[](const Corner &a,const Corner &b) { return a.vertex<b.vertex || (a.vertex==b.vertex && a.before<b.before); };
+  std::sort(corners.begin(),corners.end(),less);
+  for(size_t i=0;i<corners.size();++i) {
+    const auto &c=corners[i];
+    if(i && c.vertex==corners[i-1].vertex && c.before==corners[i-1].before)
+      return fail(Code::InvalidMesh,c.face,"Multiply directed edge");
+    Corner reverse{c.before,c.vertex,0,0};
+    auto found=std::lower_bound(corners.begin(),corners.end(),reverse,less);
+    if(found==corners.end() || found->vertex!=reverse.vertex || found->before!=reverse.before)
+      return fail(Code::InvalidMesh,0,"Open or inconsistently wound solid");
+  }
+  // Closed edges alone do not exclude two shells welded at a single vertex.
+  // Every used vertex must have one cycle of incident surface neighbors.
+  for(size_t begin=0,end;begin<corners.size();begin=end) {
+    end=begin+1; while(end<corners.size() && corners[end].vertex==corners[begin].vertex) ++end;
+    auto first=corners[begin].before,current=first; size_t visited=0;
+    do {
+      Corner key{corners[begin].vertex,current,0,0};
+      auto next=std::lower_bound(corners.begin()+begin,corners.begin()+end,key,less);
+      if(next==corners.begin()+end || next->before!=current || ++visited>end-begin)
+        return fail(Code::InvalidMesh,0,"Open vertex fan");
+      current=next->after;
+    } while(current!=first);
+    if(visited!=end-begin) return fail(Code::InvalidMesh,0,"Separate closed components share a non-manifold vertex");
+  }
   if (!(volume(m) > tolerance * tolerance * tolerance)) return fail(Code::InvalidMesh, 0, "Solid has no positive volume");
   return true;
 }
@@ -353,6 +391,17 @@ void alignSurface(Surface &target,const Surface &source)
   auto material=target.material; auto smoothing=target.smoothing;
   target=source; target.material=material; target.smoothing=smoothing;
 }
+bool mapSurfaceTriangle(Surface &surface,Vec a,Vec b,Vec c,Vec uv0,Vec uv1,Vec uv2)
+{
+  Vec e=b-a,g=c-a; double ee=dot(e,e),gg=dot(g,g),eg=dot(e,g),det=ee*gg-eg*eg;
+  if(det<=0) return false;
+  auto gradient=[&](double b,double c) { return e*((b*gg-c*eg)/det)+g*((c*ee-b*eg)/det); };
+  auto result=surface; result.u=gradient(uv1.x-uv0.x,uv2.x-uv0.x); result.v=gradient(uv1.y-uv0.y,uv2.y-uv0.y);
+  double originU=dot(result.u,a)-uv0.x,originV=dot(result.v,a)-uv0.y,angle=result.rotation*3.14159265358979323846/180;
+  result.offsetU-=(originU*std::cos(angle)-originV*std::sin(angle))/result.scaleU;
+  result.offsetV-=(originU*std::sin(angle)+originV*std::cos(angle))/result.scaleV;
+  surface=std::move(result); return true;
+}
 std::array<double,2> textureCoordinates(const Surface &s,Vec p)
 {
   double a=s.rotation*3.14159265358979323846/180, u=dot(s.u,p),v=dot(s.v,p);
@@ -367,19 +416,47 @@ static void hashSurface(uint64_t &h,const Surface &s)
   hashValue(h,s.u); hashValue(h,s.v); hashValue(h,s.scaleU); hashValue(h,s.scaleV);
   hashValue(h,s.offsetU); hashValue(h,s.offsetV); hashValue(h,s.rotation); hashValue(h,s.worldLocked); hashValue(h,s.smoothing);
 }
-uint64_t fingerprint(const Node &n)
+static uint64_t fingerprintOwn(const Node &n,bool includeChildren)
 {
   uint64_t h=14695981039346656037ULL;
   hashValue(h,n.id); hashValue(h,n.operation); hashValue(h,n.visible); hashValue(h,n.transform.column);
   hashValue(h,n.brush.vertices.size()); for (auto p:n.brush.vertices) hashValue(h,p);
   hashValue(h,n.brush.faces.size());
+  hashValue(h,n.closedMesh); hashValue(h,n.meshSource.size()); hashBytes(h,n.meshSource.data(),n.meshSource.size());
   for (const auto &f:n.brush.faces)
   {
     hashValue(h,f.id); hashValue(h,f.sourceBrush); hashValue(h,f.vertices.size());
     for (auto v:f.vertices) hashValue(h,v); hashSurface(h,f.surface);
   }
   hashValue(h,n.overrideCutSurface); if (n.overrideCutSurface) hashSurface(h,n.cutSurface);
-  hashValue(h,n.children.size()); for (const auto &c:n.children) { auto ch=fingerprint(c); hashValue(h,ch); }
+  hashValue(h,n.parametric);
+  if(n.parametric) {
+    const auto &s=n.extrusion; hashValue(h,s.mode); hashValue(h,s.depth); hashValue(h,s.spinDegrees);
+    hashValue(h,s.spinSides); hashValue(h,s.pathSubdivisions); hashValue(h,s.pathJoined); hashSurface(h,s.surface);
+    hashValue(h,s.polygon.size()); for(auto p:s.polygon) hashValue(h,p);
+    hashValue(h,s.path.size()); for(const auto &p:s.path) {
+      hashValue(h,p.position); hashValue(h,p.incoming); hashValue(h,p.outgoing); hashValue(h,p.tilt);
+    }
+    hashValue(h,n.extrusionSurfaces.size()); for(auto id:n.extrusionSurfaces) hashValue(h,id);
+    if(!s.surfaces.empty()) {
+      hashValue(h,s.surfaces.size());
+      for(const auto &face:s.surfaces) { hashSurface(h,face.surface); hashValue(h,face.automaticUv); }
+    }
+  }
+  size_t count=includeChildren ? n.children.size():0; hashValue(h,count);
+  return h;
+}
+uint64_t fingerprint(const Node &n,bool includeChildren)
+{
+  auto h=fingerprintOwn(n,includeChildren);
+  if(includeChildren) for (const auto &c:n.children) { auto ch=fingerprint(c); hashValue(h,ch); }
+  return h;
+}
+uint64_t Evaluator::hashNode(const Node &n)
+{
+  auto h=fingerprintOwn(n,true);
+  for(const auto &child:n.children) { auto childHash=hashNode(child); hashValue(h,childHash); }
+  inputHashes[n.id]=h;
   return h;
 }
 } // namespace csg

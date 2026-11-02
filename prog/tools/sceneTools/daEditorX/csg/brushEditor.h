@@ -9,6 +9,8 @@ class ObjEd;
 class GeomObject;
 class StaticGeometryContainer;
 class IGenViewportWnd;
+class MaterialData;
+class ITextureNumerator;
 class BrushEditor
 {
 public:
@@ -28,7 +30,11 @@ public:
   void gather(StaticGeometryContainer &container,bool collision);
   void updateImgui();
   void restore(csg::Document value);
+  std::pair<int,float> mappingSettings() const { return {lightmapSize,lightmapSampleSize}; }
+  void restoreMappingSettings(std::pair<int,float> value) { lightmapSize=value.first; lightmapSampleSize=value.second; dirty=true; }
   csg::Document document;
+  bool collectRuntimeTextures(ITextureNumerator &textures);
+  bool writeRuntimeSettings(DataBlock &source,const ITextureNumerator &textures);
   void syncGizmo();
   void transformSelection(const TMatrix &before,const TMatrix &after);
   void putTransformUndo();
@@ -37,6 +43,8 @@ public:
   bool deleteSelection();
   bool duplicateSelection();
 private:
+  MaterialData *resolveMaterial(const std::string &name,csg::Id brush=0,csg::Id face=0);
+  std::map<std::string,Ptr<MaterialData>> runtimePalette();
   ObjEd &owner;
   csg::Evaluator evaluator;
   csg::Result current;
@@ -78,7 +86,16 @@ private:
   void edit(const char *label,const std::function<bool()> &action);
   void hierarchy(csg::Node &node);
   void add(csg::Mesh mesh,const char *name);
+  void addExtrusion(csg::Extrusion source,const char *name);
+  void addNativeGeometry(const StaticGeometryContainer &source,const char *name,bool preserve_smoothing=false);
+  void importClosedMesh();
   void modelling(csg::Node &node);
+  void extrusionProperties(csg::Node &node);
+  csg::Id extrusionEditing = 0;
+  uint64_t extrusionFingerprint = 0;
+  csg::Extrusion extrusionDraft;
+  std::vector<csg::Id> extrusionDraftSurfaces;
+  int extrusionProfilePoint = 0, extrusionCurvePoint = 0;
   void surfaces(csg::Node &node);
   void drawContents();
   bool buildPublished(const csg::Mesh &mesh,StaticGeometryContainer &container);

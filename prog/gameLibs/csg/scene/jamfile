@@ -1,0 +1,11 @@
+Root ?= ../../../.. ;
+Location = prog/gameLibs/csg/scene ;
+TargetType = lib ;
+Target = gameLibs/csg/scene.lib ;
+AddIncludes = $(Root)/prog/gameLibs/publicInclude $(Root)/prog/engine/sharedInclude $(Root)/prog/tools/sharedInclude ;
+Sources = ../scene.cpp ;
+UseProgLibs = gameLibs/csg tools/libTools/unwrapMapping gameLibs/gamePhys/collision/collision-common ;
+UseProgLibs += gameLibs/render/lruCollision ;
+include $(Root)/prog/3rdPartyLibs/math/carve/carve-options.jam ;
+include $(Root)/prog/3rdPartyLibs/phys/setup-phys.jam ;
+include $(Root)/prog/_jBuild/build.jam ;

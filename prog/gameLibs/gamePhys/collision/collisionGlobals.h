@@ -6,6 +6,7 @@
 class LandMeshManager;
 class Point2;
 struct CollisionObject;
+class CollisionResource;
 
 namespace dacoll
 {
@@ -14,6 +15,7 @@ PhysMat::MatID get_lmesh_mat_id();
 bool has_only_water2d();
 void get_landmesh_mirroring(int &cells_x_pos, int &cells_x_neg, int &cells_z_pos, int &cells_z_neg);
 float get_collision_object_collapse_threshold(const CollisionObject &co);
+dag::ConstSpan<CollisionResource *> get_runtime_static_collision_resources();
 
 // v0.w of a cached triangle: TAG | matId, or untagged for a face that carries no material
 inline constexpr int STATIC_CACHE_TRI_MAT_TAG = 0x40000000;

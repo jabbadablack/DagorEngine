@@ -8,6 +8,7 @@
 #include <math/dag_capsule.h>
 #include <libTools/staticGeom/staticGeometryContainer.h>
 #include <phys/dag_physics.h>
+#include <debug/dag_debug.h>
 #ifdef USE_JOLT_PHYSICS
 #include <Jolt/Physics/Collision/Shape/MeshShape.h>
 #endif
@@ -25,12 +26,14 @@ void *DeDagorPhys::prepare(const StaticGeometryContainer &container)
     for(const auto &face:mesh.face) for(auto index:face.v) indices.push_back(base+index);
   }
   if(indices.empty()) return nullptr;
-  // Same public Jolt cooking path used by PhysBody's triangle-mesh adapter.
-  JPH::MeshShapeSettings input;
-  for(auto vertex:vertices) input.mTriangleVertices.emplace_back(vertex.x,vertex.y,vertex.z);
-  for(int i=0;i<indices.size();i+=3) input.mIndexedTriangles.emplace_back(indices[i],indices[i+1],indices[i+2]);
+  // Use Jolt's normal constructor, which applies its existing quantized-space
+  // sanitization. Populating a default settings object bypasses that step.
+  JPH::VertexList positions; JPH::IndexedTriangleList triangles;
+  for(auto vertex:vertices) positions.emplace_back(vertex.x,vertex.y,vertex.z);
+  for(int i=0;i<indices.size();i+=3) triangles.emplace_back(indices[i],indices[i+1],indices[i+2]);
+  JPH::MeshShapeSettings input(std::move(positions),std::move(triangles));
   auto cooked=input.Create();
-  if(!cooked.IsValid()) return nullptr;
+  if(!cooked.IsValid()) { logerr("CSG Jolt mesh preparation failed: %s",cooked.GetError().c_str()); return nullptr; }
   // A cooked immutable shape has no dependency on a particular world's body
   // lifetime, so it remains safe across the embedded game's scene reloads.
   return new JPH::RefConst<JPH::Shape>(cooked.Get());

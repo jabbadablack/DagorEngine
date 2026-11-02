@@ -89,6 +89,8 @@ extern void (*on_batch_exit)();
 class TextureRemapHelper : public ITextureNumerator
 {
 public:
+  int addManagedTexture(TEXTUREID id) override;
+  int getManagedTextureOrdinal(TEXTUREID id) const override;
   TextureRemapHelper(int target);
   ~TextureRemapHelper();
 

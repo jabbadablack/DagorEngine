@@ -5,6 +5,7 @@
 #pragma once
 
 #include <generic/dag_tabFwd.h>
+#include <drv/3d/dag_resId.h>
 #include <de3_navmeshObstacle.h>
 #include <de3_gameLadder.h>
 #include <util/dag_oaHashNameMap.h>
@@ -45,6 +46,9 @@ public:
   virtual int getTextureOrdinal(const char *fname) const = 0;
 
   virtual int getTargetCode() const = 0;
+  // Resolve managed IDs in the host; plugins must not duplicate its texture registry.
+  virtual int addManagedTexture(TEXTUREID) { return -1; }
+  virtual int getManagedTextureOrdinal(TEXTUREID) const { return -1; }
 };
 
 

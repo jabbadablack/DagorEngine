@@ -19,10 +19,8 @@
 
 bool dacoll::append_static_collision_tris(bbox3f_cref box, vec4f *out_tris, int &left)
 {
-  const CollisionResource *res = get_static_collision_resource();
-  if (!res)
-    return false;
-  const bool overflow = res->visitTrianglesInBox(box, CollisionNode::TRACEABLE, [&](vec3f a, vec3f b, vec3f c, int mat, int) {
+  auto append = [&](const CollisionResource *res) {
+    return res->visitTrianglesInBox(box, CollisionNode::TRACEABLE, [&](vec3f a, vec3f b, vec3f c, int mat, int) {
     if (left <= 0)
       return true;
     out_tris[0] = v_perm_xyzd(a, v_cast_vec4f(v_splatsi(static_cache_pack_tri_mat(mat))));
@@ -31,8 +29,15 @@ bool dacoll::append_static_collision_tris(bbox3f_cref box, vec4f *out_tris, int 
     out_tris += 3;
     --left;
     return false;
-  });
-  return !overflow;
+    });
+  };
+  const auto *level = get_static_collision_resource();
+  if (level && append(level))
+    return false;
+  for (auto *resource : get_runtime_static_collision_resources())
+    if (append(resource))
+      return false;
+  return level || !get_runtime_static_collision_resources().empty();
 }
 
 int dacoll::resolve_static_cache_tri_mat(int packed_w)
@@ -42,7 +47,8 @@ int dacoll::resolve_static_cache_tri_mat(int packed_w)
 
 static bool can_use_trace_cache(const bbox3f &query_box, const TraceMeshFaces *handle)
 {
-  return !handle->isDirty && v_bbox3_test_box_inside(v_ldu_bbox3(handle->box), query_box);
+  return !handle->isDirty && handle->staticCollisionRevision == dacoll::get_static_collision_revision() &&
+         v_bbox3_test_box_inside(v_ldu_bbox3(handle->box), query_box);
 }
 
 bool dacoll::try_use_trace_cache(const bbox3f &query_box, const TraceMeshFaces *handle)
@@ -83,7 +89,8 @@ void dacoll::validate_trace_cache(const bbox3f &query_box, const vec3f &expands,
   float shiftThreshold = v_extract_x(v_length3_x(v_bbox3_size(query_box))) * rel_shift_threshold;
   vec3f queryBoxcenter = v_bbox3_center(query_box);
   vec3f cacheBoxCenter = v_bbox3_center(v_ldu_bbox3(handle->box));
-  bool validated = v_extract_x(v_length3_x(v_sub(queryBoxcenter, cacheBoxCenter))) < shiftThreshold && !handle->box.isempty();
+  bool validated = v_extract_x(v_length3_x(v_sub(queryBoxcenter, cacheBoxCenter))) < shiftThreshold && !handle->box.isempty() &&
+                   !handle->isDirty && handle->staticCollisionRevision == get_static_collision_revision();
 
   if (validated)
   {
@@ -99,6 +106,7 @@ void dacoll::validate_trace_cache(const bbox3f &query_box, const vec3f &expands,
   TIME_PROFILE(validate_trace_cache);
 
   handle->isDirty = false;
+  handle->staticCollisionRevision = get_static_collision_revision();
 
   int left = handle->MAX_TRIANGLES;
   int trianglesAdded = 0;

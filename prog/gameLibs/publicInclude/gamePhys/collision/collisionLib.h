@@ -89,6 +89,17 @@ bool load_static_collision_frt(IGenLoad *crd);
 // False: the stream landed empty, the cause already logged.
 bool load_static_collision(IGenLoad &crd);
 CollisionResource *get_static_collision_resource();
+// Prepared, immutable runtime additions to static world collision. Prepare may
+// fail; replace makes the already-cooked revision visible to rays, caches,
+// contacts and shape queries together. Use at a quiescent physics boundary on
+// the owner thread, and destroy before terminating the collision world.
+struct RuntimeStaticCollision;
+RuntimeStaticCollision *prepare_runtime_static_collision(CollisionResource *resource);
+bool replace_runtime_static_collision(RuntimeStaticCollision *previous, RuntimeStaticCollision *next);
+bool replace_runtime_static_collisions(dag::ConstSpan<RuntimeStaticCollision *> previous,
+  dag::ConstSpan<RuntimeStaticCollision *> next);
+void destroy_runtime_static_collision(RuntimeStaticCollision *collision);
+uint64_t get_static_collision_revision();
 // The level's water surface, its own resource of traceable nodes. Null until a level sets one.
 CollisionResource *get_water_collision();
 // An old level's water faces converted to that resource, which is cleared first. False: no faces

@@ -1,0 +1,13 @@
+Root ?= ../../.. ;
+Location = prog/gameLibs/csg ;
+TargetType = lib ;
+Target = gameLibs/csg.lib ;
+AddIncludes = $(Root)/prog/tools/sharedInclude $(Root)/prog/gameLibs/publicInclude ;
+# Compile the same tested geometry implementation, without editor, unwrap,
+# renderer, physics-world, or game-specific dependencies.
+Sources = ../../tools/libTools/CSG/brush.cpp ../../tools/libTools/CSG/brushCarve.cpp ../../tools/libTools/CSG/extrusion.cpp ;
+Sources += ../../tools/sceneTools/daEditorX/csg/brushDocument.cpp ;
+Sources += runtime.cpp ;
+UseProgLibs = 3rdPartyLibs/math/carve ;
+include $(Root)/prog/3rdPartyLibs/math/carve/carve-options.jam ;
+include $(Root)/prog/_jBuild/build.jam ;

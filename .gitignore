@@ -19,6 +19,12 @@
 *.dascache
 ShaderLog-*
 
+# Generated editor, game, build and rotated logs.
+.logs/
+.game_logs/
+*.log
+*.log.*
+
 # Local Visual Studio state and regenerated project folder filters.
 /.vs/
 *.vcxproj.user

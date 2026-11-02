@@ -66,7 +66,10 @@ public:
   {
     if (!hasTransform())
       return false;
-    box = matrix * BSphere3(Point3(0, 0, 0), 0.5);
+    if (g_entity_mgr->has(eid, ECS_HASH("custom_edit_box__min")))
+      box = matrix * lbb;
+    else
+      box = matrix * BSphere3(Point3(0, 0, 0), 0.5);
     return true;
   }
 

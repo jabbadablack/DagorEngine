@@ -12,4 +12,10 @@ CPPopt +=
 
 if $(Platform) = windows { CPPopt += -DWIN32 ; }
 
+# Shewchuk's exact predicates require IEEE arithmetic. Fast-math also breaks
+# repeated room cuts in the CSG regressions. Override the game's default for
+# every translation unit using this backend, without changing global epsilon.
+if $(Platform) in windows xboxOne scarlett { CPPopt += -fp:precise /EHsc ; }
+else { CPPopt += -fno-fast-math -ffp-contract=off -fexceptions ; }
+
 if $(Platform)-$(PlatformArch) = windows-x86_64 { CPPopt += -wd4267 ; } # no support for > 4G vertices

@@ -35,6 +35,7 @@
 #include <EditorCore/ec_IEditorCore.h>
 #include "csg.h"
 #include "de3_box_vs_tri.h"
+#include <libTools/util/makeBindump.h>
 
 using editorcore_extapi::dagGeom;
 
@@ -355,7 +356,6 @@ void CSGPlugin::clearObjects()
 
 void CSGPlugin::gatherStaticCollisionGeomGame(StaticGeometryContainer &cont)
 {
-  objEd.brushEditor().gather(cont, true);
   BBox3 bbox;
   for (int b = 0; b < objEd.objectCount(); b++)
   {
@@ -374,9 +374,16 @@ void CSGPlugin::gatherStaticCollisionGeomGame(StaticGeometryContainer &cont)
   }
 }
 
-void CSGPlugin::gatherStaticCollisionGeomEditor(StaticGeometryContainer &cont) { gatherStaticCollisionGeomGame(cont); }
+void CSGPlugin::gatherStaticCollisionGeomEditor(StaticGeometryContainer &cont)
+{
+  objEd.brushEditor().gather(cont,true);
+  gatherStaticCollisionGeomGame(cont);
+}
 
-void CSGPlugin::gatherStaticVisualGeometry(StaticGeometryContainer &cont) { objEd.brushEditor().gather(cont, false); }
+void CSGPlugin::gatherStaticVisualGeometry(StaticGeometryContainer &cont)
+{
+  (void)cont; // Authored CSG is published from CSG2 source, without a baked duplicate.
+}
 
 bool CSGPlugin::validateBuild(int, ILogWriter &, PropPanel::ContainerPropertyControl *)
 {
@@ -386,7 +393,23 @@ bool CSGPlugin::validateBuild(int, ILogWriter &, PropPanel::ContainerPropertyCon
   return false;
 }
 
-bool CSGPlugin::buildAndWrite(BinDumpSaveCB &, const ITextureNumerator &, PropPanel::ContainerPropertyControl *)
+bool CSGPlugin::buildAndWrite(BinDumpSaveCB &writer, const ITextureNumerator &textures, PropPanel::ContainerPropertyControl *)
 {
-  return objEd.brushEditor().validForExport(); // Geometry is exported through IGatherStaticGeometry.
+  auto &editor=objEd.brushEditor();
+  if(!editor.validForExport()) return false;
+  // Render/collision meshes still use the existing gathering interfaces.
+  // Retain authoring identities separately, including invisible cutters and
+  // groups, so runtime ECS/game logic can address the original operations.
+  if(!editor.document.root.children.empty()) {
+    DataBlock source; csg::saveDocument(editor.document,source);
+    if(!editor.writeRuntimeSettings(source,textures)) return false;
+    writer.beginTaggedBlock(_MAKE4C('CSG2'));
+    bool saved=source.saveToStream(writer.getRawWriter()); writer.endBlock();
+    return saved;
+  }
+  return true;
+}
+bool CSGPlugin::addUsedTextures(ITextureNumerator &textures)
+{
+  return objEd.brushEditor().collectRuntimeTextures(textures);
 }

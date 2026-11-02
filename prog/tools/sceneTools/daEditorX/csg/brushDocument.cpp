@@ -49,12 +49,30 @@ Surface readSurface(const DataBlock &b)
   s.offsetU=readNumber(b,"offsetU",0); s.offsetV=readNumber(b,"offsetV",0); s.rotation=readNumber(b,"rotation",0);
   s.worldLocked=b.getBool("worldLocked",false); s.smoothing=b.getInt("smoothing",0); return s;
 }
-void saveNode(const Node &n,DataBlock &b)
+void saveNode(const Node &n,DataBlock &b,bool children=true)
 {
   b.setInt64("id",n.id); b.setStr("name",n.name.c_str()); b.setInt("operation",int(n.operation)); b.setBool("visible",n.visible);
   const char *keys[]={"axisX","axisY","axisZ","origin"};
   for (unsigned i=0;i<4;++i) saveVec(b,keys[i],n.transform.column[i]);
   b.setBool("overrideCutSurface",n.overrideCutSurface); if (n.overrideCutSurface) saveSurface(n.cutSurface,*b.addNewBlock("cutSurface"));
+  if(n.closedMesh) { b.setBool("closedMesh",true); b.setStr("meshSource",n.meshSource.c_str()); }
+  if(n.parametric) {
+    auto &shape=*b.addNewBlock("extrusion"); const auto &s=n.extrusion;
+    shape.setInt("mode",int(s.mode)); shape.setStr("depth",number(s.depth).c_str());
+    shape.setStr("spinDegrees",number(s.spinDegrees).c_str()); shape.setInt("spinSides",s.spinSides);
+    shape.setInt("pathSubdivisions",s.pathSubdivisions); shape.setBool("pathJoined",s.pathJoined);
+    saveSurface(s.surface,*shape.addNewBlock("surface"));
+    for(const auto &settings:s.surfaces) {
+      auto &out=*shape.addNewBlock("faceSettings"); saveSurface(settings.surface,out);
+      out.setBool("automaticUv",settings.automaticUv);
+    }
+    for(auto p:s.polygon) saveVec(*shape.addNewBlock("point"),"position",p);
+    for(const auto &p:s.path) {
+      auto &out=*shape.addNewBlock("curvePoint"); saveVec(out,"position",p.position);
+      saveVec(out,"incoming",p.incoming); saveVec(out,"outgoing",p.outgoing); out.setStr("tilt",number(p.tilt).c_str());
+    }
+    for(auto id:n.extrusionSurfaces) shape.addInt64("surfaceId",id);
+  }
   auto &mesh=*b.addNewBlock("brush");
   for (auto p:n.brush.vertices) { auto &v=*mesh.addNewBlock("vertex"); saveVec(v,"position",p); }
   for (const auto &f:n.brush.faces)
@@ -63,7 +81,7 @@ void saveNode(const Node &n,DataBlock &b)
     for (auto i:f.vertices) face.addInt("index",i);
     saveSurface(f.surface,*face.addNewBlock("surface"));
   }
-  for (const auto &c:n.children) saveNode(c,*b.addNewBlock("node"));
+  if(children) for (const auto &c:n.children) saveNode(c,*b.addNewBlock("node"));
 }
 Node readNode(const DataBlock &b,unsigned depth,size_t &budget)
 {
@@ -74,6 +92,21 @@ Node readNode(const DataBlock &b,unsigned depth,size_t &budget)
   const char *keys[]={"axisX","axisY","axisZ","origin"};
   for (unsigned i=0;i<4;++i) n.transform.column[i]=readVec(b,keys[i],n.transform.column[i]);
   n.overrideCutSurface=b.getBool("overrideCutSurface",false); n.cutSurface=readSurface(*b.getBlockByNameEx("cutSurface"));
+  n.closedMesh=b.getBool("closedMesh",false); n.meshSource=b.getStr("meshSource","");
+  if(const auto *shape=b.getBlockByName("extrusion")) {
+    n.parametric=true; auto &s=n.extrusion;
+    int mode=shape->getInt("mode",0); if(mode<0 || mode>2) throw std::runtime_error("Unknown parametric extrusion mode");
+    s.mode=ExtrusionMode(mode); s.depth=readNumber(*shape,"depth",1); s.spinDegrees=readNumber(*shape,"spinDegrees",360);
+    s.spinSides=shape->getInt("spinSides",32); s.pathSubdivisions=shape->getInt("pathSubdivisions",8);
+    s.pathJoined=shape->getBool("pathJoined",false); s.surface=readSurface(*shape->getBlockByNameEx("surface"));
+    for(int i=0;i<shape->blockCount();++i) {
+      const auto &p=*shape->getBlock(i);
+      if(!strcmp(p.getBlockName(),"point")) s.polygon.push_back(readVec(p,"position"));
+      else if(!strcmp(p.getBlockName(),"curvePoint")) s.path.push_back({readVec(p,"position"),readVec(p,"incoming"),readVec(p,"outgoing"),readNumber(p,"tilt",0)});
+      else if(!strcmp(p.getBlockName(),"faceSettings")) s.surfaces.push_back({readSurface(p),p.getBool("automaticUv",true)});
+    }
+    for(int i=0;i<shape->paramCount();++i) if(!strcmp(shape->getParamName(i),"surfaceId")) n.extrusionSurfaces.push_back(shape->getInt64(i));
+  }
   const auto &mesh=*b.getBlockByNameEx("brush");
   for (int i=0;i<mesh.blockCount();++i)
   {
@@ -93,13 +126,20 @@ Node readNode(const DataBlock &b,unsigned depth,size_t &budget)
 void saveDocument(const Document &doc,DataBlock &b)
 {
   b.clearData(); b.setInt("version",Document::VERSION); b.setInt64("nextId",doc.nextId); saveNode(doc.root,*b.addNewBlock("root"));
+  b.setBool("runtimeEditable",doc.runtimeEditable);
+}
+void saveSourceNode(const Node &node,DataBlock &block)
+{
+  block.clearData(); saveNode(node,block,false);
 }
 bool loadDocument(const DataBlock &b,Document &doc,Diagnostics &errors)
 {
   try
   {
-    if (b.getInt("version",0)!=Document::VERSION) throw std::runtime_error("Unsupported CSG document version; source data retained");
+    int version=b.getInt("version",0);
+    if (version<1 || version>Document::VERSION) throw std::runtime_error("Unsupported CSG document version; source data retained");
     Document candidate; candidate.nextId=b.getInt64("nextId",0); size_t budget=0;
+    candidate.runtimeEditable=b.getBool("runtimeEditable",false);
     const DataBlock *root=b.getBlockByName("root"); if (!root) throw std::runtime_error("Missing CSG root");
     candidate.root=readNode(*root,0,budget);
     // Loading is transactional. Evaluation also checks stable identities.

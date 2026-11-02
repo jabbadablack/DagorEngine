@@ -17,6 +17,7 @@
 
 ECS_UNICAST_EVENT_TYPE(EditorToDeleteEntitiesEvent, ecs::EidList /*linkedEntitiesToDelete*/)
 ECS_UNICAST_EVENT_TYPE(EditorOnInitClonedEntity)
+ECS_UNICAST_EVENT_TYPE(EditorComponentSavedEvent, ecs::component_t)
 
 struct EntCreateData;
 class EntityObj;

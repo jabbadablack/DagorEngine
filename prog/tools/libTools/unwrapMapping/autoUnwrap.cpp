@@ -632,6 +632,50 @@ struct Lightmap
       memset(upper, 0xFF, sizeof(used)); // -1
     }
 
+    // Visit the same candidate columns as find_bestxy, with identical integer
+    // scores. A rectangular histogram needs only a sliding maximum/minimum and
+    // sum, rather than rescanning every column of its width at every position.
+    template <class Visitor>
+    void scan_rectangle(int width, int lower_value, int upper_value, Visitor visit) const
+    {
+      if (width <= 0 || width > right - left + 1)
+        return;
+      int maxQueue[MAX_LIGHTMAPSZ], minQueue[MAX_LIGHTMAPSZ];
+      int maxHead = 0, maxTail = 0, minHead = 0, minTail = 0, sum = 0;
+      for (int x = left; x <= right; ++x)
+      {
+        while (maxTail > maxHead && used[maxQueue[maxTail - 1]] <= used[x])
+          --maxTail;
+        maxQueue[maxTail++] = x;
+        while (minTail > minHead && upper[minQueue[minTail - 1]] >= upper[x])
+          --minTail;
+        minQueue[minTail++] = x;
+        sum += used[x];
+        const int start = x - width + 1;
+        if (start < left)
+          continue;
+        if (start > left)
+          sum -= used[start - 1];
+        while (maxQueue[maxHead] < start)
+          ++maxHead;
+        while (minQueue[minHead] < start)
+          ++minHead;
+        const int dy = max(0, used[maxQueue[maxHead]] - lower_value);
+        if (dy < LIGHTMAPSZ && upper_value + dy <= upper[minQueue[minHead]])
+          visit(start, dy, sum, used[maxQueue[maxHead]]);
+      }
+    }
+
+    static bool rectangular_histogram(int width, const short *lower_values, const short *upper_values)
+    {
+      if (!memoryMappingSession || width <= 0 || upper_values[0] < lower_values[0])
+        return false;
+      for (int x = 1; x < width; ++x)
+        if (lower_values[x] != lower_values[0] || upper_values[x] != upper_values[0])
+          return false;
+      return true;
+    }
+
     bool find_bestxy(int w, int &best_transf, int &bestx, int &besty, const FaceGroup &fg, int &opt)
     {
       int i, j, k, best_S, dS, dy;
@@ -664,6 +708,23 @@ struct Lightmap
 
       if (best_S < 100)
       {
+        if (rectangular_histogram(w, lwr, upr))
+        {
+          scan_rectangle(w, lwr[0], upr[0], [&](int x, int y, int, int max_used) {
+            if (max_used - lwr[0] >= besty)
+              return; // Preserve the original small-block tie/pruning rule.
+            const int score = (y + fg.ht) / 2 + best_S * 2 / w;
+            if (score <= opt)
+            {
+              bestx = x;
+              besty = y;
+              found = true;
+              opt = score;
+            }
+          });
+          best_transf = 0;
+          return found;
+        }
         for (i = left; i <= right + 1 - w; ++i)
         {
           // find bottom line
@@ -714,6 +775,23 @@ struct Lightmap
         int mh;
         if (!fg.get_transformed(k, t_lwr, t_upr, w, mh))
           break;
+
+        if (rectangular_histogram(w, lwr, upr))
+        {
+          scan_rectangle(w, lwr[0], upr[0], [&](int x, int y, int used_sum, int) {
+            const int score = (y + mh) / 2 + ((y + upr[0]) * w - used_sum) * 2 / w;
+            if (score < best_S - 2 || (score < best_S + 4 && y < besty))
+            {
+              bestx = x;
+              besty = y;
+              best_S = score;
+              best_transf = k;
+              found = true;
+              opt = score;
+            }
+          });
+          continue;
+        }
 
         for (i = left; i <= right + 1 - w; ++i)
         {
@@ -1227,7 +1305,10 @@ int AutoUnwrapMapping::repack_facegroups(float samplesize_scale, float *out_lm_a
 
     ltmobjs[i].prepareForPacking(samplesize_scale);
     ltmobjs[i].measure();
-    ltmobjs[i].finishPacking();
+    // A memory session can retain the exact histograms just measured until
+    // this object's packing completes. Disk sessions keep their bounded-memory
+    // behavior; rebuilding identical histograms there remains intentional.
+    if (!memoryMappingSession) ltmobjs[i].finishPacking();
     obj_order[i] = i;
   }
   sort(obj_order, &cmp_ltmap_objs_ids);
@@ -1241,7 +1322,7 @@ int AutoUnwrapMapping::repack_facegroups(float samplesize_scale, float *out_lm_a
       return -1;
 
     LightMapObject &obj = ltmobjs[obj_order[i]];
-    obj.recalcHist();
+    if (!memoryMappingSession) obj.recalcHist();
 
     SimpleQsort<FaceGroup *, FaceGroupCompare>::sort(&obj.fgrps[0], obj.fgrps.size());
 
@@ -1449,6 +1530,12 @@ void AutoUnwrapMapping::finish_mapping()
   fp_svg = NULL;
 #endif
 
+  if (memoryMappingSession)
+  {
+    for (auto *lightmap : ltmap)
+      delete lightmap;
+    clear_and_shrink(ltmap);
+  }
   clear_and_shrink(tmp_tvert);
   print_mapping_stat();
   clear_and_shrink(ltmobjs);

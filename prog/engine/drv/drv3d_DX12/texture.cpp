@@ -721,7 +721,15 @@ bool BaseTex::copyAllSubresourcesToStaging(void **pointer, uint32_t, uint32_t pr
   if (!image)
     return false;
   if (!stagingMemory)
-    stagingMemory = allocate_read_write_staging_memory(image, SubresourceRange::make(0, mipLevels));
+  {
+    // Render targets cannot be CPU-write locked. Keep their readback destinations
+    // out of the bidirectional pool, which is also written on the graphics queue.
+    if (cflg & TEXCF_RTARGET)
+      stagingMemory = get_device().allocatePersistentReadBackMemory(
+        calculate_texture_staging_buffer_size(*image, SubresourceRange::make(0, mipLevels)), D3D12_TEXTURE_DATA_PLACEMENT_ALIGNMENT);
+    else
+      stagingMemory = allocate_read_write_staging_memory(image, SubresourceRange::make(0, mipLevels));
+  }
   if (!stagingMemory)
     return false;
 

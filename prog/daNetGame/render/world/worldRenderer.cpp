@@ -4,6 +4,7 @@
 #define INSIDE_RENDERER 1 // fixme: move to jam
 
 #include "render/renderEvent.h"
+#include <csg/scene.h>
 #include <render/lruCollision.h>
 #include <gameRes/dag_collisionResource.h>
 #include <render/shaderCacheWarmup/shaderCacheWarmup.h>
@@ -5607,6 +5608,7 @@ void WorldRenderer::renderStaticSceneOpaque(int cascade,
     d3d::resummarize_htile(currentDepth);
   }
 
+  csg::renderScenes(culling_frustum);
   g_entity_mgr->broadcastEventImmediate(RenderStaticSceneEvent(culling_frustum, camera_pos, cascade));
 }
 

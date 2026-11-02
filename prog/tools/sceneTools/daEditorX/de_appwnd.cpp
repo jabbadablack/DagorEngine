@@ -3,6 +3,7 @@
 #define IMGUI_DEFINE_MATH_OPERATORS
 
 #include "de_appwnd.h"
+#include <debug/dag_logSys.h>
 #include "de_apphandler.h"
 #include "plugin_dlg.h"
 #include "de_plugindata.h"
@@ -70,6 +71,8 @@
 #include <EditorCore/ec_testSystem.h>
 #include <EditorCore/ec_imguiTestHooks.h>
 #include <de3_csgCollision.h>
+#include <de3_primitiveGeometry.h>
+#include <libTools/ObjCreator3d/objCreator3d.h>
 #include <EditorCore/ec_input.h>
 #include <EditorCore/ec_startup.h>
 #include <EditorCore/ec_viewportSplitter.h>
@@ -2525,6 +2528,15 @@ void DagorEdAppWindow::startWithWorkspace(const char *wspName, const char *app_b
 
 void *DagorEdAppWindow::queryEditorInterfacePtr(unsigned huid)
 {
+  if(huid==IEditorPrimitiveGeometry::HUID) {
+    static struct NativePrimitives final : IEditorPrimitiveGeometry {
+      bool generate(Kind kind,int segments,StaticGeometryContainer &output) override {
+        if(segments<4 || segments>128) return false;
+        return kind==Sphere && ObjCreator3d::generateSphere(segments,output);
+      }
+    } library;
+    return &library;
+  }
 #ifdef USE_JOLT_PHYSICS
   if(huid==ICsgCollisionPreparation::HUID)
     return static_cast<ICsgCollisionPreparation *>(&deDagorPhysImpl);
@@ -4542,10 +4554,23 @@ void DagorEdAppWindow::updateImgui()
   {
     uiTestStarted = true;
     const char *script = dgs_get_settings()->getBlockByNameEx("debug")->getStr("editorUiTest", nullptr);
-    if (script && !editor_core_test_runtime_run_script(script, [](bool failed) {
-          DAEDITOR3.conNote("Editor UI acceptance %s", failed ? "FAIL" : "PASS");
-        }))
-      DAEDITOR3.conError("Editor UI acceptance failed to load script: %s", script);
+    if (script)
+    {
+      const bool backgroundSleep = ::dgs_dont_use_cpu_in_background;
+      ::dgs_dont_use_cpu_in_background = false;
+      dagor_enable_idle_priority(false);
+      if (!editor_core_test_runtime_run_script(script, [backgroundSleep](bool failed) {
+            DAEDITOR3.conNote("Editor UI acceptance %s", failed ? "FAIL" : "PASS");
+            flush_debug_file();
+            ::dgs_dont_use_cpu_in_background = backgroundSleep;
+            dagor_enable_idle_priority(true);
+          }))
+      {
+        DAEDITOR3.conError("Editor UI acceptance failed to load script: %s", script);
+        ::dgs_dont_use_cpu_in_background = backgroundSleep;
+        dagor_enable_idle_priority(true);
+      }
+    }
   }
 
   PropPanel::before_end_frame();

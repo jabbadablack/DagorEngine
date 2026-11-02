@@ -67,12 +67,18 @@ static bool trace_world_resource(const CollisionResource *res, const Point3 &p, 
 
 bool dacoll::traceray_normalized_frt(const Point3 &p, const Point3 &dir, real &t, int *out_pmid, Point3 *out_norm)
 {
-  return trace_world_resource(get_static_collision_resource(), p, dir, t, out_pmid, out_norm, /*force_cull*/ false);
+  bool hit = trace_world_resource(get_static_collision_resource(), p, dir, t, out_pmid, out_norm, /*force_cull*/ false);
+  for (auto *resource : get_runtime_static_collision_resources())
+    hit |= trace_world_resource(resource, p, dir, t, out_pmid, out_norm, /*force_cull*/ false);
+  return hit;
 }
 
 bool dacoll::tracedown_normalized_frt(const Point3 &p, real &t, int *out_pmid, Point3 *out_norm)
 {
-  return trace_world_resource(get_static_collision_resource(), p, Point3(0.f, -1.f, 0.f), t, out_pmid, out_norm, /*force_cull*/ true);
+  bool hit = trace_world_resource(get_static_collision_resource(), p, Point3(0.f, -1.f, 0.f), t, out_pmid, out_norm, true);
+  for (auto *resource : get_runtime_static_collision_resources())
+    hit |= trace_world_resource(resource, p, Point3(0.f, -1.f, 0.f), t, out_pmid, out_norm, true);
+  return hit;
 }
 
 bool dacoll::traceray_water(const Point3 &p, const Point3 &dir, real &t, Point3 *out_norm)
@@ -117,12 +123,15 @@ bool dacoll::traceray_normalized_lmesh(const Point3 &p, const Point3 &dir, real 
 bool dacoll::rayhit_normalized_frt(const Point3 &p, const Point3 &dir, real t)
 {
   const CollisionResource *res = dacoll::get_static_collision_resource();
-  if (!res)
-    return false;
   mat44f identTm;
   v_mat44_ident(identTm);
   int outMat;
-  return res->rayHit(identTm, p, dir, t, PHYSMAT_INVALID, outMat, CollisionNode::TRACEABLE);
+  if (res && res->rayHit(identTm, p, dir, t, PHYSMAT_INVALID, outMat, CollisionNode::TRACEABLE))
+    return true;
+  for (auto *resource : get_runtime_static_collision_resources())
+    if (resource->rayHit(identTm, p, dir, t, PHYSMAT_INVALID, outMat, CollisionNode::TRACEABLE))
+      return true;
+  return false;
 }
 
 bool dacoll::rayhit_normalized_lmesh(const Point3 &p, const Point3 &dir, real t)

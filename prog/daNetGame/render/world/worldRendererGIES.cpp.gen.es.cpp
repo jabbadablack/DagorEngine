@@ -18,7 +18,7 @@ static void wr_handle_on_hero_teleport_es_all_events(const ecs::Event &__restric
 static ecs::EntitySystemDesc wr_handle_on_hero_teleport_es_es_desc
 (
   "wr_handle_on_hero_teleport_es",
-  "prog/daNetGame/render/world/worldRendererGIES.cpp.inl",
+  "C:/Users/cisco/develop/DagorEngine/prog/daNetGame/render/world/worldRendererGIES.cpp.inl",
   ecs::EntitySystemOps(nullptr, wr_handle_on_hero_teleport_es_all_events),
   empty_span(),
   empty_span(),

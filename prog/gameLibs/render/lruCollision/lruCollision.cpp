@@ -56,6 +56,89 @@ extern const CollisionResource *lru_collision_get_collres(uint32_t i);
 extern mat43f lru_collision_get_transform(rendinst::riex_handle_t h);
 extern uint32_t lru_collision_get_type(rendinst::riex_handle_t h);
 
+namespace
+{
+// RI extras use 16 type bits, and the static scene uses type zero. Reserve a
+// compact range beyond both; generations reject handles from retired chunks.
+constexpr uint32_t worldCollisionBase = rendinst::riex_max_type() + 2;
+struct WorldCollision
+{
+  const CollisionResource *resource = nullptr;
+  uint32_t generation = 0;
+  uint32_t retiredFrame = 0;
+  bool published = false;
+};
+dag::Vector<WorldCollision> worldCollisions;
+WorldCollision *worldCollisionSlot(rendinst::riex_handle_t handle)
+{
+  uint32_t type = rendinst::handle_to_ri_type(handle);
+  if (type < worldCollisionBase || type - worldCollisionBase >= worldCollisions.size()) return nullptr;
+  auto &entry = worldCollisions[type - worldCollisionBase];
+  return entry.resource && entry.generation == rendinst::handle_to_ri_inst(handle) ? &entry : nullptr;
+}
+}
+rendinst::riex_handle_t LRURendinstCollision::prepareWorldCollision(const CollisionResource *resource)
+{
+  if (!resource || resource->boundingBox.isempty() ||
+      resource->getTrianglesCount(CollisionNode::TRACEABLE) > MAX_VOXELIZATION_TRIS)
+    return rendinst::RIEX_HANDLE_NULL;
+  uint32_t slot = 0;
+  for (; slot < worldCollisions.size(); ++slot) {
+    const auto &entry = worldCollisions[slot];
+    // Match the native LRU's six-frame retirement policy before reusing a
+    // type/buffer range which may still be referenced by submitted GPU work.
+    if (!entry.resource && entry.generation != ~0u && uint32_t(::dagor_frame_no() - entry.retiredFrame) > 6) break;
+  }
+  if (slot == worldCollisions.size()) {
+    if (slot + worldCollisionBase >= (1u << 21)) return rendinst::RIEX_HANDLE_NULL;
+    worldCollisions.push_back({});
+  }
+  uint32_t type = worldCollisionBase + slot;
+  if (type < riToLRUmap.size()) {
+    ibAllocator.free(riToLRUmap[type].ib); vbAllocator.free(riToLRUmap[type].vb);
+    entryLastFrameUsed[type] = 0;
+  }
+  if (type < riInfo.size()) { riInfo[type] = {}; riInfoSettled[type] = false; }
+  auto &entry = worldCollisions[slot]; entry.resource = resource; entry.published = false; ++entry.generation;
+  return rendinst::make_handle(worldCollisionBase + slot, entry.generation);
+}
+void LRURendinstCollision::publishWorldCollision(rendinst::riex_handle_t handle)
+{
+  if (auto *entry = worldCollisionSlot(handle)) entry->published = true;
+}
+void LRURendinstCollision::releaseWorldCollision(rendinst::riex_handle_t handle)
+{
+  auto *entry = worldCollisionSlot(handle); if (!entry) return;
+  // Leave GPU ranges in the normal LRU until eviction or safe slot reuse.
+  // Freeing here would bypass its recent-frame buffer renaming policy.
+  entry->retiredFrame = ::dagor_frame_no();
+  entry->resource = nullptr; entry->published = false;
+}
+bool LRURendinstCollision::isWorldCollision(rendinst::riex_handle_t handle)
+{
+  return handle != rendinst::RIEX_HANDLE_NULL && rendinst::handle_to_ri_type(handle) >= worldCollisionBase;
+}
+uint32_t LRURendinstCollision::worldCollisionType(rendinst::riex_handle_t handle)
+{
+  auto *entry = worldCollisionSlot(handle);
+  return entry && entry->published ? rendinst::handle_to_ri_type(handle) : ~0u;
+}
+const CollisionResource *LRURendinstCollision::worldCollisionResource(uint32_t type)
+{
+  if (type < worldCollisionBase || type - worldCollisionBase >= worldCollisions.size()) return nullptr;
+  const auto &entry = worldCollisions[type - worldCollisionBase];
+  return entry.published ? entry.resource : nullptr;
+}
+void LRURendinstCollision::gatherWorldCollisions(const BBox3 &bounds,
+  const eastl::fixed_function<32,void(rendinst::riex_handle_t)> &append)
+{
+  for (uint32_t i = 0; i < worldCollisions.size(); ++i) {
+    const auto &entry = worldCollisions[i];
+    if (entry.published && entry.resource && (entry.resource->boundingBox & bounds))
+      append(rendinst::make_handle(worldCollisionBase + i, entry.generation));
+  }
+}
+
 uint32_t LRURendinstCollision::getMaxBatchSize() const { return MAX_VOXELIZATION_INSTANCES; }
 
 static constexpr uint32_t compute_vb_flags = (can_voxelize_in_compute ? SBCF_BIND_SHADER_RES | SBCF_MISC_ALLOW_RAW : 0);

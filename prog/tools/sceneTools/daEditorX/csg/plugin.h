@@ -73,7 +73,7 @@ public:
 
   void gatherStaticVisualGeometry(StaticGeometryContainer &cont) override;
   bool validateBuild(int target, ILogWriter &rep, PropPanel::ContainerPropertyControl *params) override;
-  bool addUsedTextures(ITextureNumerator &) override { return true; }
+  bool addUsedTextures(ITextureNumerator &textures) override;
   bool buildAndWrite(BinDumpSaveCB &, const ITextureNumerator &, PropPanel::ContainerPropertyControl *) override;
   bool checkMetrics(const DataBlock &) override { return true; }
 

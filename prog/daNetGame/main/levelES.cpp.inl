@@ -1,6 +1,7 @@
 // Copyright (C) Gaijin Games KFT.  All rights reserved.
 
 #include "level.h"
+#include "csgEntities.h"
 #include <streaming/dag_streamingBase.h>
 #include <shaders/dag_renderScene.h>
 #include <shaders/dag_shaderResUnitedData.h>
@@ -235,6 +236,8 @@ public:
   bool riTmInst12x32bit = false;
   eastl::unique_ptr<DataBlock> levelBlk; // Warn: can be accessed only during loading (null after)
   Tab<ObjectsToPlace *> objectsToPlace, efxToPlace;
+  eastl::vector<eastl::unique_ptr<DataBlock>> csgSources;
+  Tab<ecs::EntityId> csgSourceEntities;
 
   StrmSceneHolder(const char *blk_path, const WeatherAndDateTime &wdt, ecs::EntityId eid, bool load_render) : eid(eid)
   {
@@ -242,6 +245,8 @@ public:
   }
   ~StrmSceneHolder()
   {
+    for(auto entity:csgSourceEntities) destroy_csg_runtime_scene(entity);
+    for(auto entity:csgSourceEntities) if(g_entity_mgr->doesEntityExist(entity)) g_entity_mgr->destroyEntity(entity);
     // To consider: wait for LevelLoadJob's completion?
     set_level_status(LEVEL_NOT_LOADED);
     if (get_world_renderer())
@@ -282,6 +287,23 @@ public:
   }
   virtual bool bdlCustomLoad(unsigned /*bindump_id*/, int tag, IGenLoad &crd, dag::ConstSpan<TEXTUREID> texMap)
   {
+    if(tag==_MAKE4C('CSG2')) {
+      auto source=eastl::make_unique<DataBlock>();
+      if(!source->loadFromStream(crd,"CSG2")) return false;
+      if(source->getBool("runtimeEditable",false)) {
+        auto *materials=source->getBlockByName("runtimeMaterials"); if(!materials) return false;
+        for(int i=0;i<materials->blockCount();++i) {
+          auto *material=materials->getBlock(i);
+          for(int j=0;j<material->blockCount();++j) {
+            auto *texture=material->getBlock(j); int ordinal=texture->getInt("ordinal",-1);
+            if(ordinal<0 || ordinal>=texMap.size() || texMap[ordinal]==BAD_TEXTUREID) return false;
+            const char *name=get_managed_texture_name(texMap[ordinal]); if(!name) return false;
+            texture->setStr("managedName",name);
+          }
+        }
+      }
+      csgSources.push_back(eastl::move(source)); return true;
+    }
     if (tag == _MAKE4C('eVER'))
     {
       static const int sha1Size = 20;
@@ -608,6 +630,8 @@ public:
   void onLoaded()
   {
     G_ASSERT(is_main_thread());
+    for(const auto &source:csgSources) create_csg_source_entities(*source,eid,csgSourceEntities);
+    csgSources.clear();
     animated_splash_screen_begin_rush_exit();
     // the level spawns in this act, before the frame that would publish it
     set_loading_splash_opens_onto_game(splash_opens_onto_game());

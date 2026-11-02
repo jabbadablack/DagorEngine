@@ -1,10 +1,10 @@
 #include <daECS/core/internal/ltComponentList.h>
 static constexpr ecs::component_t effect__name_get_type();
-static ecs::LTComponentList effect__name_component(ECS_HASH("effect__name"), effect__name_get_type(), "prog/daNetGame/main/levelES.cpp.inl", "", 0);
+static ecs::LTComponentList effect__name_component(ECS_HASH("effect__name"), effect__name_get_type(), "C:/Users/cisco/develop/DagorEngine/prog/daNetGame/main/levelES.cpp.inl", "", 0);
 static constexpr ecs::component_t skies_settings__weatherSeed_get_type();
-static ecs::LTComponentList skies_settings__weatherSeed_component(ECS_HASH("skies_settings__weatherSeed"), skies_settings__weatherSeed_get_type(), "prog/daNetGame/main/levelES.cpp.inl", "", 0);
+static ecs::LTComponentList skies_settings__weatherSeed_component(ECS_HASH("skies_settings__weatherSeed"), skies_settings__weatherSeed_get_type(), "C:/Users/cisco/develop/DagorEngine/prog/daNetGame/main/levelES.cpp.inl", "", 0);
 static constexpr ecs::component_t transform_get_type();
-static ecs::LTComponentList transform_component(ECS_HASH("transform"), transform_get_type(), "prog/daNetGame/main/levelES.cpp.inl", "", 0);
+static ecs::LTComponentList transform_component(ECS_HASH("transform"), transform_get_type(), "C:/Users/cisco/develop/DagorEngine/prog/daNetGame/main/levelES.cpp.inl", "", 0);
 // Built with ECS codegen version 1.0
 #include <daECS/core/entitySystem.h>
 #include <daECS/core/componentTypes.h>
@@ -30,7 +30,7 @@ static void level_render_es_all_events(const ecs::Event &__restrict evt, const e
 static ecs::EntitySystemDesc level_render_es_es_desc
 (
   "level_render_es",
-  "prog/daNetGame/main/levelES.cpp.inl",
+  "C:/Users/cisco/develop/DagorEngine/prog/daNetGame/main/levelES.cpp.inl",
   ecs::EntitySystemOps(nullptr, level_render_es_all_events),
   make_span(level_render_es_comps+0, 1)/*rw*/,
   empty_span(),
@@ -58,7 +58,7 @@ static void level_es_all_events(const ecs::Event &__restrict evt, const ecs::Que
 static ecs::EntitySystemDesc level_es_es_desc
 (
   "level_es",
-  "prog/daNetGame/main/levelES.cpp.inl",
+  "C:/Users/cisco/develop/DagorEngine/prog/daNetGame/main/levelES.cpp.inl",
   ecs::EntitySystemOps(nullptr, level_es_all_events),
   make_span(level_es_comps+0, 1)/*rw*/,
   empty_span(),
@@ -81,7 +81,7 @@ static void world_renderer_es_event_handler_all_events(const ecs::Event &__restr
 static ecs::EntitySystemDesc world_renderer_es_event_handler_es_desc
 (
   "world_renderer_es",
-  "prog/daNetGame/main/levelES.cpp.inl",
+  "C:/Users/cisco/develop/DagorEngine/prog/daNetGame/main/levelES.cpp.inl",
   ecs::EntitySystemOps(nullptr, world_renderer_es_event_handler_all_events),
   empty_span(),
   empty_span(),

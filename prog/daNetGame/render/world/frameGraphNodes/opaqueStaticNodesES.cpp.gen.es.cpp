@@ -15,7 +15,7 @@ static void create_opaque_triangle_size_debug_node_es_all_events(const ecs::Even
 static ecs::EntitySystemDesc create_opaque_triangle_size_debug_node_es_es_desc
 (
   "create_opaque_triangle_size_debug_node_es",
-  "prog/daNetGame/render/world/frameGraphNodes/opaqueStaticNodesES.cpp.inl",
+  "C:/Users/cisco/develop/DagorEngine/prog/daNetGame/render/world/frameGraphNodes/opaqueStaticNodesES.cpp.inl",
   ecs::EntitySystemOps(nullptr, create_opaque_triangle_size_debug_node_es_all_events),
   empty_span(),
   empty_span(),
@@ -35,7 +35,7 @@ static void create_opaque_static_nodes_es_all_events(const ecs::Event &__restric
 static ecs::EntitySystemDesc create_opaque_static_nodes_es_es_desc
 (
   "create_opaque_static_nodes_es",
-  "prog/daNetGame/render/world/frameGraphNodes/opaqueStaticNodesES.cpp.inl",
+  "C:/Users/cisco/develop/DagorEngine/prog/daNetGame/render/world/frameGraphNodes/opaqueStaticNodesES.cpp.inl",
   ecs::EntitySystemOps(nullptr, create_opaque_static_nodes_es_all_events),
   empty_span(),
   empty_span(),

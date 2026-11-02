@@ -506,6 +506,7 @@ void WorldRenderer::renderGiCollision(const TMatrix &view_itm, const Frustum &)
   rendinst::gatherRIGenExtraCollidableMin(handles, v_ldu_bbox3(sceneBox), 0);
   if (staticSceneCollisionResource && (staticSceneCollisionResource->boundingBox & sceneBox))
     handles.push_back(rendinst::RIEX_HANDLE_NULL);
+  LRURendinstCollision::gatherWorldCollisions(sceneBox, [&](auto handle) { handles.push_back(handle); });
   ShaderGlobal::set_int(get_shader_variable_id("rasterize_collision_type", true), 1);
   if (!handles.empty())
     voxelizeCollision->rasterize(*lruCollision, dag::Span<uint64_t>(handles.data(), handles.size()), nullptr, nullptr,
@@ -623,6 +624,7 @@ void WorldRenderer::updateGIPos(const Point3 &pos, const TMatrix &view_itm, floa
       }
       if (staticSceneCollisionResource && (staticSceneCollisionResource->boundingBox & sceneBox))
         handles.push_back(rendinst::RIEX_HANDLE_NULL);
+      LRURendinstCollision::gatherWorldCollisions(sceneBox, [&](auto handle) { handles.push_back(handle); });
       {
         TIME_PROFILE(sort_instances)
         stlsort::sort(handles.begin(), handles.end(),

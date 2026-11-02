@@ -12,10 +12,14 @@
 #include <de3_assetService.h>
 #include <de3_interface.h>
 #include <de3_csgCollision.h>
+#include <de3_primitiveGeometry.h>
 #include <ioSys/dag_dataBlock.h>
 #include <oldEditor/de_workspace.h>
 #include <startup/dag_globalSettings.h>
 #include <imgui/imgui.h>
+#include <propPanel/propPanel.h>
+#include <propPanel/propPanelService.h>
+#include <winGuiWrapper/wgw_dialogs.h>
 #include <algorithm>
 #include <chrono>
 #include <charconv>
@@ -57,6 +61,12 @@ bool readDoubleSetting(const DataBlock &settings,const char *key,double fallback
   return parsed.ec==std::errc{} && parsed.ptr==end && std::isfinite(value);
 }
 struct OnExit { std::function<void()> callback; ~OnExit() { callback(); } };
+struct TreeScope {
+  bool open;
+  explicit TreeScope(const char *label):open(ImGui::TreeNode(label)) {}
+  ~TreeScope() { if(open) ImGui::TreePop(); }
+  explicit operator bool() const { return open; }
+};
 Point3 point(csg::Vec p) { return Point3(float(p.x),float(p.y),float(p.z)); }
 csg::Vec vec(Point3 p) { return {p.x,p.y,p.z}; }
 csg::Transform compose(const csg::Transform &a,const csg::Transform &b)
@@ -71,16 +81,26 @@ class BrushUndo final : public UndoRedoObject
 {
   BrushEditor &editor;
   csg::Document before,after;
+  std::pair<int,float> beforeMapping,afterMapping;
 public:
-  BrushUndo(BrushEditor &e,csg::Document b,csg::Document a):editor(e),before(std::move(b)),after(std::move(a)) {}
-  void restore(bool saveRedo) override { if (saveRedo) after=editor.document; editor.restore(before); }
-  void redo() override { editor.restore(after); }
+  BrushUndo(BrushEditor &e,csg::Document b,csg::Document a):BrushUndo(e,std::move(b),std::move(a),e.mappingSettings()) {}
+  BrushUndo(BrushEditor &e,csg::Document b,csg::Document a,std::pair<int,float> mapping):
+    editor(e),before(std::move(b)),after(std::move(a)),beforeMapping(mapping),afterMapping(e.mappingSettings()) {}
+  void restore(bool saveRedo) override {
+    if (saveRedo) { after=editor.document; afterMapping=editor.mappingSettings(); }
+    editor.restore(before); editor.restoreMappingSettings(beforeMapping);
+  }
+  void redo() override { editor.restore(after); editor.restoreMappingSettings(afterMapping); }
   size_t size() override
   {
     std::function<size_t(const csg::Node &)> storage=[&](const csg::Node &node) {
-      size_t bytes=node.name.capacity()+1+node.cutSurface.material.capacity()+1;
+      size_t bytes=node.name.capacity()+1+node.meshSource.capacity()+1+node.cutSurface.material.capacity()+1;
       bytes+=node.children.capacity()*sizeof(csg::Node)+node.brush.vertices.capacity()*sizeof(csg::Vec)+
         node.brush.faces.capacity()*sizeof(csg::Face);
+      bytes+=node.extrusion.polygon.capacity()*sizeof(csg::Vec)+node.extrusion.path.capacity()*sizeof(csg::CurvePoint)+
+        node.extrusionSurfaces.capacity()*sizeof(csg::Id)+node.extrusion.surface.material.capacity()+1;
+      bytes+=node.extrusion.surfaces.capacity()*sizeof(csg::Extrusion::FaceSettings);
+      for(const auto &face:node.extrusion.surfaces) bytes+=face.surface.material.capacity()+1;
       for(const auto &face:node.brush.faces)
         bytes+=face.vertices.capacity()*sizeof(uint32_t)+face.surface.material.capacity()+1;
       for(const auto &child:node.children) bytes+=storage(child);
@@ -118,6 +138,18 @@ public:
 };
 bool inputDouble(const char *label,double &v,double step=0)
 { return ImGui::InputDouble(label,&v,step,0,"%.9g"); }
+bool shapeButton(const char *label,const char *iconName,const char *hint)
+{
+  float iconSize=ImGui::GetTextLineHeight(); auto pos=ImGui::GetCursorScreenPos(); auto pad=ImGui::GetStyle().FramePadding;
+  auto *service=DAEDITOR3.getPropPanelService(); auto texture=service ? service->getIconTextureId(iconName,int(iconSize)):nullptr;
+  ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign,ImVec2(1,0.5f));
+  bool clicked=ImGui::Button(label,ImVec2(ImGui::CalcTextSize(label).x+iconSize+ImGui::GetStyle().ItemInnerSpacing.x+pad.x*2,iconSize+pad.y*2));
+  ImGui::PopStyleVar();
+  if(texture) ImGui::GetWindowDrawList()->AddImage(texture,
+    ImVec2(pos.x+pad.x,pos.y+pad.y),ImVec2(pos.x+pad.x+iconSize,pos.y+pad.y+iconSize));
+  if(ImGui::IsItemHovered()) ImGui::SetTooltip("%s",hint);
+  return clicked;
+}
 bool inputVec(const char *label,csg::Vec &v)
 {
   double a[]={v.x,v.y,v.z}; bool changed=ImGui::InputScalarN(label,ImGuiDataType_Double,a,3,nullptr,nullptr,"%.9g");
@@ -227,9 +259,9 @@ void BrushEditor::restore(csg::Document value)
 void BrushEditor::edit(const char *label,const std::function<bool()> &action)
 {
   if (loadFailed) throw UiEditFinished{};
-  auto before=document; editErrors.clear();
-  if (!action()) { document=std::move(before); throw UiEditFinished{}; }
-  owner.getUndoSystem()->begin(); owner.getUndoSystem()->put(new BrushUndo(*this,std::move(before),document));
+  auto before=document; auto beforeMapping=mappingSettings(); editErrors.clear();
+  if (!action()) { document=std::move(before); restoreMappingSettings(beforeMapping); throw UiEditFinished{}; }
+  owner.getUndoSystem()->begin(); owner.getUndoSystem()->put(new BrushUndo(*this,std::move(before),document,beforeMapping));
   owner.getUndoSystem()->accept(label); dirty=true; activateSelection();
   DAGORED2->invalidateViewportCache();
   throw UiEditFinished{}; // Unwind references into vectors changed by this edit.
@@ -238,10 +270,72 @@ void BrushEditor::add(csg::Mesh mesh,const char *name)
 {
   if (!csg::validate(mesh,editErrors,0,true)) return;
   edit("Create CSG brush",[&] {
-    auto *parent=document.find(selected); if (!parent || !parent->brush.faces.empty()) parent=&document.root;
+    auto *parent=document.find(selected); if (!parent || parent->parametric || !parent->brush.faces.empty()) parent=&document.root;
     csg::Node n; n.name=name; n.brush=std::move(mesh); document.assignIds(n); selected=n.id;
     parent->children.push_back(std::move(n)); components.clear(); return true;
   });
+}
+void BrushEditor::addExtrusion(csg::Extrusion source,const char *name)
+{
+  editErrors.clear(); csg::Mesh generated;
+  if(!csg::generateExtrusion(source,generated,editErrors)) return;
+  edit("Create parametric CSG source",[&] {
+    auto *parent=document.find(selected); if(!parent || parent->parametric || !parent->brush.faces.empty()) parent=&document.root;
+    csg::Node shape; shape.name=name; shape.parametric=true; shape.extrusion=std::move(source);
+    document.assignIds(shape); selected=shape.id; parent->children.push_back(std::move(shape)); components.clear(); mode=0; return true;
+  });
+}
+void BrushEditor::addNativeGeometry(const StaticGeometryContainer &source,const char *name,bool preserveSmoothing)
+{
+  csg::Node group; group.name=name; editErrors.clear();
+  for(const auto *node:source.nodes) {
+    if(!node->mesh || node->mesh->mesh.face.empty()) continue;
+    const auto &mesh=node->mesh->mesh;
+    csg::Node brush; brush.name=node->name.str(); brush.closedMesh=true; brush.meshSource=name;
+    for(int i=0;i<4;++i) brush.transform.column[i]=vec(node->wtm.getcol(i));
+    for(auto p:mesh.vert) brush.brush.vertices.push_back(vec(p));
+    for(int i=0;i<mesh.face.size();++i) {
+      const auto &triangle=mesh.face[i]; csg::Face face;
+        for(auto index:triangle.v) {
+          if(index>=brush.brush.vertices.size()) {
+            editErrors.push_back({csg::Code::InvalidMesh,0,0,"Imported mesh contains an invalid vertex index"}); return;
+          }
+          face.vertices.push_back(index);
+        }
+      if(preserveSmoothing) face.surface.smoothing=triangle.smgr;
+      if(mesh.tface[0].size()==mesh.face.size()) {
+        csg::Vec uv[3]; bool valid=true;
+        for(int j=0;j<3;++j) {
+          auto index=mesh.tface[0][i].t[j]; if(index>=mesh.tvert[0].size()) { valid=false; break; }
+          auto p=mesh.tvert[0][index]; uv[j]={p.x,p.y,0};
+        }
+        if(!valid || !csg::mapSurfaceTriangle(face.surface,brush.brush.vertices[triangle.v[0]],brush.brush.vertices[triangle.v[1]],
+          brush.brush.vertices[triangle.v[2]],uv[0],uv[1],uv[2])) {
+          editErrors.push_back({csg::Code::InvalidMesh,0,0,"Imported mesh contains invalid UV indices or degenerate triangles"}); return;
+        }
+      }
+      brush.brush.faces.push_back(std::move(face));
+    }
+    if(csg::volume(brush.brush)<0) for(auto &face:brush.brush.faces) std::reverse(face.vertices.begin(),face.vertices.end());
+    if(!csg::validateClosedMesh(brush.brush,editErrors)) return;
+    group.children.push_back(std::move(brush));
+  }
+  if(group.children.empty()) { editErrors.push_back({csg::Code::InvalidMesh,0,0,"No closed mesh geometry was found"}); return; }
+  edit("Import closed CSG geometry",[&] {
+    auto *parent=document.find(selected); if(!parent || parent->parametric || !parent->brush.faces.empty()) parent=&document.root;
+    csg::Node added=group.children.size()==1 ? std::move(group.children[0]):std::move(group);
+    added.name=name; document.assignIds(added); selected=added.id; parent->children.push_back(std::move(added)); components.clear(); mode=0; return true;
+  });
+}
+void BrushEditor::importClosedMesh()
+{
+  String filename=wingw::file_open_dlg(nullptr,"Import a closed mesh for CSG","DAG files|*.dag|All files|*.*","dag");
+  if(filename.empty()) return;
+  StaticGeometryContainer source;
+  if(!dagGeom->staticGeometryContainerLoadFromDag(source,filename.str(),nullptr)) {
+    editErrors={{csg::Code::InvalidMesh,0,0,"Dagor could not load the selected mesh"}}; return;
+  }
+  addNativeGeometry(source,filename.str(),true);
 }
 void BrushEditor::hierarchy(csg::Node &n)
 {
@@ -254,7 +348,7 @@ void BrushEditor::hierarchy(csg::Node &n)
   if (ImGui::IsItemClicked()) { selected=n.id; components.clear(); faceIndex=0; activateSelection(); }
   if (n.id!=document.root.id && ImGui::BeginDragDropSource())
   { ImGui::SetDragDropPayload("CSG_NODE",&n.id,sizeof(n.id)); ImGui::TextUnformatted(n.name.c_str()); ImGui::EndDragDropSource(); }
-  if (n.brush.faces.empty() && ImGui::BeginDragDropTarget())
+  if (!n.parametric && n.brush.faces.empty() && ImGui::BeginDragDropTarget())
   {
     if (auto *payload=ImGui::AcceptDragDropPayload("CSG_NODE"))
     {
@@ -269,6 +363,8 @@ void BrushEditor::hierarchy(csg::Node &n)
 }
 void BrushEditor::modelling(csg::Node &n)
 {
+  if(n.parametric) { extrusionProperties(n); return; }
+  if(n.closedMesh) { ImGui::TextWrapped("Closed mesh source. Use the object gizmo, booleans and per-face surfaces. Component modelling is reserved for convex brushes."); return; }
   if (n.brush.faces.empty()) return;
   ImGui::Combo("Selection mode",&mode,"Brush\0Face\0Edge\0Vertex\0");
   ImGui::TextWrapped("Click a brush in the viewport to select a component. Ctrl-click toggles vertices. Component indices refer to source brushes.");
@@ -334,9 +430,76 @@ void BrushEditor::modelling(csg::Node &n)
   ImGui::SameLine(); if (ImGui::Button("Clip back")) clipping(false,true);
   ImGui::SameLine(); if (ImGui::Button("Split")) clipping(true,false);
 }
+void BrushEditor::extrusionProperties(csg::Node &n)
+{
+  uint64_t key=csg::fingerprint(n);
+  if(extrusionEditing!=n.id || extrusionFingerprint!=key) {
+    extrusionEditing=n.id; extrusionFingerprint=key; extrusionDraft=n.extrusion;
+    extrusionDraftSurfaces=n.extrusionSurfaces;
+  }
+  if(ImGui::RadioButton("Depth extrusion",extrusionDraft.mode==csg::ExtrusionMode::Depth)) extrusionDraft.mode=csg::ExtrusionMode::Depth;
+  ImGui::SameLine(); if(ImGui::RadioButton("Spin extrusion",extrusionDraft.mode==csg::ExtrusionMode::Spin)) extrusionDraft.mode=csg::ExtrusionMode::Spin;
+  ImGui::SameLine(); if(ImGui::RadioButton("Path extrusion",extrusionDraft.mode==csg::ExtrusionMode::Path)) {
+    extrusionDraft.mode=csg::ExtrusionMode::Path;
+    if(extrusionDraft.path.empty()) extrusionDraft.path={{{0,0,0},{},{0,0,-1}},{{0,0,-4},{0,0,1},{}}};
+  }
+  if(auto tree=TreeScope("Profile vertices")) {
+    extrusionProfilePoint=std::clamp(extrusionProfilePoint,0,int(extrusionDraft.polygon.size())-1);
+    ImGui::SliderInt("Profile vertex",&extrusionProfilePoint,0,int(extrusionDraft.polygon.size())-1);
+    auto &p=extrusionDraft.polygon[extrusionProfilePoint]; double xy[]={p.x,p.y};
+    if(ImGui::InputScalarN("Vertex XY",ImGuiDataType_Double,xy,2,nullptr,nullptr,"%.9g")) { p.x=xy[0]; p.y=xy[1]; }
+    if(ImGui::Button("Insert vertex") && extrusionDraft.polygon.size()<256) {
+      int next=extrusionProfilePoint+1; auto midpoint=(p+extrusionDraft.polygon[next%extrusionDraft.polygon.size()])*0.5;
+      extrusionDraft.polygon.insert(extrusionDraft.polygon.begin()+next,midpoint);
+      extrusionDraftSurfaces.insert(extrusionDraftSurfaces.begin()+next+2,0); extrusionProfilePoint=next;
+      if(!extrusionDraft.surfaces.empty()) {
+        auto inherited=extrusionDraft.surfaces[next+1];
+        extrusionDraft.surfaces.insert(extrusionDraft.surfaces.begin()+next+2,inherited);
+      }
+    }
+    ImGui::SameLine(); if(ImGui::Button("Remove vertex") && extrusionDraft.polygon.size()>3) {
+      extrusionDraft.polygon.erase(extrusionDraft.polygon.begin()+extrusionProfilePoint);
+      extrusionDraftSurfaces.erase(extrusionDraftSurfaces.begin()+extrusionProfilePoint+2);
+      if(!extrusionDraft.surfaces.empty()) extrusionDraft.surfaces.erase(extrusionDraft.surfaces.begin()+extrusionProfilePoint+2);
+    }
+  }
+  if(extrusionDraft.mode==csg::ExtrusionMode::Depth) inputDouble("Depth",extrusionDraft.depth);
+  if(extrusionDraft.mode==csg::ExtrusionMode::Spin) {
+    inputDouble("Spin degrees",extrusionDraft.spinDegrees);
+    int sides=int(extrusionDraft.spinSides); ImGui::InputInt("Spin sides",&sides); extrusionDraft.spinSides=unsigned(sides);
+  }
+  if(extrusionDraft.mode==csg::ExtrusionMode::Path) {
+    extrusionCurvePoint=std::clamp(extrusionCurvePoint,0,int(extrusionDraft.path.size())-1);
+    ImGui::SliderInt("Curve point",&extrusionCurvePoint,0,int(extrusionDraft.path.size())-1);
+    auto &p=extrusionDraft.path[extrusionCurvePoint]; inputVec("Curve position",p.position);
+    if(auto tree=TreeScope("Bezier handles and tilt")) {
+      ImGui::TextWrapped("Handles are offsets from the selected curve point.");
+      inputVec("Incoming handle",p.incoming); inputVec("Outgoing handle",p.outgoing);
+      double degrees=p.tilt*180/3.14159265358979323846;
+      if(inputDouble("Tilt (degrees)",degrees,angleSnap)) p.tilt=degrees*3.14159265358979323846/180;
+    }
+    if(ImGui::Button("Add curve point") && extrusionDraft.path.size()<128) {
+      auto last=extrusionDraft.path.back(); auto delta=last.position-extrusionDraft.path[extrusionDraft.path.size()-2].position;
+      extrusionDraft.path.back().outgoing=delta/3;
+      extrusionDraft.path.push_back({last.position+delta,delta*(-1.0/3),{},last.tilt}); extrusionCurvePoint=int(extrusionDraft.path.size())-1;
+    }
+    ImGui::SameLine(); if(ImGui::Button("Remove curve point") && extrusionDraft.path.size()>size_t(extrusionDraft.pathJoined ? 3:2))
+      extrusionDraft.path.erase(extrusionDraft.path.begin()+extrusionCurvePoint);
+    int divisions=int(extrusionDraft.pathSubdivisions); ImGui::InputInt("Path subdivisions",&divisions); extrusionDraft.pathSubdivisions=unsigned(divisions);
+    ImGui::Checkbox("Join path ends",&extrusionDraft.pathJoined);
+  }
+  ImGui::TextWrapped("Apply validates the complete solid. Invalid changes retain the saved parameters and last valid geometry. Use the object gizmo for transforms.");
+  if(ImGui::Button("Apply extrusion parameters")) edit("Edit parametric CSG extrusion",[&] {
+    auto candidate=extrusionDraft;
+    csg::Mesh generated; if(!csg::generateExtrusion(candidate,generated,editErrors)) return false;
+    n.extrusion=std::move(candidate); n.extrusionSurfaces=extrusionDraftSurfaces;
+    for(auto &id:n.extrusionSurfaces) if(!id) id=document.allocate();
+    components.clear(); this->mode=0; return true;
+  });
+}
 void BrushEditor::surfaces(csg::Node &n)
 {
-  if (n.brush.faces.empty())
+  if (!n.parametric && n.brush.faces.empty())
   {
     bool enabled=n.overrideCutSurface;
     if(ImGui::Checkbox("Override subtraction surface",&enabled)) edit("Override CSG group cut surface",[&] {
@@ -348,8 +511,18 @@ void BrushEditor::surfaces(csg::Node &n)
     if(n.overrideCutSurface) ImGui::Text("Cut material: %s",n.cutSurface.material.empty() ? "Default":n.cutSurface.material.c_str());
     return;
   }
-  faceIndex=std::clamp(faceIndex,0,int(n.brush.faces.size())-1);
-  auto &s=n.brush.faces[faceIndex].surface; csg::Surface proposed=s;
+  if(n.closedMesh || n.parametric) ImGui::InputInt("Face index",&faceIndex);
+  faceIndex=std::clamp(faceIndex,0,int(n.parametric ? n.extrusionSurfaces.size():n.brush.faces.size())-1);
+  if(n.parametric) ImGui::TextWrapped("Surface 0: front cap; 1: back cap; 2 onward: profile edges. Surface IDs persist when parameters change.");
+  auto &s=n.parametric ? (n.extrusion.surfaces.empty() ? n.extrusion.surface:n.extrusion.surfaces[faceIndex].surface):n.brush.faces[faceIndex].surface;
+  csg::Surface proposed=s;
+  bool automaticUv=n.parametric && (n.extrusion.surfaces.empty() || n.extrusion.surfaces[faceIndex].automaticUv);
+  auto apply=[&](const csg::Surface &value,bool automatic) {
+    if(n.parametric) {
+      if(n.extrusion.surfaces.empty()) n.extrusion.surfaces.resize(n.extrusion.polygon.size()+2,{n.extrusion.surface,true});
+      n.extrusion.surfaces[faceIndex]={value,automatic};
+    } else n.brush.faces[faceIndex].surface=value;
+  };
   char material[512]; std::snprintf(material,sizeof(material),"%s",s.material.c_str());
   bool changed=ImGui::InputText("Material asset",material,sizeof(material),ImGuiInputTextFlags_EnterReturnsTrue);
   if(changed) proposed.material=material;
@@ -357,16 +530,54 @@ void BrushEditor::surfaces(csg::Node &n)
   changed|=inputDouble("U scale",proposed.scaleU); changed|=inputDouble("V scale",proposed.scaleV);
   changed|=inputDouble("U offset",proposed.offsetU); changed|=inputDouble("V offset",proposed.offsetV);
   changed|=inputDouble("UV rotation",proposed.rotation); changed|=ImGui::Checkbox("World locked",&proposed.worldLocked);
+  if(n.parametric) changed|=ImGui::Checkbox("Follow extrusion UVs",&automaticUv);
+  if(!n.parametric || !automaticUv) { changed|=inputVec("U mapping axis",proposed.u); changed|=inputVec("V mapping axis",proposed.v); }
   int smoothing=int(proposed.smoothing); changed|=ImGui::InputInt("Smoothing mask (0 = hard)",&smoothing); proposed.smoothing=uint32_t(smoothing);
-  if (changed) edit("Edit CSG surface",[&] { s=proposed; return csg::validate(n.brush,editErrors,n.id,true); });
-  if (ImGui::Button("Copy mapping")) { copiedSurface=s; haveCopiedSurface=true; }
+  if (changed) edit("Edit CSG surface",[&] { apply(proposed,automaticUv); csg::Mesh mesh; return n.parametric ? csg::generateExtrusion(n.extrusion,mesh,editErrors):csg::validate(n.brush,editErrors,n.id,!n.closedMesh); });
+  csg::Transform world;
+  std::function<bool(const csg::Node &,const csg::Transform &)> findWorld;
+  findWorld=[&](const csg::Node &node,const csg::Transform &parent) {
+    auto tm=compose(parent,node.transform);
+    if(node.id==n.id) { world=tm; return true; }
+    for(const auto &child:node.children) if(findWorld(child,tm)) return true;
+    return false;
+  }; findWorld(document.root,{});
+  if (ImGui::Button("Copy mapping")) {
+    copiedSurface=csg::transformedSurface(s,world);
+    if(n.parametric) {
+      csg::Mesh generated; csg::Diagnostics errors;
+      if(csg::generateExtrusion(n.extrusion,generated,errors))
+        for(const auto &face:generated.faces) if(face.id==csg::Id(faceIndex+1)) {
+          copiedSurface=csg::transformedSurface(face.surface,world); break;
+        }
+    }
+    // Copied axes are now in world space, including for operation overrides.
+    // Alignment converts them back to local axes for brush-locked targets.
+    copiedSurface.worldLocked=true; haveCopiedSurface=true;
+  }
   ImGui::SameLine(); if (ImGui::Button("Align to copied mapping") && haveCopiedSurface)
-    edit("Align CSG mapping",[&] { csg::alignSurface(s,copiedSurface); return true; });
-  if (ImGui::Button("Apply surface to brush")) edit("Apply CSG surface",[&] { for (auto &f:n.brush.faces) f.surface=s; return true; });
+    edit("Align CSG mapping",[&] {
+      auto mapping=copiedSurface;
+      if(!s.worldLocked) {
+        csg::Transform inverse; inverse.column[3]=world.inversePoint({});
+        for(int i=0;i<3;++i) { csg::Vec axis{}; if(i==0) axis.x=1; else if(i==1) axis.y=1; else axis.z=1;
+          inverse.column[i]=world.inversePoint(axis)-inverse.column[3]; }
+        mapping.worldLocked=false; mapping=csg::transformedSurface(mapping,inverse);
+      }
+      mapping.worldLocked=s.worldLocked;
+      auto aligned=s; csg::alignSurface(aligned,mapping); apply(aligned,false); return true;
+    });
+  if (ImGui::Button("Apply surface to brush")) edit("Apply CSG surface",[&] {
+    if(n.parametric) { auto value=s; n.extrusion.surface=value; n.extrusion.surfaces.assign(n.extrusion.polygon.size()+2,{value,automaticUv}); }
+    else for (auto &f:n.brush.faces) f.surface=s;
+    return true;
+  });
   ImGui::InputText("Replace material",replaceFrom,sizeof(replaceFrom)); ImGui::InputText("With material",replaceTo,sizeof(replaceTo));
   if (ImGui::Button("Replace throughout model")) edit("Replace CSG material",[&] {
     std::function<void(csg::Node &)> replace=[&](csg::Node &node) {
       for (auto &f:node.brush.faces) if (f.surface.material==replaceFrom) f.surface.material=replaceTo;
+      if(node.parametric && node.extrusion.surface.material==replaceFrom) node.extrusion.surface.material=replaceTo;
+      for(auto &face:node.extrusion.surfaces) if(face.surface.material==replaceFrom) face.surface.material=replaceTo;
       if(node.overrideCutSurface && node.cutSurface.material==replaceFrom) node.cutSurface.material=replaceTo;
       for (auto &c:node.children) replace(c);
     }; replace(document.root); return true;
@@ -390,13 +601,15 @@ void BrushEditor::drawContents()
 {
   if(dgs_get_settings()->getBlockByNameEx("debug")->getStr("editorUiTest",nullptr))
   {
-    String state(96,"Test source %llu valid %d",csg::fingerprint(document.root),int(current.success));
+    String state(128,"Test source %llu valid %d atlas %d sample %.9g",csg::fingerprint(document.root),int(current.success),lightmapSize,lightmapSampleSize);
     ImGui::Button(state.c_str());
   }
   if(benchmarkFrame>=0) { ImGui::Text("Full-pipeline benchmark frame %d / 13",benchmarkFrame); return; }
   if(dgs_get_settings()->getBlockByNameEx("debug")->getBool("csgBenchmark",false) &&
     ImGui::Button("Run CSG release benchmark")) { startBenchmark(); return; }
   ImGui::TextWrapped("Create convex brushes, combine them in the hierarchy, then edit components and surfaces.");
+  ImGui::TextWrapped("CSG exports as editable entities automatically. F2 transforms update rendering and collision together.");
+  if(ImGui::IsItemHovered()) ImGui::SetTooltip("Export editable source instead of baked CSG. The engine owns rendering and collision updates for runtime cuts.");
   if (loadFailed)
   {
     ImGui::TextColored(ImVec4(1,0.2f,0.2f,1),"Document load failed. Original data retained; export blocked.");
@@ -410,14 +623,57 @@ void BrushEditor::drawContents()
   for (const auto &e:editErrors) ImGui::TextWrapped("Edit rejected: %s",e.message.c_str());
   if (ImGui::CollapsingHeader("Create",ImGuiTreeNodeFlags_DefaultOpen))
   {
-    ImGui::InputFloat3("Dimensions",size); ImGui::InputInt("Cylinder sides",&cylinderSides);
-    if (ImGui::Button("Box")) add(csg::box({size[0],size[1],size[2]}),"Box");
-    ImGui::SameLine(); if (ImGui::Button("Ramp")) add(csg::ramp({size[0],size[1],size[2]}),"Ramp");
-    ImGui::SameLine(); if (ImGui::Button("Cylinder")) add(csg::cylinder(size[0]*0.5,size[1],cylinderSides),"Cylinder");
+    ImGui::TextWrapped("Add a shape, choose Union / Subtract / Intersect, then use daEditor's move, rotate and scale gizmos.");
+    ImGui::InputFloat3("Dimensions",size); ImGui::InputInt("Sides / segments",&cylinderSides);
+    if (shapeButton("Box","create_box","Create a convex box. Use the native move, rotate and scale gizmos.")) add(csg::box({size[0],size[1],size[2]}),"Box");
+    ImGui::SameLine(); if (shapeButton("Ramp","create_box","Create a convex ramp.")) add(csg::ramp({size[0],size[1],size[2]}),"Ramp");
+    ImGui::SameLine(); if (shapeButton("Cylinder","create_cylinder","Create a cylinder using the dimensions and side count above.")) add(csg::cylinder(size[0]*0.5,size[1],cylinderSides),"Cylinder");
+    auto nativeSphere=[&] {
+      StaticGeometryContainer source;
+      auto *library=EDITORCORE->queryEditorInterface<IEditorPrimitiveGeometry>();
+      bool ok=library && library->generate(IEditorPrimitiveGeometry::Sphere,cylinderSides,source);
+      if(!ok) { editErrors={{csg::Code::InvalidMesh,0,0,"Dagor could not create the primitive"}}; return; }
+      for(auto *node:source.nodes) {
+        node->wtm.setcol(0,Point3(size[0],0,0)); node->wtm.setcol(1,Point3(0,size[1],0)); node->wtm.setcol(2,Point3(0,0,size[2]));
+      }
+      addNativeGeometry(source,"Sphere");
+    };
+    if(shapeButton("Sphere","create_sphere","Create a sphere with Dagor's existing primitive builder.")) nativeSphere();
+    ImGui::SameLine(); if(shapeButton("Capsule","contour_capsule","Spin preset. X is diameter and Y is total height; increase height for a straight middle.")) {
+      csg::Extrusion shape; shape.mode=csg::ExtrusionMode::Spin; shape.spinSides=unsigned(cylinderSides);
+      double radius=size[0]*0.5,halfBody=size[1]*0.5-radius;
+      if(!std::isfinite(radius)||!std::isfinite(halfBody)||radius<=0||halfBody<0) editErrors={{csg::Code::InvalidMesh,0,0,"Capsule requires height >= diameter > 0"}};
+      else {
+        int steps=16;
+        for(int i=0;i<=steps;++i) {
+          double a=3.14159265358979323846*i/steps;
+          double x=(i==0 || i==steps) ? 0:radius*std::sin(a),y=radius*std::cos(a);
+          if(i==steps/2) { shape.polygon.push_back({radius,halfBody,0}); if(halfBody>0) shape.polygon.push_back({radius,-halfBody,0}); }
+          else shape.polygon.push_back({x,y+(i<steps/2 ? halfBody:-halfBody),0});
+        }
+        addExtrusion(std::move(shape),"Capsule");
+      }
+    }
+    ImGui::SameLine(); if(shapeButton("Mesh...","import_dag","Import closed DAG geometry through Dagor's existing loader. Uses the CSG default material; keeps UVs and smoothing.")) importClosedMesh();
+    static float majorRadius=2,minorRadius=0.5f;
+    ImGui::InputFloat("Torus major radius",&majorRadius); ImGui::InputFloat("Torus tube radius",&minorRadius);
+    if(shapeButton("Torus","create_cylinder","Create a torus as an editable spin extrusion. Reuses the same validated polygon sweep.")) {
+      if(!std::isfinite(majorRadius)||!std::isfinite(minorRadius)||minorRadius<=0||majorRadius<=minorRadius) {
+        editErrors.push_back({csg::Code::InvalidMesh,0,0,"Torus requires major radius > tube radius > 0"}); return;
+      }
+      csg::Extrusion shape; shape.mode=csg::ExtrusionMode::Spin; shape.spinSides=unsigned(cylinderSides);
+      for(int i=0;i<16;++i) { double a=2*3.14159265358979323846*i/16; shape.polygon.push_back({majorRadius+minorRadius*std::cos(a),minorRadius*std::sin(a),0}); }
+      addExtrusion(std::move(shape),"Torus");
+    }
     if (ImGui::Button("Operation group")) edit("Create CSG group",[&] {
-      auto *parent=document.find(selected); if (!parent || !parent->brush.faces.empty()) parent=&document.root;
+      auto *parent=document.find(selected); if (!parent || parent->parametric || !parent->brush.faces.empty()) parent=&document.root;
       csg::Node group; group.name="Group"; document.assignIds(group); selected=group.id; parent->children.push_back(std::move(group)); return true;
     });
+    if(ImGui::Button("Parametric polygon")) {
+      csg::Extrusion shape; shape.polygon={{0,0,0},{2,0,0},{2,2,0},{0,2,0}};
+      shape.path={{{0,0,0},{},{0,0,-1}},{{0,0,-4},{0,0,1},{}}}; addExtrusion(std::move(shape),"Polygon extrusion");
+    }
+    if(auto tree=TreeScope("Outline extrusion")) {
     ImGui::InputTextMultiline("Outline XYZ",outline,sizeof(outline),ImVec2(-1,100)); ImGui::InputFloat3("Extrude vector",extrusion);
     if (ImGui::Button("Extrude outline"))
     {
@@ -435,6 +691,7 @@ void BrushEditor::drawContents()
         });
     }
   }
+  }
   if (ImGui::CollapsingHeader("Hierarchy",ImGuiTreeNodeFlags_DefaultOpen)) hierarchy(document.root);
   if (pendingMove)
   {
@@ -450,14 +707,16 @@ void BrushEditor::drawContents()
   }
   auto *n=document.find(selected); if (!n) { selected=document.root.id; n=&document.root; }
   char name[256]; std::snprintf(name,sizeof(name),"%s",n->name.c_str());
-  if (ImGui::InputText("Name",name,sizeof(name))) edit("Rename CSG node",[&]{n->name=name;return true;});
+  if (ImGui::InputText("Name",name,sizeof(name),ImGuiInputTextFlags_EnterReturnsTrue)) edit("Rename CSG node",[&]{n->name=name;return true;});
   bool enabled=n->visible;
   if (ImGui::Checkbox("Enabled",&enabled)) edit("Enable CSG node",[&]{n->visible=enabled;return true;});
   int op=int(n->operation);
   if (ImGui::Combo("Operation",&op,"Union\0Subtract\0Intersect\0")) edit("Set CSG operation",[&]{n->operation=csg::Operation(op);return true;});
   inputDouble("Grid spacing",grid); inputDouble("Angle snap (degrees)",angleSnap);
   csg::Transform transform=n->transform; bool changed=inputVec("Position",transform.column[3]);
-  changed|=inputVec("X axis",transform.column[0]); changed|=inputVec("Y axis",transform.column[1]); changed|=inputVec("Z axis",transform.column[2]);
+  if(auto tree=TreeScope("Advanced transform axes")) {
+    changed|=inputVec("X axis",transform.column[0]); changed|=inputVec("Y axis",transform.column[1]); changed|=inputVec("Z axis",transform.column[2]);
+  }
   if (changed) edit("Transform CSG node",[&] {
     if (grid>0) { auto &p=transform.column[3]; p.x=std::round(p.x/grid)*grid; p.y=std::round(p.y/grid)*grid; p.z=std::round(p.z/grid)*grid; }
     if (!std::isfinite(transform.determinant()) || std::abs(transform.determinant())<1e-12) return false;
@@ -480,6 +739,7 @@ void BrushEditor::drawContents()
         std::swap(parent->children[i],parent->children[target]); return true; } return false;
     }); };
     if (ImGui::Button("Earlier")) { reorder(-1); return; } ImGui::SameLine(); if (ImGui::Button("Later")) { reorder(1); return; }
+    if(auto tree=TreeScope("Repeat duplication")) {
     ImGui::InputInt("Copies",&repeatCount); ImGui::InputFloat3("Translation increment",increment);
     ImGui::InputFloat3("Rotation increment",repeatRotation); ImGui::InputFloat3("Scale increment",repeatScale);
     if (ImGui::Button("Repeat duplicate"))
@@ -514,27 +774,97 @@ void BrushEditor::drawContents()
       }); return;
     }
   }
+  }
   if (ImGui::CollapsingHeader("Component modelling",ImGuiTreeNodeFlags_DefaultOpen)) { modelling(*n); if (dirty) return; }
   if (ImGui::CollapsingHeader("Surface mapping")) surfaces(*n);
   if (ImGui::CollapsingHeader("Lightmap UV preparation"))
   {
     int lm=lightmapSize; float sample=lightmapSampleSize;
-    if (ImGui::InputInt("Atlas size",&lm) && lm>=16 && lm<=8192 && (lm&(lm-1))==0) { lightmapSize=lm;dirty=true; }
-    if (ImGui::InputFloat("Sample size",&sample) && sample>0) { lightmapSampleSize=sample;dirty=true; }
-    ImGui::TextWrapped("Uses Dagor auto-unwrapping and its existing chart padding. No lighting bake is performed.");
+    if (ImGui::InputInt("Atlas size",&lm) && lm>=32 && lm<=2048 && (lm&(lm-1))==0)
+      edit("Change CSG lightmap atlas size",[&] { lightmapSize=lm; return true; });
+    if (ImGui::InputFloat("Sample size",&sample) && std::isfinite(sample) && sample>0)
+      edit("Change CSG lightmap sample size",[&] { lightmapSampleSize=sample; return true; });
+    ImGui::TextWrapped("Scene-builder defaults: 1024 atlas, 0.1 m sample. Per-CSG overrides use Dagor's existing chart padding. Supported atlas sizes: 32 to 2048. No lighting bake is performed.");
   }
 }
 
+MaterialData *BrushEditor::resolveMaterial(const std::string &name,csg::Id brush,csg::Id face)
+{
+  auto *assets=EDITORCORE->queryEditorInterface<IAssetService>();
+  if(!name.empty()) {
+    auto *material=assets ? assets->getMaterialData(name.c_str()):nullptr;
+    if(!material) current.diagnostics.push_back({csg::Code::InvalidResult,brush,face,"Cannot resolve material asset: "+name});
+    return material;
+  }
+  DataBlock application(DAGORED2->getWorkspace().getAppBlkPath());
+  bool dng=application.getBlockByNameEx("game")->getBool("daNetGameEditorRender",false);
+  if(dng && (defaultTexture.empty() || defaultNormalTexture.empty())) {
+    current.diagnostics.push_back({csg::Code::InvalidResult,brush,face,
+      "Set brushEditorSettings/defaultTexture and defaultNormalTexture to project texture assets, or assign a static material asset"});
+    return nullptr;
+  }
+  auto *data=new MaterialData; data->className=dng ? "csg_static":"simple";
+  data->mat.diff=Color4(0.7f,0.7f,0.7f,1); data->mat.power=0;
+  data->mtex[0]=dagRender->addManagedTexture(defaultTexture.empty() ?
+    editorcore_extapi::make_full_start_path("../commonData/tex/missing.dds"):defaultTexture.c_str());
+  if(dng) data->mtex[2]=dagRender->addManagedTexture(defaultNormalTexture.c_str());
+  return data;
+}
+std::map<std::string,Ptr<MaterialData>> BrushEditor::runtimePalette()
+{
+  std::set<std::string> names={""};
+  std::function<void(const csg::Node &)> visit=[&](const csg::Node &node) {
+    for(const auto &face:node.brush.faces) names.insert(face.surface.material);
+    if(node.parametric) names.insert(node.extrusion.surface.material);
+    for(const auto &face:node.extrusion.surfaces) names.insert(face.surface.material);
+    if(node.overrideCutSurface) names.insert(node.cutSurface.material);
+    for(const auto &child:node.children) visit(child);
+  }; visit(document.root);
+  std::map<std::string,Ptr<MaterialData>> palette;
+  for(const auto &name:names) {
+    auto *data=resolveMaterial(name); if(!data) return {};
+    palette[name]=data;
+  }
+  return palette;
+}
+bool BrushEditor::collectRuntimeTextures(ITextureNumerator &textures)
+{
+  if(document.root.children.empty()) return true;
+  auto palette=runtimePalette(); if(palette.empty()) return false;
+  for(const auto &[name,data]:palette) for(auto texture:data->mtex)
+    if(texture!=BAD_TEXTUREID && textures.addManagedTexture(texture)<0) return false;
+  return true;
+}
+bool BrushEditor::writeRuntimeSettings(DataBlock &source,const ITextureNumerator &textures)
+{
+  source.setBool("runtimeEditable",true);
+  auto palette=runtimePalette(); if(palette.empty()) return false;
+  source.setInt("lightmapSize",lightmapSize); source.setReal("lightmapSampleSize",lightmapSampleSize);
+  auto &out=*source.addNewBlock("runtimeMaterials");
+  for(const auto &[name,data]:palette) {
+    auto &material=*out.addNewBlock("material");
+    material.setStr("name",name.c_str()); material.setStr("class",data->className);
+    material.setStr("script",data->matScript); material.setInt("flags",data->flags);
+    auto color=[&](const char *key,Color4 c) { material.setPoint4(key,Point4(c.r,c.g,c.b,c.a)); };
+    color("diffuse",data->mat.diff); color("ambient",data->mat.amb); color("specular",data->mat.spec); color("emissive",data->mat.emis);
+    material.setReal("power",data->mat.power);
+    for(int slot=0;slot<MAXMATTEXNUM;++slot) if(data->mtex[slot]!=BAD_TEXTUREID) {
+      int ordinal=textures.getManagedTextureOrdinal(data->mtex[slot]); if(ordinal<0) return false;
+      auto &texture=*material.addNewBlock("texture"); texture.setInt("slot",slot); texture.setInt("ordinal",ordinal);
+    }
+  }
+  return true;
+}
 bool BrushEditor::buildPublished(const csg::Mesh &polygons,StaticGeometryContainer &container)
 {
   csg::Mesh source;
-  if(!csg::triangulateForPublication(polygons,source,current.diagnostics))
+  csg::Vec origin;
+  if(!csg::prepareFloatPublication(polygons,source,origin,current.diagnostics))
   { current.diagnostics.push_back({csg::Code::InvalidResult,0,0,"Triangulation did not produce a valid publication mesh"}); return false; }
   if (source.faces.empty()) return true;
-  csg::Vec origin=source.vertices.front();
   auto *mesh=new Mesh;
   mesh->vert.resize(source.vertices.size());
-  for (size_t i=0;i<source.vertices.size();++i) mesh->vert[i]=point(source.vertices[i]-origin);
+  for (size_t i=0;i<source.vertices.size();++i) mesh->vert[i]=point(source.vertices[i]);
   // Verify the actual float publication does not collapse valid geometry.
   csg::Mesh converted=source;
   for (size_t i=0;i<source.vertices.size();++i) converted.vertices[i]=vec(mesh->vert[i]);
@@ -542,36 +872,13 @@ bool BrushEditor::buildPublished(const csg::Mesh &polygons,StaticGeometryContain
   { current.diagnostics.push_back({csg::Code::InvalidResult,0,0,"Float publication collapsed geometry"}); delete mesh; return false; }
   MaterialDataList materials;
   std::map<std::string,int> materialIds;
-  IAssetService *assets=EDITORCORE->queryEditorInterface<IAssetService>();
   for (const auto &face:source.faces)
   {
     int mat=0; auto found=materialIds.find(face.surface.material);
     if (found==materialIds.end())
     {
-      MaterialData *data=nullptr;
-      if (!face.surface.material.empty() && assets) data=assets->getMaterialData(face.surface.material.c_str());
-      if (!face.surface.material.empty() && !data)
-      {
-        current.diagnostics.push_back({csg::Code::InvalidResult,face.sourceBrush,face.id,"Cannot resolve material asset: "+face.surface.material});
-        delete mesh; return false;
-      }
-      if (!data)
-      {
-        DataBlock application(DAGORED2->getWorkspace().getAppBlkPath());
-        bool dng=application.getBlockByNameEx("game")->getBool("daNetGameEditorRender",false);
-        data=new MaterialData; data->className=dng ? "csg_static":"simple";
-        data->mat.diff=Color4(0.7f,0.7f,0.7f,1);
-        data->mat.power=0;
-        if(dng && (defaultTexture.empty() || defaultNormalTexture.empty()))
-        {
-          current.diagnostics.push_back({csg::Code::InvalidResult,face.sourceBrush,face.id,
-            "Set brushEditorSettings/defaultTexture and defaultNormalTexture to project texture assets, or assign a static material asset"});
-          delete data; delete mesh; return false;
-        }
-        data->mtex[0]=dagRender->addManagedTexture(defaultTexture.empty() ?
-          editorcore_extapi::make_full_start_path("../commonData/tex/missing.dds"):defaultTexture.c_str());
-        if(dng) data->mtex[2]=dagRender->addManagedTexture(defaultNormalTexture.c_str());
-      }
+      MaterialData *data=resolveMaterial(face.surface.material,face.sourceBrush,face.id);
+      if(!data) { delete mesh; return false; }
       mat=materials.addSubMat(data); materialIds[face.surface.material]=mat;
     }
     else mat=found->second;
@@ -582,13 +889,13 @@ bool BrushEditor::buildPublished(const csg::Mesh &polygons,StaticGeometryContain
       TFace tex{};
       for (unsigned j=0;j<3;++j)
       {
-        auto uv=csg::textureCoordinates(face.surface,source.vertices[triangle.v[j]]);
+      auto uv=csg::textureCoordinates(face.surface,source.vertices[triangle.v[j]]+origin);
         tex.t[j]=mesh->tvert[0].size(); mesh->tvert[0].push_back(Point2(float(uv[0]),float(uv[1])));
       }
       mesh->tface[0].push_back(tex);
     }
   }
-  if (lightmapSize<16 || lightmapSize>8192 || (lightmapSize&(lightmapSize-1)) ||
+  if (lightmapSize<32 || lightmapSize>2048 || (lightmapSize&(lightmapSize-1)) ||
       !std::isfinite(lightmapSampleSize) || lightmapSampleSize<=0)
   {
     current.diagnostics.push_back({csg::Code::InvalidResult,0,0,"Invalid lightmap settings"}); delete mesh; return false;
@@ -666,28 +973,7 @@ void BrushEditor::update()
   current=evaluator.evaluate(document); dirty=false;
   auto evaluatedAt=std::chrono::steady_clock::now();
   if (!current.success) return;
-  const auto &mesh=*current.mesh;
-  std::vector<uint32_t> parent(mesh.vertices.size());
-  for(uint32_t i=0;i<parent.size();++i) parent[i]=i;
-  auto root=[&](uint32_t i) { while(parent[i]!=i) { parent[i]=parent[parent[i]]; i=parent[i]; } return i; };
-  for(const auto &face:mesh.faces) for(auto i:face.vertices) parent[root(i)]=root(face.vertices[0]);
-  std::map<uint32_t,csg::Mesh> components;
-  std::map<uint32_t,std::map<uint32_t,uint32_t>> remaps;
-  for(const auto &face:mesh.faces)
-  {
-    auto component=root(face.vertices[0]); auto &out=components[component]; auto &remap=remaps[component]; auto f=face;
-    for(auto &index:f.vertices)
-    {
-      auto inserted=remap.emplace(index,uint32_t(remap.size()));
-      if(inserted.second) out.vertices.push_back(mesh.vertices[index]);
-      index=inserted.first->second;
-    }
-    out.faces.push_back(std::move(f));
-  }
-  // A cavity's inward boundary is not a standalone positive solid. Keep the
-  // complete result together when shell topology requires that relationship.
-  for(const auto &component:components) if(csg::volume(component.second)<=0)
-  { components.clear(); components.emplace(0,mesh); break; }
+  std::vector<csg::ResultChunk> outputComponents=current.chunks;
   std::map<uint64_t,PublishedPart> nextParts;
   auto partitionedAt=std::chrono::steady_clock::now();
   double mappingMs=0,renderCollisionMs=0,joltMs=0;
@@ -695,11 +981,12 @@ void BrushEditor::update()
   auto discardNew=[&] {
     for(auto &part:nextParts) if(!parts.count(part.first) && part.second.geometry) dagGeom->deleteGeomObject(part.second.geometry);
   };
-  for(auto &component:components)
+  csg::Node settingsKey; settingsKey.transform.column[3]={double(lightmapSize),lightmapSampleSize,0};
+  uint64_t settingsHash=csg::fingerprint(settingsKey);
+  for(const auto &component:outputComponents)
   {
-    csg::Node key; key.brush=std::move(component.second);
-    key.transform.column[3]={double(lightmapSize),lightmapSampleSize,0};
-    uint64_t hash=csg::fingerprint(key);
+    uint64_t hash=component.hash;
+    hash^=settingsHash+0x9e3779b97f4a7c15ULL+(hash<<6)+(hash>>2);
     PublishedPart part;
     auto previous=parts.find(hash);
     if(previous!=parts.end()) part=previous->second;
@@ -707,7 +994,7 @@ void BrushEditor::update()
     {
       part.container=std::make_shared<StaticGeometryContainer>();
       auto mapStart=std::chrono::steady_clock::now();
-      if(!buildPublished(key.brush,*part.container)) { discardNew(); current.success=false; return; }
+      if(!buildPublished(*component.mesh,*part.container)) { discardNew(); current.success=false; return; }
       mappingMs+=std::chrono::duration<double,std::milli>(std::chrono::steady_clock::now()-mapStart).count();
       auto compileStart=std::chrono::steady_clock::now();
       part.geometry=dagGeom->newGeomObject();
@@ -804,6 +1091,65 @@ void BrushEditor::runAcceptance()
     }
     publishBrushes({csg::ramp({2,2,2})},"ramp publication");
     publishBrushes({csg::cylinder(1,2,16)},"cylinder publication");
+    for(int mode=0;mode<3;++mode) {
+      csg::Document generatedDoc; generatedDoc.assignIds(generatedDoc.root);
+      csg::Node shape; shape.parametric=true; shape.extrusion.mode=csg::ExtrusionMode(mode);
+      shape.extrusion.polygon={{0,0,0},{2,0,0},{2,2,0},{0,2,0}};
+      shape.extrusion.path={{{0,0,0},{},{0,0,-1}},{{1,0,-4},{0,0,1},{}}};
+      shape.extrusion.surfaces.resize(shape.extrusion.polygon.size()+2,{shape.extrusion.surface,true});
+      shape.extrusion.surfaces[2].surface.offsetU=0.375;
+      shape.extrusion.surfaces[2].surface.rotation=17;
+      shape.extrusion.surfaces[2].automaticUv=false;
+      generatedDoc.assignIds(shape); generatedDoc.root.children.push_back(shape);
+      DataBlock savedShape; csg::saveDocument(generatedDoc,savedShape); csg::Document loadedShape; csg::Diagnostics shapeErrors;
+      require(csg::loadDocument(savedShape,loadedShape,shapeErrors),"Parametric source did not reload");
+      require(csg::fingerprint(loadedShape.root)==csg::fingerprint(generatedDoc.root),"Parametric source changed on reload");
+      restore(std::move(loadedShape)); update(); require(current.success,"Parametric extrusion did not publish in Dagor");
+      if(dgs_get_settings()->getBlockByNameEx("debug")->getBool("csgMappingParity",false))
+        for(const auto *node:published->nodes) for(float scale:{1.0f,0.75f})
+          require(mappingEqual(mappingSnapshot(node->mesh->mesh,lightmapSize,lightmapSampleSize,false,scale),
+                               mappingSnapshot(node->mesh->mesh,lightmapSize,lightmapSampleSize,true,scale)),
+            "Parametric disk/memory UV parity failed");
+    }
+    DAEDITOR3.conNote("CSG parametric acceptance PASS: depth, spin, Bezier path, per-surface persistence, Dagor publication and UV packing parity");
+    if(dgs_get_settings()->getBlockByNameEx("debug")->getBool("csgMappingParity",false)) {
+      csg::Document neighborhood; neighborhood.assignIds(neighborhood.root);
+      for(unsigned i=0;i<33;++i) {
+        csg::Node box; box.brush=csg::box({1,1,1}); box.transform.column[3]={i*0.02,0,0};
+        neighborhood.assignIds(box); neighborhood.root.children.push_back(std::move(box));
+      }
+      for(double displacement:{0.0,0.03,0.12}) {
+        neighborhood.root.children.back().transform.column[3].y=displacement;
+        restore(neighborhood); update(); require(current.success,"Neighborhood UV parity geometry failed");
+        for(const auto *node:published->nodes) for(int atlas:{32,128,1024}) for(float scale:{1.0f,0.75f})
+          require(mappingEqual(mappingSnapshot(node->mesh->mesh,atlas,lightmapSampleSize,false,scale),
+                               mappingSnapshot(node->mesh->mesh,atlas,lightmapSampleSize,true,scale)),
+            "Neighborhood disk/memory UV parity failed");
+      }
+      DAEDITOR3.conNote("CSG neighborhood UV parity PASS: 32 neighbors, three edits, 32/128/1024 atlases and repeated 1/0.75 packing scales");
+    }
+    if(auto *library=EDITORCORE->queryEditorInterface<IEditorPrimitiveGeometry>()) {
+      for(auto kind:{IEditorPrimitiveGeometry::Sphere}) {
+        restore(source); selected=document.root.id;
+        StaticGeometryContainer geometry; require(library->generate(kind,16,geometry),"Native primitive builder failed");
+        for(auto *node:geometry.nodes) { node->wtm.setcol(0,Point3(2,0,0)); node->wtm.setcol(1,Point3(0,2,0)); node->wtm.setcol(2,Point3(0,0,2)); }
+        try { addNativeGeometry(geometry,"Sphere"); } catch(const UiEditFinished &) {}
+        require(editErrors.empty(),"Native primitive could not become a closed CSG source");
+        update(); require(current.success,"Native primitive crossing room floor did not publish");
+      }
+      DAEDITOR3.conNote("CSG native primitives acceptance PASS: existing Dagor sphere builder, room-floor booleans and Jolt publication");
+    }
+    const char *meshFixture=dgs_get_settings()->getBlockByNameEx("debug")->getStr("csgAcceptanceMesh","");
+    if(*meshFixture) {
+      csg::Document empty; empty.assignIds(empty.root); restore(empty); selected=document.root.id;
+      StaticGeometryContainer geometry; require(dagGeom->staticGeometryContainerLoadFromDag(geometry,meshFixture,nullptr),"DAG fixture did not load");
+      try { addNativeGeometry(geometry,meshFixture,true); } catch(const UiEditFinished &) {}
+      require(editErrors.empty() && !document.root.children.empty() && document.root.children.back().closedMesh,"DAG import did not retain closed mesh source");
+      update(); require(current.success,"Imported DAG did not publish");
+      DataBlock savedMesh; csg::saveDocument(document,savedMesh); csg::Document loadedMesh; csg::Diagnostics meshErrors;
+      require(csg::loadDocument(savedMesh,loadedMesh,meshErrors) && csg::fingerprint(loadedMesh.root)==csg::fingerprint(document.root),"Imported mesh source did not persist");
+      DAEDITOR3.conNote("CSG DAG import acceptance PASS: existing loader, closed mesh, UV/smoothing conversion, persistence and Jolt publication");
+    }
     auto pulled=cube;
     require(csg::moveVertices(pulled,pulled.faces[0].vertices,{0,0,-0.5},modellingErrors),"Face push/pull rejected");
     publishBrushes({pulled},"push/pull publication");
@@ -878,6 +1224,16 @@ void BrushEditor::runAcceptance()
     gizmo->moveObject(Point3(0.25f,0,0),IEditorCoreEngine::BASIS_World); owner.gizmoEnded(true);
     require(csg::fingerprint(document.root)!=before,"Native move gizmo did not change source");
     owner.getUndoSystem()->undo(); require(csg::fingerprint(document.root)==before,"Native move undo failed");
+    for(bool scale:{false,true}) {
+      selected=document.root.children[0].id; activateSelection();
+      owner.onClick(scale ? CM_OBJED_MODE_SCALE:CM_OBJED_MODE_ROTATE,nullptr); owner.gizmoStarted();
+      if(scale) gizmo->scaleObject(Point3(1.1f,1.1f,1.1f),gizmo->getPos(),IEditorCoreEngine::BASIS_World);
+      else gizmo->rotateObject(Point3(0,0.2f,0),gizmo->getPos(),IEditorCoreEngine::BASIS_World);
+      owner.gizmoEnded(true); update();
+      require(current.success && csg::fingerprint(document.root)!=before,"Native rotation/scale did not publish");
+      owner.getUndoSystem()->undo(); update();
+      require(current.success && csg::fingerprint(document.root)==before,"Native rotation/scale undo failed");
+    }
     selected=document.root.children[0].id; activateSelection(); owner.gizmoStarted();
     gizmo->moveObject(Point3(0.25f,0,0),IEditorCoreEngine::BASIS_World); owner.gizmoEnded(false);
     require(csg::fingerprint(document.root)==before,"Cancelled native gizmo left source changed");
@@ -889,7 +1245,7 @@ void BrushEditor::runAcceptance()
     require(csg::fingerprint(document.root)!=before,"Native Delete did not remove selected source");
     owner.getUndoSystem()->undo(); require(csg::fingerprint(document.root)==before,"Native Delete undo failed");
     update(); require(current.success,"Native gizmo tests did not restore valid publication");
-    DAEDITOR3.conNote("CSG native selection acceptance PASS: hierarchy activation, focus bounds, move, cancel, duplicate, Delete and undo");
+    DAEDITOR3.conNote("CSG native selection acceptance PASS: hierarchy activation, focus bounds, move/rotate/scale, cancel, duplicate, Delete and undo");
     auto *previous=published;
     document.root.children[0].brush.vertices[0].x=std::nan(""); dirty=true; update();
     require(!current.success && published==previous,"Failed evaluation replaced last valid publication");
@@ -941,7 +1297,9 @@ void BrushEditor::renderHandles()
     tm=compose(tm,n.transform);
     if (n.id==selected)
     {
-      auto mesh=csg::transformed(n.brush,tm);
+      csg::Mesh generated; csg::Diagnostics errors; const auto *source=&n.brush;
+      if(n.parametric && csg::generateExtrusion(n.extrusion,generated,errors)) source=&generated;
+      auto mesh=csg::transformed(*source,tm);
       dagRender->setLinesTm(TMatrix::IDENT);
       E3DCOLOR color=current.success ? E3DCOLOR(255,230,80):E3DCOLOR(255,60,30);
       for (size_t fi=0;fi<mesh.faces.size();++fi)
@@ -968,7 +1326,9 @@ bool BrushEditor::pick(IGenViewportWnd *vp,int x,int y,bool toggle)
   csg::Id id=0; int hitFace=0; csg::Mesh hitMesh;
   std::function<void(const csg::Node &,csg::Transform)> visit=[&](const csg::Node &n,csg::Transform tm) {
     if (!n.visible) return; tm=compose(tm,n.transform);
-    auto mesh=csg::transformed(n.brush,tm);
+    csg::Mesh generated; csg::Diagnostics errors; const auto *source=&n.brush;
+    if(n.parametric && csg::generateExtrusion(n.extrusion,generated,errors)) source=&generated;
+    auto mesh=csg::transformed(*source,tm);
     for (size_t fi=0;fi<mesh.faces.size();++fi)
     {
       const auto &f=mesh.faces[fi];
@@ -979,6 +1339,7 @@ bool BrushEditor::pick(IGenViewportWnd *vp,int x,int y,bool toggle)
     for (const auto &c:n.children) visit(c,tm);
   }; visit(document.root,{});
   if (!id) return false;
+  if(const auto *node=document.find(id); node && (node->parametric || node->closedMesh)) mode=0;
   if (!toggle || selected!=id) components.clear(); selected=id; faceIndex=hitFace;
   if (mode==1) components=hitMesh.faces[hitFace].vertices;
   if (mode==2 || mode==3)
@@ -1030,7 +1391,7 @@ void BrushEditor::syncGizmo()
   };
   if (!find(document.root,{})) return;
   const auto *node=document.find(selected);
-  if (mode && node && !node->brush.faces.empty())
+  if (mode && node && !node->closedMesh && !node->brush.faces.empty())
   {
     auto indices=components;
     if (mode==1) indices=node->brush.faces[std::clamp(faceIndex,0,int(node->brush.faces.size())-1)].vertices;
@@ -1053,7 +1414,11 @@ bool BrushEditor::selectionBounds(BBox3 &box) const
   box.setempty(); bool found=false;
   std::function<void(const csg::Node &,csg::Transform,bool)> visit=[&](const csg::Node &n,csg::Transform parent,bool branch) {
     auto tm=compose(parent,n.transform); branch=branch || n.id==selected;
-    if(branch) for(auto p:n.brush.vertices) { box+=point(tm.point(p)); found=true; }
+    if(branch) {
+      csg::Mesh generated; csg::Diagnostics errors; const auto *source=&n.brush;
+      if(n.parametric && csg::generateExtrusion(n.extrusion,generated,errors)) source=&generated;
+      for(auto p:source->vertices) { box+=point(tm.point(p)); found=true; }
+    }
     for(const auto &child:n.children) visit(child,tm,branch);
   }; visit(document.root,{},false); return found;
 }
@@ -1091,7 +1456,7 @@ void BrushEditor::transformSelection(const TMatrix &before,const TMatrix &after)
   if (std::abs(oldTm.determinant())<1e-12 || std::abs(newTm.determinant())<1e-12) { syncGizmo(); return; }
   auto map=[&](csg::Vec p) { return newTm.point(oldTm.inversePoint(p)); };
   editErrors.clear();
-  if (mode && !node->brush.faces.empty())
+  if (mode && !node->closedMesh && !node->brush.faces.empty())
   {
     auto indices=mode==1 ? node->brush.faces[std::clamp(faceIndex,0,int(node->brush.faces.size())-1)].vertices:components;
     auto candidate=node->brush; std::set<uint32_t> unique(indices.begin(),indices.end());

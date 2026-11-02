@@ -54,6 +54,15 @@ static PhysBody *box_cast_shape = nullptr;
 static bool debugDrawerForced = false, debugDrawerInited = false;
 static Ptr<CollisionResource> static_collres;
 static Ptr<CollisionResource> water_collres;
+struct dacoll::RuntimeStaticCollision
+{
+  Ptr<CollisionResource> resource;
+  Tab<PhysBody *> bodies;
+  bool active = false;
+};
+static Tab<dacoll::RuntimeStaticCollision *> runtime_static_collisions;
+static Tab<CollisionResource *> runtime_static_resources;
+static uint64_t static_collision_revision = 1;
 static PhysBody *hmapObj = NULL;
 static LandMeshManager *lmeshMgr = NULL;
 static PhysMat::MatID lmesh_mat_id = -1;
@@ -156,6 +165,18 @@ float dacoll::get_collision_object_collapse_threshold(const CollisionObject &co)
 
 void dacoll::destroy_static_collision()
 {
+  // Runtime owners can outlive level unload. Detach their bodies before the
+  // legacy list deletes its own bodies, and leave their handles safe to free.
+  while (!runtime_static_collisions.empty())
+  {
+    auto *runtime = runtime_static_collisions.back();
+    replace_runtime_static_collision(runtime, nullptr);
+    for (auto *body : runtime->bodies)
+      del_it(body);
+    runtime->bodies.clear();
+    runtime->resource = nullptr;
+  }
+  ++static_collision_revision;
   // Bodies first: a Jolt chunk shape reads the resource's chunk memory.
   for (int i = 0; i < frtObj.size(); ++i)
     del_it(frtObj[i]);
@@ -205,6 +226,8 @@ const PhysMap *dacoll::get_lmesh_phys_map() { return phys_map; }
 
 
 CollisionResource *dacoll::get_static_collision_resource() { return static_collres.get(); }
+uint64_t dacoll::get_static_collision_revision() { return static_collision_revision; }
+dag::ConstSpan<CollisionResource *> dacoll::get_runtime_static_collision_resources() { return runtime_static_resources; }
 
 // Extent a contact solver can still resolve. A near-singular authored node tm scales the stored
 // geometry by 1/det, and the float grid over such a box is coarser than the shapes that meet on it.
@@ -227,14 +250,18 @@ static void push_static_tri(Tab<Point3> &verts, Tab<int> &indices, vec3f a, vec3
 
 bool dacoll::append_static_collision_mesh(const BBox3 &box, Tab<Point3> &vertices, Tab<int> &indices)
 {
-  if (!static_collres)
-    return false;
-  static_collres->visitTrianglesInBox(v_ldu_bbox3(box), CollisionNode::PHYS_COLLIDABLE,
+  auto append = [&](const CollisionResource *resource) {
+    resource->visitTrianglesInBox(v_ldu_bbox3(box), CollisionNode::PHYS_COLLIDABLE,
     [&](vec3f a, vec3f b, vec3f c, int, int) { //-V657 collect all
       push_static_tri(vertices, indices, a, b, c);
       return false;
     });
-  return true;
+  };
+  if (static_collres)
+    append(static_collres);
+  for (auto *resource : runtime_static_resources)
+    append(resource);
+  return static_collres || !runtime_static_resources.empty();
 }
 
 CollisionResource *dacoll::get_water_collision() { return water_collres.get(); }
@@ -255,7 +282,8 @@ void dacoll::init_phys_materials()
   }
 }
 
-static void add_static_collision_bodies(const CollisionResource &res, [[maybe_unused]] const char *res_name)
+static void add_static_collision_bodies(const CollisionResource &res, [[maybe_unused]] const char *res_name,
+  Tab<PhysBody *> &bodies, bool add_to_world)
 {
   using namespace dacoll;
   PhysBodyCreationData pbcd;
@@ -263,6 +291,7 @@ static void add_static_collision_bodies(const CollisionResource &res, [[maybe_un
   pbcd.materialId = -1;
   pbcd.friction = 1.f;
   pbcd.autoMask = false;
+  pbcd.addToWorld = add_to_world;
   pbcd.group = EPL_STATIC, pbcd.mask = EPL_ALL & ~(EPL_KINEMATIC | EPL_STATIC);
 
   const dag::ConstSpan<CollisionNode> nodes = res.getAllNodes();
@@ -299,7 +328,7 @@ static void add_static_collision_bodies(const CollisionResource &res, [[maybe_un
   }
 #ifdef USE_JOLT_PHYSICS
   if (chunks.getChildrenCount())
-    frtObj.push_back(new PhysBody(dacoll::get_phys_world(), 0.f, &chunks, TMatrix::IDENT, pbcd));
+    bodies.push_back(new PhysBody(dacoll::get_phys_world(), 0.f, &chunks, TMatrix::IDENT, pbcd));
 #endif
   if (allBodied)
     return;
@@ -314,7 +343,97 @@ static void add_static_collision_bodies(const CollisionResource &res, [[maybe_un
     return;
   PhysTriMeshCollision shape(verts, indices);
   shape.setDebugNamePtr("frt");
-  frtObj.push_back(new PhysBody(dacoll::get_phys_world(), 0.f, &shape, TMatrix::IDENT, pbcd));
+  bodies.push_back(new PhysBody(dacoll::get_phys_world(), 0.f, &shape, TMatrix::IDENT, pbcd));
+}
+
+dacoll::RuntimeStaticCollision *dacoll::prepare_runtime_static_collision(CollisionResource *resource)
+{
+  if (!phys_world || !resource)
+    return nullptr;
+  for (int i = 0; i < resource->getAllNodes().size(); ++i)
+    if (resource->getAllNodes()[i].checkBehaviorFlags(CollisionNode::PHYS_COLLIDABLE) &&
+        !is_node_phys_usable(resource->getNodeBBox(i)))
+      return nullptr;
+  auto *prepared = new RuntimeStaticCollision;
+  prepared->resource = resource;
+  add_static_collision_bodies(*resource, "runtime", prepared->bodies, false);
+  for (auto *body : prepared->bodies)
+    if (!body->isValid())
+    {
+      destroy_runtime_static_collision(prepared);
+      return nullptr;
+    }
+  return prepared;
+}
+
+bool dacoll::replace_runtime_static_collision(RuntimeStaticCollision *previous, RuntimeStaticCollision *next)
+{
+  return replace_runtime_static_collisions({&previous, previous ? 1u : 0u}, {&next, next ? 1u : 0u});
+}
+
+bool dacoll::replace_runtime_static_collisions(dag::ConstSpan<RuntimeStaticCollision *> previous,
+  dag::ConstSpan<RuntimeStaticCollision *> next)
+{
+  if (!phys_world)
+    return false;
+  for (int i = 0; i < previous.size(); ++i)
+  {
+    if (!previous[i] || !previous[i]->active)
+      return false;
+    for (int j = 0; j < i; ++j)
+      if (previous[j] == previous[i])
+        return false;
+  }
+  int addedBodies = 0;
+  for (int i = 0; i < next.size(); ++i)
+  {
+    if (!next[i] || next[i]->active || !next[i]->resource)
+      return false;
+    for (int j = 0; j < i; ++j)
+      if (next[j] == next[i])
+        return false;
+    addedBodies += next[i]->bodies.size();
+  }
+  phys_world->fetchSimRes(true);
+  // All potentially allocating list growth precedes any visible change.
+  runtime_static_collisions.reserve(runtime_static_collisions.size() + next.size());
+  runtime_static_resources.reserve(runtime_static_resources.size() + next.size());
+  frtObj.reserve(frtObj.size() + addedBodies);
+  for (auto *old : previous)
+  {
+    for (auto *body : old->bodies)
+    {
+      erase_item_by_value(frtObj, body);
+      phys_world->removeBody(body);
+    }
+    erase_item_by_value(runtime_static_collisions, old);
+    erase_item_by_value(runtime_static_resources, old->resource.get());
+    old->active = false;
+  }
+  for (auto *added : next)
+  {
+    for (auto *body : added->bodies)
+    {
+      phys_world->addBody(body, false);
+      frtObj.push_back(body);
+    }
+    runtime_static_collisions.push_back(added);
+    runtime_static_resources.push_back(added->resource);
+    added->active = true;
+  }
+  ++static_collision_revision;
+  return true;
+}
+
+void dacoll::destroy_runtime_static_collision(RuntimeStaticCollision *collision)
+{
+  if (!collision)
+    return;
+  if (collision->active)
+    replace_runtime_static_collision(collision, nullptr);
+  for (auto *body : collision->bodies)
+    del_it(body);
+  delete collision;
 }
 
 #if ENABLE_APEX == 1
@@ -349,7 +468,7 @@ static void install_static_collision(CollisionResource *res, const char *name)
 {
   static_collres = res;
   if (phys_world && phys_world->getScene())
-    add_static_collision_bodies(*res, name);
+    add_static_collision_bodies(*res, name, frtObj, true);
 #if ENABLE_APEX == 1
   if (enable_apex)
     add_static_collision_apex(*res, name);

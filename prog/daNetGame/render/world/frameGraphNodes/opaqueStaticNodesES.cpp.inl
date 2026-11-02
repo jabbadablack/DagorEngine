@@ -4,6 +4,7 @@
 #include <render/daFrameGraph/daFG.h>
 
 #include <render/deferredRenderer.h>
+#include <csg/scene.h>
 #include <ecs/render/renderPasses.h>
 #include <landMesh/virtualtexture.h>
 #include <util/dag_convar.h>
@@ -298,19 +299,18 @@ eastl::fixed_vector<dafg::NodeHandle, 8> makeOpaqueStaticNodes(bool prepassEnabl
 
       auto *binScene = wr.binScene;
 
-      if (!binScene)
-        return;
-
       const camera_in_camera::ApplyMasterState camcam{multiplexing_index};
 
       const auto &cameraPos = cameraHndl.ref().viewItm.getcol(3);
       const auto &cullingFrustum = cameraHndl.ref().noJitterFrustum;
 
-      VisibilityFinder vf;
-      Occlusion *occlusion = cameraHndl.ref().jobsMgr->getOcclusion();
-      vf.set(v_ldu(&cameraPos.x), cullingFrustum, 0.0f, 0.0f, 1.0f, 1.0f, occlusion);
-
-      binScene->render(vf, 0, 0xFFFFFFFF);
+      if(binScene) {
+        VisibilityFinder vf;
+        Occlusion *occlusion = cameraHndl.ref().jobsMgr->getOcclusion();
+        vf.set(v_ldu(&cameraPos.x), cullingFrustum, 0.0f, 0.0f, 1.0f, 1.0f, occlusion);
+        binScene->render(vf, 0, 0xFFFFFFFF);
+      }
+      csg::renderScenes(cullingFrustum,true);
     };
   }));
 

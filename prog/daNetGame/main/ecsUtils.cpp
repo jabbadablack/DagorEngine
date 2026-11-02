@@ -1,6 +1,7 @@
 // Copyright (C) Gaijin Games KFT.  All rights reserved.
 
 #include "ecsUtils.h"
+#include "csgEntities.h"
 #include "templateFilters.h"
 #include "game/gameEvents.h"
 #include <daECS/core/entityManager.h>
@@ -112,6 +113,7 @@ void load_ecs_templates(ecs::EntityManager &mgr, const char *user_game_mode_impo
     last_loaded_templates = tpath;
     last_user_game_mode_import_fn = user_game_mode_import_fn ? user_game_mode_import_fn : "";
     mgr.addTemplates(trefs, default_templates_tag);
+    register_csg_templates(mgr);
     apply_component_filters(mgr, netFilters);
     apply_replicated_component_client_modify_blacklist(mgr, modifyBlackList);
   }

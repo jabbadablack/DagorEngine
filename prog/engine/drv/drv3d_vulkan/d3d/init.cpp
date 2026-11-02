@@ -377,7 +377,7 @@ struct InitCtx
     const char *skip = nullptr;
     void reject(const char *msg) { skip = msg; }
 
-    void init(const DataBlock *extension_cfg, const Tab<const char *> &enabled_instance_layers)
+    void init(const DataBlock *extension_cfg)
     {
       extensionCfg = extension_cfg;
 
@@ -386,8 +386,9 @@ struct InitCtx
         prio[i] = 1.f;
 
       dci.flags = 0;
-      dci.enabledLayerCount = static_cast<uint32_t>(enabled_instance_layers.size());
-      dci.ppEnabledLayerNames = enabled_instance_layers.data();
+      // Instance layers already intercept device calls; legacy device layers must remain empty.
+      dci.enabledLayerCount = 0;
+      dci.ppEnabledLayerNames = nullptr;
     }
 
     void setupFeatures()
@@ -800,7 +801,7 @@ struct InitCtx
 
   void tryInitDeviceLoop()
   {
-    dcc.init(extensionCfg, enabledInstanceLayers);
+    dcc.init(extensionCfg);
     if (usePhysicalDeviceIndex != -1)
       tryInitDevice(usePhysicalDeviceIndex);
     else

@@ -858,6 +858,8 @@ void EntityObjEditor::addEntityEx(ecs::EntityId eid, bool use_undo)
 
   String name(0, "%s_%u", g_entity_mgr->getOr(eid, ECS_HASH("animchar__res"), g_entity_mgr->getEntityTemplateName(eid)),
     (ecs::entity_id_t)eid);
+  if (const auto *label = g_entity_mgr->getNullable<ecs::string>(eid, ECS_HASH("editor__name")); label && !label->empty())
+    name.printf(0, "%s_%u", label->c_str(), (ecs::entity_id_t)eid);
   EntityObj *o = new EntityObj(name, eid);
   addObject(o, use_undo);
 
@@ -3218,6 +3220,7 @@ void EntityObjEditor::resetComponent(ecs::EntityId eid, const char *comp_name)
 
 void EntityObjEditor::saveComponent(ecs::EntityId eid, const char *comp_name)
 {
+  g_entity_mgr->sendEvent(eid, EditorComponentSavedEvent(ECS_HASH_SLOW(comp_name).hash));
   ecs::Scene &scene = ecs::g_scenes->getActiveScene();
   ecs::Scene::EntityRecord *erec = scene.findEntityRecordForModify(eid);
   if (!erec)
